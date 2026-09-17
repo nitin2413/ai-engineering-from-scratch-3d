@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Gateways — LiteLLM, Portkey, Kong AI Gateway, Bifrost — Infrastructure &amp; Production — AIFS</title>
+<meta name="description" content="Infrastructure &amp; Production: AI Gateways — LiteLLM, Portkey, Kong AI Gateway, Bifrost. 4 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="AI Gateways — LiteLLM, Portkey, Kong AI Gateway, Bifrost — Infrastructure &amp; Production — AIFS">
+<meta property="og:description" content="Infrastructure &amp; Production: AI Gateways — LiteLLM, Portkey, Kong AI Gateway, Bifrost. 4 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"mx-gateway-fallback":["../assets/figures/figures-misc2.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-misc2.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#C79BFF" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#C79BFF;--accent-ink:#111111"
+  data-lesson-id="infrastructure-and-production/19-ai-gateways" data-module="infrastructure-and-production"
+  data-prev="18-vllm-production-stack-lmcache.html" data-next="20-shadow-canary-progressive.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#C79BFF">
+        <span class="label">Phase 17</span>
+        <b>Infrastructure &amp; Production</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="infrastructure-and-production/01-managed-llm-platforms"><a href="01-managed-llm-platforms.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Managed LLM Platforms — Bedrock, Vertex AI, Azure OpenAI</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/02-inference-platform-economics"><a href="02-inference-platform-economics.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Inference Platform Economics — Fireworks, Together, Baseten, Modal, Replicate, Anyscale</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/03-gpu-autoscaling-kubernetes"><a href="03-gpu-autoscaling-kubernetes.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">GPU Autoscaling on Kubernetes — Karpenter, KAI Scheduler, Gang Scheduling</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/04-vllm-serving-internals"><a href="04-vllm-serving-internals.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Serving Engine Internals — PagedAttention, Continuous Batching, Chunked Prefill</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/05-eagle3-speculative-decoding"><a href="05-eagle3-speculative-decoding.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">EAGLE-3 Speculative Decoding in Production</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/06-sglang-radixattention"><a href="06-sglang-radixattention.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Prefix-Cache Serving — RadixAttention and KV Reuse</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/07-tensorrt-llm-blackwell"><a href="07-tensorrt-llm-blackwell.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Hardware-Specialized Inference Compilation — FP8 and NVFP4 on Blackwell</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/08-inference-metrics-goodput"><a href="08-inference-metrics-goodput.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Inference Metrics — TTFT, TPOT, ITL, Goodput, P99</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/09-production-quantization"><a href="09-production-quantization.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Production Quantization — AWQ, GPTQ, GGUF K-quants, FP8, MXFP4/NVFP4</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/10-cold-start-mitigation"><a href="10-cold-start-mitigation.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Cold Start Mitigation for Serverless LLMs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/11-multi-region-kv-locality"><a href="11-multi-region-kv-locality.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Multi-Region LLM Serving and KV Cache Locality</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/12-edge-inference"><a href="12-edge-inference.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Edge Inference — Apple Neural Engine, Qualcomm Hexagon, WebGPU/WebLLM, Jetson</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/13-llm-observability"><a href="13-llm-observability.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">LLM Observability Stack Selection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/14-prompt-semantic-caching"><a href="14-prompt-semantic-caching.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Prompt Caching and Semantic Caching Economics</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/15-batch-apis"><a href="15-batch-apis.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Batch APIs — the 50% Discount as Industry Standard</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/16-model-routing"><a href="16-model-routing.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Model Routing as a Cost-Reduction Primitive</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/17-disaggregated-prefill-decode"><a href="17-disaggregated-prefill-decode.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Disaggregated Prefill/Decode — NVIDIA Dynamo and llm-d</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/18-vllm-production-stack-lmcache"><a href="18-vllm-production-stack-lmcache.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Production Serving Stack — KV Offloading and Cache-Aware Routing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/19-ai-gateways"><a href="19-ai-gateways.html" class="is-current">
+  <span class="snav__n">19</span>
+  <span class="snav__t">AI Gateways — LiteLLM, Portkey, Kong AI Gateway, Bifrost</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/20-shadow-canary-progressive"><a href="20-shadow-canary-progressive.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Shadow Traffic, Canary Rollout, and Progressive Deployment for LLMs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/21-ab-testing-llm-features"><a href="21-ab-testing-llm-features.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">A/B Testing LLM Features — GrowthBook, Statsig, and the Vibes Problem</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/22-load-testing-llm-apis"><a href="22-load-testing-llm-apis.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Load Testing LLM APIs — Why k6 and Locust Lie</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/23-sre-for-ai"><a href="23-sre-for-ai.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">SRE for AI — Multi-Agent Incident Response, Runbooks, Predictive Detection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/24-chaos-engineering-llm"><a href="24-chaos-engineering-llm.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Chaos Engineering for LLM Production</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/25-security-secrets-audit"><a href="25-security-secrets-audit.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Security — Secrets, API Key Rotation, Audit Logs, Guardrails</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/26-compliance-frameworks"><a href="26-compliance-frameworks.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Compliance — SOC 2, HIPAA, GDPR, PCI-DSS, EU AI Act, ISO 42001</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/27-finops-llms"><a href="27-finops-llms.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">FinOps for LLMs — Unit Economics and Multi-Tenant Attribution</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/28-self-hosted-serving-selection"><a href="28-self-hosted-serving-selection.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">Self-Hosted Serving Selection — Matching Engine to Hardware and Scale</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Infrastructure &amp; Production</a></p>
+      <h1 class="page__title">AI Gateways — LiteLLM, Portkey, Kong AI Gateway, Bifrost</h1>
+      <p class="page__lede">A gateway sits between your apps and model providers. Core features are provider routing, fallback, retries, rate limiting, secret references, observability, guardrails. Market split in 2026: <b>LiteLLM</b> is MIT OSS with 100+ providers, OpenAI-compatible, but breaks down around ~2000 RPS (8 GB memory, cascading failures in published benchmarks); best for Python, &lt;500 RPS, dev/prototyping. <b>Portkey</b> is control-plane-positioned (guardrails, PII redaction, jailbreak detection, audit trails), went Apache 2.0 open-source March 2026, 20-40 ms latency overhead, $49/mo production tier. <b>Kong AI Gateway</b> built on Kong Gateway — Kong's own benchmark on same 12 CPUs: 228% faster than Portkey, 859% faster than LiteLLM; $100/model/month pricing (max 5 on Plus tier); enterprise-fit if you're already on Kong. <b>Bifrost</b> (Maxim AI) — automatic retries with configurable backoff, fallback to Anthropic on OpenAI 429. <b>Cloudflare / Vercel AI Gateways</b> — managed, zero-ops, basic retry. Data residency drives the self-host decision; Portkey and Kong sit in the middle with OSS + optional managed.</p>
+      <div class="page__meta">
+        <span class="chip">4 min read</span>
+        <span class="chip">802 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Learn</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (stdlib, toy gateway-routing simulator)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 17 · 01 (Managed LLM Platforms), Phase 17 · 16 (Model Routing)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~60 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Enumerate the six core gateway features (routing, fallback, retries, rate limits, secrets, observability, guardrails).</li>
+<li>Map four 2026 gateways (LiteLLM, Portkey, Kong AI, Bifrost) to scale ceilings and use cases.</li>
+<li>Cite the Kong benchmark (228% vs Portkey, 859% vs LiteLLM) and explain why it matters for &gt;500 RPS.</li>
+<li>Choose self-hosted vs managed given data residency and ops budget.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Your product calls OpenAI, Anthropic, and a self-hosted Llama. Each provider has a different SDK, error model, rate limit, and auth scheme. You want failover (if OpenAI 429s, try Anthropic), a single credential store, unified observability, and rate limits per tenant.</p>
+<p>Reinventing this at the app layer couples every service to every provider. A gateway layer consolidates it into one process with one API (typically OpenAI-compatible) that fans out to providers.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="six-core-features" class="prose-h prose-h3"><a class="prose-h__anchor" href="#six-core-features" aria-label="Link to this section">#</a>Six core features</h3>
+<ol>
+<li><strong>Provider routing</strong> — OpenAI, Anthropic, Gemini, self-hosted, etc. behind one API.</li>
+<li><strong>Fallback</strong> — on 429, 5xx, or quality failure, retry elsewhere.</li>
+<li><strong>Retries</strong> — exponential backoff, bounded attempts.</li>
+<li><strong>Rate limits</strong> — per-tenant, per-key, per-model.</li>
+<li><strong>Secret references</strong> — pull credentials from vault at runtime (never in app).</li>
+<li><strong>Observability</strong> — OTel + GenAI attributes (Phase 17 · 13) + cost attribution.</li>
+<li><strong>Guardrails</strong> — PII redaction, jailbreak detection, allowed-topics filters.</li>
+</ol>
+<h3 id="litellm-mit-oss-python" class="prose-h prose-h3"><a class="prose-h__anchor" href="#litellm-mit-oss-python" aria-label="Link to this section">#</a>LiteLLM — MIT OSS, Python</h3>
+<ul>
+<li>100+ providers, OpenAI-compatible, router config, fallback, basic observability.</li>
+<li>Breaks down around 2000 RPS in Kong&#39;s benchmark; 8 GB memory footprint, cascading failures under sustained load.</li>
+<li>Best fit: Python app, &lt;500 RPS, dev/staging gateways, experimental routing.</li>
+<li>Cost: $0 for OSS; cloud free tier exists.</li>
+</ul>
+<h3 id="portkey-control-plane-positioning" class="prose-h prose-h3"><a class="prose-h__anchor" href="#portkey-control-plane-positioning" aria-label="Link to this section">#</a>Portkey — control plane positioning</h3>
+<ul>
+<li>Apache 2.0 OSS as of March 2026. Guardrails, PII redaction, jailbreak detection, audit trails.</li>
+<li>20-40 ms per-request latency overhead.</li>
+<li>$49/mo for production tier with retention + SLA.</li>
+<li>Best fit: regulated industries needing guardrails + observability bundled.</li>
+</ul>
+<h3 id="kong-ai-gateway-the-scale-play" class="prose-h prose-h3"><a class="prose-h__anchor" href="#kong-ai-gateway-the-scale-play" aria-label="Link to this section">#</a>Kong AI Gateway — the scale play</h3>
+<ul>
+<li>Built on Kong Gateway (mature API gateway product, lua+OpenResty).</li>
+<li>Kong&#39;s own benchmark on 12-CPU equivalent: 228% faster than Portkey, 859% faster than LiteLLM.</li>
+<li>Pricing: $100/model/month, max 5 on Plus tier.</li>
+<li>Best fit: already on Kong; &gt;1000 RPS; willing to license.</li>
+</ul>
+<h3 id="bifrost-maxim-ai" class="prose-h prose-h3"><a class="prose-h__anchor" href="#bifrost-maxim-ai" aria-label="Link to this section">#</a>Bifrost (Maxim AI)</h3>
+<ul>
+<li>Automatic retries with configurable backoff.</li>
+<li>Fallback to Anthropic on OpenAI 429 is a canonical recipe.</li>
+<li>Newer entrant; commercial.</li>
+</ul>
+<h3 id="cloudflare-ai-gateway-vercel-ai-gateway" class="prose-h prose-h3"><a class="prose-h__anchor" href="#cloudflare-ai-gateway-vercel-ai-gateway" aria-label="Link to this section">#</a>Cloudflare AI Gateway / Vercel AI Gateway</h3>
+<ul>
+<li>Managed, zero-ops. Basic retry and observability.</li>
+<li>Best fit: Edge-serving JavaScript apps on Cloudflare/Vercel.</li>
+<li>Limited compared to Kong/Portkey on guardrails and rate limits.</li>
+</ul>
+<h3 id="self-hosted-vs-managed" class="prose-h prose-h3"><a class="prose-h__anchor" href="#self-hosted-vs-managed" aria-label="Link to this section">#</a>Self-hosted vs managed</h3>
+<p>Data residency is the forcing function. Healthcare and finance default self-host (LiteLLM or Portkey OSS or Kong). Consumer products default managed (Cloudflare AI Gateway) or middle-tier (Portkey managed). Hybrid: self-hosted for regulated tenant, managed for others.</p>
+<h3 id="latency-budget" class="prose-h prose-h3"><a class="prose-h__anchor" href="#latency-budget" aria-label="Link to this section">#</a>Latency budget</h3>
+<ul>
+<li>LiteLLM: 5-15 ms overhead typical.</li>
+<li>Portkey: 20-40 ms overhead.</li>
+<li>Kong: 3-8 ms overhead.</li>
+<li>Cloudflare/Vercel: 1-3 ms overhead (edge advantage).</li>
+</ul>
+<p>Gateway latency directly adds to TTFT. For TTFT P99 &lt; 100 ms SLA, Kong or Cloudflare. For P99 &lt; 500 ms, any.</p>
+<h3 id="rate-limit-semantics-matter" class="prose-h prose-h3"><a class="prose-h__anchor" href="#rate-limit-semantics-matter" aria-label="Link to this section">#</a>Rate-limit semantics matter</h3>
+<p>Simple token-bucket works up to moderate scale. Multi-tenant requires sliding-window + burst allowance + per-tenant tiering. LiteLLM ships token-bucket; Kong ships sliding-window; Portkey ships tiered.</p>
+<h3 id="gateway-observability-routing-compose" class="prose-h prose-h3"><a class="prose-h__anchor" href="#gateway-observability-routing-compose" aria-label="Link to this section">#</a>Gateway + observability + routing compose</h3>
+<p>Phase 17 · 13 (observability) + 16 (model routing) + 19 (gateways) are the same layer in production. Pick one tool that covers all three or wire them carefully: most 2026 deployments combine Helicone (observability) or Portkey (guardrails) with Kong (scale) for split roles.</p>
+<h3 id="numbers-you-should-remember" class="prose-h prose-h3"><a class="prose-h__anchor" href="#numbers-you-should-remember" aria-label="Link to this section">#</a>Numbers you should remember</h3>
+<ul>
+<li>LiteLLM: breaks at ~2000 RPS, 8 GB memory.</li>
+<li>Portkey: 20-40 ms overhead; Apache 2.0 since March 2026.</li>
+<li>Kong: 228% faster than Portkey, 859% faster than LiteLLM.</li>
+<li>Kong pricing: $100/model/month, 5 max on Plus tier.</li>
+<li>Cloudflare/Vercel: 1-3 ms overhead at the edge.</li>
+</ul>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="mx-gateway-fallback"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">mx-gateway-fallback</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> mx gateway fallback</figcaption>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p><code class="inline-code">code/main.py</code> simulates gateway routing with fallback across 3 providers under 429/5xx injection. Reports latency, retry rate, and fallback hit rate.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces <code class="inline-code">outputs/skill-gateway-picker.md</code>. Given scale, ops posture, compliance, latency budget, picks a gateway.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li>Run <code class="inline-code">code/main.py</code>. Configure fallback from OpenAI→Anthropic→self-hosted. What&#39;s the expected hit rate at 5% provider error rate?</li>
+<li>Your SLA is TTFT P99 &lt; 200 ms on a 300 ms baseline. Which gateways stay within budget?</li>
+<li>A healthcare customer requires self-hosted + PII redaction + audit. Pick Portkey OSS or Kong.</li>
+<li>Compare LiteLLM vs Kong: at what RPS ceiling should a team migrate?</li>
+<li>Design a rate-limit policy for a multi-tenant SaaS: free tier, trial tier, paid tier. Token-bucket or sliding-window?</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Gateway</td>
+<td>&quot;API broker&quot;</td>
+<td>Process sitting between apps and providers</td>
+</tr>
+<tr>
+<td>LiteLLM</td>
+<td>&quot;the MIT one&quot;</td>
+<td>Python OSS, 100+ providers, breaks at 2K RPS</td>
+</tr>
+<tr>
+<td>Portkey</td>
+<td>&quot;guardrails gateway&quot;</td>
+<td>Control plane + observability, Apache 2.0</td>
+</tr>
+<tr>
+<td>Kong AI Gateway</td>
+<td>&quot;the scale one&quot;</td>
+<td>Built on Kong Gateway, benchmark leader</td>
+</tr>
+<tr>
+<td>Bifrost</td>
+<td>&quot;Maxim&#39;s gateway&quot;</td>
+<td>Retries + Anthropic fallback recipe</td>
+</tr>
+<tr>
+<td>Cloudflare AI Gateway</td>
+<td>&quot;edge managed&quot;</td>
+<td>Edge-deployed managed gateway, zero-ops</td>
+</tr>
+<tr>
+<td>PII redaction</td>
+<td>&quot;data scrub&quot;</td>
+<td>Regex + NER mask before sending to model</td>
+</tr>
+<tr>
+<td>Jailbreak detection</td>
+<td>&quot;prompt injection guard&quot;</td>
+<td>Classifier on user input</td>
+</tr>
+<tr>
+<td>Audit trail</td>
+<td>&quot;regulated log&quot;</td>
+<td>Immutable record of every LLM call</td>
+</tr>
+<tr>
+<td>Token-bucket</td>
+<td>&quot;simple rate limit&quot;</td>
+<td>Refill-based rate limiter</td>
+</tr>
+<tr>
+<td>Sliding-window</td>
+<td>&quot;precise rate limit&quot;</td>
+<td>Time-windowed rate limiter; better fairness</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://konghq.com/blog/engineering/ai-gateway-benchmark-kong-ai-gateway-portkey-litellm" target="_blank" rel="noopener">Kong AI Gateway Benchmark</a></li>
+<li><a href="https://www.truefoundry.com/blog/a-definitive-guide-to-ai-gateways-in-2026-competitive-landscape-comparison" target="_blank" rel="noopener">TrueFoundry — AI Gateways 2026 Comparison</a></li>
+<li><a href="https://techsy.io/en/blog/best-llm-gateway-tools" target="_blank" rel="noopener">Techsy — Top LLM Gateway Tools 2026</a></li>
+<li><a href="https://github.com/BerriAI/litellm" target="_blank" rel="noopener">LiteLLM GitHub</a></li>
+<li><a href="https://github.com/Portkey-AI/gateway" target="_blank" rel="noopener">Portkey GitHub</a></li>
+<li><a href="https://docs.konghq.com/gateway/latest/ai-gateway/" target="_blank" rel="noopener">Kong AI Gateway docs</a></li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="18-vllm-production-stack-lmcache.html">
+  <span class="label">← Previous</span>
+  <b>Production Serving Stack — KV Offloading and Cache-Aware Routing</b>
+</a>
+      <a class="pager__item pager__item--next" href="20-shadow-canary-progressive.html">
+  <span class="label">Next →</span>
+  <b>Shadow Traffic, Canary Rollout, and Progressive Deployment for LLMs</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>4 minutes</b> of Infrastructure &amp; Production behind you.</p>
+      <a class="btn btn--solid" href="20-shadow-canary-progressive.html">Continue to Shadow Traffic, Canary Rollout, and Progressive Deployment for LLMs →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#six-core-features">Six core features</a></li><li class="mini__item mini__item--d3"><a href="#litellm-mit-oss-python">LiteLLM — MIT OSS, Python</a></li><li class="mini__item mini__item--d3"><a href="#portkey-control-plane-positioning">Portkey — control plane positioning</a></li><li class="mini__item mini__item--d3"><a href="#kong-ai-gateway-the-scale-play">Kong AI Gateway — the scale play</a></li><li class="mini__item mini__item--d3"><a href="#bifrost-maxim-ai">Bifrost (Maxim AI)</a></li><li class="mini__item mini__item--d3"><a href="#cloudflare-ai-gateway-vercel-ai-gateway">Cloudflare AI Gateway / Vercel AI Gateway</a></li><li class="mini__item mini__item--d3"><a href="#self-hosted-vs-managed">Self-hosted vs managed</a></li><li class="mini__item mini__item--d3"><a href="#latency-budget">Latency budget</a></li><li class="mini__item mini__item--d3"><a href="#rate-limit-semantics-matter">Rate-limit semantics matter</a></li><li class="mini__item mini__item--d3"><a href="#gateway-observability-routing-compose">Gateway + observability + routing compose</a></li><li class="mini__item mini__item--d3"><a href="#numbers-you-should-remember">Numbers you should remember</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

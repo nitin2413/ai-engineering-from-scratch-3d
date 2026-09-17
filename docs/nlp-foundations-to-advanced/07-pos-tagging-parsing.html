@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>POS Tagging and Syntactic Parsing — NLP, Foundations to Advanced — AIFS</title>
+<meta name="description" content="NLP, Foundations to Advanced: POS Tagging and Syntactic Parsing. 5 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="POS Tagging and Syntactic Parsing — NLP, Foundations to Advanced — AIFS">
+<meta property="og:description" content="NLP, Foundations to Advanced: POS Tagging and Syntactic Parsing. 5 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"pos-tagger":["../assets/figures/figures-nlp3.js"],"dependency-arcs":["../assets/figures/figures-nlp3.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-nlp3.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#B8FF3C" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#B8FF3C;--accent-ink:#111111"
+  data-lesson-id="nlp-foundations-to-advanced/07-pos-tagging-parsing" data-module="nlp-foundations-to-advanced"
+  data-prev="06-named-entity-recognition.html" data-next="08-cnns-rnns-for-text.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#B8FF3C">
+        <span class="label">Phase 05</span>
+        <b>NLP, Foundations to Advanced</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="nlp-foundations-to-advanced/01-text-processing"><a href="01-text-processing.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Text Processing — Tokenization, Stemming, Lemmatization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/02-bag-of-words-tfidf"><a href="02-bag-of-words-tfidf.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Bag of Words, TF-IDF, and Text Representation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/03-word-embeddings-word2vec"><a href="03-word-embeddings-word2vec.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Word Embeddings — Word2Vec from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/04-glove-fasttext-subword"><a href="04-glove-fasttext-subword.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">GloVe, FastText, and Subword Embeddings</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/05-sentiment-analysis"><a href="05-sentiment-analysis.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Sentiment Analysis</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/06-named-entity-recognition"><a href="06-named-entity-recognition.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Named Entity Recognition</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/07-pos-tagging-parsing"><a href="07-pos-tagging-parsing.html" class="is-current">
+  <span class="snav__n">07</span>
+  <span class="snav__t">POS Tagging and Syntactic Parsing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/08-cnns-rnns-for-text"><a href="08-cnns-rnns-for-text.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">CNNs and RNNs for Text</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/09-sequence-to-sequence"><a href="09-sequence-to-sequence.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Sequence-to-Sequence Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/10-attention-mechanism"><a href="10-attention-mechanism.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Attention Mechanism — The Breakthrough</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/11-machine-translation"><a href="11-machine-translation.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Machine Translation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/12-text-summarization"><a href="12-text-summarization.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Text Summarization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/13-question-answering"><a href="13-question-answering.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Question Answering Systems</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/14-information-retrieval-search"><a href="14-information-retrieval-search.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Information Retrieval and Search</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/15-topic-modeling"><a href="15-topic-modeling.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Topic Modeling — LDA and BERTopic</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/16-text-generation-pre-transformer"><a href="16-text-generation-pre-transformer.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Text Generation Before Transformers — N-gram Language Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/17-chatbots-rule-to-neural"><a href="17-chatbots-rule-to-neural.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Chatbots — Rule-Based to Neural to LLM Agents</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/18-multilingual-nlp"><a href="18-multilingual-nlp.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Multilingual NLP</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/19-subword-tokenization"><a href="19-subword-tokenization.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">Subword Tokenization — BPE, WordPiece, Unigram, SentencePiece</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/20-structured-outputs-constrained-decoding"><a href="20-structured-outputs-constrained-decoding.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Structured Outputs &amp; Constrained Decoding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/21-nli-textual-entailment"><a href="21-nli-textual-entailment.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Natural Language Inference — Textual Entailment</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/22-embedding-models-deep-dive"><a href="22-embedding-models-deep-dive.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Embedding Models — The 2026 Deep Dive</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/23-chunking-strategies-rag"><a href="23-chunking-strategies-rag.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Chunking Strategies for RAG</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/24-coreference-resolution"><a href="24-coreference-resolution.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Coreference Resolution</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/25-entity-linking"><a href="25-entity-linking.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Entity Linking &amp; Disambiguation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/26-relation-extraction-kg"><a href="26-relation-extraction-kg.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Relation Extraction &amp; Knowledge Graph Construction</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/27-llm-evaluation-frameworks"><a href="27-llm-evaluation-frameworks.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">LLM Evaluation — RAGAS, DeepEval, G-Eval</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/28-long-context-evaluation"><a href="28-long-context-evaluation.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">Long-Context Evaluation — NIAH, RULER, LongBench, MRCR</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/29-dialogue-state-tracking"><a href="29-dialogue-state-tracking.html" class="">
+  <span class="snav__n">29</span>
+  <span class="snav__t">Dialogue State Tracking</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">NLP, Foundations to Advanced</a></p>
+      <h1 class="page__title">POS Tagging and Syntactic Parsing</h1>
+      <p class="page__lede">Grammar was unfashionable for a while. Then every LLM pipeline needed to validate structured extraction, and it came back.</p>
+      <div class="page__meta">
+        <span class="chip">5 min read</span>
+        <span class="chip">1,029 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 5 · 01 (Text Processing), Phase 2 · 14 (Naive Bayes)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~45 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Lesson 01 promised that lemmatization needs a part-of-speech tag. Without knowing <code class="inline-code">running</code> is a verb, a lemmatizer cannot reduce it to <code class="inline-code">run</code>. Without knowing <code class="inline-code">better</code> is an adjective, it cannot reduce to <code class="inline-code">good</code>.</p>
+<p>That promise hid a whole subfield. Part-of-speech tagging assigns grammatical categories. Syntactic parsing recovers the sentence&#39;s tree structure: which word modifies which, which verb governs which arguments. Classical NLP spent twenty years refining both. Then deep learning collapsed them into a token-classification task on top of a pretrained transformer, and the research community moved on.</p>
+<p>Not the applied community. Every structured-extraction pipeline still uses POS and dependency trees under the hood. LLM-generated JSON gets validated against grammatical constraints. Question-answering systems decompose queries using dependency parses. Machine translation quality evaluators check alignment of parse trees.</p>
+<p>Worth knowing. This lesson introduces the tagsets, the baselines, and the point where you stop implementing from scratch and call spaCy.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<p><strong>POS tagging</strong> labels each token with a grammatical category. The <strong>Penn Treebank (PTB)</strong> tagset is the English default. 36 tags with distinctions the casual reader finds fussy: <code class="inline-code">NN</code> singular noun, <code class="inline-code">NNS</code> plural noun, <code class="inline-code">NNP</code> proper noun singular, <code class="inline-code">VBD</code> verb past tense, <code class="inline-code">VBZ</code> verb 3rd person singular present, and so on. The <strong>Universal Dependencies (UD)</strong> tagset is coarser (17 tags) and language-agnostic; it became the default for cross-lingual work.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>The/DET cats/NOUN were/AUX running/VERB at/ADP 3pm/NOUN ./PUNCT</code></pre>
+</figure>
+<p><strong>Syntactic parsing</strong> produces a tree. Two major styles:</p>
+<ul>
+<li><strong>Constituency parsing.</strong> Noun phrases, verb phrases, prepositional phrases nest inside each other. Output is a tree of non-terminal categories (NP, VP, PP) with words as leaves.</li>
+<li><strong>Dependency parsing.</strong> Each word has a single head word it depends on, labeled with a grammatical relation. Output is a tree where every edge is a (head, dependent, relation) triple.</li>
+</ul>
+<p>Dependency parsing won in the 2010s because it generalizes cleanly across languages, especially free-word-order ones.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>running is ROOT
+cats is nsubj of running
+were is aux of running
+at is prep of running
+3pm is pobj of at</code></pre>
+</figure>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="pos-tagger"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">pos-tagger</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> pos tagger</figcaption>
+</figure>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="dependency-arcs"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">dependency-arcs</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> dependency arcs</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-most-frequent-tag-baseline" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-most-frequent-tag-baseline" aria-label="Link to this section">#</a>Step 1: most-frequent-tag baseline</h3>
+<p>The dumbest POS tagger that works. For each word, predict the tag it had most often in training.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> collections <span class="token keyword">import</span> Counter<span class="token punctuation">,</span> defaultdict
+
+
+<span class="token keyword">def</span> <span class="token function">train_mft</span><span class="token punctuation">(</span>train_examples<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    word_tag_counts <span class="token operator">=</span> defaultdict<span class="token punctuation">(</span>Counter<span class="token punctuation">)</span>
+    all_tags <span class="token operator">=</span> Counter<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> tokens<span class="token punctuation">,</span> tags <span class="token keyword">in</span> train_examples<span class="token punctuation">:</span>
+        <span class="token keyword">for</span> token<span class="token punctuation">,</span> tag <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>tokens<span class="token punctuation">,</span> tags<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            word_tag_counts<span class="token punctuation">[</span>token<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">[</span>tag<span class="token punctuation">]</span> <span class="token operator">+=</span> <span class="token number">1</span>
+            all_tags<span class="token punctuation">[</span>tag<span class="token punctuation">]</span> <span class="token operator">+=</span> <span class="token number">1</span>
+    word_best <span class="token operator">=</span> <span class="token punctuation">{</span>w<span class="token punctuation">:</span> c<span class="token punctuation">.</span>most_common<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token keyword">for</span> w<span class="token punctuation">,</span> c <span class="token keyword">in</span> word_tag_counts<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span>
+    default_tag <span class="token operator">=</span> all_tags<span class="token punctuation">.</span>most_common<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+    <span class="token keyword">return</span> word_best<span class="token punctuation">,</span> default_tag
+
+
+<span class="token keyword">def</span> <span class="token function">predict_mft</span><span class="token punctuation">(</span>tokens<span class="token punctuation">,</span> word_best<span class="token punctuation">,</span> default_tag<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token punctuation">[</span>word_best<span class="token punctuation">.</span>get<span class="token punctuation">(</span>t<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> default_tag<span class="token punctuation">)</span> <span class="token keyword">for</span> t <span class="token keyword">in</span> tokens<span class="token punctuation">]</span></code></pre>
+</figure>
+<p>On the Brown corpus, this baseline hits ~85% accuracy. Not good, but the floor below which no serious model should fall.</p>
+<h3 id="step-2-bigram-hmm-tagger" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-bigram-hmm-tagger" aria-label="Link to this section">#</a>Step 2: bigram HMM tagger</h3>
+<p>Model the joint probability of the sequence:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>P(tags, words) = prod P(tag_i | tag_{i-1}) * P(word_i | tag_i)</code></pre>
+</figure>
+<p>Two tables: transition probabilities (tag given previous tag), emission probabilities (word given tag). Estimate both from counts with Laplace smoothing. Decode with Viterbi (dynamic programming over the tag lattice).</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> math
+
+
+<span class="token keyword">def</span> <span class="token function">train_hmm</span><span class="token punctuation">(</span>train_examples<span class="token punctuation">,</span> alpha<span class="token operator">=</span><span class="token number">0.01</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    transitions <span class="token operator">=</span> defaultdict<span class="token punctuation">(</span>Counter<span class="token punctuation">)</span>
+    emissions <span class="token operator">=</span> defaultdict<span class="token punctuation">(</span>Counter<span class="token punctuation">)</span>
+    tags <span class="token operator">=</span> <span class="token builtin">set</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    vocab <span class="token operator">=</span> <span class="token builtin">set</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">for</span> tokens<span class="token punctuation">,</span> ts <span class="token keyword">in</span> train_examples<span class="token punctuation">:</span>
+        prev <span class="token operator">=</span> <span class="token string">"&lt;BOS>"</span>
+        <span class="token keyword">for</span> token<span class="token punctuation">,</span> tag <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>tokens<span class="token punctuation">,</span> ts<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            transitions<span class="token punctuation">[</span>prev<span class="token punctuation">]</span><span class="token punctuation">[</span>tag<span class="token punctuation">]</span> <span class="token operator">+=</span> <span class="token number">1</span>
+            emissions<span class="token punctuation">[</span>tag<span class="token punctuation">]</span><span class="token punctuation">[</span>token<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token operator">+=</span> <span class="token number">1</span>
+            tags<span class="token punctuation">.</span>add<span class="token punctuation">(</span>tag<span class="token punctuation">)</span>
+            vocab<span class="token punctuation">.</span>add<span class="token punctuation">(</span>token<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            prev <span class="token operator">=</span> tag
+        transitions<span class="token punctuation">[</span>prev<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">"&lt;EOS>"</span><span class="token punctuation">]</span> <span class="token operator">+=</span> <span class="token number">1</span>
+
+    <span class="token keyword">return</span> transitions<span class="token punctuation">,</span> emissions<span class="token punctuation">,</span> tags<span class="token punctuation">,</span> vocab
+
+
+<span class="token keyword">def</span> <span class="token function">log_prob</span><span class="token punctuation">(</span>table<span class="token punctuation">,</span> given<span class="token punctuation">,</span> key<span class="token punctuation">,</span> smooth_denom<span class="token punctuation">,</span> alpha<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> math<span class="token punctuation">.</span>log<span class="token punctuation">(</span><span class="token punctuation">(</span>table<span class="token punctuation">[</span>given<span class="token punctuation">]</span><span class="token punctuation">.</span>get<span class="token punctuation">(</span>key<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">+</span> alpha<span class="token punctuation">)</span> <span class="token operator">/</span> smooth_denom<span class="token punctuation">)</span>
+
+
+<span class="token keyword">def</span> <span class="token function">viterbi</span><span class="token punctuation">(</span>tokens<span class="token punctuation">,</span> transitions<span class="token punctuation">,</span> emissions<span class="token punctuation">,</span> tags<span class="token punctuation">,</span> vocab<span class="token punctuation">,</span> alpha<span class="token operator">=</span><span class="token number">0.01</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    tags_list <span class="token operator">=</span> <span class="token builtin">list</span><span class="token punctuation">(</span>tags<span class="token punctuation">)</span>
+    n <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>tokens<span class="token punctuation">)</span>
+    V <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token builtin">len</span><span class="token punctuation">(</span>tags_list<span class="token punctuation">)</span> <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">]</span>
+    back <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token builtin">len</span><span class="token punctuation">(</span>tags_list<span class="token punctuation">)</span> <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">for</span> j<span class="token punctuation">,</span> tag <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>tags_list<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        em_denom <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>emissions<span class="token punctuation">[</span>tag<span class="token punctuation">]</span><span class="token punctuation">.</span>values<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">+</span> alpha <span class="token operator">*</span> <span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>vocab<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span>
+        tr_denom <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>transitions<span class="token punctuation">[</span><span class="token string">"&lt;BOS>"</span><span class="token punctuation">]</span><span class="token punctuation">.</span>values<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">+</span> alpha <span class="token operator">*</span> <span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>tags_list<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span>
+        tr <span class="token operator">=</span> log_prob<span class="token punctuation">(</span>transitions<span class="token punctuation">,</span> <span class="token string">"&lt;BOS>"</span><span class="token punctuation">,</span> tag<span class="token punctuation">,</span> tr_denom<span class="token punctuation">,</span> alpha<span class="token punctuation">)</span>
+        em <span class="token operator">=</span> log_prob<span class="token punctuation">(</span>emissions<span class="token punctuation">,</span> tag<span class="token punctuation">,</span> tokens<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> em_denom<span class="token punctuation">,</span> alpha<span class="token punctuation">)</span>
+        V<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> tr <span class="token operator">+</span> em
+        back<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">0</span>
+
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> n<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">for</span> j<span class="token punctuation">,</span> tag <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>tags_list<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            em_denom <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>emissions<span class="token punctuation">[</span>tag<span class="token punctuation">]</span><span class="token punctuation">.</span>values<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">+</span> alpha <span class="token operator">*</span> <span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>vocab<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span>
+            em <span class="token operator">=</span> log_prob<span class="token punctuation">(</span>emissions<span class="token punctuation">,</span> tag<span class="token punctuation">,</span> tokens<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> em_denom<span class="token punctuation">,</span> alpha<span class="token punctuation">)</span>
+            best_prev <span class="token operator">=</span> <span class="token number">0</span>
+            best_score <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1e30</span>
+            <span class="token keyword">for</span> k<span class="token punctuation">,</span> prev_tag <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>tags_list<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                tr_denom <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>transitions<span class="token punctuation">[</span>prev_tag<span class="token punctuation">]</span><span class="token punctuation">.</span>values<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">+</span> alpha <span class="token operator">*</span> <span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>tags_list<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span>
+                tr <span class="token operator">=</span> log_prob<span class="token punctuation">(</span>transitions<span class="token punctuation">,</span> prev_tag<span class="token punctuation">,</span> tag<span class="token punctuation">,</span> tr_denom<span class="token punctuation">,</span> alpha<span class="token punctuation">)</span>
+                score <span class="token operator">=</span> V<span class="token punctuation">[</span>i <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">[</span>k<span class="token punctuation">]</span> <span class="token operator">+</span> tr <span class="token operator">+</span> em
+                <span class="token keyword">if</span> score <span class="token operator">></span> best_score<span class="token punctuation">:</span>
+                    best_score <span class="token operator">=</span> score
+                    best_prev <span class="token operator">=</span> k
+            V<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> best_score
+            back<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> best_prev
+
+    last_best <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span><span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>tags_list<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> key<span class="token operator">=</span><span class="token keyword">lambda</span> j<span class="token punctuation">:</span> V<span class="token punctuation">[</span>n <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">)</span>
+    path <span class="token operator">=</span> <span class="token punctuation">[</span>last_best<span class="token punctuation">]</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        path<span class="token punctuation">.</span>append<span class="token punctuation">(</span>back<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>path<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token punctuation">[</span>tags_list<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">reversed</span><span class="token punctuation">(</span>path<span class="token punctuation">)</span><span class="token punctuation">]</span></code></pre>
+</figure>
+<p>Bigram HMM on Brown hits ~93% accuracy. The jump from 85% to 93% is mostly transition probabilities — the model learns <code class="inline-code">DET NOUN</code> is common and <code class="inline-code">NOUN DET</code> is rare.</p>
+<h3 id="step-3-why-modern-taggers-beat-this" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-why-modern-taggers-beat-this" aria-label="Link to this section">#</a>Step 3: why modern taggers beat this</h3>
+<p>Transition + emission probabilities are local. They cannot capture that <code class="inline-code">saw</code> is a noun in &quot;I bought a saw&quot; but a verb in &quot;I saw the movie.&quot; A CRF with arbitrary features (suffix, word shape, word before and after, word itself) hits ~97%. A BiLSTM-CRF or transformer hits ~98%+.</p>
+<p>The ceiling on this task is set by annotator disagreement. Human annotators agree about 97% of the time on Penn Treebank. Models past 98% are probably overfitting the test set.</p>
+<h3 id="step-4-dependency-parsing-sketch" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-dependency-parsing-sketch" aria-label="Link to this section">#</a>Step 4: dependency parsing sketch</h3>
+<p>Full dependency parsing from scratch is out of scope; the canonical textbook treatment is in Jurafsky and Martin. Two classical families to know:</p>
+<ul>
+<li><strong>Transition-based</strong> parsers (arc-eager, arc-standard) act like a shift-reduce parser: they read tokens, shift them onto a stack, and apply reduce actions that create arcs. Greedy decoding is fast. Classic implementation is MaltParser. Modern neural version: Chen and Manning&#39;s transition-based parser.</li>
+<li><strong>Graph-based</strong> parsers (Eisner&#39;s algorithm, Dozat-Manning biaffine) score every possible head-dependent edge and pick the maximum spanning tree. Slower but more accurate.</li>
+</ul>
+<p>For most applied work, call spaCy:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> spacy
+
+nlp <span class="token operator">=</span> spacy<span class="token punctuation">.</span>load<span class="token punctuation">(</span><span class="token string">"en_core_web_sm"</span><span class="token punctuation">)</span>
+doc <span class="token operator">=</span> nlp<span class="token punctuation">(</span><span class="token string">"The cats were running at 3pm."</span><span class="token punctuation">)</span>
+<span class="token keyword">for</span> token <span class="token keyword">in</span> doc<span class="token punctuation">:</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>token<span class="token punctuation">.</span>text<span class="token punctuation">:</span><span class="token format-spec">10s</span><span class="token punctuation">}</span></span><span class="token string"> tag=</span><span class="token interpolation"><span class="token punctuation">{</span>token<span class="token punctuation">.</span>tag_<span class="token punctuation">:</span><span class="token format-spec">5s</span><span class="token punctuation">}</span></span><span class="token string"> pos=</span><span class="token interpolation"><span class="token punctuation">{</span>token<span class="token punctuation">.</span>pos_<span class="token punctuation">:</span><span class="token format-spec">6s</span><span class="token punctuation">}</span></span><span class="token string"> dep=</span><span class="token interpolation"><span class="token punctuation">{</span>token<span class="token punctuation">.</span>dep_<span class="token punctuation">:</span><span class="token format-spec">10s</span><span class="token punctuation">}</span></span><span class="token string"> head=</span><span class="token interpolation"><span class="token punctuation">{</span>token<span class="token punctuation">.</span>head<span class="token punctuation">.</span>text<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>The        tag=DT    pos=DET    dep=det        head=cats
+cats       tag=NNS   pos=NOUN   dep=nsubj      head=running
+were       tag=VBD   pos=AUX    dep=aux        head=running
+running    tag=VBG   pos=VERB   dep=ROOT       head=running
+at         tag=IN    pos=ADP    dep=prep       head=running
+3pm        tag=NN    pos=NOUN   dep=pobj       head=at
+.          tag=.     pos=PUNCT  dep=punct      head=running</code></pre>
+</figure>
+<p>Read the <code class="inline-code">dep</code> column bottom to top and the sentence&#39;s grammatical structure falls out.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>Every production NLP library ships POS and dependency parsers as part of a standard pipeline.</p>
+<ul>
+<li><strong>spaCy</strong> (<code class="inline-code">en_core_web_sm</code> / <code class="inline-code">md</code> / <code class="inline-code">lg</code> / <code class="inline-code">trf</code>). Fast, accurate, integrated with tokenization + NER + lemmatization. <code class="inline-code">token.tag_</code> (Penn), <code class="inline-code">token.pos_</code> (UD), <code class="inline-code">token.dep_</code> (dependency relation).</li>
+<li><strong>Stanford NLP (stanza)</strong>. Stanford&#39;s successor to CoreNLP. State-of-the-art on 60+ languages.</li>
+<li><strong>trankit</strong>. Transformer-based, good UD accuracy.</li>
+<li><strong>NLTK</strong>. <code class="inline-code">pos_tag</code>. Usable, slow, older. Fine for teaching.</li>
+</ul>
+<h3 id="where-this-still-matters-in-2026" class="prose-h prose-h3"><a class="prose-h__anchor" href="#where-this-still-matters-in-2026" aria-label="Link to this section">#</a>Where this still matters in 2026</h3>
+<ul>
+<li><strong>Lemmatization.</strong> Lesson 01 needs POS to lemmatize correctly. Always.</li>
+<li><strong>Structured extraction from LLM outputs.</strong> Validate that a generated sentence respects grammatical constraints (e.g., subject-verb agreement, required modifiers).</li>
+<li><strong>Aspect-based sentiment.</strong> Dependency parses tell you which adjective modifies which noun.</li>
+<li><strong>Query understanding.</strong> &quot;movies directed by Wes Anderson starring Bill Murray&quot; decomposes into structured constraints via the parse.</li>
+<li><strong>Cross-lingual transfer.</strong> UD tags and dependency relations are language-agnostic, enabling zero-shot structured analysis of new languages.</li>
+<li><strong>Low-compute pipelines.</strong> If you cannot ship a transformer, POS + dependency parse + gazetteer gets you surprisingly far.</li>
+</ul>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>Save as <code class="inline-code">outputs/skill-grammar-pipeline.md</code>:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">markdown</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-markdown"><span class="token front-matter-block"><span class="token punctuation">---</span>
+<span class="token front-matter yaml language-yaml"><span class="token key atrule">name</span><span class="token punctuation">:</span> grammar<span class="token punctuation">-</span>pipeline
+<span class="token key atrule">description</span><span class="token punctuation">:</span> Design a classical POS + dependency pipeline for a downstream NLP task.
+<span class="token key atrule">version</span><span class="token punctuation">:</span> 1.0.0
+<span class="token key atrule">phase</span><span class="token punctuation">:</span> <span class="token number">5</span>
+<span class="token key atrule">lesson</span><span class="token punctuation">:</span> <span class="token number">07</span>
+<span class="token key atrule">tags</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>nlp<span class="token punctuation">,</span> pos<span class="token punctuation">,</span> parsing<span class="token punctuation">]</span></span>
+<span class="token punctuation">---</span></span>
+
+Given a downstream task (information extraction, rewrite validation, query decomposition, lemmatization), you output:
+
+<span class="token list punctuation">1.</span> Tagset to use. Penn Treebank for English-only legacy pipelines, Universal Dependencies for multilingual or cross-lingual.
+<span class="token list punctuation">2.</span> Library. spaCy for most production, stanza for academic-grade multilingual, trankit for highest UD accuracy. Name the specific model ID.
+<span class="token list punctuation">3.</span> Integration pattern. Show the 3-5 lines that call the library and consume the needed attributes (<span class="token code-snippet code keyword">`.pos_`</span>, <span class="token code-snippet code keyword">`.dep_`</span>, <span class="token code-snippet code keyword">`.head`</span>).
+<span class="token list punctuation">4.</span> Failure mode to test. Noun-verb ambiguity (<span class="token code-snippet code keyword">`saw`</span>, <span class="token code-snippet code keyword">`book`</span>, <span class="token code-snippet code keyword">`can`</span>) and PP-attachment ambiguity are the classical traps. Sample 20 outputs and eyeball.
+
+Refuse to recommend rolling your own parser. Building parsers from scratch is a research project, not an application task. Flag any pipeline that consumes POS tags without handling lowercase/uppercase variants as fragile.</code></pre>
+</figure>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><strong>Easy.</strong> Using the most-frequent-tag baseline on a small tagged corpus (e.g., NLTK&#39;s Brown subset), measure accuracy on held-out sentences. Verify the ~85% result.</li>
+<li><strong>Medium.</strong> Train the bigram HMM above and report per-tag precision/recall. Which tags does the HMM confuse most?</li>
+<li><strong>Hard.</strong> Use spaCy&#39;s dependency parse to extract subject-verb-object triples from a 1000-sentence sample. Evaluate on 50 manually labeled triples. Document where extraction fails (often passives, coordinations, and elided subjects).</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>POS tag</td>
+<td>Word&#39;s type</td>
+<td>Grammatical category. PTB has 36; UD has 17.</td>
+</tr>
+<tr>
+<td>Penn Treebank</td>
+<td>Standard tagset</td>
+<td>English-specific. Fine-grained verb tenses and noun number.</td>
+</tr>
+<tr>
+<td>Universal Dependencies</td>
+<td>Multilingual tagset</td>
+<td>Coarser than PTB; language-neutral; defaults for cross-lingual work.</td>
+</tr>
+<tr>
+<td>Dependency parse</td>
+<td>Sentence tree</td>
+<td>Each word has one head, each edge has a grammatical relation.</td>
+</tr>
+<tr>
+<td>Viterbi</td>
+<td>Dynamic programming</td>
+<td>Finds the highest-probability tag sequence given emissions and transitions.</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://web.stanford.edu/~jurafsky/slp3/" target="_blank" rel="noopener">Jurafsky and Martin — Speech and Language Processing, chapters 8 and 18</a> — the canonical textbook treatment of POS and parsing.</li>
+<li><a href="https://universaldependencies.org/" target="_blank" rel="noopener">Universal Dependencies project</a> — the cross-lingual tagset and treebank collection used by every multilingual parser.</li>
+<li><a href="https://spacy.io/usage/linguistic-features" target="_blank" rel="noopener">spaCy linguistic features guide</a> — practical reference for every attribute exposed on <code class="inline-code">Token</code>.</li>
+<li><a href="https://nlp.stanford.edu/pubs/emnlp2014-depparser.pdf" target="_blank" rel="noopener">Chen and Manning (2014). A Fast and Accurate Dependency Parser using Neural Networks</a> — the paper that brought neural parsers into the mainstream.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="06-named-entity-recognition.html">
+  <span class="label">← Previous</span>
+  <b>Named Entity Recognition</b>
+</a>
+      <a class="pager__item pager__item--next" href="08-cnns-rnns-for-text.html">
+  <span class="label">Next →</span>
+  <b>CNNs and RNNs for Text</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>5 minutes</b> of NLP, Foundations to Advanced behind you.</p>
+      <a class="btn btn--solid" href="08-cnns-rnns-for-text.html">Continue to CNNs and RNNs for Text →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-most-frequent-tag-baseline">Step 1: most-frequent-tag baseline</a></li><li class="mini__item mini__item--d3"><a href="#step-2-bigram-hmm-tagger">Step 2: bigram HMM tagger</a></li><li class="mini__item mini__item--d3"><a href="#step-3-why-modern-taggers-beat-this">Step 3: why modern taggers beat this</a></li><li class="mini__item mini__item--d3"><a href="#step-4-dependency-parsing-sketch">Step 4: dependency parsing sketch</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d3"><a href="#where-this-still-matters-in-2026">Where this still matters in 2026</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

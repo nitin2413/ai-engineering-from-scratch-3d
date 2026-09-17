@@ -1,0 +1,1018 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging Neural Networks — Deep Learning Core — AIFS</title>
+<meta name="description" content="Deep Learning Core: Debugging Neural Networks. 10 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Debugging Neural Networks — Deep Learning Core — AIFS">
+<meta property="og:description" content="Deep Learning Core: Debugging Neural Networks. 10 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"learning-curves":["../assets/figures/figures-dl.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-dl.js"];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#FF4FA3" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#FF4FA3;--accent-ink:#111111"
+  data-lesson-id="deep-learning-core/13-debugging-neural-networks" data-module="deep-learning-core"
+  data-prev="12-intro-to-jax.html" data-next="">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#FF4FA3">
+        <span class="label">Phase 03</span>
+        <b>Deep Learning Core</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="deep-learning-core/01-the-perceptron"><a href="01-the-perceptron.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">The Perceptron</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/02-multi-layer-networks"><a href="02-multi-layer-networks.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Multi-Layer Networks and Forward Pass</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/03-backpropagation"><a href="03-backpropagation.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Backpropagation from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/04-activation-functions"><a href="04-activation-functions.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Activation Functions</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/05-loss-functions"><a href="05-loss-functions.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Loss Functions</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/06-optimizers"><a href="06-optimizers.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Optimizers</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/07-regularization"><a href="07-regularization.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Regularization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/08-weight-initialization"><a href="08-weight-initialization.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Weight Initialization and Training Stability</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/09-learning-rate-schedules"><a href="09-learning-rate-schedules.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Learning Rate Schedules and Warmup</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/10-mini-framework"><a href="10-mini-framework.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Build Your Own Mini Framework</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/11-intro-to-pytorch"><a href="11-intro-to-pytorch.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Introduction to PyTorch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/12-intro-to-jax"><a href="12-intro-to-jax.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Introduction to JAX</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/13-debugging-neural-networks"><a href="13-debugging-neural-networks.html" class="is-current">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Debugging Neural Networks</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Deep Learning Core</a></p>
+      <h1 class="page__title">Debugging Neural Networks</h1>
+      <p class="page__lede">Your network compiled. It ran. It produced a number. The number is wrong and nothing crashed. Welcome to the hardest kind of debugging -- the kind where there is no error message.</p>
+      <div class="page__meta">
+        <span class="chip">10 min read</span>
+        <span class="chip">2,129 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python, PyTorch</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 03 Lessons 01-10 (especially backpropagation, loss functions, optimizers)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~90 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Diagnose common neural network failures (NaN loss, flat loss curve, overfitting, oscillation) using systematic debugging strategies</li>
+<li>Apply the &quot;overfit one batch&quot; technique to verify that your model architecture and training loop are correct</li>
+<li>Inspect gradient magnitudes, activation distributions, and weight norms to identify vanishing/exploding gradient problems</li>
+<li>Build a debugging checklist that covers data pipeline, model architecture, loss function, optimizer, and learning rate issues</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Traditional software crashes when it is broken. A null pointer throws an exception. A type mismatch fails at compile time. An off-by-one error produces a clearly wrong output.</p>
+<p>Neural networks do not give you that luxury.</p>
+<p>A broken neural network runs to completion, prints a loss value, and outputs predictions. The loss might decrease. The predictions might look plausible. But the model is silently wrong -- learning shortcuts, memorizing noise, or converging to a useless local minimum. Google researchers estimated that 60-70% of ML debugging time is spent on &quot;silent&quot; bugs that produce no errors but degrade model quality.</p>
+<p>The difference between a working model and a broken one is often a single misplaced line: a missing <code class="inline-code">zero_grad()</code>, a transposed dimension, a learning rate off by 10x. the canonical &quot;Recipe for Training Neural Networks&quot; (2019) opens with this: &quot;The most common neural net mistakes are bugs that don&#39;t crash.&quot;</p>
+<p>This lesson teaches you to find those bugs.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="the-debugging-mindset" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-debugging-mindset" aria-label="Link to this section">#</a>The Debugging Mindset</h3>
+<p>Forget print-and-pray debugging. Neural network debugging requires a systematic approach because the feedback loop is slow (minutes to hours per training run) and the symptoms are ambiguous (bad loss could mean 20 different things).</p>
+<p>The golden rule: <strong>start simple, add complexity one piece at a time, and verify each piece independently.</strong></p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">flowchart TD
+    A[&quot;Loss not decreasing&quot;] --&gt; B{&quot;Check learning rate&quot;}
+    B --&gt;|&quot;Too high&quot;| C[&quot;Loss oscillates or explodes&quot;]
+    B --&gt;|&quot;Too low&quot;| D[&quot;Loss barely moves&quot;]
+    B --&gt;|&quot;Reasonable&quot;| E{&quot;Check gradients&quot;}
+    E --&gt;|&quot;All zeros&quot;| F[&quot;Dead ReLUs or vanishing gradients&quot;]
+    E --&gt;|&quot;NaN/Inf&quot;| G[&quot;Exploding gradients&quot;]
+    E --&gt;|&quot;Normal&quot;| H{&quot;Check data pipeline&quot;}
+    H --&gt;|&quot;Labels shuffled&quot;| I[&quot;Random-chance accuracy&quot;]
+    H --&gt;|&quot;Preprocessing bug&quot;| J[&quot;Model learns noise&quot;]
+    H --&gt;|&quot;Data is fine&quot;| K{&quot;Check architecture&quot;}
+    K --&gt;|&quot;Too small&quot;| L[&quot;Underfitting&quot;]
+    K --&gt;|&quot;Too deep&quot;| M[&quot;Optimization difficulty&quot;]</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<h3 id="symptom-1-loss-not-decreasing" class="prose-h prose-h3"><a class="prose-h__anchor" href="#symptom-1-loss-not-decreasing" aria-label="Link to this section">#</a>Symptom 1: Loss Not Decreasing</h3>
+<p>This is the most common complaint. The training loop runs, epochs tick by, and the loss stays flat or oscillates wildly.</p>
+<p><strong>Wrong learning rate.</strong> Too high: loss oscillates or jumps to NaN. Too low: loss decreases so slowly it looks flat. For Adam, start at 1e-3. For SGD, start at 1e-1 or 1e-2. Always try 3 learning rates spanning 10x each (e.g., 1e-2, 1e-3, 1e-4) before concluding something else is wrong.</p>
+<p><strong>Dead ReLUs.</strong> If a ReLU neuron receives a large negative input, it outputs 0 and its gradient is 0. It never activates again. If enough neurons die, the network cannot learn. Check: print the fraction of activations that are exactly 0 after each ReLU layer. If &gt;50% are dead, switch to LeakyReLU or reduce the learning rate.</p>
+<p><strong>Vanishing gradients.</strong> In deep networks with sigmoid or tanh activations, gradients shrink exponentially as they propagate backward. By the time they reach the first layer, they are ~0. The first layers stop learning. Fix: use ReLU/GELU, add residual connections, or use batch normalization.</p>
+<p><strong>Exploding gradients.</strong> The opposite problem -- gradients grow exponentially. Common in RNNs and very deep networks. Loss jumps to NaN. Fix: gradient clipping (<code class="inline-code">torch.nn.utils.clip_grad_norm_</code>), lower learning rate, or add normalization.</p>
+<h3 id="symptom-2-loss-decreasing-but-model-is-bad" class="prose-h prose-h3"><a class="prose-h__anchor" href="#symptom-2-loss-decreasing-but-model-is-bad" aria-label="Link to this section">#</a>Symptom 2: Loss Decreasing But Model is Bad</h3>
+<p>The loss goes down. Training accuracy hits 99%. But test accuracy is 55%. Or the model produces nonsensical outputs on real data.</p>
+<p><strong>Overfitting.</strong> The model memorizes training data instead of learning patterns. Gap between training and validation loss grows over time. Fix: more data, dropout, weight decay, early stopping, data augmentation.</p>
+<p><strong>Data leakage.</strong> Test data leaked into training. Accuracy is suspiciously high. Common causes: shuffling before splitting, preprocessing with statistics from the full dataset, duplicate samples across splits. Fix: split first, preprocess second, check for duplicates.</p>
+<p><strong>Label errors.</strong> 5-10% of labels in most real datasets are wrong (Northcutt et al., 2021 -- &quot;Pervasive Label Errors in Test Sets&quot;). The model learns the noise. Fix: use confident learning to find and fix mislabeled examples, or use loss truncation to ignore high-loss samples.</p>
+<h3 id="symptom-3-nan-or-inf-in-loss" class="prose-h prose-h3"><a class="prose-h__anchor" href="#symptom-3-nan-or-inf-in-loss" aria-label="Link to this section">#</a>Symptom 3: NaN or Inf in Loss</h3>
+<p>The loss value becomes <code class="inline-code">nan</code> or <code class="inline-code">inf</code>. Training is dead.</p>
+<p><strong>Learning rate too high.</strong> Gradient updates overshoot so far that weights explode. Fix: reduce by 10x.</p>
+<p><strong>log(0) or log(negative).</strong> Cross-entropy loss computes <code class="inline-code">log(p)</code>. If your model outputs exactly 0 or a negative probability, the log explodes. Fix: clamp predictions to <code class="inline-code">[eps, 1-eps]</code> where <code class="inline-code">eps=1e-7</code>.</p>
+<p><strong>Division by zero.</strong> Batch normalization divides by standard deviation. A batch with constant values has std=0. Fix: add epsilon to the denominator (PyTorch does this by default, but custom implementations might not).</p>
+<p><strong>Numerical overflow.</strong> Large activations fed into <code class="inline-code">exp()</code> produce Inf. Softmax is especially prone. Fix: subtract the max before exponentiating (the log-sum-exp trick).</p>
+<h3 id="technique-1-gradient-checking" class="prose-h prose-h3"><a class="prose-h__anchor" href="#technique-1-gradient-checking" aria-label="Link to this section">#</a>Technique 1: Gradient Checking</h3>
+<p>Compare your analytical gradients (from backprop) to numerical gradients (from finite differences). If they disagree, your backward pass has a bug.</p>
+<p>Numerical gradient for parameter <code class="inline-code">w</code>:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>grad_numerical = (loss(w + eps) - loss(w - eps)) / (2 * eps)</code></pre>
+</figure>
+<p>Agreement metric (relative difference):</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>rel_diff = |grad_analytical - grad_numerical| / max(|grad_analytical|, |grad_numerical|, 1e-8)</code></pre>
+</figure>
+<p>If <code class="inline-code">rel_diff &lt; 1e-5</code>: correct. If <code class="inline-code">rel_diff &gt; 1e-3</code>: almost certainly a bug.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">flowchart LR
+    A[&quot;Parameter w&quot;] --&gt; B[&quot;w + eps&quot;]
+    A --&gt; C[&quot;w - eps&quot;]
+    B --&gt; D[&quot;Forward pass&quot;]
+    C --&gt; E[&quot;Forward pass&quot;]
+    D --&gt; F[&quot;loss+&quot;]
+    E --&gt; G[&quot;loss-&quot;]
+    F --&gt; H[&quot;(loss+ - loss-) / 2eps&quot;]
+    G --&gt; H
+    H --&gt; I[&quot;Compare to backprop gradient&quot;]</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<h3 id="technique-2-activation-statistics" class="prose-h prose-h3"><a class="prose-h__anchor" href="#technique-2-activation-statistics" aria-label="Link to this section">#</a>Technique 2: Activation Statistics</h3>
+<p>Monitor the mean and standard deviation of activations after each layer during training. Healthy networks maintain activations with mean near 0 and std near 1 (after normalization) or at least bounded.</p>
+<table>
+<thead>
+<tr>
+<th>Health indicator</th>
+<th>Mean</th>
+<th>Std</th>
+<th>Diagnosis</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Healthy</td>
+<td>~0</td>
+<td>~1</td>
+<td>Network is learning normally</td>
+</tr>
+<tr>
+<td>Saturated</td>
+<td>&gt;&gt;0 or &lt;&lt;0</td>
+<td>~0</td>
+<td>Activations stuck at extreme values</td>
+</tr>
+<tr>
+<td>Dead</td>
+<td>0</td>
+<td>0</td>
+<td>Neurons are dead (all zeros)</td>
+</tr>
+<tr>
+<td>Exploding</td>
+<td>&gt;&gt;10</td>
+<td>&gt;&gt;10</td>
+<td>Activations growing without bound</td>
+</tr>
+</tbody></table>
+<h3 id="technique-3-gradient-flow-visualization" class="prose-h prose-h3"><a class="prose-h__anchor" href="#technique-3-gradient-flow-visualization" aria-label="Link to this section">#</a>Technique 3: Gradient Flow Visualization</h3>
+<p>Plot the average gradient magnitude for each layer. In a healthy network, gradient magnitudes should be roughly similar across layers. If early layers have gradients 1000x smaller than later layers, you have vanishing gradients.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph LR
+    subgraph &quot;Healthy Gradient Flow&quot;
+        L1[&quot;Layer 1&lt;br/&gt;grad: 0.05&quot;] --- L2[&quot;Layer 2&lt;br/&gt;grad: 0.04&quot;] --- L3[&quot;Layer 3&lt;br/&gt;grad: 0.06&quot;] --- L4[&quot;Layer 4&lt;br/&gt;grad: 0.05&quot;]
+    end</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph LR
+    subgraph &quot;Vanishing Gradient Flow&quot;
+        V1[&quot;Layer 1&lt;br/&gt;grad: 0.0001&quot;] --- V2[&quot;Layer 2&lt;br/&gt;grad: 0.003&quot;] --- V3[&quot;Layer 3&lt;br/&gt;grad: 0.02&quot;] --- V4[&quot;Layer 4&lt;br/&gt;grad: 0.08&quot;]
+    end</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<h3 id="technique-4-the-overfit-one-batch-test" class="prose-h prose-h3"><a class="prose-h__anchor" href="#technique-4-the-overfit-one-batch-test" aria-label="Link to this section">#</a>Technique 4: The Overfit-One-Batch Test</h3>
+<p>The single most important debugging technique in deep learning.</p>
+<p>Take one small batch (8-32 samples). Train on it for 100+ iterations. The loss should go to nearly zero and training accuracy should hit 100%. If it does not, your model or training loop has a fundamental bug -- do not proceed to full training.</p>
+<p>This test catches:</p>
+<ul>
+<li>Broken loss functions</li>
+<li>Broken backward passes</li>
+<li>Architecture too small to represent the data</li>
+<li>Optimizer not connected to model parameters</li>
+<li>Data and labels misaligned</li>
+</ul>
+<p>This takes 30 seconds to run and saves hours of debugging full training runs.</p>
+<h3 id="technique-5-learning-rate-finder" class="prose-h prose-h3"><a class="prose-h__anchor" href="#technique-5-learning-rate-finder" aria-label="Link to this section">#</a>Technique 5: Learning Rate Finder</h3>
+<p>Leslie Smith (2017) proposed sweeping the learning rate from very small (1e-7) to very large (10) over one epoch while recording the loss. Plot loss vs learning rate. The optimal learning rate is roughly 10x smaller than the rate where loss starts decreasing fastest.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph TD
+    subgraph &quot;LR Finder Plot&quot;
+        direction LR
+        A[&quot;1e-7: loss=2.3&quot;] --&gt; B[&quot;1e-5: loss=2.3&quot;]
+        B --&gt; C[&quot;1e-3: loss=1.8&quot;]
+        C --&gt; D[&quot;1e-2: loss=0.9 -- steepest&quot;]
+        D --&gt; E[&quot;1e-1: loss=0.5&quot;]
+        E --&gt; F[&quot;1.0: loss=NaN -- too high&quot;]
+    end</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>Best LR in this example: ~1e-3 (one order of magnitude before the steepest point).</p>
+<h3 id="common-pytorch-bugs" class="prose-h prose-h3"><a class="prose-h__anchor" href="#common-pytorch-bugs" aria-label="Link to this section">#</a>Common PyTorch Bugs</h3>
+<p>These are the bugs that waste the most collective hours in the PyTorch community:</p>
+<table>
+<thead>
+<tr>
+<th>Bug</th>
+<th>Symptom</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Forgetting <code class="inline-code">optimizer.zero_grad()</code></td>
+<td>Gradients accumulate across batches, loss oscillates</td>
+<td>Add <code class="inline-code">optimizer.zero_grad()</code> before <code class="inline-code">loss.backward()</code></td>
+</tr>
+<tr>
+<td>Forgetting <code class="inline-code">model.eval()</code> at test time</td>
+<td>Dropout and batch norm behave differently, test accuracy varies between runs</td>
+<td>Add <code class="inline-code">model.eval()</code> and <code class="inline-code">torch.no_grad()</code></td>
+</tr>
+<tr>
+<td>Wrong tensor shapes</td>
+<td>Silent broadcasting produces wrong results, no error</td>
+<td>Print shapes after every operation during debugging</td>
+</tr>
+<tr>
+<td>CPU/GPU mismatch</td>
+<td><code class="inline-code">RuntimeError: expected CUDA tensor</code></td>
+<td>Use <code class="inline-code">.to(device)</code> on model AND data</td>
+</tr>
+<tr>
+<td>Not detaching tensors</td>
+<td>Computation graph grows forever, OOM</td>
+<td>Use <code class="inline-code">.detach()</code> or <code class="inline-code">with torch.no_grad()</code></td>
+</tr>
+<tr>
+<td>In-place operations breaking autograd</td>
+<td><code class="inline-code">RuntimeError: modified by in-place operation</code></td>
+<td>Replace <code class="inline-code">x += 1</code> with <code class="inline-code">x = x + 1</code></td>
+</tr>
+<tr>
+<td>Data not normalized</td>
+<td>Loss stuck at random-chance level</td>
+<td>Normalize inputs to mean=0, std=1</td>
+</tr>
+<tr>
+<td>Labels as wrong dtype</td>
+<td>Cross-entropy expects <code class="inline-code">Long</code>, got <code class="inline-code">Float</code></td>
+<td>Cast labels: <code class="inline-code">labels.long()</code></td>
+</tr>
+</tbody></table>
+<h3 id="the-master-debugging-table" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-master-debugging-table" aria-label="Link to this section">#</a>The Master Debugging Table</h3>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Likely cause</th>
+<th>First thing to try</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Loss stuck at -log(1/num_classes)</td>
+<td>Model predicting uniform distribution</td>
+<td>Check data pipeline, verify labels match inputs</td>
+</tr>
+<tr>
+<td>Loss NaN after a few steps</td>
+<td>Learning rate too high</td>
+<td>Reduce LR by 10x</td>
+</tr>
+<tr>
+<td>Loss NaN immediately</td>
+<td>log(0) or division by zero</td>
+<td>Add epsilon to log/division operations</td>
+</tr>
+<tr>
+<td>Loss oscillating wildly</td>
+<td>LR too high or batch size too small</td>
+<td>Reduce LR, increase batch size</td>
+</tr>
+<tr>
+<td>Loss decreasing then plateaus</td>
+<td>LR too high for fine-tuning phase</td>
+<td>Add LR schedule (cosine or step decay)</td>
+</tr>
+<tr>
+<td>Training acc high, test acc low</td>
+<td>Overfitting</td>
+<td>Add dropout, weight decay, more data</td>
+</tr>
+<tr>
+<td>Training acc = test acc = chance</td>
+<td>Model not learning anything</td>
+<td>Run overfit-one-batch test</td>
+</tr>
+<tr>
+<td>Training acc = test acc but both low</td>
+<td>Underfitting</td>
+<td>Bigger model, more layers, more features</td>
+</tr>
+<tr>
+<td>Gradients all zero</td>
+<td>Dead ReLUs or detached computation graph</td>
+<td>Switch to LeakyReLU, check <code class="inline-code">.requires_grad</code></td>
+</tr>
+<tr>
+<td>Out of memory during training</td>
+<td>Batch too large or graph not freed</td>
+<td>Reduce batch size, use <code class="inline-code">torch.no_grad()</code> for eval</td>
+</tr>
+</tbody></table>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="learning-curves"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">learning-curves</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> learning curves</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<p>A diagnostic toolkit that monitors activations, gradients, and loss curves. You will deliberately break a network and use the toolkit to diagnose each problem.</p>
+<h3 id="step-1-the-networkdebugger-class" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-the-networkdebugger-class" aria-label="Link to this section">#</a>Step 1: The NetworkDebugger Class</h3>
+<p>Hooks into a PyTorch model to record activation and gradient statistics per layer.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> torch
+<span class="token keyword">import</span> torch<span class="token punctuation">.</span>nn <span class="token keyword">as</span> nn
+<span class="token keyword">import</span> math
+
+
+<span class="token keyword">class</span> <span class="token class-name">NetworkDebugger</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> model<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>model <span class="token operator">=</span> model
+        self<span class="token punctuation">.</span>activation_stats <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+        self<span class="token punctuation">.</span>gradient_stats <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+        self<span class="token punctuation">.</span>loss_history <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        self<span class="token punctuation">.</span>lr_losses <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        self<span class="token punctuation">.</span>hooks <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        self<span class="token punctuation">.</span>_register_hooks<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">_register_hooks</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">for</span> name<span class="token punctuation">,</span> module <span class="token keyword">in</span> self<span class="token punctuation">.</span>model<span class="token punctuation">.</span>named_modules<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> <span class="token builtin">isinstance</span><span class="token punctuation">(</span>module<span class="token punctuation">,</span> <span class="token punctuation">(</span>nn<span class="token punctuation">.</span>Linear<span class="token punctuation">,</span> nn<span class="token punctuation">.</span>Conv2d<span class="token punctuation">,</span> nn<span class="token punctuation">.</span>ReLU<span class="token punctuation">,</span> nn<span class="token punctuation">.</span>LeakyReLU<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                hook <span class="token operator">=</span> module<span class="token punctuation">.</span>register_forward_hook<span class="token punctuation">(</span>self<span class="token punctuation">.</span>_make_activation_hook<span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                self<span class="token punctuation">.</span>hooks<span class="token punctuation">.</span>append<span class="token punctuation">(</span>hook<span class="token punctuation">)</span>
+                hook <span class="token operator">=</span> module<span class="token punctuation">.</span>register_full_backward_hook<span class="token punctuation">(</span>self<span class="token punctuation">.</span>_make_gradient_hook<span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                self<span class="token punctuation">.</span>hooks<span class="token punctuation">.</span>append<span class="token punctuation">(</span>hook<span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">_make_activation_hook</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> name<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">def</span> <span class="token function">hook</span><span class="token punctuation">(</span>module<span class="token punctuation">,</span> <span class="token builtin">input</span><span class="token punctuation">,</span> output<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">with</span> torch<span class="token punctuation">.</span>no_grad<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                out <span class="token operator">=</span> output<span class="token punctuation">.</span>detach<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token builtin">float</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                self<span class="token punctuation">.</span>activation_stats<span class="token punctuation">[</span>name<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
+                    <span class="token string">"mean"</span><span class="token punctuation">:</span> out<span class="token punctuation">.</span>mean<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                    <span class="token string">"std"</span><span class="token punctuation">:</span> out<span class="token punctuation">.</span>std<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                    <span class="token string">"fraction_zero"</span><span class="token punctuation">:</span> <span class="token punctuation">(</span>out <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token builtin">float</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>mean<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                    <span class="token string">"min"</span><span class="token punctuation">:</span> out<span class="token punctuation">.</span><span class="token builtin">min</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                    <span class="token string">"max"</span><span class="token punctuation">:</span> out<span class="token punctuation">.</span><span class="token builtin">max</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> hook
+
+    <span class="token keyword">def</span> <span class="token function">_make_gradient_hook</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> name<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">def</span> <span class="token function">hook</span><span class="token punctuation">(</span>module<span class="token punctuation">,</span> grad_input<span class="token punctuation">,</span> grad_output<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> grad_output<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token keyword">is</span> <span class="token keyword">not</span> <span class="token boolean">None</span><span class="token punctuation">:</span>
+                <span class="token keyword">with</span> torch<span class="token punctuation">.</span>no_grad<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                    grad <span class="token operator">=</span> grad_output<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>detach<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token builtin">float</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                    self<span class="token punctuation">.</span>gradient_stats<span class="token punctuation">[</span>name<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
+                        <span class="token string">"mean"</span><span class="token punctuation">:</span> grad<span class="token punctuation">.</span>mean<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                        <span class="token string">"std"</span><span class="token punctuation">:</span> grad<span class="token punctuation">.</span>std<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                        <span class="token string">"abs_mean"</span><span class="token punctuation">:</span> grad<span class="token punctuation">.</span><span class="token builtin">abs</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>mean<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                        <span class="token string">"max"</span><span class="token punctuation">:</span> grad<span class="token punctuation">.</span><span class="token builtin">abs</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token builtin">max</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                    <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> hook
+
+    <span class="token keyword">def</span> <span class="token function">record_loss</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> loss_value<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>loss_history<span class="token punctuation">.</span>append<span class="token punctuation">(</span>loss_value<span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">check_loss_health</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>loss_history<span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">2</span><span class="token punctuation">:</span>
+            <span class="token keyword">return</span> <span class="token string">"NOT_ENOUGH_DATA"</span>
+        recent <span class="token operator">=</span> self<span class="token punctuation">.</span>loss_history<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">10</span><span class="token punctuation">:</span><span class="token punctuation">]</span>
+        <span class="token keyword">if</span> <span class="token builtin">any</span><span class="token punctuation">(</span>math<span class="token punctuation">.</span>isnan<span class="token punctuation">(</span>v<span class="token punctuation">)</span> <span class="token keyword">or</span> math<span class="token punctuation">.</span>isinf<span class="token punctuation">(</span>v<span class="token punctuation">)</span> <span class="token keyword">for</span> v <span class="token keyword">in</span> recent<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">return</span> <span class="token string">"NAN_OR_INF"</span>
+        <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>loss_history<span class="token punctuation">)</span> <span class="token operator">>=</span> <span class="token number">20</span><span class="token punctuation">:</span>
+            first_half <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>loss_history<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">10</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token number">10</span>
+            second_half <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>loss_history<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">10</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token number">10</span>
+            <span class="token keyword">if</span> second_half <span class="token operator">>=</span> first_half <span class="token operator">*</span> <span class="token number">0.99</span><span class="token punctuation">:</span>
+                <span class="token keyword">return</span> <span class="token string">"NOT_DECREASING"</span>
+        <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>recent<span class="token punctuation">)</span> <span class="token operator">>=</span> <span class="token number">5</span><span class="token punctuation">:</span>
+            diffs <span class="token operator">=</span> <span class="token punctuation">[</span>recent<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">-</span> recent<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>recent<span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+            <span class="token keyword">if</span> <span class="token builtin">max</span><span class="token punctuation">(</span>diffs<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token builtin">min</span><span class="token punctuation">(</span>diffs<span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">2</span> <span class="token operator">*</span> <span class="token builtin">abs</span><span class="token punctuation">(</span><span class="token builtin">sum</span><span class="token punctuation">(</span>diffs<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>diffs<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                <span class="token keyword">return</span> <span class="token string">"OSCILLATING"</span>
+        <span class="token keyword">return</span> <span class="token string">"HEALTHY"</span>
+
+    <span class="token keyword">def</span> <span class="token function">check_activations</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        issues <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">for</span> name<span class="token punctuation">,</span> stats <span class="token keyword">in</span> self<span class="token punctuation">.</span>activation_stats<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> stats<span class="token punctuation">[</span><span class="token string">"fraction_zero"</span><span class="token punctuation">]</span> <span class="token operator">></span> <span class="token number">0.5</span><span class="token punctuation">:</span>
+                issues<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"DEAD_NEURONS: </span><span class="token interpolation"><span class="token punctuation">{</span>name<span class="token punctuation">}</span></span><span class="token string"> has </span><span class="token interpolation"><span class="token punctuation">{</span>stats<span class="token punctuation">[</span><span class="token string">'fraction_zero'</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.0%</span><span class="token punctuation">}</span></span><span class="token string"> zero activations"</span></span><span class="token punctuation">)</span>
+            <span class="token keyword">if</span> <span class="token builtin">abs</span><span class="token punctuation">(</span>stats<span class="token punctuation">[</span><span class="token string">"mean"</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">10</span><span class="token punctuation">:</span>
+                issues<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"EXPLODING_ACTIVATIONS: </span><span class="token interpolation"><span class="token punctuation">{</span>name<span class="token punctuation">}</span></span><span class="token string"> mean=</span><span class="token interpolation"><span class="token punctuation">{</span>stats<span class="token punctuation">[</span><span class="token string">'mean'</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.2f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+            <span class="token keyword">if</span> stats<span class="token punctuation">[</span><span class="token string">"std"</span><span class="token punctuation">]</span> <span class="token operator">&lt;</span> <span class="token number">1e-6</span><span class="token punctuation">:</span>
+                issues<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"COLLAPSED_ACTIVATIONS: </span><span class="token interpolation"><span class="token punctuation">{</span>name<span class="token punctuation">}</span></span><span class="token string"> std=</span><span class="token interpolation"><span class="token punctuation">{</span>stats<span class="token punctuation">[</span><span class="token string">'std'</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.2e</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> issues <span class="token keyword">if</span> issues <span class="token keyword">else</span> <span class="token punctuation">[</span><span class="token string">"HEALTHY"</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">def</span> <span class="token function">check_gradients</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        issues <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        grad_magnitudes <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">for</span> name<span class="token punctuation">,</span> stats <span class="token keyword">in</span> self<span class="token punctuation">.</span>gradient_stats<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            grad_magnitudes<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span> stats<span class="token punctuation">[</span><span class="token string">"abs_mean"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token keyword">if</span> stats<span class="token punctuation">[</span><span class="token string">"abs_mean"</span><span class="token punctuation">]</span> <span class="token operator">&lt;</span> <span class="token number">1e-7</span><span class="token punctuation">:</span>
+                issues<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"VANISHING_GRADIENT: </span><span class="token interpolation"><span class="token punctuation">{</span>name<span class="token punctuation">}</span></span><span class="token string"> abs_mean=</span><span class="token interpolation"><span class="token punctuation">{</span>stats<span class="token punctuation">[</span><span class="token string">'abs_mean'</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.2e</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+            <span class="token keyword">if</span> stats<span class="token punctuation">[</span><span class="token string">"abs_mean"</span><span class="token punctuation">]</span> <span class="token operator">></span> <span class="token number">100</span><span class="token punctuation">:</span>
+                issues<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"EXPLODING_GRADIENT: </span><span class="token interpolation"><span class="token punctuation">{</span>name<span class="token punctuation">}</span></span><span class="token string"> abs_mean=</span><span class="token interpolation"><span class="token punctuation">{</span>stats<span class="token punctuation">[</span><span class="token string">'abs_mean'</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.2e</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>grad_magnitudes<span class="token punctuation">)</span> <span class="token operator">>=</span> <span class="token number">2</span><span class="token punctuation">:</span>
+            first_mag <span class="token operator">=</span> grad_magnitudes<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span>
+            last_mag <span class="token operator">=</span> grad_magnitudes<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span>
+            <span class="token keyword">if</span> last_mag <span class="token operator">></span> <span class="token number">0</span> <span class="token keyword">and</span> first_mag <span class="token operator">/</span> last_mag <span class="token operator">></span> <span class="token number">100</span><span class="token punctuation">:</span>
+                issues<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"GRADIENT_RATIO: first/last = </span><span class="token interpolation"><span class="token punctuation">{</span>first_mag<span class="token operator">/</span>last_mag<span class="token punctuation">:</span><span class="token format-spec">.0f</span><span class="token punctuation">}</span></span><span class="token string">x (vanishing)"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> issues <span class="token keyword">if</span> issues <span class="token keyword">else</span> <span class="token punctuation">[</span><span class="token string">"HEALTHY"</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">def</span> <span class="token function">print_report</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n=== NETWORK DEBUGGER REPORT ==="</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"\nLoss health: </span><span class="token interpolation"><span class="token punctuation">{</span>self<span class="token punctuation">.</span>check_loss_health<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> self<span class="token punctuation">.</span>loss_history<span class="token punctuation">:</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Last 5 losses: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token punctuation">[</span><span class="token string-interpolation"><span class="token string">f'</span><span class="token interpolation"><span class="token punctuation">{</span>v<span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">'</span></span> <span class="token keyword">for</span> v <span class="token keyword">in</span> self<span class="token punctuation">.</span>loss_history<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">5</span><span class="token punctuation">:</span><span class="token format-spec">]]</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\nActivation diagnostics:"</span><span class="token punctuation">)</span>
+        <span class="token keyword">for</span> item <span class="token keyword">in</span> self<span class="token punctuation">.</span>check_activations<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  </span><span class="token interpolation"><span class="token punctuation">{</span>item<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\nGradient diagnostics:"</span><span class="token punctuation">)</span>
+        <span class="token keyword">for</span> item <span class="token keyword">in</span> self<span class="token punctuation">.</span>check_gradients<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  </span><span class="token interpolation"><span class="token punctuation">{</span>item<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\nPer-layer activation stats:"</span><span class="token punctuation">)</span>
+        <span class="token keyword">for</span> name<span class="token punctuation">,</span> stats <span class="token keyword">in</span> self<span class="token punctuation">.</span>activation_stats<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  </span><span class="token interpolation"><span class="token punctuation">{</span>name<span class="token punctuation">}</span></span><span class="token string">: mean=</span><span class="token interpolation"><span class="token punctuation">{</span>stats<span class="token punctuation">[</span><span class="token string">'mean'</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string"> std=</span><span class="token interpolation"><span class="token punctuation">{</span>stats<span class="token punctuation">[</span><span class="token string">'std'</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string"> zero=</span><span class="token interpolation"><span class="token punctuation">{</span>stats<span class="token punctuation">[</span><span class="token string">'fraction_zero'</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.1%</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\nPer-layer gradient stats:"</span><span class="token punctuation">)</span>
+        <span class="token keyword">for</span> name<span class="token punctuation">,</span> stats <span class="token keyword">in</span> self<span class="token punctuation">.</span>gradient_stats<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  </span><span class="token interpolation"><span class="token punctuation">{</span>name<span class="token punctuation">}</span></span><span class="token string">: abs_mean=</span><span class="token interpolation"><span class="token punctuation">{</span>stats<span class="token punctuation">[</span><span class="token string">'abs_mean'</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.2e</span><span class="token punctuation">}</span></span><span class="token string"> max=</span><span class="token interpolation"><span class="token punctuation">{</span>stats<span class="token punctuation">[</span><span class="token string">'max'</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.2e</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">remove_hooks</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">for</span> hook <span class="token keyword">in</span> self<span class="token punctuation">.</span>hooks<span class="token punctuation">:</span>
+            hook<span class="token punctuation">.</span>remove<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>hooks<span class="token punctuation">.</span>clear<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h3 id="step-2-the-overfit-one-batch-test" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-the-overfit-one-batch-test" aria-label="Link to this section">#</a>Step 2: The Overfit-One-Batch Test</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">overfit_one_batch</span><span class="token punctuation">(</span>model<span class="token punctuation">,</span> x_batch<span class="token punctuation">,</span> y_batch<span class="token punctuation">,</span> criterion<span class="token punctuation">,</span> lr<span class="token operator">=</span><span class="token number">0.01</span><span class="token punctuation">,</span> steps<span class="token operator">=</span><span class="token number">200</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    optimizer <span class="token operator">=</span> torch<span class="token punctuation">.</span>optim<span class="token punctuation">.</span>Adam<span class="token punctuation">(</span>model<span class="token punctuation">.</span>parameters<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> lr<span class="token operator">=</span>lr<span class="token punctuation">)</span>
+    model<span class="token punctuation">.</span>train<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n=== OVERFIT ONE BATCH TEST ==="</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Batch size: </span><span class="token interpolation"><span class="token punctuation">{</span>x_batch<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">}</span></span><span class="token string">, Steps: </span><span class="token interpolation"><span class="token punctuation">{</span>steps<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">for</span> step <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>steps<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        optimizer<span class="token punctuation">.</span>zero_grad<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        output <span class="token operator">=</span> model<span class="token punctuation">(</span>x_batch<span class="token punctuation">)</span>
+        loss <span class="token operator">=</span> criterion<span class="token punctuation">(</span>output<span class="token punctuation">,</span> y_batch<span class="token punctuation">)</span>
+        loss<span class="token punctuation">.</span>backward<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        optimizer<span class="token punctuation">.</span>step<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+        <span class="token keyword">if</span> step <span class="token operator">%</span> <span class="token number">50</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token keyword">or</span> step <span class="token operator">==</span> steps <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">:</span>
+            <span class="token keyword">with</span> torch<span class="token punctuation">.</span>no_grad<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                preds <span class="token operator">=</span> <span class="token punctuation">(</span>output <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token builtin">float</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">if</span> output<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token number">1</span> <span class="token keyword">else</span> output<span class="token punctuation">.</span>argmax<span class="token punctuation">(</span>dim<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">)</span>
+                targets <span class="token operator">=</span> y_batch <span class="token keyword">if</span> y_batch<span class="token punctuation">.</span>dim<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">1</span> <span class="token keyword">else</span> y_batch<span class="token punctuation">.</span>squeeze<span class="token punctuation">(</span><span class="token punctuation">)</span>
+                acc <span class="token operator">=</span> <span class="token punctuation">(</span>preds<span class="token punctuation">.</span>squeeze<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> targets<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token builtin">float</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>mean<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Step </span><span class="token interpolation"><span class="token punctuation">{</span>step<span class="token punctuation">:</span><span class="token format-spec">3d</span><span class="token punctuation">}</span></span><span class="token string"> | Loss: </span><span class="token interpolation"><span class="token punctuation">{</span>loss<span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.6f</span><span class="token punctuation">}</span></span><span class="token string"> | Accuracy: </span><span class="token interpolation"><span class="token punctuation">{</span>acc<span class="token punctuation">:</span><span class="token format-spec">.1%</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    final_loss <span class="token operator">=</span> loss<span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> final_loss <span class="token operator">></span> <span class="token number">0.1</span><span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"\n  FAIL: Loss did not converge (</span><span class="token interpolation"><span class="token punctuation">{</span>final_loss<span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">). Model or training loop is broken."</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token boolean">False</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"\n  PASS: Loss converged to </span><span class="token interpolation"><span class="token punctuation">{</span>final_loss<span class="token punctuation">:</span><span class="token format-spec">.6f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token boolean">True</span></code></pre>
+</figure>
+<h3 id="step-3-learning-rate-finder" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-learning-rate-finder" aria-label="Link to this section">#</a>Step 3: Learning Rate Finder</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">find_learning_rate</span><span class="token punctuation">(</span>model<span class="token punctuation">,</span> x_data<span class="token punctuation">,</span> y_data<span class="token punctuation">,</span> criterion<span class="token punctuation">,</span> start_lr<span class="token operator">=</span><span class="token number">1e-7</span><span class="token punctuation">,</span> end_lr<span class="token operator">=</span><span class="token number">10</span><span class="token punctuation">,</span> steps<span class="token operator">=</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">import</span> copy
+    original_state <span class="token operator">=</span> copy<span class="token punctuation">.</span>deepcopy<span class="token punctuation">(</span>model<span class="token punctuation">.</span>state_dict<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    optimizer <span class="token operator">=</span> torch<span class="token punctuation">.</span>optim<span class="token punctuation">.</span>SGD<span class="token punctuation">(</span>model<span class="token punctuation">.</span>parameters<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> lr<span class="token operator">=</span>start_lr<span class="token punctuation">)</span>
+    lr_mult <span class="token operator">=</span> <span class="token punctuation">(</span>end_lr <span class="token operator">/</span> start_lr<span class="token punctuation">)</span> <span class="token operator">**</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">/</span> steps<span class="token punctuation">)</span>
+
+    model<span class="token punctuation">.</span>train<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    results <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    best_loss <span class="token operator">=</span> <span class="token builtin">float</span><span class="token punctuation">(</span><span class="token string">"inf"</span><span class="token punctuation">)</span>
+    current_lr <span class="token operator">=</span> start_lr
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n=== LEARNING RATE FINDER ==="</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">for</span> step <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>steps<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        optimizer<span class="token punctuation">.</span>zero_grad<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        output <span class="token operator">=</span> model<span class="token punctuation">(</span>x_data<span class="token punctuation">)</span>
+        loss <span class="token operator">=</span> criterion<span class="token punctuation">(</span>output<span class="token punctuation">,</span> y_data<span class="token punctuation">)</span>
+
+        <span class="token keyword">if</span> math<span class="token punctuation">.</span>isnan<span class="token punctuation">(</span>loss<span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">or</span> loss<span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">></span> best_loss <span class="token operator">*</span> <span class="token number">10</span><span class="token punctuation">:</span>
+            <span class="token keyword">break</span>
+
+        best_loss <span class="token operator">=</span> <span class="token builtin">min</span><span class="token punctuation">(</span>best_loss<span class="token punctuation">,</span> loss<span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        results<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">(</span>current_lr<span class="token punctuation">,</span> loss<span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+        loss<span class="token punctuation">.</span>backward<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        optimizer<span class="token punctuation">.</span>step<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+        current_lr <span class="token operator">*=</span> lr_mult
+        <span class="token keyword">for</span> param_group <span class="token keyword">in</span> optimizer<span class="token punctuation">.</span>param_groups<span class="token punctuation">:</span>
+            param_group<span class="token punctuation">[</span><span class="token string">"lr"</span><span class="token punctuation">]</span> <span class="token operator">=</span> current_lr
+
+    model<span class="token punctuation">.</span>load_state_dict<span class="token punctuation">(</span>original_state<span class="token punctuation">)</span>
+
+    <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>results<span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">10</span><span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"  Could not complete LR sweep -- loss diverged too quickly"</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> results
+
+    min_loss_idx <span class="token operator">=</span> <span class="token builtin">min</span><span class="token punctuation">(</span><span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>results<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> key<span class="token operator">=</span><span class="token keyword">lambda</span> i<span class="token punctuation">:</span> results<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    suggested_lr <span class="token operator">=</span> results<span class="token punctuation">[</span><span class="token builtin">max</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> min_loss_idx <span class="token operator">-</span> <span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Swept </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">len</span><span class="token punctuation">(</span>results<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string"> steps from </span><span class="token interpolation"><span class="token punctuation">{</span>start_lr<span class="token punctuation">:</span><span class="token format-spec">.0e</span><span class="token punctuation">}</span></span><span class="token string"> to </span><span class="token interpolation"><span class="token punctuation">{</span>results<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.0e</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Minimum loss </span><span class="token interpolation"><span class="token punctuation">{</span>results<span class="token punctuation">[</span>min_loss_idx<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string"> at lr=</span><span class="token interpolation"><span class="token punctuation">{</span>results<span class="token punctuation">[</span>min_loss_idx<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.2e</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Suggested learning rate: </span><span class="token interpolation"><span class="token punctuation">{</span>suggested_lr<span class="token punctuation">:</span><span class="token format-spec">.2e</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> results</code></pre>
+</figure>
+<h3 id="step-4-gradient-checker" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-gradient-checker" aria-label="Link to this section">#</a>Step 4: Gradient Checker</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">_flat_to_multi_index</span><span class="token punctuation">(</span>flat_idx<span class="token punctuation">,</span> shape<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    multi_idx <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    remaining <span class="token operator">=</span> flat_idx
+    <span class="token keyword">for</span> dim <span class="token keyword">in</span> <span class="token builtin">reversed</span><span class="token punctuation">(</span>shape<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        multi_idx<span class="token punctuation">.</span>insert<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> remaining <span class="token operator">%</span> dim<span class="token punctuation">)</span>
+        remaining <span class="token operator">//=</span> dim
+    <span class="token keyword">return</span> <span class="token builtin">tuple</span><span class="token punctuation">(</span>multi_idx<span class="token punctuation">)</span>
+
+
+<span class="token keyword">def</span> <span class="token function">gradient_check</span><span class="token punctuation">(</span>model<span class="token punctuation">,</span> x<span class="token punctuation">,</span> y<span class="token punctuation">,</span> criterion<span class="token punctuation">,</span> eps<span class="token operator">=</span><span class="token number">1e-4</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    model<span class="token punctuation">.</span>train<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    x_double <span class="token operator">=</span> x<span class="token punctuation">.</span>double<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    y_double <span class="token operator">=</span> y<span class="token punctuation">.</span>double<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    model_double <span class="token operator">=</span> model<span class="token punctuation">.</span>double<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n=== GRADIENT CHECK ==="</span><span class="token punctuation">)</span>
+    overall_max_diff <span class="token operator">=</span> <span class="token number">0</span>
+    checked <span class="token operator">=</span> <span class="token number">0</span>
+
+    <span class="token keyword">for</span> name<span class="token punctuation">,</span> param <span class="token keyword">in</span> model_double<span class="token punctuation">.</span>named_parameters<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> <span class="token keyword">not</span> param<span class="token punctuation">.</span>requires_grad<span class="token punctuation">:</span>
+            <span class="token keyword">continue</span>
+
+        layer_max_diff <span class="token operator">=</span> <span class="token number">0</span>
+
+        model_double<span class="token punctuation">.</span>zero_grad<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        output <span class="token operator">=</span> model_double<span class="token punctuation">(</span>x_double<span class="token punctuation">)</span>
+        loss <span class="token operator">=</span> criterion<span class="token punctuation">(</span>output<span class="token punctuation">,</span> y_double<span class="token punctuation">)</span>
+        loss<span class="token punctuation">.</span>backward<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        analytical_grad <span class="token operator">=</span> param<span class="token punctuation">.</span>grad<span class="token punctuation">.</span>clone<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+        num_checks <span class="token operator">=</span> <span class="token builtin">min</span><span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">,</span> param<span class="token punctuation">.</span>numel<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>num_checks<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            idx <span class="token operator">=</span> _flat_to_multi_index<span class="token punctuation">(</span>i<span class="token punctuation">,</span> param<span class="token punctuation">.</span>shape<span class="token punctuation">)</span>
+            original <span class="token operator">=</span> param<span class="token punctuation">.</span>data<span class="token punctuation">[</span>idx<span class="token punctuation">]</span><span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+            param<span class="token punctuation">.</span>data<span class="token punctuation">[</span>idx<span class="token punctuation">]</span> <span class="token operator">=</span> original <span class="token operator">+</span> eps
+            <span class="token keyword">with</span> torch<span class="token punctuation">.</span>no_grad<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                loss_plus <span class="token operator">=</span> criterion<span class="token punctuation">(</span>model_double<span class="token punctuation">(</span>x_double<span class="token punctuation">)</span><span class="token punctuation">,</span> y_double<span class="token punctuation">)</span><span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+            param<span class="token punctuation">.</span>data<span class="token punctuation">[</span>idx<span class="token punctuation">]</span> <span class="token operator">=</span> original <span class="token operator">-</span> eps
+            <span class="token keyword">with</span> torch<span class="token punctuation">.</span>no_grad<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                loss_minus <span class="token operator">=</span> criterion<span class="token punctuation">(</span>model_double<span class="token punctuation">(</span>x_double<span class="token punctuation">)</span><span class="token punctuation">,</span> y_double<span class="token punctuation">)</span><span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+            param<span class="token punctuation">.</span>data<span class="token punctuation">[</span>idx<span class="token punctuation">]</span> <span class="token operator">=</span> original
+
+            numerical <span class="token operator">=</span> <span class="token punctuation">(</span>loss_plus <span class="token operator">-</span> loss_minus<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token punctuation">(</span><span class="token number">2</span> <span class="token operator">*</span> eps<span class="token punctuation">)</span>
+            analytical <span class="token operator">=</span> analytical_grad<span class="token punctuation">[</span>idx<span class="token punctuation">]</span><span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+            denom <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span><span class="token builtin">abs</span><span class="token punctuation">(</span>numerical<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token builtin">abs</span><span class="token punctuation">(</span>analytical<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">1e-8</span><span class="token punctuation">)</span>
+            rel_diff <span class="token operator">=</span> <span class="token builtin">abs</span><span class="token punctuation">(</span>numerical <span class="token operator">-</span> analytical<span class="token punctuation">)</span> <span class="token operator">/</span> denom
+
+            layer_max_diff <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span>layer_max_diff<span class="token punctuation">,</span> rel_diff<span class="token punctuation">)</span>
+            checked <span class="token operator">+=</span> <span class="token number">1</span>
+
+        overall_max_diff <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span>overall_max_diff<span class="token punctuation">,</span> layer_max_diff<span class="token punctuation">)</span>
+        status <span class="token operator">=</span> <span class="token string">"OK"</span> <span class="token keyword">if</span> layer_max_diff <span class="token operator">&lt;</span> <span class="token number">1e-5</span> <span class="token keyword">else</span> <span class="token string">"MISMATCH"</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  </span><span class="token interpolation"><span class="token punctuation">{</span>name<span class="token punctuation">}</span></span><span class="token string">: max_rel_diff=</span><span class="token interpolation"><span class="token punctuation">{</span>layer_max_diff<span class="token punctuation">:</span><span class="token format-spec">.2e</span><span class="token punctuation">}</span></span><span class="token string"> [</span><span class="token interpolation"><span class="token punctuation">{</span>status<span class="token punctuation">}</span></span><span class="token string">]"</span></span><span class="token punctuation">)</span>
+
+    model<span class="token punctuation">.</span><span class="token builtin">float</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"\n  Checked </span><span class="token interpolation"><span class="token punctuation">{</span>checked<span class="token punctuation">}</span></span><span class="token string"> parameters"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> overall_max_diff <span class="token operator">&lt;</span> <span class="token number">1e-5</span><span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"  PASS: Gradients match (rel_diff &lt; 1e-5)"</span><span class="token punctuation">)</span>
+    <span class="token keyword">elif</span> overall_max_diff <span class="token operator">&lt;</span> <span class="token number">1e-3</span><span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"  WARN: Small differences (1e-5 &lt; rel_diff &lt; 1e-3)"</span><span class="token punctuation">)</span>
+    <span class="token keyword">else</span><span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"  FAIL: Gradient mismatch detected (rel_diff > 1e-3)"</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> overall_max_diff</code></pre>
+</figure>
+<h3 id="step-5-deliberately-broken-networks" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-deliberately-broken-networks" aria-label="Link to this section">#</a>Step 5: Deliberately Broken Networks</h3>
+<p>Now apply the toolkit to broken networks and diagnose each one.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">demo_broken_networks</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    torch<span class="token punctuation">.</span>manual_seed<span class="token punctuation">(</span><span class="token number">42</span><span class="token punctuation">)</span>
+    x <span class="token operator">=</span> torch<span class="token punctuation">.</span>randn<span class="token punctuation">(</span><span class="token number">64</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span>
+    y <span class="token operator">=</span> <span class="token punctuation">(</span>x<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token builtin">long</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n"</span> <span class="token operator">+</span> <span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">60</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"BUG 1: Learning rate too high (lr=10)"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">60</span><span class="token punctuation">)</span>
+    model1 <span class="token operator">=</span> nn<span class="token punctuation">.</span>Sequential<span class="token punctuation">(</span>nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nn<span class="token punctuation">.</span>ReLU<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    debugger1 <span class="token operator">=</span> NetworkDebugger<span class="token punctuation">(</span>model1<span class="token punctuation">)</span>
+    optimizer1 <span class="token operator">=</span> torch<span class="token punctuation">.</span>optim<span class="token punctuation">.</span>SGD<span class="token punctuation">(</span>model1<span class="token punctuation">.</span>parameters<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> lr<span class="token operator">=</span><span class="token number">10.0</span><span class="token punctuation">)</span>
+    criterion <span class="token operator">=</span> nn<span class="token punctuation">.</span>CrossEntropyLoss<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> step <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        optimizer1<span class="token punctuation">.</span>zero_grad<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        out <span class="token operator">=</span> model1<span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+        loss <span class="token operator">=</span> criterion<span class="token punctuation">(</span>out<span class="token punctuation">,</span> y<span class="token punctuation">)</span>
+        debugger1<span class="token punctuation">.</span>record_loss<span class="token punctuation">(</span>loss<span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        loss<span class="token punctuation">.</span>backward<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        optimizer1<span class="token punctuation">.</span>step<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    debugger1<span class="token punctuation">.</span>print_report<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    debugger1<span class="token punctuation">.</span>remove_hooks<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n"</span> <span class="token operator">+</span> <span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">60</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"BUG 2: Dead ReLUs from bad initialization"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">60</span><span class="token punctuation">)</span>
+    model2 <span class="token operator">=</span> nn<span class="token punctuation">.</span>Sequential<span class="token punctuation">(</span>nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nn<span class="token punctuation">.</span>ReLU<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">,</span> <span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nn<span class="token punctuation">.</span>ReLU<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">with</span> torch<span class="token punctuation">.</span>no_grad<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">for</span> m <span class="token keyword">in</span> model2<span class="token punctuation">.</span>modules<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> <span class="token builtin">isinstance</span><span class="token punctuation">(</span>m<span class="token punctuation">,</span> nn<span class="token punctuation">.</span>Linear<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                m<span class="token punctuation">.</span>weight<span class="token punctuation">.</span>fill_<span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">1.0</span><span class="token punctuation">)</span>
+                m<span class="token punctuation">.</span>bias<span class="token punctuation">.</span>fill_<span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">5.0</span><span class="token punctuation">)</span>
+    debugger2 <span class="token operator">=</span> NetworkDebugger<span class="token punctuation">(</span>model2<span class="token punctuation">)</span>
+    optimizer2 <span class="token operator">=</span> torch<span class="token punctuation">.</span>optim<span class="token punctuation">.</span>Adam<span class="token punctuation">(</span>model2<span class="token punctuation">.</span>parameters<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> lr<span class="token operator">=</span><span class="token number">1e-3</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> step <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">50</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        optimizer2<span class="token punctuation">.</span>zero_grad<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        out <span class="token operator">=</span> model2<span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+        loss <span class="token operator">=</span> criterion<span class="token punctuation">(</span>out<span class="token punctuation">,</span> y<span class="token punctuation">)</span>
+        debugger2<span class="token punctuation">.</span>record_loss<span class="token punctuation">(</span>loss<span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        loss<span class="token punctuation">.</span>backward<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        optimizer2<span class="token punctuation">.</span>step<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    debugger2<span class="token punctuation">.</span>print_report<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    debugger2<span class="token punctuation">.</span>remove_hooks<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n"</span> <span class="token operator">+</span> <span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">60</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"BUG 3: Missing zero_grad (gradients accumulate)"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">60</span><span class="token punctuation">)</span>
+    model3 <span class="token operator">=</span> nn<span class="token punctuation">.</span>Sequential<span class="token punctuation">(</span>nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nn<span class="token punctuation">.</span>ReLU<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    debugger3 <span class="token operator">=</span> NetworkDebugger<span class="token punctuation">(</span>model3<span class="token punctuation">)</span>
+    optimizer3 <span class="token operator">=</span> torch<span class="token punctuation">.</span>optim<span class="token punctuation">.</span>SGD<span class="token punctuation">(</span>model3<span class="token punctuation">.</span>parameters<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> lr<span class="token operator">=</span><span class="token number">0.01</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> step <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">50</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        out <span class="token operator">=</span> model3<span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+        loss <span class="token operator">=</span> criterion<span class="token punctuation">(</span>out<span class="token punctuation">,</span> y<span class="token punctuation">)</span>
+        debugger3<span class="token punctuation">.</span>record_loss<span class="token punctuation">(</span>loss<span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        loss<span class="token punctuation">.</span>backward<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        optimizer3<span class="token punctuation">.</span>step<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    debugger3<span class="token punctuation">.</span>print_report<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    debugger3<span class="token punctuation">.</span>remove_hooks<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n"</span> <span class="token operator">+</span> <span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">60</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"HEALTHY NETWORK: Correct setup for comparison"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">60</span><span class="token punctuation">)</span>
+    model_good <span class="token operator">=</span> nn<span class="token punctuation">.</span>Sequential<span class="token punctuation">(</span>nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nn<span class="token punctuation">.</span>ReLU<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    debugger_good <span class="token operator">=</span> NetworkDebugger<span class="token punctuation">(</span>model_good<span class="token punctuation">)</span>
+    optimizer_good <span class="token operator">=</span> torch<span class="token punctuation">.</span>optim<span class="token punctuation">.</span>Adam<span class="token punctuation">(</span>model_good<span class="token punctuation">.</span>parameters<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> lr<span class="token operator">=</span><span class="token number">1e-3</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> step <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">50</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        optimizer_good<span class="token punctuation">.</span>zero_grad<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        out <span class="token operator">=</span> model_good<span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+        loss <span class="token operator">=</span> criterion<span class="token punctuation">(</span>out<span class="token punctuation">,</span> y<span class="token punctuation">)</span>
+        debugger_good<span class="token punctuation">.</span>record_loss<span class="token punctuation">(</span>loss<span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        loss<span class="token punctuation">.</span>backward<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        optimizer_good<span class="token punctuation">.</span>step<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    debugger_good<span class="token punctuation">.</span>print_report<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    debugger_good<span class="token punctuation">.</span>remove_hooks<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n"</span> <span class="token operator">+</span> <span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">60</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"OVERFIT-ONE-BATCH TEST (healthy model)"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">60</span><span class="token punctuation">)</span>
+    model_test <span class="token operator">=</span> nn<span class="token punctuation">.</span>Sequential<span class="token punctuation">(</span>nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nn<span class="token punctuation">.</span>ReLU<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    overfit_one_batch<span class="token punctuation">(</span>model_test<span class="token punctuation">,</span> x<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">8</span><span class="token punctuation">]</span><span class="token punctuation">,</span> y<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">8</span><span class="token punctuation">]</span><span class="token punctuation">,</span> criterion<span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n"</span> <span class="token operator">+</span> <span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">60</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"LEARNING RATE FINDER"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">60</span><span class="token punctuation">)</span>
+    model_lr <span class="token operator">=</span> nn<span class="token punctuation">.</span>Sequential<span class="token punctuation">(</span>nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nn<span class="token punctuation">.</span>ReLU<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    find_learning_rate<span class="token punctuation">(</span>model_lr<span class="token punctuation">,</span> x<span class="token punctuation">,</span> y<span class="token punctuation">,</span> criterion<span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n"</span> <span class="token operator">+</span> <span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">60</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"GRADIENT CHECK"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">60</span><span class="token punctuation">)</span>
+    model_grad <span class="token operator">=</span> nn<span class="token punctuation">.</span>Sequential<span class="token punctuation">(</span>nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nn<span class="token punctuation">.</span>ReLU<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    gradient_check<span class="token punctuation">(</span>model_grad<span class="token punctuation">,</span> x<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">4</span><span class="token punctuation">]</span><span class="token punctuation">,</span> y<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">4</span><span class="token punctuation">]</span><span class="token punctuation">,</span> criterion<span class="token punctuation">)</span></code></pre>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<h3 id="pytorch-built-in-tools" class="prose-h prose-h3"><a class="prose-h__anchor" href="#pytorch-built-in-tools" aria-label="Link to this section">#</a>PyTorch Built-in Tools</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> torch
+<span class="token keyword">import</span> torch<span class="token punctuation">.</span>nn <span class="token keyword">as</span> nn
+
+model <span class="token operator">=</span> nn<span class="token punctuation">.</span>Sequential<span class="token punctuation">(</span>
+    nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">768</span><span class="token punctuation">,</span> <span class="token number">256</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    nn<span class="token punctuation">.</span>ReLU<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">256</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">)</span>
+
+<span class="token keyword">with</span> torch<span class="token punctuation">.</span>autograd<span class="token punctuation">.</span>detect_anomaly<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    output <span class="token operator">=</span> model<span class="token punctuation">(</span>input_tensor<span class="token punctuation">)</span>
+    loss <span class="token operator">=</span> criterion<span class="token punctuation">(</span>output<span class="token punctuation">,</span> target<span class="token punctuation">)</span>
+    loss<span class="token punctuation">.</span>backward<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token keyword">for</span> name<span class="token punctuation">,</span> param <span class="token keyword">in</span> model<span class="token punctuation">.</span>named_parameters<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> param<span class="token punctuation">.</span>grad <span class="token keyword">is</span> <span class="token keyword">not</span> <span class="token boolean">None</span><span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>name<span class="token punctuation">}</span></span><span class="token string">: grad_mean=</span><span class="token interpolation"><span class="token punctuation">{</span>param<span class="token punctuation">.</span>grad<span class="token punctuation">.</span><span class="token builtin">abs</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>mean<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.2e</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h3 id="weights-biases-integration" class="prose-h prose-h3"><a class="prose-h__anchor" href="#weights-biases-integration" aria-label="Link to this section">#</a>Weights &amp; Biases Integration</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> wandb
+
+wandb<span class="token punctuation">.</span>init<span class="token punctuation">(</span>project<span class="token operator">=</span><span class="token string">"debug-training"</span><span class="token punctuation">)</span>
+
+<span class="token keyword">for</span> epoch <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    loss <span class="token operator">=</span> train_one_epoch<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    wandb<span class="token punctuation">.</span>log<span class="token punctuation">(</span><span class="token punctuation">{</span>
+        <span class="token string">"loss"</span><span class="token punctuation">:</span> loss<span class="token punctuation">,</span>
+        <span class="token string">"lr"</span><span class="token punctuation">:</span> optimizer<span class="token punctuation">.</span>param_groups<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">"lr"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+        <span class="token string">"grad_norm"</span><span class="token punctuation">:</span> torch<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>utils<span class="token punctuation">.</span>clip_grad_norm_<span class="token punctuation">(</span>model<span class="token punctuation">.</span>parameters<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token builtin">float</span><span class="token punctuation">(</span><span class="token string">"inf"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">for</span> name<span class="token punctuation">,</span> param <span class="token keyword">in</span> model<span class="token punctuation">.</span>named_parameters<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> param<span class="token punctuation">.</span>grad <span class="token keyword">is</span> <span class="token keyword">not</span> <span class="token boolean">None</span><span class="token punctuation">:</span>
+            wandb<span class="token punctuation">.</span>log<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string-interpolation"><span class="token string">f"grad/</span><span class="token interpolation"><span class="token punctuation">{</span>name<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">:</span> wandb<span class="token punctuation">.</span>Histogram<span class="token punctuation">(</span>param<span class="token punctuation">.</span>grad<span class="token punctuation">.</span>cpu<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>numpy<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h3 id="tensorboard" class="prose-h prose-h3"><a class="prose-h__anchor" href="#tensorboard" aria-label="Link to this section">#</a>TensorBoard</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> torch<span class="token punctuation">.</span>utils<span class="token punctuation">.</span>tensorboard <span class="token keyword">import</span> SummaryWriter
+
+writer <span class="token operator">=</span> SummaryWriter<span class="token punctuation">(</span><span class="token string">"runs/debug_experiment"</span><span class="token punctuation">)</span>
+
+<span class="token keyword">for</span> epoch <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    loss <span class="token operator">=</span> train_one_epoch<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    writer<span class="token punctuation">.</span>add_scalar<span class="token punctuation">(</span><span class="token string">"Loss/train"</span><span class="token punctuation">,</span> loss<span class="token punctuation">,</span> epoch<span class="token punctuation">)</span>
+
+    <span class="token keyword">for</span> name<span class="token punctuation">,</span> param <span class="token keyword">in</span> model<span class="token punctuation">.</span>named_parameters<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        writer<span class="token punctuation">.</span>add_histogram<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"weights/</span><span class="token interpolation"><span class="token punctuation">{</span>name<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">,</span> param<span class="token punctuation">,</span> epoch<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> param<span class="token punctuation">.</span>grad <span class="token keyword">is</span> <span class="token keyword">not</span> <span class="token boolean">None</span><span class="token punctuation">:</span>
+            writer<span class="token punctuation">.</span>add_histogram<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"gradients/</span><span class="token interpolation"><span class="token punctuation">{</span>name<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">,</span> param<span class="token punctuation">.</span>grad<span class="token punctuation">,</span> epoch<span class="token punctuation">)</span></code></pre>
+</figure>
+<h3 id="the-debug-checklist-before-full-training" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-debug-checklist-before-full-training" aria-label="Link to this section">#</a>The Debug Checklist (Before Full Training)</h3>
+<ol>
+<li>Run overfit-one-batch test. If it fails, stop.</li>
+<li>Print model summary -- verify parameter count is reasonable.</li>
+<li>Run a single forward pass with random data -- check output shape.</li>
+<li>Train for 5 epochs -- verify loss decreases.</li>
+<li>Check activation statistics -- no dead layers, no explosions.</li>
+<li>Check gradient flow -- no vanishing, no exploding.</li>
+<li>Verify data pipeline -- print 5 random samples with labels.</li>
+</ol>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces:</p>
+<ul>
+<li><code class="inline-code">outputs/prompt-nn-debugger.md</code> -- a prompt for diagnosing neural network training failures</li>
+<li><code class="inline-code">outputs/skill-debug-checklist.md</code> -- a decision-tree checklist for debugging training issues</li>
+</ul>
+<p>Key deployment patterns for debugging:</p>
+<ul>
+<li>Add monitoring hooks to production training scripts</li>
+<li>Log activation and gradient statistics to W&amp;B or TensorBoard every N steps</li>
+<li>Implement automatic alerts for NaN loss, dead neurons (&gt;80% zero), or gradient explosion</li>
+<li>Always run the overfit-one-batch test when changing architectures or data pipelines</li>
+</ul>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p><strong>Add an exploding gradient detector.</strong> Modify the <code class="inline-code">NetworkDebugger</code> to detect when gradients exceed a threshold and automatically suggest a gradient clipping value. Test it on a 20-layer network with no normalization.</p>
+</li>
+<li><p><strong>Build a dead neuron resurrector.</strong> Write a function that identifies dead ReLU neurons (always outputting 0) and reinitializes their incoming weights with Kaiming initialization. Show that this recovers a network where &gt;70% of neurons are dead.</p>
+</li>
+<li><p><strong>Implement the learning rate finder with plotting.</strong> Extend <code class="inline-code">find_learning_rate</code> to save results as a CSV and write a separate script that reads the CSV and displays the LR vs loss curve using matplotlib. Identify the optimal LR for ResNet-18 on CIFAR-10.</p>
+</li>
+<li><p><strong>Create a data pipeline validator.</strong> Write a function that checks for: duplicate samples across train/test splits, label distribution imbalance (&gt;10:1 ratio), input normalization (mean near 0, std near 1), and NaN/Inf values in the data. Run it on a deliberately corrupted dataset.</p>
+</li>
+<li><p><strong>Debug a real failure.</strong> Take the mini-framework from Lesson 10, introduce a subtle bug (e.g., transpose the weight matrix in backward), and use gradient checking to locate exactly which parameter has incorrect gradients. Document the debugging process.</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Silent bug</td>
+<td>&quot;It runs but gives bad results&quot;</td>
+<td>A bug that produces no error but degrades model quality -- the dominant failure mode in ML</td>
+</tr>
+<tr>
+<td>Dead ReLU</td>
+<td>&quot;The neurons died&quot;</td>
+<td>A ReLU neuron whose input is always negative, so it outputs 0 and receives 0 gradient permanently</td>
+</tr>
+<tr>
+<td>Vanishing gradients</td>
+<td>&quot;Early layers stop learning&quot;</td>
+<td>Gradients shrink exponentially through layers, making weights in early layers effectively frozen</td>
+</tr>
+<tr>
+<td>Exploding gradients</td>
+<td>&quot;Loss went to NaN&quot;</td>
+<td>Gradients grow exponentially through layers, causing weight updates so large they overflow</td>
+</tr>
+<tr>
+<td>Gradient checking</td>
+<td>&quot;Verify backprop is correct&quot;</td>
+<td>Comparing analytical gradients from backprop to numerical gradients from finite differences</td>
+</tr>
+<tr>
+<td>Overfit-one-batch</td>
+<td>&quot;The most important debug test&quot;</td>
+<td>Training on a single small batch to verify the model CAN learn -- if it cannot, something is fundamentally broken</td>
+</tr>
+<tr>
+<td>LR finder</td>
+<td>&quot;Sweep to find the right learning rate&quot;</td>
+<td>Exponentially increasing the learning rate over one epoch and picking the rate just before loss diverges</td>
+</tr>
+<tr>
+<td>Data leakage</td>
+<td>&quot;Test data leaked into training&quot;</td>
+<td>When information from the test set contaminates training, producing artificially high accuracy</td>
+</tr>
+<tr>
+<td>Activation statistics</td>
+<td>&quot;Monitor layer health&quot;</td>
+<td>Tracking mean, std, and zero-fraction of each layer&#39;s output to detect dead, saturated, or exploding neurons</td>
+</tr>
+<tr>
+<td>Gradient clipping</td>
+<td>&quot;Cap the gradient magnitude&quot;</td>
+<td>Scaling gradients down when their norm exceeds a threshold, preventing exploding gradient updates</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li>Smith, &quot;Cyclical Learning Rates for Training Neural Networks&quot; (2017) -- the paper introducing the learning rate range test (LR finder)</li>
+<li>Northcutt et al., &quot;Pervasive Label Errors in Test Sets Destabilize Machine Learning Benchmarks&quot; (2021) -- demonstrates that 3-6% of labels in ImageNet, CIFAR-10, and other major benchmarks are wrong</li>
+<li>Zhang et al., &quot;Understanding Deep Learning Requires Rethinking Generalization&quot; (2017) -- the paper showing neural networks can memorize random labels, which is why the overfit-one-batch test works</li>
+<li>PyTorch documentation on <code class="inline-code">torch.autograd.detect_anomaly</code> and <code class="inline-code">torch.autograd.set_detect_anomaly</code> for built-in NaN/Inf detection</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="12-intro-to-jax.html">
+  <span class="label">← Previous</span>
+  <b>Introduction to JAX</b>
+</a>
+      <span class="pager__item pager__item--next is-empty">
+  <span class="label">Next →</span>
+  <b>End of this module</b>
+</span>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>10 minutes</b> of Deep Learning Core behind you.</p>
+      <a class="btn btn--solid" href="../index.html#modules">Pick the next module →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#the-debugging-mindset">The Debugging Mindset</a></li><li class="mini__item mini__item--d3"><a href="#symptom-1-loss-not-decreasing">Symptom 1: Loss Not Decreasing</a></li><li class="mini__item mini__item--d3"><a href="#symptom-2-loss-decreasing-but-model-is-bad">Symptom 2: Loss Decreasing But Model is Bad</a></li><li class="mini__item mini__item--d3"><a href="#symptom-3-nan-or-inf-in-loss">Symptom 3: NaN or Inf in Loss</a></li><li class="mini__item mini__item--d3"><a href="#technique-1-gradient-checking">Technique 1: Gradient Checking</a></li><li class="mini__item mini__item--d3"><a href="#technique-2-activation-statistics">Technique 2: Activation Statistics</a></li><li class="mini__item mini__item--d3"><a href="#technique-3-gradient-flow-visualization">Technique 3: Gradient Flow Visualization</a></li><li class="mini__item mini__item--d3"><a href="#technique-4-the-overfit-one-batch-test">Technique 4: The Overfit-One-Batch Test</a></li><li class="mini__item mini__item--d3"><a href="#technique-5-learning-rate-finder">Technique 5: Learning Rate Finder</a></li><li class="mini__item mini__item--d3"><a href="#common-pytorch-bugs">Common PyTorch Bugs</a></li><li class="mini__item mini__item--d3"><a href="#the-master-debugging-table">The Master Debugging Table</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-the-networkdebugger-class">Step 1: The NetworkDebugger Class</a></li><li class="mini__item mini__item--d3"><a href="#step-2-the-overfit-one-batch-test">Step 2: The Overfit-One-Batch Test</a></li><li class="mini__item mini__item--d3"><a href="#step-3-learning-rate-finder">Step 3: Learning Rate Finder</a></li><li class="mini__item mini__item--d3"><a href="#step-4-gradient-checker">Step 4: Gradient Checker</a></li><li class="mini__item mini__item--d3"><a href="#step-5-deliberately-broken-networks">Step 5: Deliberately Broken Networks</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d3"><a href="#pytorch-built-in-tools">PyTorch Built-in Tools</a></li><li class="mini__item mini__item--d3"><a href="#weights-biases-integration">Weights &amp; Biases Integration</a></li><li class="mini__item mini__item--d3"><a href="#tensorboard">TensorBoard</a></li><li class="mini__item mini__item--d3"><a href="#the-debug-checklist-before-full-training">The Debug Checklist (Before Full Training)</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

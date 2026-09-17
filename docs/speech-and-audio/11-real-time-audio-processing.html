@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Real-Time Audio Processing — Speech &amp; Audio — AIFS</title>
+<meta name="description" content="Speech &amp; Audio: Real-Time Audio Processing. 4 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Real-Time Audio Processing — Speech &amp; Audio — AIFS">
+<meta property="og:description" content="Speech &amp; Audio: Real-Time Audio Processing. 4 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"nyquist-aliasing":["../assets/figures/figures-vision-speech.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-vision-speech.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#00C2FF" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#00C2FF;--accent-ink:#111111"
+  data-lesson-id="speech-and-audio/11-real-time-audio-processing" data-module="speech-and-audio"
+  data-prev="10-audio-language-models.html" data-next="12-voice-assistant-pipeline.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#00C2FF">
+        <span class="label">Phase 06</span>
+        <b>Speech &amp; Audio</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="speech-and-audio/01-audio-fundamentals"><a href="01-audio-fundamentals.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Audio Fundamentals — Waveforms, Sampling, Fourier Transform</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/02-spectrograms-mel-features"><a href="02-spectrograms-mel-features.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Spectrograms, Mel Scale &amp; Audio Features</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/03-audio-classification"><a href="03-audio-classification.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Audio Classification — From k-NN on MFCCs to AST and BEATs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/04-speech-recognition-asr"><a href="04-speech-recognition-asr.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Speech Recognition (ASR) — CTC, RNN-T, Attention</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/05-whisper-architecture-finetuning"><a href="05-whisper-architecture-finetuning.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Whisper — Architecture &amp; Fine-Tuning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/06-speaker-recognition-verification"><a href="06-speaker-recognition-verification.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Speaker Recognition &amp; Verification</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/07-text-to-speech"><a href="07-text-to-speech.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Text-to-Speech (TTS) — From Tacotron to F5 and Kokoro</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/08-voice-cloning-conversion"><a href="08-voice-cloning-conversion.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Voice Cloning &amp; Voice Conversion</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/09-music-generation"><a href="09-music-generation.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Music Generation — MusicGen, Stable Audio, Suno, and the Licensing Earthquake</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/10-audio-language-models"><a href="10-audio-language-models.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Audio-Language Models — Qwen2.5-Omni, Audio Flamingo, GPT-4o Audio</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/11-real-time-audio-processing"><a href="11-real-time-audio-processing.html" class="is-current">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Real-Time Audio Processing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/12-voice-assistant-pipeline"><a href="12-voice-assistant-pipeline.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Build a Voice Assistant Pipeline — The Phase 6 Capstone</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/13-neural-audio-codecs"><a href="13-neural-audio-codecs.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Neural Audio Codecs — EnCodec, SNAC, Mimi, DAC and the Semantic-Acoustic Split</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/14-voice-activity-detection-turn-taking"><a href="14-voice-activity-detection-turn-taking.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Voice Activity Detection &amp; Turn-Taking — Silero, Cobra, and the Flush Trick</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/15-streaming-speech-to-speech-moshi-hibiki"><a href="15-streaming-speech-to-speech-moshi-hibiki.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Streaming Speech-to-Speech — Moshi, Hibiki, and Full-Duplex Dialogue</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/16-anti-spoofing-audio-watermarking"><a href="16-anti-spoofing-audio-watermarking.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Voice Anti-Spoofing &amp; Audio Watermarking — ASVspoof 5, AudioSeal, WaveVerify</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/17-audio-evaluation-metrics"><a href="17-audio-evaluation-metrics.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Audio Evaluation — WER, MOS, UTMOS, MMAU, FAD, and the Open Leaderboards</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Speech &amp; Audio</a></p>
+      <h1 class="page__title">Real-Time Audio Processing</h1>
+      <p class="page__lede">Batch pipelines process a file. Real-time pipelines process the next 20 milliseconds before the next 20 arrive. Every conversational AI, broadcast studio, and telephony bot lives and dies by this latency budget.</p>
+      <div class="page__meta">
+        <span class="chip">4 min read</span>
+        <span class="chip">866 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 6 · 02 (Spectrograms), Phase 6 · 04 (ASR), Phase 6 · 07 (TTS)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>You want a voice assistant that feels alive. Human conversational turn-taking latency is ~230 ms (silence-to-response). Anything above 500 ms feels robotic; above 1500 ms feels broken. The budget for a full <strong>hear → understand → respond → speak</strong> loop in 2026 is:</p>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Budget</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Mic → buffer</td>
+<td>20 ms</td>
+</tr>
+<tr>
+<td>VAD</td>
+<td>10 ms</td>
+</tr>
+<tr>
+<td>ASR (streaming)</td>
+<td>150 ms</td>
+</tr>
+<tr>
+<td>LLM (first token)</td>
+<td>100 ms</td>
+</tr>
+<tr>
+<td>TTS (first chunk)</td>
+<td>100 ms</td>
+</tr>
+<tr>
+<td>Render → speaker</td>
+<td>20 ms</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>~400 ms</strong></td>
+</tr>
+</tbody></table>
+<p>Moshi (Kyutai, 2024) clocked 200 ms full-duplex. GPT-4o-realtime (2024) clocks ~320 ms. Cascaded pipelines in 2022 shipped at 2500 ms. The 10× improvement came from three techniques: (1) streaming everywhere, (2) asynchronous pipelining with partial results, (3) interruptible generation.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<p><img src="assets/11-real-time-audio-processing/real-time.svg" alt="Streaming audio pipeline with ring buffer, VAD gate, interruption" loading="lazy"></p>
+<p><strong>Frame / chunk / window.</strong> Real-time audio flows as fixed-size blocks. Common choice: 20 ms (320 samples at 16 kHz). Everything downstream must keep up with this cadence.</p>
+<p><strong>Ring buffer.</strong> Fixed-size circular buffer. Producer thread writes new frames, consumer thread reads. Prevents allocations in the hot path. Size ≈ maximum-latency × sample-rate; a 2-second 16 kHz ring = 32,000 samples.</p>
+<p><strong>VAD (Voice Activity Detection).</strong> Gates downstream work when nobody is speaking. Silero VAD 4.0 (2024) runs &lt;1 ms per 30 ms frame on CPU. <code class="inline-code">webrtcvad</code> is the older alternative.</p>
+<p><strong>Streaming ASR.</strong> Models that emit partial transcripts as audio arrives. Parakeet-CTC-0.6B in streaming mode (NeMo, 2024) does 2–5% WER at 320 ms latency. Whisper-Streaming (Macháček et al., 2023) chunks Whisper for near-streaming at ~2 s latency.</p>
+<p><strong>Interruption.</strong> When the user speaks while the assistant is talking, you must (a) detect the barge-in, (b) stop the TTS, (c) discard the remaining LLM output. All within 100 ms, or the user perceives deaf assistant.</p>
+<p><strong>WebRTC Opus transport.</strong> 20 ms frames, 48 kHz, adaptive bitrate 8–128 kbps. Standard for browser and mobile. LiveKit, Daily.co, Pion are the 2026 stacks for building voice apps.</p>
+<p><strong>Jitter buffer.</strong> Network packets arrive out of order / late. The jitter buffer reorders and smooths; too small → audible gaps, too large → latency. 60–80 ms typical.</p>
+<h3 id="common-gotchas" class="prose-h prose-h3"><a class="prose-h__anchor" href="#common-gotchas" aria-label="Link to this section">#</a>Common gotchas</h3>
+<ul>
+<li><strong>Thread contention.</strong> Python&#39;s GIL + heavy models can starve the audio thread. Use a C-callback audio library (sounddevice, PortAudio) and keep Python off the hot path.</li>
+<li><strong>Sample-rate conversion latency.</strong> Resampling inside the pipeline adds 5–20 ms. Either resample upfront or use a zero-latency resampler (PolyPhase, <code class="inline-code">soxr_hq</code>).</li>
+<li><strong>TTS priming.</strong> Even fast TTS like Kokoro has a 100–200 ms warm-up on first request. Cache model + warm it with a dummy run before the first real turn.</li>
+<li><strong>Echo cancellation.</strong> Without AEC, TTS output re-enters the mic and triggers ASR on the bot&#39;s own voice. WebRTC AEC3 is the open-source default.</li>
+</ul>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="nyquist-aliasing"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">nyquist-aliasing</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> nyquist aliasing</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-ring-buffer" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-ring-buffer" aria-label="Link to this section">#</a>Step 1: ring buffer</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> collections
+
+<span class="token keyword">class</span> <span class="token class-name">RingBuffer</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> capacity<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>buf <span class="token operator">=</span> collections<span class="token punctuation">.</span>deque<span class="token punctuation">(</span>maxlen<span class="token operator">=</span>capacity<span class="token punctuation">)</span>
+    <span class="token keyword">def</span> <span class="token function">write</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> frame<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>buf<span class="token punctuation">.</span>extend<span class="token punctuation">(</span>frame<span class="token punctuation">)</span>
+    <span class="token keyword">def</span> <span class="token function">read</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> n<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">[</span>self<span class="token punctuation">.</span>buf<span class="token punctuation">.</span>popleft<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">min</span><span class="token punctuation">(</span>n<span class="token punctuation">,</span> <span class="token builtin">len</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>buf<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+    <span class="token keyword">def</span> <span class="token function">level</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token builtin">len</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>buf<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Capacity determines max buffering latency. 32,000 samples at 16 kHz = 2 s.</p>
+<h3 id="step-2-vad-gate" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-vad-gate" aria-label="Link to this section">#</a>Step 2: VAD gate</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">simple_energy_vad</span><span class="token punctuation">(</span>frame<span class="token punctuation">,</span> threshold<span class="token operator">=</span><span class="token number">0.01</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>x <span class="token operator">*</span> x <span class="token keyword">for</span> x <span class="token keyword">in</span> frame<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>frame<span class="token punctuation">)</span> <span class="token operator">></span> threshold <span class="token operator">**</span> <span class="token number">2</span></code></pre>
+</figure>
+<p>Replace with Silero VAD in production:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> torch
+vad<span class="token punctuation">,</span> _ <span class="token operator">=</span> torch<span class="token punctuation">.</span>hub<span class="token punctuation">.</span>load<span class="token punctuation">(</span><span class="token string">"snakers4/silero-vad"</span><span class="token punctuation">,</span> <span class="token string">"silero_vad"</span><span class="token punctuation">)</span>
+is_speech <span class="token operator">=</span> vad<span class="token punctuation">(</span>torch<span class="token punctuation">.</span>tensor<span class="token punctuation">(</span>frame<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">16000</span><span class="token punctuation">)</span><span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">0.5</span></code></pre>
+</figure>
+<h3 id="step-3-streaming-asr" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-streaming-asr" aria-label="Link to this section">#</a>Step 3: streaming ASR</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token comment"># Parakeet-CTC-0.6B streaming via NeMo</span>
+<span class="token keyword">from</span> nemo<span class="token punctuation">.</span>collections<span class="token punctuation">.</span>asr<span class="token punctuation">.</span>models <span class="token keyword">import</span> EncDecCTCModelBPE
+asr <span class="token operator">=</span> EncDecCTCModelBPE<span class="token punctuation">.</span>from_pretrained<span class="token punctuation">(</span><span class="token string">"nvidia/parakeet-ctc-0.6b"</span><span class="token punctuation">)</span>
+<span class="token comment"># chunk_ms=320 ms, look_ahead_ms=80 ms</span>
+<span class="token keyword">for</span> chunk <span class="token keyword">in</span> audio_stream<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    partial_text <span class="token operator">=</span> asr<span class="token punctuation">.</span>transcribe_streaming<span class="token punctuation">(</span>chunk<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span>partial_text<span class="token punctuation">,</span> end<span class="token operator">=</span><span class="token string">"\r"</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h3 id="step-4-interruption-handler" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-interruption-handler" aria-label="Link to this section">#</a>Step 4: interruption handler</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">Dialog</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>tts_task <span class="token operator">=</span> <span class="token boolean">None</span>
+
+    <span class="token keyword">def</span> <span class="token function">on_user_speech</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> frame<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> self<span class="token punctuation">.</span>tts_task <span class="token keyword">and</span> <span class="token keyword">not</span> self<span class="token punctuation">.</span>tts_task<span class="token punctuation">.</span>done<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            self<span class="token punctuation">.</span>tts_task<span class="token punctuation">.</span>cancel<span class="token punctuation">(</span><span class="token punctuation">)</span>   <span class="token comment"># barge-in</span>
+        <span class="token comment"># then feed to streaming ASR</span>
+
+    <span class="token keyword">def</span> <span class="token function">on_final_user_utterance</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> text<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>tts_task <span class="token operator">=</span> asyncio<span class="token punctuation">.</span>create_task<span class="token punctuation">(</span>self<span class="token punctuation">.</span>reply<span class="token punctuation">(</span>text<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">async</span> <span class="token keyword">def</span> <span class="token function">reply</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> text<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">async</span> <span class="token keyword">for</span> tts_chunk <span class="token keyword">in</span> llm_then_tts<span class="token punctuation">(</span>text<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            speaker<span class="token punctuation">.</span>write<span class="token punctuation">(</span>tts_chunk<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Hinges on async I/O and cancellable TTS streaming. WebRTC peerconnection.stop() on the audio track is the canonical way.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>The 2026 stack:</p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Pick</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Transport</td>
+<td>LiveKit (WebRTC) or Pion (Go)</td>
+</tr>
+<tr>
+<td>VAD</td>
+<td>Silero VAD 4.0</td>
+</tr>
+<tr>
+<td>Streaming ASR</td>
+<td>Parakeet-CTC-0.6B or Whisper-Streaming</td>
+</tr>
+<tr>
+<td>LLM first-token</td>
+<td>Groq, Cerebras, vLLM-streaming</td>
+</tr>
+<tr>
+<td>Streaming TTS</td>
+<td>Kokoro or ElevenLabs Turbo v2.5</td>
+</tr>
+<tr>
+<td>Echo cancel</td>
+<td>WebRTC AEC3</td>
+</tr>
+<tr>
+<td>End-to-end native</td>
+<td>OpenAI Realtime API or Moshi</td>
+</tr>
+</tbody></table>
+<h2 id="pitfalls" class="prose-h prose-h2"><a class="prose-h__anchor" href="#pitfalls" aria-label="Link to this section">#</a>Pitfalls</h2>
+<ul>
+<li><strong>Buffering 500 ms to be safe.</strong> The buffer <em>is</em> your latency floor. Shrink it.</li>
+<li><strong>Not pinning threads.</strong> Audio callback on a priority-lower-than-UI thread = glitches under load.</li>
+<li><strong>TTS chunks too small.</strong> Sub-200 ms chunks make vocoder artifacts audible. 320 ms chunks are the sweet spot.</li>
+<li><strong>No jitter buffer.</strong> Real networks are jittery; without smoothing you get pops.</li>
+<li><strong>Single-shot error handling.</strong> Audio pipelines must be crash-proof. One exception kills the session.</li>
+</ul>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>Save as <code class="inline-code">outputs/skill-realtime-designer.md</code>. Design a real-time audio pipeline with concrete latency budgets per stage.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><strong>Easy.</strong> Run <code class="inline-code">code/main.py</code>. Simulates a ring buffer + energy VAD; prints stage latencies for a fake 10-second stream.</li>
+<li><strong>Medium.</strong> Using <code class="inline-code">sounddevice</code>, build a passthrough loop that processes your mic in 20 ms frames and prints VAD state at each frame.</li>
+<li><strong>Hard.</strong> Build a full duplex echo test with <code class="inline-code">aiortc</code>: browser → WebRTC → Python → WebRTC → browser. Measure glass-to-glass latency with a 1 kHz pulse.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Ring buffer</td>
+<td>The circular queue</td>
+<td>Fixed-size, lock-free (or SPSC-locked) FIFO for audio frames.</td>
+</tr>
+<tr>
+<td>VAD</td>
+<td>Silence gate</td>
+<td>Model or heuristic marking speech vs non-speech.</td>
+</tr>
+<tr>
+<td>Streaming ASR</td>
+<td>Real-time STT</td>
+<td>Emits partial text as audio arrives; bounded lookahead.</td>
+</tr>
+<tr>
+<td>Jitter buffer</td>
+<td>Network smoother</td>
+<td>Queue reordering out-of-order packets; 60–80 ms typical.</td>
+</tr>
+<tr>
+<td>AEC</td>
+<td>Echo cancellation</td>
+<td>Subtracts speaker-to-mic feedback path.</td>
+</tr>
+<tr>
+<td>Barge-in</td>
+<td>User interrupt</td>
+<td>System detects user speech mid-TTS; must cancel playback.</td>
+</tr>
+<tr>
+<td>Full duplex</td>
+<td>Simultaneous both ways</td>
+<td>User and bot can talk at the same time; Moshi is full duplex.</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2307.14743" target="_blank" rel="noopener">Macháček et al. (2023). Whisper-Streaming</a> — chunked near-streaming Whisper.</li>
+<li><a href="https://kyutai.org/Moshi.pdf" target="_blank" rel="noopener">Kyutai (2024). Moshi</a> — full-duplex 200 ms latency.</li>
+<li><a href="https://docs.livekit.io/agents/" target="_blank" rel="noopener">LiveKit Agents framework (2024)</a> — production audio agent orchestration.</li>
+<li><a href="https://github.com/snakers4/silero-vad" target="_blank" rel="noopener">Silero VAD repo</a> — sub-1 ms VAD, Apache 2.0.</li>
+<li><a href="https://webrtc.googlesource.com/src/+/main/modules/audio_processing/aec3/" target="_blank" rel="noopener">WebRTC AEC3 paper</a> — echo cancellation under open source.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="10-audio-language-models.html">
+  <span class="label">← Previous</span>
+  <b>Audio-Language Models — Qwen2.5-Omni, Audio Flamingo, GPT-4o Audio</b>
+</a>
+      <a class="pager__item pager__item--next" href="12-voice-assistant-pipeline.html">
+  <span class="label">Next →</span>
+  <b>Build a Voice Assistant Pipeline — The Phase 6 Capstone</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>4 minutes</b> of Speech &amp; Audio behind you.</p>
+      <a class="btn btn--solid" href="12-voice-assistant-pipeline.html">Continue to Build a Voice Assistant Pipeline — The Phase 6 Capstone →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#common-gotchas">Common gotchas</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-ring-buffer">Step 1: ring buffer</a></li><li class="mini__item mini__item--d3"><a href="#step-2-vad-gate">Step 2: VAD gate</a></li><li class="mini__item mini__item--d3"><a href="#step-3-streaming-asr">Step 3: streaming ASR</a></li><li class="mini__item mini__item--d3"><a href="#step-4-interruption-handler">Step 4: interruption handler</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#pitfalls">Pitfalls</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

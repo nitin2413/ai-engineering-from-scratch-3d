@@ -1,0 +1,969 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DPO: Direct Preference Optimization — LLMs from Scratch — AIFS</title>
+<meta name="description" content="LLMs from Scratch: DPO: Direct Preference Optimization. 11 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="DPO: Direct Preference Optimization — LLMs from Scratch — AIFS">
+<meta property="og:description" content="LLMs from Scratch: DPO: Direct Preference Optimization. 11 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"dpo-loss":["../assets/figures/figures-llms2.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-llms2.js"];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#6C4DFF" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#6C4DFF;--accent-ink:#FFFFFF"
+  data-lesson-id="llms-from-scratch/08-dpo" data-module="llms-from-scratch"
+  data-prev="07-rlhf.html" data-next="09-constitutional-ai-self-improvement.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#6C4DFF">
+        <span class="label">Phase 10</span>
+        <b>LLMs from Scratch</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="llms-from-scratch/01-tokenizers"><a href="01-tokenizers.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Tokenizers: BPE, WordPiece, SentencePiece</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/02-building-a-tokenizer"><a href="02-building-a-tokenizer.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Building a Tokenizer from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/03-data-pipelines"><a href="03-data-pipelines.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Data Pipelines for Pre-Training</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/04-pre-training-mini-gpt"><a href="04-pre-training-mini-gpt.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Pre-Training a Mini GPT (124M Parameters)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/05-scaling-distributed"><a href="05-scaling-distributed.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Scaling: Distributed Training, FSDP, DeepSpeed</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/06-instruction-tuning-sft"><a href="06-instruction-tuning-sft.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Instruction Tuning (SFT)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/07-rlhf"><a href="07-rlhf.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">RLHF: Reward Model + PPO</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/08-dpo"><a href="08-dpo.html" class="is-current">
+  <span class="snav__n">08</span>
+  <span class="snav__t">DPO: Direct Preference Optimization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/09-constitutional-ai-self-improvement"><a href="09-constitutional-ai-self-improvement.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Constitutional AI and Self-Improvement</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/10-evaluation"><a href="10-evaluation.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Evaluation: Benchmarks, Evals, LM Harness</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/11-quantization"><a href="11-quantization.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Quantization: Making Models Fit</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/12-inference-optimization"><a href="12-inference-optimization.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Inference Optimization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/13-building-complete-llm-pipeline"><a href="13-building-complete-llm-pipeline.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Building a Complete LLM Pipeline</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/14-open-models-architecture-walkthroughs"><a href="14-open-models-architecture-walkthroughs.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Open Models: Architecture Walkthroughs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/15-speculative-decoding-eagle3"><a href="15-speculative-decoding-eagle3.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Speculative Decoding and EAGLE-3</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/16-differential-attention-v2"><a href="16-differential-attention-v2.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Differential Attention (V2)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/17-native-sparse-attention"><a href="17-native-sparse-attention.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Native Sparse Attention (DeepSeek NSA)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/18-multi-token-prediction"><a href="18-multi-token-prediction.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Multi-Token Prediction (MTP)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/19-dualpipe-parallelism"><a href="19-dualpipe-parallelism.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">DualPipe Parallelism</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/20-deepseek-v3-walkthrough"><a href="20-deepseek-v3-walkthrough.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">DeepSeek-V3 Architecture Walkthrough</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/21-jamba-hybrid-ssm-transformer"><a href="21-jamba-hybrid-ssm-transformer.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Jamba — Hybrid SSM-Transformer</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/22-async-hogwild-inference"><a href="22-async-hogwild-inference.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Async and Hogwild! Inference</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/25-speculative-decoding"><a href="25-speculative-decoding.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Speculative Decoding and EAGLE</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/34-gradient-checkpointing"><a href="34-gradient-checkpointing.html" class="">
+  <span class="snav__n">34</span>
+  <span class="snav__t">Gradient Checkpointing and Activation Recomputation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">LLMs from Scratch</a></p>
+      <h1 class="page__title">DPO: Direct Preference Optimization</h1>
+      <p class="page__lede">RLHF works. It also requires training three models (SFT, reward model, policy), managing PPO's instability, and tuning a KL penalty. DPO asks: what if you could skip all of that? DPO directly optimizes the language model on preference pairs. No reward model. No PPO. One training loop. Same results.</p>
+      <div class="page__meta">
+        <span class="chip">11 min read</span>
+        <span class="chip">2,523 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (with numpy)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 10, Lesson 07 (RLHF)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~90 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Implement DPO training that directly optimizes a language model on preference pairs without a separate reward model</li>
+<li>Derive the DPO loss function and explain how it implicitly represents a reward model through the policy&#39;s log probabilities</li>
+<li>Compare DPO vs RLHF in terms of training stability, compute cost, and number of models required</li>
+<li>Tune the beta parameter to control how far the trained policy diverges from the reference model</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>You built an RLHF pipeline in Lesson 07. Three stages. Three models. The SFT model, the reward model, and the policy model optimized with PPO. The reward model alone required thousands of human preference pairs and a separate training loop. PPO required careful tuning of the KL coefficient, learning rate, clip ratio, and number of epochs.</p>
+<p>In practice, PPO training is notoriously unstable. Small hyperparameter changes cause the training to diverge. The reward model is an imperfect proxy for human preferences, and the policy finds ways to exploit its weaknesses. The KL penalty helps but requires its own tuning -- too low and you get reward hacking, too high and the model barely learns.</p>
+<p>This complexity is why most open-source models struggled with RLHF for years after InstructGPT was published. The three-stage pipeline is fragile. Each stage has its own failure modes, and errors compound.</p>
+<p>In May 2023, Rafael Rafailov, Archit Sharma, and colleagues at Stanford published &quot;Direct Preference Optimization: Your Language Model is Secretly a Reward Model.&quot; The key insight: you don&#39;t need a separate reward model. The optimal reward function is mathematically determined by the language model&#39;s own token probabilities. You can skip the reward model entirely and optimize the language model directly on preference pairs.</p>
+<p>DPO reduces RLHF to a single supervised learning step. One model. One loss function. One training loop. No reinforcement learning. Zephyr-7B, one of the first models to use DPO at scale, matched or beat models trained with full RLHF on several benchmarks. Meta used DPO as part of Llama 3&#39;s alignment pipeline. Anthropic has cited DPO-style methods in their alignment research.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="the-key-insight" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-key-insight" aria-label="Link to this section">#</a>The Key Insight</h3>
+<p>RLHF optimizes this objective:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>maximize: E[R(x, y)] - beta * KL(pi || pi_ref)</code></pre>
+</figure>
+<p>where R is the reward model, pi is the policy, pi_ref is the reference model, and beta is the KL coefficient.</p>
+<p>The DPO paper showed that this objective has a closed-form optimal solution. For any reward function R, the optimal policy is:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>pi*(y | x) = pi_ref(y | x) * exp(R(x, y) / beta) / Z(x)</code></pre>
+</figure>
+<p>where Z(x) is a normalizing constant. Rearranging:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>R(x, y) = beta * log(pi*(y | x) / pi_ref(y | x)) + beta * log Z(x)</code></pre>
+</figure>
+<p>This is the breakthrough. The reward is expressed entirely in terms of the policy model&#39;s probabilities and the reference model&#39;s probabilities. You don&#39;t need to train a separate reward model. The reward is <em>implicit</em> in the probability ratio.</p>
+<p>Substituting this into the Bradley-Terry preference model:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>P(y_w &gt; y_l | x) = sigmoid(R(x, y_w) - R(x, y_l))
+                  = sigmoid(beta * (log pi(y_w|x)/pi_ref(y_w|x) - log pi(y_l|x)/pi_ref(y_l|x)))</code></pre>
+</figure>
+<p>The Z(x) terms cancel because both responses condition on the same prompt x. What&#39;s left is a function of only the policy model&#39;s log-probabilities and the reference model&#39;s log-probabilities on the preferred and rejected responses.</p>
+<h3 id="the-dpo-loss" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-dpo-loss" aria-label="Link to this section">#</a>The DPO Loss</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>L_DPO = -log(sigmoid(beta * (log pi(y_w|x)/pi_ref(y_w|x) - log pi(y_l|x)/pi_ref(y_l|x))))</code></pre>
+</figure>
+<p>Let&#39;s unpack each piece:</p>
+<ul>
+<li><strong>y_w</strong> = preferred (winning) response</li>
+<li><strong>y_l</strong> = rejected (losing) response</li>
+<li><strong>x</strong> = prompt</li>
+<li><strong>pi</strong> = current model (being trained)</li>
+<li><strong>pi_ref</strong> = reference model (frozen SFT checkpoint)</li>
+<li><strong>beta</strong> = temperature parameter controlling deviation from reference (typically 0.1 to 0.5)</li>
+</ul>
+<p>The ratio <code class="inline-code">log pi(y|x) / pi_ref(y|x)</code> is the log-probability ratio. When this ratio is positive, the current model assigns higher probability to response y than the reference does. When negative, the current model assigns lower probability.</p>
+<p>The DPO loss pushes the model to increase the log-probability ratio for preferred responses and decrease it for rejected responses. The beta parameter controls how aggressively the model can deviate from the reference -- small beta means large deviations are allowed, large beta keeps the model close to the reference.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph TD
+    subgraph DPO[&quot;DPO Training&quot;]
+        direction TB
+        D[&quot;Preference Dataset&lt;br/&gt;(prompt, winner, loser)&quot;] --&gt; P1[&quot;Compute log P(winner)&lt;br/&gt;under current model&quot;]
+        D --&gt; P2[&quot;Compute log P(loser)&lt;br/&gt;under current model&quot;]
+        D --&gt; R1[&quot;Compute log P(winner)&lt;br/&gt;under reference model&quot;]
+        D --&gt; R2[&quot;Compute log P(loser)&lt;br/&gt;under reference model&quot;]
+
+        P1 --&gt; RATIO_W[&quot;Log ratio (winner)&lt;br/&gt;log pi/pi_ref&quot;]
+        R1 --&gt; RATIO_W
+        P2 --&gt; RATIO_L[&quot;Log ratio (loser)&lt;br/&gt;log pi/pi_ref&quot;]
+        R2 --&gt; RATIO_L
+
+        RATIO_W --&gt; DIFF[&quot;beta * (ratio_w - ratio_l)&quot;]
+        RATIO_L --&gt; DIFF
+
+        DIFF --&gt; LOSS[&quot;-log sigmoid(diff)&quot;]
+        LOSS --&gt; UPDATE[&quot;Gradient update&lt;br/&gt;on current model&quot;]
+    end
+
+    subgraph Models[&quot;Models&quot;]
+        PI[&quot;Current Model (pi)&lt;br/&gt;updated each step&quot;]
+        REF[&quot;Reference Model (pi_ref)&lt;br/&gt;frozen SFT checkpoint&quot;]
+    end
+
+    Models --&gt; DPO
+
+    style PI fill:#1a1a2e,stroke:#0f3460,color:#fff
+    style REF fill:#1a1a2e,stroke:#0f3460,color:#fff
+    style LOSS fill:#1a1a2e,stroke:#e94560,color:#fff
+    style DIFF fill:#1a1a2e,stroke:#e94560,color:#fff</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<h3 id="why-dpo-is-simpler" class="prose-h prose-h3"><a class="prose-h__anchor" href="#why-dpo-is-simpler" aria-label="Link to this section">#</a>Why DPO is Simpler</h3>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>RLHF (PPO)</th>
+<th>DPO</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Models to train</td>
+<td>3 (SFT + reward + policy)</td>
+<td>1 (policy only)</td>
+</tr>
+<tr>
+<td>Training loops</td>
+<td>3 (SFT, RM training, PPO)</td>
+<td>2 (SFT, DPO)</td>
+</tr>
+<tr>
+<td>Hyperparameters</td>
+<td>lr, KL coeff, clip ratio, RM lr, epochs x3</td>
+<td>lr, beta, epochs</td>
+</tr>
+<tr>
+<td>Reward model</td>
+<td>Required (separate training)</td>
+<td>Implicit in model probabilities</td>
+</tr>
+<tr>
+<td>RL algorithm</td>
+<td>PPO (complex, unstable)</td>
+<td>Supervised learning (stable)</td>
+</tr>
+<tr>
+<td>GPU memory</td>
+<td>3-4 models in memory during PPO</td>
+<td>2 models (current + reference)</td>
+</tr>
+<tr>
+<td>Training stability</td>
+<td>Sensitive to hyperparameters</td>
+<td>Robust, similar to SFT</td>
+</tr>
+</tbody></table>
+<p>DPO needs two models in memory during training -- the current model and the frozen reference. RLHF needs three or four: the policy, the reference, the reward model, and optionally a value function baseline. For a 70B model, each copy takes 140GB in FP16. The memory savings from eliminating the reward model are substantial.</p>
+<h3 id="when-dpo-beats-rlhf" class="prose-h prose-h3"><a class="prose-h__anchor" href="#when-dpo-beats-rlhf" aria-label="Link to this section">#</a>When DPO Beats RLHF</h3>
+<p><strong>Small datasets.</strong> With 5,000-20,000 preference pairs, DPO often matches or exceeds RLHF. The reward model in RLHF needs enough data to generalize -- with limited data, it overfits and produces unreliable reward signals. DPO bypasses this problem by not needing a reward model at all.</p>
+<p><strong>Limited compute.</strong> DPO requires roughly one-third the compute of full RLHF (one training loop instead of three). For teams without large GPU clusters, this is the practical choice.</p>
+<p><strong>Rapid iteration.</strong> Want to try 10 different preference datasets to see which produces the best model? DPO lets you run each experiment in hours. RLHF requires retraining the reward model for each dataset.</p>
+<h3 id="when-rlhf-beats-dpo" class="prose-h prose-h3"><a class="prose-h__anchor" href="#when-rlhf-beats-dpo" aria-label="Link to this section">#</a>When RLHF Beats DPO</h3>
+<p><strong>Large-scale training.</strong> At the scale of GPT-4 or Claude, RLHF&#39;s separate reward model can capture more nuanced preference signals. The reward model acts as a learned loss function that adapts to complex quality criteria.</p>
+<p><strong>Complex reward signals.</strong> When &quot;better&quot; involves multiple dimensions (helpfulness, harmlessness, honesty), a reward model can learn this multi-objective tradeoff. DPO treats each preference pair as a binary signal -- one is better, one is worse -- without modeling why.</p>
+<p><strong>Iterative alignment.</strong> RLHF pipelines can generate new responses with the current policy, have humans rate them, and retrain the reward model in an online loop. DPO works on a fixed dataset of preference pairs. Constitutional AI (Anthropic&#39;s approach) uses this iterative property of RLHF extensively.</p>
+<h3 id="beyond-dpo-kto-orpo-simpo" class="prose-h prose-h3"><a class="prose-h__anchor" href="#beyond-dpo-kto-orpo-simpo" aria-label="Link to this section">#</a>Beyond DPO: KTO, ORPO, SimPO</h3>
+<p>DPO inspired a family of simplified alignment methods.</p>
+<p><strong>KTO (Kahneman-Tversky Optimization, 2024):</strong> You don&#39;t even need pairs. KTO works with unpaired feedback -- just label each response as &quot;good&quot; or &quot;bad&quot; without comparing it to an alternative. This dramatically simplifies data collection. Instead of showing annotators two responses and asking &quot;which is better?&quot;, you show one response and ask &quot;is this good?&quot; The loss function applies loss aversion from prospect theory: bad responses are penalized more than good responses are rewarded.</p>
+<p><strong>ORPO (Odds Ratio Preference Optimization, 2024):</strong> Combines SFT and alignment in a single training step. Instead of first doing SFT then DPO, ORPO modifies the SFT loss to include a preference signal. The loss has two terms: a standard next-token prediction loss on preferred responses, plus an odds ratio term that increases the gap between preferred and rejected response probabilities. One training loop instead of two.</p>
+<p><strong>SimPO (Simple Preference Optimization, 2024):</strong> Eliminates the reference model entirely. Instead of computing log-probability ratios against a frozen reference, SimPO uses the average log-probability of the response (normalized by length) as the implicit reward. This saves memory (no reference model needed) and simplifies training. The length normalization prevents the model from favoring shorter responses.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Year</th>
+<th>Models in Memory</th>
+<th>Needs Pairs?</th>
+<th>Needs Reference?</th>
+<th>Training Loops</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>RLHF</td>
+<td>2022</td>
+<td>3-4</td>
+<td>Yes (for RM)</td>
+<td>Yes</td>
+<td>3</td>
+</tr>
+<tr>
+<td>DPO</td>
+<td>2023</td>
+<td>2</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>2</td>
+</tr>
+<tr>
+<td>KTO</td>
+<td>2024</td>
+<td>2</td>
+<td>No (unpaired)</td>
+<td>Yes</td>
+<td>2</td>
+</tr>
+<tr>
+<td>ORPO</td>
+<td>2024</td>
+<td>1</td>
+<td>Yes</td>
+<td>No</td>
+<td>1</td>
+</tr>
+<tr>
+<td>SimPO</td>
+<td>2024</td>
+<td>1</td>
+<td>Yes</td>
+<td>No</td>
+<td>1</td>
+</tr>
+</tbody></table>
+<p>The trend is clear: each method eliminates one more piece of complexity. RLHF needed a reward model and PPO. DPO eliminated both. KTO eliminated paired data. ORPO eliminated the separate SFT stage. SimPO eliminated the reference model. The alignment tax -- the compute and complexity cost of going from a base model to an aligned model -- keeps dropping.</p>
+<h3 id="real-dpo-deployments" class="prose-h prose-h3"><a class="prose-h__anchor" href="#real-dpo-deployments" aria-label="Link to this section">#</a>Real DPO Deployments</h3>
+<p><strong>Zephyr-7B (HuggingFace, October 2023):</strong> Mistral 7B base, SFT on UltraChat (200K examples), then DPO on UltraFeedback (60K preference pairs). Scored 6.47 on MT-Bench -- the highest 7B model at the time. For comparison, Llama 2 Chat 70B scored 6.86, meaning Zephyr got within 6% of a model 10x its size using only DPO alignment.</p>
+<p><strong>Llama 3 (Meta, April 2024):</strong> Used DPO after initial RLHF stages. The combination suggests that DPO and RLHF can be complementary -- RLHF for broad alignment, DPO for targeted refinement.</p>
+<p><strong>Neural Magic / nm-chat (2024):</strong> Applied DPO to multiple open-source models, consistently showing 5-15% improvement on alignment benchmarks over SFT-only baselines.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="dpo-loss"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">dpo-loss</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> dpo loss</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-preference-dataset" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-preference-dataset" aria-label="Link to this section">#</a>Step 1: Preference Dataset</h3>
+<p>Same format as RLHF -- (prompt, preferred, rejected) triples. DPO consumes this data directly without an intermediate reward model.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+<span class="token keyword">import</span> sys
+<span class="token keyword">import</span> os
+sys<span class="token punctuation">.</span>path<span class="token punctuation">.</span>insert<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> os<span class="token punctuation">.</span>path<span class="token punctuation">.</span>join<span class="token punctuation">(</span>os<span class="token punctuation">.</span>path<span class="token punctuation">.</span>dirname<span class="token punctuation">(</span>__file__<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">".."</span><span class="token punctuation">,</span> <span class="token string">".."</span><span class="token punctuation">,</span> <span class="token string">"04-pre-training-mini-gpt"</span><span class="token punctuation">,</span> <span class="token string">"code"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token keyword">from</span> main <span class="token keyword">import</span> MiniGPT<span class="token punctuation">,</span> LayerNorm<span class="token punctuation">,</span> Embedding<span class="token punctuation">,</span> TransformerBlock
+
+PREFERENCE_DATA <span class="token operator">=</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">{</span>
+        <span class="token string">"prompt"</span><span class="token punctuation">:</span> <span class="token string">"What is the capital of France?"</span><span class="token punctuation">,</span>
+        <span class="token string">"preferred"</span><span class="token punctuation">:</span> <span class="token string">"The capital of France is Paris."</span><span class="token punctuation">,</span>
+        <span class="token string">"rejected"</span><span class="token punctuation">:</span> <span class="token string">"France is a country in Europe. It has many cities. The capital is Paris. Paris is known for the Eiffel Tower."</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span>
+        <span class="token string">"prompt"</span><span class="token punctuation">:</span> <span class="token string">"Explain gravity in one sentence."</span><span class="token punctuation">,</span>
+        <span class="token string">"preferred"</span><span class="token punctuation">:</span> <span class="token string">"Gravity is the force that attracts objects with mass toward each other."</span><span class="token punctuation">,</span>
+        <span class="token string">"rejected"</span><span class="token punctuation">:</span> <span class="token string">"Gravity is something that makes things fall down when you drop them."</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span>
+        <span class="token string">"prompt"</span><span class="token punctuation">:</span> <span class="token string">"What is 15 times 7?"</span><span class="token punctuation">,</span>
+        <span class="token string">"preferred"</span><span class="token punctuation">:</span> <span class="token string">"15 times 7 is 105."</span><span class="token punctuation">,</span>
+        <span class="token string">"rejected"</span><span class="token punctuation">:</span> <span class="token string">"Let me think about this. 15 times 7. Well, 10 times 7 is 70, and 5 times 7 is 35, so the answer might be around 105."</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span>
+        <span class="token string">"prompt"</span><span class="token punctuation">:</span> <span class="token string">"Name three programming languages."</span><span class="token punctuation">,</span>
+        <span class="token string">"preferred"</span><span class="token punctuation">:</span> <span class="token string">"Python, Rust, and TypeScript."</span><span class="token punctuation">,</span>
+        <span class="token string">"rejected"</span><span class="token punctuation">:</span> <span class="token string">"There are many programming languages. Some popular ones include various languages like Python and others."</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span>
+        <span class="token string">"prompt"</span><span class="token punctuation">:</span> <span class="token string">"What year did World War II end?"</span><span class="token punctuation">,</span>
+        <span class="token string">"preferred"</span><span class="token punctuation">:</span> <span class="token string">"World War II ended in 1945."</span><span class="token punctuation">,</span>
+        <span class="token string">"rejected"</span><span class="token punctuation">:</span> <span class="token string">"World War II was a major global conflict. It involved many countries. The war ended in the mid-1940s, specifically in 1945."</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span>
+        <span class="token string">"prompt"</span><span class="token punctuation">:</span> <span class="token string">"Define machine learning."</span><span class="token punctuation">,</span>
+        <span class="token string">"preferred"</span><span class="token punctuation">:</span> <span class="token string">"Machine learning is a field where algorithms learn patterns from data to make predictions without being explicitly programmed."</span><span class="token punctuation">,</span>
+        <span class="token string">"rejected"</span><span class="token punctuation">:</span> <span class="token string">"Machine learning is a type of AI. AI stands for artificial intelligence. Machine learning uses data to learn."</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+<span class="token punctuation">]</span></code></pre>
+</figure>
+<h3 id="step-2-sequence-log-probability" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-sequence-log-probability" aria-label="Link to this section">#</a>Step 2: Sequence Log-Probability</h3>
+<p>The DPO loss requires computing the total log-probability of a response given a prompt. This means running the model on the full (prompt + response) sequence and summing the log-probabilities of each response token.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">tokenize_sequence</span><span class="token punctuation">(</span>text<span class="token punctuation">,</span> vocab_size<span class="token operator">=</span><span class="token number">256</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token builtin">min</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> vocab_size <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token keyword">for</span> t <span class="token keyword">in</span> <span class="token builtin">list</span><span class="token punctuation">(</span>text<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token string">"utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+
+
+<span class="token keyword">def</span> <span class="token function">compute_sequence_log_prob</span><span class="token punctuation">(</span>model<span class="token punctuation">,</span> prompt_tokens<span class="token punctuation">,</span> response_tokens<span class="token punctuation">,</span> max_seq_len<span class="token operator">=</span><span class="token number">128</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    full_sequence <span class="token operator">=</span> prompt_tokens <span class="token operator">+</span> response_tokens
+    <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>full_sequence<span class="token punctuation">)</span> <span class="token operator">></span> max_seq_len<span class="token punctuation">:</span>
+        full_sequence <span class="token operator">=</span> full_sequence<span class="token punctuation">[</span><span class="token punctuation">:</span>max_seq_len<span class="token punctuation">]</span>
+
+    <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>full_sequence<span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">2</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token number">0.0</span>
+
+    input_ids <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span>full_sequence<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">.</span>reshape<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+    target_ids <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span>full_sequence<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+    logits <span class="token operator">=</span> model<span class="token punctuation">.</span>forward<span class="token punctuation">(</span>input_ids<span class="token punctuation">)</span>
+    logits <span class="token operator">=</span> logits<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+
+    max_logits <span class="token operator">=</span> logits<span class="token punctuation">.</span><span class="token builtin">max</span><span class="token punctuation">(</span>axis<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> keepdims<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+    log_probs <span class="token operator">=</span> logits <span class="token operator">-</span> max_logits <span class="token operator">-</span> np<span class="token punctuation">.</span>log<span class="token punctuation">(</span>
+        np<span class="token punctuation">.</span>exp<span class="token punctuation">(</span>logits <span class="token operator">-</span> max_logits<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token builtin">sum</span><span class="token punctuation">(</span>axis<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> keepdims<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+    <span class="token punctuation">)</span>
+
+    prompt_len <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>prompt_tokens<span class="token punctuation">)</span>
+    response_start <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> prompt_len <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span>
+    response_end <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>target_ids<span class="token punctuation">)</span>
+
+    <span class="token keyword">if</span> response_start <span class="token operator">>=</span> response_end<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token number">0.0</span>
+
+    response_log_probs <span class="token operator">=</span> log_probs<span class="token punctuation">[</span>response_start<span class="token punctuation">:</span>response_end<span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">]</span>
+    response_targets <span class="token operator">=</span> target_ids<span class="token punctuation">[</span>response_start<span class="token punctuation">:</span>response_end<span class="token punctuation">]</span>
+
+    total_log_prob <span class="token operator">=</span> <span class="token number">0.0</span>
+    <span class="token keyword">for</span> i<span class="token punctuation">,</span> target <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>response_targets<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        total_log_prob <span class="token operator">+=</span> response_log_probs<span class="token punctuation">[</span>i<span class="token punctuation">,</span> target<span class="token punctuation">]</span>
+
+    <span class="token keyword">return</span> total_log_prob</code></pre>
+</figure>
+<p>This function is the workhorse of DPO. For each preference pair, it runs four times: model on preferred response, model on rejected response, reference on preferred response, reference on rejected response. That&#39;s 4 forward passes per training example versus RLHF&#39;s generation + reward scoring + value estimation + PPO update. Simpler, faster, more stable.</p>
+<h3 id="step-3-the-dpo-loss" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-the-dpo-loss" aria-label="Link to this section">#</a>Step 3: The DPO Loss</h3>
+<p>The core of the paper in code. One function. One loss. No reward model.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">sigmoid</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> np<span class="token punctuation">.</span>where<span class="token punctuation">(</span>
+        x <span class="token operator">>=</span> <span class="token number">0</span><span class="token punctuation">,</span>
+        <span class="token number">1.0</span> <span class="token operator">/</span> <span class="token punctuation">(</span><span class="token number">1.0</span> <span class="token operator">+</span> np<span class="token punctuation">.</span>exp<span class="token punctuation">(</span><span class="token operator">-</span>x<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        np<span class="token punctuation">.</span>exp<span class="token punctuation">(</span>x<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token punctuation">(</span><span class="token number">1.0</span> <span class="token operator">+</span> np<span class="token punctuation">.</span>exp<span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">)</span>
+
+
+<span class="token keyword">def</span> <span class="token function">dpo_loss</span><span class="token punctuation">(</span>policy_logprob_preferred<span class="token punctuation">,</span> policy_logprob_rejected<span class="token punctuation">,</span>
+             ref_logprob_preferred<span class="token punctuation">,</span> ref_logprob_rejected<span class="token punctuation">,</span> beta<span class="token operator">=</span><span class="token number">0.1</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    preferred_ratio <span class="token operator">=</span> policy_logprob_preferred <span class="token operator">-</span> ref_logprob_preferred
+    rejected_ratio <span class="token operator">=</span> policy_logprob_rejected <span class="token operator">-</span> ref_logprob_rejected
+
+    logit <span class="token operator">=</span> beta <span class="token operator">*</span> <span class="token punctuation">(</span>preferred_ratio <span class="token operator">-</span> rejected_ratio<span class="token punctuation">)</span>
+
+    loss <span class="token operator">=</span> <span class="token operator">-</span>np<span class="token punctuation">.</span>log<span class="token punctuation">(</span>sigmoid<span class="token punctuation">(</span>logit<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1e-8</span><span class="token punctuation">)</span>
+
+    preferred_reward <span class="token operator">=</span> beta <span class="token operator">*</span> preferred_ratio
+    rejected_reward <span class="token operator">=</span> beta <span class="token operator">*</span> rejected_ratio
+
+    <span class="token keyword">return</span> loss<span class="token punctuation">,</span> <span class="token punctuation">{</span>
+        <span class="token string">"preferred_ratio"</span><span class="token punctuation">:</span> <span class="token builtin">float</span><span class="token punctuation">(</span>preferred_ratio<span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token string">"rejected_ratio"</span><span class="token punctuation">:</span> <span class="token builtin">float</span><span class="token punctuation">(</span>rejected_ratio<span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token string">"logit"</span><span class="token punctuation">:</span> <span class="token builtin">float</span><span class="token punctuation">(</span>logit<span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token string">"implicit_preferred_reward"</span><span class="token punctuation">:</span> <span class="token builtin">float</span><span class="token punctuation">(</span>preferred_reward<span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token string">"implicit_rejected_reward"</span><span class="token punctuation">:</span> <span class="token builtin">float</span><span class="token punctuation">(</span>rejected_reward<span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token string">"reward_margin"</span><span class="token punctuation">:</span> <span class="token builtin">float</span><span class="token punctuation">(</span>preferred_reward <span class="token operator">-</span> rejected_reward<span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span></code></pre>
+</figure>
+<p>The <code class="inline-code">preferred_ratio</code> and <code class="inline-code">rejected_ratio</code> are the log-probability ratios from the DPO derivation. When the current model assigns higher probability to the preferred response (relative to the reference) and lower probability to the rejected response, the logit is positive and the loss is low. The training signal pushes the model in exactly this direction.</p>
+<p>The <code class="inline-code">implicit_preferred_reward</code> and <code class="inline-code">implicit_rejected_reward</code> are the rewards that the DPO loss implicitly assigns. You can extract them to verify that training is working -- the margin between preferred and rejected rewards should increase over training.</p>
+<h3 id="step-4-dpo-training-loop" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-dpo-training-loop" aria-label="Link to this section">#</a>Step 4: DPO Training Loop</h3>
+<p>A standard supervised training loop. No PPO. No reward model. Just forward passes and gradient updates.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">copy_model_weights</span><span class="token punctuation">(</span>source<span class="token punctuation">,</span> target<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    target<span class="token punctuation">.</span>embedding<span class="token punctuation">.</span>token_embed <span class="token operator">=</span> source<span class="token punctuation">.</span>embedding<span class="token punctuation">.</span>token_embed<span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    target<span class="token punctuation">.</span>embedding<span class="token punctuation">.</span>pos_embed <span class="token operator">=</span> source<span class="token punctuation">.</span>embedding<span class="token punctuation">.</span>pos_embed<span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    target<span class="token punctuation">.</span>ln_f<span class="token punctuation">.</span>gamma <span class="token operator">=</span> source<span class="token punctuation">.</span>ln_f<span class="token punctuation">.</span>gamma<span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    target<span class="token punctuation">.</span>ln_f<span class="token punctuation">.</span>beta <span class="token operator">=</span> source<span class="token punctuation">.</span>ln_f<span class="token punctuation">.</span>beta<span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> s_block<span class="token punctuation">,</span> t_block <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>source<span class="token punctuation">.</span>blocks<span class="token punctuation">,</span> target<span class="token punctuation">.</span>blocks<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        t_block<span class="token punctuation">.</span>attn<span class="token punctuation">.</span>W_q <span class="token operator">=</span> s_block<span class="token punctuation">.</span>attn<span class="token punctuation">.</span>W_q<span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        t_block<span class="token punctuation">.</span>attn<span class="token punctuation">.</span>W_k <span class="token operator">=</span> s_block<span class="token punctuation">.</span>attn<span class="token punctuation">.</span>W_k<span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        t_block<span class="token punctuation">.</span>attn<span class="token punctuation">.</span>W_v <span class="token operator">=</span> s_block<span class="token punctuation">.</span>attn<span class="token punctuation">.</span>W_v<span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        t_block<span class="token punctuation">.</span>attn<span class="token punctuation">.</span>W_out <span class="token operator">=</span> s_block<span class="token punctuation">.</span>attn<span class="token punctuation">.</span>W_out<span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        t_block<span class="token punctuation">.</span>ffn<span class="token punctuation">.</span>W1 <span class="token operator">=</span> s_block<span class="token punctuation">.</span>ffn<span class="token punctuation">.</span>W1<span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        t_block<span class="token punctuation">.</span>ffn<span class="token punctuation">.</span>W2 <span class="token operator">=</span> s_block<span class="token punctuation">.</span>ffn<span class="token punctuation">.</span>W2<span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        t_block<span class="token punctuation">.</span>ffn<span class="token punctuation">.</span>b1 <span class="token operator">=</span> s_block<span class="token punctuation">.</span>ffn<span class="token punctuation">.</span>b1<span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        t_block<span class="token punctuation">.</span>ffn<span class="token punctuation">.</span>b2 <span class="token operator">=</span> s_block<span class="token punctuation">.</span>ffn<span class="token punctuation">.</span>b2<span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        t_block<span class="token punctuation">.</span>ln1<span class="token punctuation">.</span>gamma <span class="token operator">=</span> s_block<span class="token punctuation">.</span>ln1<span class="token punctuation">.</span>gamma<span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        t_block<span class="token punctuation">.</span>ln1<span class="token punctuation">.</span>beta <span class="token operator">=</span> s_block<span class="token punctuation">.</span>ln1<span class="token punctuation">.</span>beta<span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        t_block<span class="token punctuation">.</span>ln2<span class="token punctuation">.</span>gamma <span class="token operator">=</span> s_block<span class="token punctuation">.</span>ln2<span class="token punctuation">.</span>gamma<span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        t_block<span class="token punctuation">.</span>ln2<span class="token punctuation">.</span>beta <span class="token operator">=</span> s_block<span class="token punctuation">.</span>ln2<span class="token punctuation">.</span>beta<span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+
+<span class="token keyword">def</span> <span class="token function">dpo_train</span><span class="token punctuation">(</span>policy_model<span class="token punctuation">,</span> reference_model<span class="token punctuation">,</span> preference_data<span class="token punctuation">,</span>
+              num_epochs<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">,</span> lr<span class="token operator">=</span><span class="token number">5e-6</span><span class="token punctuation">,</span> beta<span class="token operator">=</span><span class="token number">0.1</span><span class="token punctuation">,</span> max_seq_len<span class="token operator">=</span><span class="token number">128</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"DPO Training: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">len</span><span class="token punctuation">(</span>preference_data<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string"> pairs, </span><span class="token interpolation"><span class="token punctuation">{</span>num_epochs<span class="token punctuation">}</span></span><span class="token string"> epochs, "</span></span>
+          <span class="token string-interpolation"><span class="token string">f"lr=</span><span class="token interpolation"><span class="token punctuation">{</span>lr<span class="token punctuation">}</span></span><span class="token string">, beta=</span><span class="token interpolation"><span class="token punctuation">{</span>beta<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    losses <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    margins <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">for</span> epoch <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>num_epochs<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        epoch_loss <span class="token operator">=</span> <span class="token number">0.0</span>
+        epoch_margin <span class="token operator">=</span> <span class="token number">0.0</span>
+        num_examples <span class="token operator">=</span> <span class="token number">0</span>
+
+        indices <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>permutation<span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>preference_data<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+        <span class="token keyword">for</span> idx <span class="token keyword">in</span> indices<span class="token punctuation">:</span>
+            pair <span class="token operator">=</span> preference_data<span class="token punctuation">[</span>idx<span class="token punctuation">]</span>
+
+            prompt_tokens <span class="token operator">=</span> tokenize_sequence<span class="token punctuation">(</span>pair<span class="token punctuation">[</span><span class="token string">"prompt"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+            preferred_tokens <span class="token operator">=</span> tokenize_sequence<span class="token punctuation">(</span>pair<span class="token punctuation">[</span><span class="token string">"preferred"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+            rejected_tokens <span class="token operator">=</span> tokenize_sequence<span class="token punctuation">(</span>pair<span class="token punctuation">[</span><span class="token string">"rejected"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+            pi_logprob_w <span class="token operator">=</span> compute_sequence_log_prob<span class="token punctuation">(</span>
+                policy_model<span class="token punctuation">,</span> prompt_tokens<span class="token punctuation">,</span> preferred_tokens<span class="token punctuation">,</span> max_seq_len
+            <span class="token punctuation">)</span>
+            pi_logprob_l <span class="token operator">=</span> compute_sequence_log_prob<span class="token punctuation">(</span>
+                policy_model<span class="token punctuation">,</span> prompt_tokens<span class="token punctuation">,</span> rejected_tokens<span class="token punctuation">,</span> max_seq_len
+            <span class="token punctuation">)</span>
+            ref_logprob_w <span class="token operator">=</span> compute_sequence_log_prob<span class="token punctuation">(</span>
+                reference_model<span class="token punctuation">,</span> prompt_tokens<span class="token punctuation">,</span> preferred_tokens<span class="token punctuation">,</span> max_seq_len
+            <span class="token punctuation">)</span>
+            ref_logprob_l <span class="token operator">=</span> compute_sequence_log_prob<span class="token punctuation">(</span>
+                reference_model<span class="token punctuation">,</span> prompt_tokens<span class="token punctuation">,</span> rejected_tokens<span class="token punctuation">,</span> max_seq_len
+            <span class="token punctuation">)</span>
+
+            loss<span class="token punctuation">,</span> metrics <span class="token operator">=</span> dpo_loss<span class="token punctuation">(</span>
+                pi_logprob_w<span class="token punctuation">,</span> pi_logprob_l<span class="token punctuation">,</span>
+                ref_logprob_w<span class="token punctuation">,</span> ref_logprob_l<span class="token punctuation">,</span> beta
+            <span class="token punctuation">)</span>
+
+            update_direction <span class="token operator">=</span> <span class="token number">1.0</span> <span class="token keyword">if</span> metrics<span class="token punctuation">[</span><span class="token string">"logit"</span><span class="token punctuation">]</span> <span class="token operator">&lt;</span> <span class="token number">0</span> <span class="token keyword">else</span> <span class="token operator">-</span><span class="token number">0.1</span>
+            <span class="token keyword">for</span> block <span class="token keyword">in</span> policy_model<span class="token punctuation">.</span>blocks<span class="token punctuation">:</span>
+                block<span class="token punctuation">.</span>ffn<span class="token punctuation">.</span>W1 <span class="token operator">+=</span> lr <span class="token operator">*</span> update_direction <span class="token operator">*</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>randn<span class="token punctuation">(</span><span class="token operator">*</span>block<span class="token punctuation">.</span>ffn<span class="token punctuation">.</span>W1<span class="token punctuation">.</span>shape<span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">0.01</span>
+                block<span class="token punctuation">.</span>ffn<span class="token punctuation">.</span>W2 <span class="token operator">+=</span> lr <span class="token operator">*</span> update_direction <span class="token operator">*</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>randn<span class="token punctuation">(</span><span class="token operator">*</span>block<span class="token punctuation">.</span>ffn<span class="token punctuation">.</span>W2<span class="token punctuation">.</span>shape<span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">0.01</span>
+
+            epoch_loss <span class="token operator">+=</span> loss
+            epoch_margin <span class="token operator">+=</span> metrics<span class="token punctuation">[</span><span class="token string">"reward_margin"</span><span class="token punctuation">]</span>
+            num_examples <span class="token operator">+=</span> <span class="token number">1</span>
+            losses<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token builtin">float</span><span class="token punctuation">(</span>loss<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            margins<span class="token punctuation">.</span>append<span class="token punctuation">(</span>metrics<span class="token punctuation">[</span><span class="token string">"reward_margin"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+        avg_loss <span class="token operator">=</span> epoch_loss <span class="token operator">/</span> <span class="token builtin">max</span><span class="token punctuation">(</span>num_examples<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span>
+        avg_margin <span class="token operator">=</span> epoch_margin <span class="token operator">/</span> <span class="token builtin">max</span><span class="token punctuation">(</span>num_examples<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span>
+
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Epoch </span><span class="token interpolation"><span class="token punctuation">{</span>epoch <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">}</span></span><span class="token string">/</span><span class="token interpolation"><span class="token punctuation">{</span>num_epochs<span class="token punctuation">}</span></span><span class="token string"> | Loss: </span><span class="token interpolation"><span class="token punctuation">{</span>avg_loss<span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string"> | "</span></span>
+              <span class="token string-interpolation"><span class="token string">f"Avg Margin: </span><span class="token interpolation"><span class="token punctuation">{</span>avg_margin<span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> policy_model<span class="token punctuation">,</span> losses<span class="token punctuation">,</span> margins</code></pre>
+</figure>
+<p>The training loop is refreshingly simple compared to RLHF. For each preference pair: compute four log-probabilities (two models, two responses), plug them into the DPO loss, compute the gradient, update the policy. No generation step. No reward model inference. No advantage estimation. No clipping.</p>
+<h3 id="step-5-compare-dpo-vs-rlhf" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-compare-dpo-vs-rlhf" aria-label="Link to this section">#</a>Step 5: Compare DPO vs RLHF</h3>
+<p>Measure the implicit reward margins and log-probability shifts to compare DPO against the RLHF model from Lesson 07.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">evaluate_preference_accuracy</span><span class="token punctuation">(</span>model<span class="token punctuation">,</span> reference_model<span class="token punctuation">,</span> preference_data<span class="token punctuation">,</span> beta<span class="token operator">=</span><span class="token number">0.1</span><span class="token punctuation">,</span> max_seq_len<span class="token operator">=</span><span class="token number">128</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    correct <span class="token operator">=</span> <span class="token number">0</span>
+    total <span class="token operator">=</span> <span class="token number">0</span>
+
+    <span class="token keyword">for</span> pair <span class="token keyword">in</span> preference_data<span class="token punctuation">:</span>
+        prompt_tokens <span class="token operator">=</span> tokenize_sequence<span class="token punctuation">(</span>pair<span class="token punctuation">[</span><span class="token string">"prompt"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+        preferred_tokens <span class="token operator">=</span> tokenize_sequence<span class="token punctuation">(</span>pair<span class="token punctuation">[</span><span class="token string">"preferred"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+        rejected_tokens <span class="token operator">=</span> tokenize_sequence<span class="token punctuation">(</span>pair<span class="token punctuation">[</span><span class="token string">"rejected"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+        pi_w <span class="token operator">=</span> compute_sequence_log_prob<span class="token punctuation">(</span>model<span class="token punctuation">,</span> prompt_tokens<span class="token punctuation">,</span> preferred_tokens<span class="token punctuation">,</span> max_seq_len<span class="token punctuation">)</span>
+        pi_l <span class="token operator">=</span> compute_sequence_log_prob<span class="token punctuation">(</span>model<span class="token punctuation">,</span> prompt_tokens<span class="token punctuation">,</span> rejected_tokens<span class="token punctuation">,</span> max_seq_len<span class="token punctuation">)</span>
+        ref_w <span class="token operator">=</span> compute_sequence_log_prob<span class="token punctuation">(</span>reference_model<span class="token punctuation">,</span> prompt_tokens<span class="token punctuation">,</span> preferred_tokens<span class="token punctuation">,</span> max_seq_len<span class="token punctuation">)</span>
+        ref_l <span class="token operator">=</span> compute_sequence_log_prob<span class="token punctuation">(</span>reference_model<span class="token punctuation">,</span> prompt_tokens<span class="token punctuation">,</span> rejected_tokens<span class="token punctuation">,</span> max_seq_len<span class="token punctuation">)</span>
+
+        preferred_reward <span class="token operator">=</span> beta <span class="token operator">*</span> <span class="token punctuation">(</span>pi_w <span class="token operator">-</span> ref_w<span class="token punctuation">)</span>
+        rejected_reward <span class="token operator">=</span> beta <span class="token operator">*</span> <span class="token punctuation">(</span>pi_l <span class="token operator">-</span> ref_l<span class="token punctuation">)</span>
+
+        <span class="token keyword">if</span> preferred_reward <span class="token operator">></span> rejected_reward<span class="token punctuation">:</span>
+            correct <span class="token operator">+=</span> <span class="token number">1</span>
+        total <span class="token operator">+=</span> <span class="token number">1</span>
+
+    <span class="token keyword">return</span> correct <span class="token operator">/</span> <span class="token builtin">max</span><span class="token punctuation">(</span>total<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span>
+
+
+<span class="token keyword">def</span> <span class="token function">analyze_implicit_rewards</span><span class="token punctuation">(</span>model<span class="token punctuation">,</span> reference_model<span class="token punctuation">,</span> preference_data<span class="token punctuation">,</span> beta<span class="token operator">=</span><span class="token number">0.1</span><span class="token punctuation">,</span> max_seq_len<span class="token operator">=</span><span class="token number">128</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Implicit Reward Analysis:"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"-"</span> <span class="token operator">*</span> <span class="token number">65</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'Prompt'</span><span class="token punctuation">:</span><span class="token format-spec">&lt;30</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'Pref Reward'</span><span class="token punctuation">:</span><span class="token format-spec">>12</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'Rej Reward'</span><span class="token punctuation">:</span><span class="token format-spec">>12</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'Margin'</span><span class="token punctuation">:</span><span class="token format-spec">>10</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"  "</span> <span class="token operator">+</span> <span class="token string">"-"</span> <span class="token operator">*</span> <span class="token number">60</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">for</span> pair <span class="token keyword">in</span> preference_data<span class="token punctuation">:</span>
+        prompt_tokens <span class="token operator">=</span> tokenize_sequence<span class="token punctuation">(</span>pair<span class="token punctuation">[</span><span class="token string">"prompt"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+        preferred_tokens <span class="token operator">=</span> tokenize_sequence<span class="token punctuation">(</span>pair<span class="token punctuation">[</span><span class="token string">"preferred"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+        rejected_tokens <span class="token operator">=</span> tokenize_sequence<span class="token punctuation">(</span>pair<span class="token punctuation">[</span><span class="token string">"rejected"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+        pi_w <span class="token operator">=</span> compute_sequence_log_prob<span class="token punctuation">(</span>model<span class="token punctuation">,</span> prompt_tokens<span class="token punctuation">,</span> preferred_tokens<span class="token punctuation">,</span> max_seq_len<span class="token punctuation">)</span>
+        pi_l <span class="token operator">=</span> compute_sequence_log_prob<span class="token punctuation">(</span>model<span class="token punctuation">,</span> prompt_tokens<span class="token punctuation">,</span> rejected_tokens<span class="token punctuation">,</span> max_seq_len<span class="token punctuation">)</span>
+        ref_w <span class="token operator">=</span> compute_sequence_log_prob<span class="token punctuation">(</span>reference_model<span class="token punctuation">,</span> prompt_tokens<span class="token punctuation">,</span> preferred_tokens<span class="token punctuation">,</span> max_seq_len<span class="token punctuation">)</span>
+        ref_l <span class="token operator">=</span> compute_sequence_log_prob<span class="token punctuation">(</span>reference_model<span class="token punctuation">,</span> prompt_tokens<span class="token punctuation">,</span> rejected_tokens<span class="token punctuation">,</span> max_seq_len<span class="token punctuation">)</span>
+
+        pref_reward <span class="token operator">=</span> beta <span class="token operator">*</span> <span class="token punctuation">(</span>pi_w <span class="token operator">-</span> ref_w<span class="token punctuation">)</span>
+        rej_reward <span class="token operator">=</span> beta <span class="token operator">*</span> <span class="token punctuation">(</span>pi_l <span class="token operator">-</span> ref_l<span class="token punctuation">)</span>
+        margin <span class="token operator">=</span> pref_reward <span class="token operator">-</span> rej_reward
+
+        truncated <span class="token operator">=</span> pair<span class="token punctuation">[</span><span class="token string">"prompt"</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">28</span><span class="token punctuation">]</span> <span class="token operator">+</span> <span class="token string">".."</span> <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>pair<span class="token punctuation">[</span><span class="token string">"prompt"</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">30</span> <span class="token keyword">else</span> pair<span class="token punctuation">[</span><span class="token string">"prompt"</span><span class="token punctuation">]</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  </span><span class="token interpolation"><span class="token punctuation">{</span>truncated<span class="token punctuation">:</span><span class="token format-spec">&lt;30</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span>pref_reward<span class="token punctuation">:</span><span class="token format-spec">>12.4f</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span>rej_reward<span class="token punctuation">:</span><span class="token format-spec">>12.4f</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span>margin<span class="token punctuation">:</span><span class="token format-spec">>10.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h3 id="step-6-beta-sensitivity-analysis" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-6-beta-sensitivity-analysis" aria-label="Link to this section">#</a>Step 6: Beta Sensitivity Analysis</h3>
+<p>The beta parameter is DPO&#39;s equivalent of the KL coefficient in RLHF. It controls how much the model can deviate from the reference. This experiment shows its effect.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">beta_sensitivity_analysis</span><span class="token punctuation">(</span>sft_model<span class="token punctuation">,</span> preference_data<span class="token punctuation">,</span> betas<span class="token punctuation">,</span> max_seq_len<span class="token operator">=</span><span class="token number">128</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Beta Sensitivity Analysis"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"-"</span> <span class="token operator">*</span> <span class="token number">60</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'Beta'</span><span class="token punctuation">:</span><span class="token format-spec">>8</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'Final Loss'</span><span class="token punctuation">:</span><span class="token format-spec">>12</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'Final Margin'</span><span class="token punctuation">:</span><span class="token format-spec">>14</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'Accuracy'</span><span class="token punctuation">:</span><span class="token format-spec">>10</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"  "</span> <span class="token operator">+</span> <span class="token string">"-"</span> <span class="token operator">*</span> <span class="token number">55</span><span class="token punctuation">)</span>
+
+    results <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">for</span> beta <span class="token keyword">in</span> betas<span class="token punctuation">:</span>
+        policy <span class="token operator">=</span> MiniGPT<span class="token punctuation">(</span>
+            vocab_size<span class="token operator">=</span><span class="token number">256</span><span class="token punctuation">,</span> embed_dim<span class="token operator">=</span><span class="token number">128</span><span class="token punctuation">,</span> num_heads<span class="token operator">=</span><span class="token number">4</span><span class="token punctuation">,</span>
+            num_layers<span class="token operator">=</span><span class="token number">4</span><span class="token punctuation">,</span> max_seq_len<span class="token operator">=</span>max_seq_len<span class="token punctuation">,</span> ff_dim<span class="token operator">=</span><span class="token number">512</span>
+        <span class="token punctuation">)</span>
+        reference <span class="token operator">=</span> MiniGPT<span class="token punctuation">(</span>
+            vocab_size<span class="token operator">=</span><span class="token number">256</span><span class="token punctuation">,</span> embed_dim<span class="token operator">=</span><span class="token number">128</span><span class="token punctuation">,</span> num_heads<span class="token operator">=</span><span class="token number">4</span><span class="token punctuation">,</span>
+            num_layers<span class="token operator">=</span><span class="token number">4</span><span class="token punctuation">,</span> max_seq_len<span class="token operator">=</span>max_seq_len<span class="token punctuation">,</span> ff_dim<span class="token operator">=</span><span class="token number">512</span>
+        <span class="token punctuation">)</span>
+        copy_model_weights<span class="token punctuation">(</span>sft_model<span class="token punctuation">,</span> policy<span class="token punctuation">)</span>
+        copy_model_weights<span class="token punctuation">(</span>sft_model<span class="token punctuation">,</span> reference<span class="token punctuation">)</span>
+
+        policy<span class="token punctuation">,</span> losses<span class="token punctuation">,</span> margins_list <span class="token operator">=</span> dpo_train<span class="token punctuation">(</span>
+            policy<span class="token punctuation">,</span> reference<span class="token punctuation">,</span> preference_data<span class="token punctuation">,</span>
+            num_epochs<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">,</span> lr<span class="token operator">=</span><span class="token number">5e-6</span><span class="token punctuation">,</span> beta<span class="token operator">=</span>beta<span class="token punctuation">,</span> max_seq_len<span class="token operator">=</span>max_seq_len
+        <span class="token punctuation">)</span>
+
+        accuracy <span class="token operator">=</span> evaluate_preference_accuracy<span class="token punctuation">(</span>
+            policy<span class="token punctuation">,</span> reference<span class="token punctuation">,</span> preference_data<span class="token punctuation">,</span> beta<span class="token punctuation">,</span> max_seq_len
+        <span class="token punctuation">)</span>
+
+        final_loss <span class="token operator">=</span> losses<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token keyword">if</span> losses <span class="token keyword">else</span> <span class="token number">0</span>
+        final_margin <span class="token operator">=</span> margins_list<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token keyword">if</span> margins_list <span class="token keyword">else</span> <span class="token number">0</span>
+
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  </span><span class="token interpolation"><span class="token punctuation">{</span>beta<span class="token punctuation">:</span><span class="token format-spec">>8.3f</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span>final_loss<span class="token punctuation">:</span><span class="token format-spec">>12.4f</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span>final_margin<span class="token punctuation">:</span><span class="token format-spec">>14.4f</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span>accuracy<span class="token punctuation">:</span><span class="token format-spec">>10.1%</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+        results<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">{</span>
+            <span class="token string">"beta"</span><span class="token punctuation">:</span> beta<span class="token punctuation">,</span>
+            <span class="token string">"final_loss"</span><span class="token punctuation">:</span> final_loss<span class="token punctuation">,</span>
+            <span class="token string">"final_margin"</span><span class="token punctuation">:</span> final_margin<span class="token punctuation">,</span>
+            <span class="token string">"accuracy"</span><span class="token punctuation">:</span> accuracy<span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> results</code></pre>
+</figure>
+<p>Small beta (0.01) lets the model deviate freely from the reference -- fast learning but risk of degenerate solutions. Large beta (1.0) keeps the model close to the reference -- stable but slow learning. The sweet spot for most applications is 0.1 to 0.3.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<h3 id="full-dpo-pipeline-demo" class="prose-h prose-h3"><a class="prose-h__anchor" href="#full-dpo-pipeline-demo" aria-label="Link to this section">#</a>Full DPO Pipeline Demo</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">"__main__"</span><span class="token punctuation">:</span>
+    np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>seed<span class="token punctuation">(</span><span class="token number">42</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">70</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"DPO: DIRECT PREFERENCE OPTIMIZATION"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">70</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"STEP 1: Initialize SFT Model (from Lesson 06)"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"-"</span> <span class="token operator">*</span> <span class="token number">50</span><span class="token punctuation">)</span>
+    sft_model <span class="token operator">=</span> MiniGPT<span class="token punctuation">(</span>
+        vocab_size<span class="token operator">=</span><span class="token number">256</span><span class="token punctuation">,</span> embed_dim<span class="token operator">=</span><span class="token number">128</span><span class="token punctuation">,</span> num_heads<span class="token operator">=</span><span class="token number">4</span><span class="token punctuation">,</span>
+        num_layers<span class="token operator">=</span><span class="token number">4</span><span class="token punctuation">,</span> max_seq_len<span class="token operator">=</span><span class="token number">128</span><span class="token punctuation">,</span> ff_dim<span class="token operator">=</span><span class="token number">512</span>
+    <span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Parameters: </span><span class="token interpolation"><span class="token punctuation">{</span>sft_model<span class="token punctuation">.</span>count_parameters<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">,</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"STEP 2: DPO Training"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"-"</span> <span class="token operator">*</span> <span class="token number">50</span><span class="token punctuation">)</span>
+
+    policy_model <span class="token operator">=</span> MiniGPT<span class="token punctuation">(</span>
+        vocab_size<span class="token operator">=</span><span class="token number">256</span><span class="token punctuation">,</span> embed_dim<span class="token operator">=</span><span class="token number">128</span><span class="token punctuation">,</span> num_heads<span class="token operator">=</span><span class="token number">4</span><span class="token punctuation">,</span>
+        num_layers<span class="token operator">=</span><span class="token number">4</span><span class="token punctuation">,</span> max_seq_len<span class="token operator">=</span><span class="token number">128</span><span class="token punctuation">,</span> ff_dim<span class="token operator">=</span><span class="token number">512</span>
+    <span class="token punctuation">)</span>
+    reference_model <span class="token operator">=</span> MiniGPT<span class="token punctuation">(</span>
+        vocab_size<span class="token operator">=</span><span class="token number">256</span><span class="token punctuation">,</span> embed_dim<span class="token operator">=</span><span class="token number">128</span><span class="token punctuation">,</span> num_heads<span class="token operator">=</span><span class="token number">4</span><span class="token punctuation">,</span>
+        num_layers<span class="token operator">=</span><span class="token number">4</span><span class="token punctuation">,</span> max_seq_len<span class="token operator">=</span><span class="token number">128</span><span class="token punctuation">,</span> ff_dim<span class="token operator">=</span><span class="token number">512</span>
+    <span class="token punctuation">)</span>
+    copy_model_weights<span class="token punctuation">(</span>sft_model<span class="token punctuation">,</span> policy_model<span class="token punctuation">)</span>
+    copy_model_weights<span class="token punctuation">(</span>sft_model<span class="token punctuation">,</span> reference_model<span class="token punctuation">)</span>
+
+    policy_model<span class="token punctuation">,</span> losses<span class="token punctuation">,</span> margins <span class="token operator">=</span> dpo_train<span class="token punctuation">(</span>
+        policy_model<span class="token punctuation">,</span> reference_model<span class="token punctuation">,</span> PREFERENCE_DATA<span class="token punctuation">,</span>
+        num_epochs<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">,</span> lr<span class="token operator">=</span><span class="token number">5e-6</span><span class="token punctuation">,</span> beta<span class="token operator">=</span><span class="token number">0.1</span>
+    <span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">70</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"STEP 3: Evaluate"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">70</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    pre_accuracy <span class="token operator">=</span> evaluate_preference_accuracy<span class="token punctuation">(</span>
+        sft_model<span class="token punctuation">,</span> reference_model<span class="token punctuation">,</span> PREFERENCE_DATA<span class="token punctuation">,</span> beta<span class="token operator">=</span><span class="token number">0.1</span>
+    <span class="token punctuation">)</span>
+    post_accuracy <span class="token operator">=</span> evaluate_preference_accuracy<span class="token punctuation">(</span>
+        policy_model<span class="token punctuation">,</span> reference_model<span class="token punctuation">,</span> PREFERENCE_DATA<span class="token punctuation">,</span> beta<span class="token operator">=</span><span class="token number">0.1</span>
+    <span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Preference accuracy (pre-DPO):  </span><span class="token interpolation"><span class="token punctuation">{</span>pre_accuracy<span class="token punctuation">:</span><span class="token format-spec">.1%</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Preference accuracy (post-DPO): </span><span class="token interpolation"><span class="token punctuation">{</span>post_accuracy<span class="token punctuation">:</span><span class="token format-spec">.1%</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    analyze_implicit_rewards<span class="token punctuation">(</span>policy_model<span class="token punctuation">,</span> reference_model<span class="token punctuation">,</span> PREFERENCE_DATA<span class="token punctuation">,</span> beta<span class="token operator">=</span><span class="token number">0.1</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">70</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"STEP 4: Training Dynamics"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">70</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">if</span> losses<span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"  Loss curve:"</span><span class="token punctuation">)</span>
+        window <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token builtin">len</span><span class="token punctuation">(</span>losses<span class="token punctuation">)</span> <span class="token operator">//</span> <span class="token number">5</span><span class="token punctuation">)</span>
+        <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token builtin">len</span><span class="token punctuation">(</span>losses<span class="token punctuation">)</span><span class="token punctuation">,</span> window<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            chunk <span class="token operator">=</span> losses<span class="token punctuation">[</span>i<span class="token punctuation">:</span>i <span class="token operator">+</span> window<span class="token punctuation">]</span>
+            avg <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>chunk<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>chunk<span class="token punctuation">)</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"    Steps </span><span class="token interpolation"><span class="token punctuation">{</span>i<span class="token punctuation">:</span><span class="token format-spec">3d</span><span class="token punctuation">}</span></span><span class="token string">-</span><span class="token interpolation"><span class="token punctuation">{</span>i <span class="token operator">+</span> <span class="token builtin">len</span><span class="token punctuation">(</span>chunk<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">:</span><span class="token format-spec">3d</span><span class="token punctuation">}</span></span><span class="token string">: loss = </span><span class="token interpolation"><span class="token punctuation">{</span>avg<span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">if</span> margins<span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"  Reward margin curve:"</span><span class="token punctuation">)</span>
+        window <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token builtin">len</span><span class="token punctuation">(</span>margins<span class="token punctuation">)</span> <span class="token operator">//</span> <span class="token number">5</span><span class="token punctuation">)</span>
+        <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token builtin">len</span><span class="token punctuation">(</span>margins<span class="token punctuation">)</span><span class="token punctuation">,</span> window<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            chunk <span class="token operator">=</span> margins<span class="token punctuation">[</span>i<span class="token punctuation">:</span>i <span class="token operator">+</span> window<span class="token punctuation">]</span>
+            avg <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>chunk<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>chunk<span class="token punctuation">)</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"    Steps </span><span class="token interpolation"><span class="token punctuation">{</span>i<span class="token punctuation">:</span><span class="token format-spec">3d</span><span class="token punctuation">}</span></span><span class="token string">-</span><span class="token interpolation"><span class="token punctuation">{</span>i <span class="token operator">+</span> <span class="token builtin">len</span><span class="token punctuation">(</span>chunk<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">:</span><span class="token format-spec">3d</span><span class="token punctuation">}</span></span><span class="token string">: margin = </span><span class="token interpolation"><span class="token punctuation">{</span>avg<span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">70</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"STEP 5: Beta Sensitivity"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">70</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    beta_results <span class="token operator">=</span> beta_sensitivity_analysis<span class="token punctuation">(</span>
+        sft_model<span class="token punctuation">,</span> PREFERENCE_DATA<span class="token punctuation">,</span> betas<span class="token operator">=</span><span class="token punctuation">[</span><span class="token number">0.01</span><span class="token punctuation">,</span> <span class="token number">0.1</span><span class="token punctuation">,</span> <span class="token number">0.3</span><span class="token punctuation">,</span> <span class="token number">1.0</span><span class="token punctuation">]</span>
+    <span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">70</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"DPO vs RLHF COMPARISON"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">70</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"  DPO advantages:"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"    - 1 training loop (vs 3 for RLHF)"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"    - 2 models in memory (vs 3-4 for RLHF)"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"    - Supervised learning (vs RL, more stable)"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"    - No reward model to train or maintain"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"  RLHF advantages:"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"    - Separate reward model captures complex preferences"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"    - Online learning: generate, rate, retrain"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"    - Better for multi-objective alignment"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"    - Proven at largest scales (GPT-4, Claude)"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"  Practical guidance:"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"    - Start with DPO. It's simpler and often sufficient."</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"    - Switch to RLHF if DPO plateaus on your eval metrics."</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"    - Many production systems use both: RLHF first, DPO to refine."</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces <code class="inline-code">outputs/prompt-alignment-method-selector.md</code> -- a prompt that helps you choose the right alignment method (SFT, RLHF, DPO, KTO, ORPO, SimPO) for your use case. Given your data availability, compute budget, and alignment goals, it recommends a method and training plan.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p>Implement KTO (Kahneman-Tversky Optimization). KTO doesn&#39;t need pairs -- just label each response as &quot;good&quot; or &quot;bad.&quot; The loss for a good response is <code class="inline-code">-log(sigmoid(beta * log_ratio))</code> and for a bad response is <code class="inline-code">-log(1 - sigmoid(beta * log_ratio))</code> with a loss aversion multiplier (typically 1.5x) on the bad response loss. Train on the same data (treat preferred as &quot;good&quot; and rejected as &quot;bad&quot; independently) and compare accuracy against DPO.</p>
+</li>
+<li><p>Implement length-normalized DPO. Instead of raw log-probabilities, divide by the number of response tokens: <code class="inline-code">normalized_logprob = total_logprob / num_tokens</code>. This prevents the model from favoring shorter responses (which have higher total log-prob). Compare the implicit reward margins with and without normalization.</p>
+</li>
+<li><p>Build an ORPO-style combined loss. Add a standard next-token prediction loss on the preferred response to the DPO loss: <code class="inline-code">L = L_sft(preferred) + alpha * L_dpo</code>. Try alpha values of 0.1, 0.5, and 1.0. The combined loss should produce a model that both follows instructions (from the SFT term) and prefers better responses (from the DPO term), eliminating the need for a separate SFT stage.</p>
+</li>
+<li><p>Implement iterative DPO. Run DPO for 3 epochs, then generate new responses from the trained model, pair them with the original preferred responses as new preference pairs, and run DPO again. Two rounds of this &quot;self-play&quot; process. Compare preference accuracy after round 1 and round 2 to see if iterative refinement helps.</p>
+</li>
+<li><p>Compare DPO with different reference models. Instead of using the SFT checkpoint as the reference, try: (a) the base model (pre-SFT), (b) a checkpoint from epoch 1 of DPO, (c) an exponential moving average of the policy model. Report which reference produces the highest preference accuracy and the most stable training curve.</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>DPO</td>
+<td>&quot;RLHF without RL&quot;</td>
+<td>Direct Preference Optimization: a supervised learning algorithm that optimizes the language model directly on preference pairs, bypassing the reward model and PPO</td>
+</tr>
+<tr>
+<td>Implicit reward</td>
+<td>&quot;The reward is in the model&quot;</td>
+<td>The reward function is determined by the log-probability ratio between the policy and reference models -- no separate reward model needed</td>
+</tr>
+<tr>
+<td>Beta (DPO)</td>
+<td>&quot;The temperature&quot;</td>
+<td>Controls how far the policy can deviate from the reference model -- small beta allows large deviations, large beta keeps the model close</td>
+</tr>
+<tr>
+<td>Log-probability ratio</td>
+<td>&quot;How much the model changed&quot;</td>
+<td>log pi(y|x) - log pi_ref(y|x) -- positive means the current model assigns higher probability than the reference</td>
+</tr>
+<tr>
+<td>Reference model</td>
+<td>&quot;The frozen checkpoint&quot;</td>
+<td>A copy of the SFT model whose weights never change -- serves as the anchor for computing probability ratios</td>
+</tr>
+<tr>
+<td>KTO</td>
+<td>&quot;DPO without pairs&quot;</td>
+<td>Kahneman-Tversky Optimization: works with unpaired &quot;good&quot; or &quot;bad&quot; labels instead of requiring preference pairs</td>
+</tr>
+<tr>
+<td>ORPO</td>
+<td>&quot;One-step alignment&quot;</td>
+<td>Odds Ratio Preference Optimization: combines SFT and alignment into a single training loop by adding a preference term to the SFT loss</td>
+</tr>
+<tr>
+<td>SimPO</td>
+<td>&quot;No reference needed&quot;</td>
+<td>Simple Preference Optimization: eliminates the reference model by using length-normalized average log-probability as the implicit reward</td>
+</tr>
+<tr>
+<td>Alignment tax</td>
+<td>&quot;The cost of making models safe&quot;</td>
+<td>The additional compute, data, and complexity required to go from a base model to an aligned model -- DPO reduces this significantly</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2305.18290" target="_blank" rel="noopener">Rafailov et al., 2023 -- &quot;Direct Preference Optimization: Your Language Model is Secretly a Reward Model&quot;</a> -- the DPO paper that simplified alignment from RLHF to supervised learning</li>
+<li><a href="https://arxiv.org/abs/2310.16944" target="_blank" rel="noopener">Tunstall et al., 2023 -- &quot;Zephyr: Direct Distillation of LM Alignment&quot;</a> -- Zephyr-7B, showing DPO on UltraFeedback matches RLHF on benchmarks</li>
+<li><a href="https://arxiv.org/abs/2402.01306" target="_blank" rel="noopener">Ethayarajh et al., 2024 -- &quot;KTO: Model Alignment as Prospect Theoretic Optimization&quot;</a> -- eliminating the need for paired preferences</li>
+<li><a href="https://arxiv.org/abs/2403.07691" target="_blank" rel="noopener">Hong et al., 2024 -- &quot;ORPO: Monolithic Preference Optimization without Reference Model&quot;</a> -- combining SFT and alignment in one step</li>
+<li><a href="https://arxiv.org/abs/2405.14734" target="_blank" rel="noopener">Meng et al., 2024 -- &quot;SimPO: Simple Preference Optimization with a Reference-Free Reward&quot;</a> -- eliminating the reference model entirely</li>
+<li><a href="https://arxiv.org/abs/2407.21783" target="_blank" rel="noopener">Llama 3 Technical Report</a> -- Meta&#39;s alignment pipeline combining RLHF and DPO</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="07-rlhf.html">
+  <span class="label">← Previous</span>
+  <b>RLHF: Reward Model + PPO</b>
+</a>
+      <a class="pager__item pager__item--next" href="09-constitutional-ai-self-improvement.html">
+  <span class="label">Next →</span>
+  <b>Constitutional AI and Self-Improvement</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>11 minutes</b> of LLMs from Scratch behind you.</p>
+      <a class="btn btn--solid" href="09-constitutional-ai-self-improvement.html">Continue to Constitutional AI and Self-Improvement →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#the-key-insight">The Key Insight</a></li><li class="mini__item mini__item--d3"><a href="#the-dpo-loss">The DPO Loss</a></li><li class="mini__item mini__item--d3"><a href="#why-dpo-is-simpler">Why DPO is Simpler</a></li><li class="mini__item mini__item--d3"><a href="#when-dpo-beats-rlhf">When DPO Beats RLHF</a></li><li class="mini__item mini__item--d3"><a href="#when-rlhf-beats-dpo">When RLHF Beats DPO</a></li><li class="mini__item mini__item--d3"><a href="#beyond-dpo-kto-orpo-simpo">Beyond DPO: KTO, ORPO, SimPO</a></li><li class="mini__item mini__item--d3"><a href="#real-dpo-deployments">Real DPO Deployments</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-preference-dataset">Step 1: Preference Dataset</a></li><li class="mini__item mini__item--d3"><a href="#step-2-sequence-log-probability">Step 2: Sequence Log-Probability</a></li><li class="mini__item mini__item--d3"><a href="#step-3-the-dpo-loss">Step 3: The DPO Loss</a></li><li class="mini__item mini__item--d3"><a href="#step-4-dpo-training-loop">Step 4: DPO Training Loop</a></li><li class="mini__item mini__item--d3"><a href="#step-5-compare-dpo-vs-rlhf">Step 5: Compare DPO vs RLHF</a></li><li class="mini__item mini__item--d3"><a href="#step-6-beta-sensitivity-analysis">Step 6: Beta Sensitivity Analysis</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d3"><a href="#full-dpo-pipeline-demo">Full DPO Pipeline Demo</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

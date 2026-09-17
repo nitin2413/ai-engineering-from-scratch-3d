@@ -1,0 +1,698 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Workbench Engineering: Why Capable Models Still Fail — Agent Engineering — AIFS</title>
+<meta name="description" content="Agent Engineering: Agent Workbench Engineering: Why Capable Models Still Fail. 12 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Agent Workbench Engineering: Why Capable Models Still Fail — Agent Engineering — AIFS">
+<meta property="og:description" content="Agent Engineering: Agent Workbench Engineering: Why Capable Models Still Fail. 12 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"wb-seven-surfaces":["../assets/figures/figures-workbench.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-workbench.js"];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#0091FF" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#0091FF;--accent-ink:#FFFFFF"
+  data-lesson-id="agent-engineering/31-agent-workbench-why-models-fail" data-module="agent-engineering"
+  data-prev="30-eval-driven-agent-development.html" data-next="32-minimal-agent-workbench.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#0091FF">
+        <span class="label">Phase 14</span>
+        <b>Agent Engineering</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="agent-engineering/01-the-agent-loop"><a href="01-the-agent-loop.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">The Agent Loop: Observe, Think, Act</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/02-rewoo-plan-and-execute"><a href="02-rewoo-plan-and-execute.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">ReWOO and Plan-and-Execute: Decoupled Planning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/03-reflexion-verbal-rl"><a href="03-reflexion-verbal-rl.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Reflexion: Verbal Reinforcement Learning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/04-tree-of-thoughts-lats"><a href="04-tree-of-thoughts-lats.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Tree of Thoughts and LATS: Deliberate Search</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/05-self-refine-and-critic"><a href="05-self-refine-and-critic.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Self-Refine and CRITIC: Iterative Output Improvement</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/06-tool-use-and-function-calling"><a href="06-tool-use-and-function-calling.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Tool Use and Function Calling</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/07-memory-virtual-context-memgpt"><a href="07-memory-virtual-context-memgpt.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Agent Memory — Virtual Context and Memory Paging</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/08-memory-blocks-sleep-time-compute"><a href="08-memory-blocks-sleep-time-compute.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Memory Blocks and Sleep-Time Compute</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/09-hybrid-memory-mem0"><a href="09-hybrid-memory-mem0.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Hybrid Memory: Vector + Graph + KV</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/10-skill-libraries-voyager"><a href="10-skill-libraries-voyager.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Skill Libraries and Lifelong Learning (Voyager)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/11-planning-htn-and-evolutionary"><a href="11-planning-htn-and-evolutionary.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Planning with HTN and Evolutionary Search</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/12-anthropic-workflow-patterns"><a href="12-anthropic-workflow-patterns.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Anthropic's Workflow Patterns: Simple Over Complex</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/13-langgraph-stateful-graphs"><a href="13-langgraph-stateful-graphs.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Stateful Graph Orchestration — Durable Execution and Checkpoints</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/14-autogen-actor-model"><a href="14-autogen-actor-model.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">The Actor Model for Agents — Async Messages and Typed Runtimes</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/15-crewai-role-based-crews"><a href="15-crewai-role-based-crews.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Role-Based Agent Teams — Roles, Tasks, Processes</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/16-openai-agents-sdk"><a href="16-openai-agents-sdk.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">OpenAI Agents SDK: Handoffs, Guardrails, Tracing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/17-claude-agent-sdk"><a href="17-claude-agent-sdk.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">The Harness as a Library — Subagents and Session Store</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/18-agno-and-mastra-runtimes"><a href="18-agno-and-mastra-runtimes.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Production Agent Runtimes — Fast Instantiation and Typed Workflows</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/19-benchmarks-swebench-gaia"><a href="19-benchmarks-swebench-gaia.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">Benchmarks: SWE-bench, GAIA, AgentBench</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/20-benchmarks-webarena-osworld"><a href="20-benchmarks-webarena-osworld.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Benchmarks: WebArena and OSWorld</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/21-computer-use-agents"><a href="21-computer-use-agents.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Computer Use: Claude, OpenAI CUA, Gemini</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/22-voice-agents-pipecat-livekit"><a href="22-voice-agents-pipecat-livekit.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Voice Agents: Pipecat and LiveKit</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/23-otel-genai-conventions"><a href="23-otel-genai-conventions.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">OpenTelemetry GenAI Semantic Conventions</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/24-agent-observability-platforms"><a href="24-agent-observability-platforms.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Agent Observability: Langfuse, Phoenix, Opik</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/25-multi-agent-debate"><a href="25-multi-agent-debate.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Multi-Agent Debate and Collaboration</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/26-failure-modes-agentic"><a href="26-failure-modes-agentic.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Failure Modes: Why Agents Break</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/27-prompt-injection-defense"><a href="27-prompt-injection-defense.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">Prompt Injection and the PVE Defense</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/28-orchestration-patterns"><a href="28-orchestration-patterns.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">Orchestration Patterns: Supervisor, Swarm, Hierarchical</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/29-production-runtimes"><a href="29-production-runtimes.html" class="">
+  <span class="snav__n">29</span>
+  <span class="snav__t">Production Runtimes: Queue, Event, Cron</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/30-eval-driven-agent-development"><a href="30-eval-driven-agent-development.html" class="">
+  <span class="snav__n">30</span>
+  <span class="snav__t">Eval-Driven Agent Development</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/31-agent-workbench-why-models-fail"><a href="31-agent-workbench-why-models-fail.html" class="is-current">
+  <span class="snav__n">31</span>
+  <span class="snav__t">Agent Workbench Engineering: Why Capable Models Still Fail</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/32-minimal-agent-workbench"><a href="32-minimal-agent-workbench.html" class="">
+  <span class="snav__n">32</span>
+  <span class="snav__t">The Minimal Agent Workbench</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/33-instructions-as-executable-constraints"><a href="33-instructions-as-executable-constraints.html" class="">
+  <span class="snav__n">33</span>
+  <span class="snav__t">Agent Instructions as Executable Constraints</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/34-repo-memory-and-state"><a href="34-repo-memory-and-state.html" class="">
+  <span class="snav__n">34</span>
+  <span class="snav__t">Repo Memory and Durable State</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/35-initialization-scripts"><a href="35-initialization-scripts.html" class="">
+  <span class="snav__n">35</span>
+  <span class="snav__t">Initialization Scripts for Agents</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/36-scope-contracts"><a href="36-scope-contracts.html" class="">
+  <span class="snav__n">36</span>
+  <span class="snav__t">Scope Contracts and Task Boundaries</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/37-runtime-feedback-loops"><a href="37-runtime-feedback-loops.html" class="">
+  <span class="snav__n">37</span>
+  <span class="snav__t">Runtime Feedback Loops</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/38-verification-gates"><a href="38-verification-gates.html" class="">
+  <span class="snav__n">38</span>
+  <span class="snav__t">Verification Gates</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/39-reviewer-agent"><a href="39-reviewer-agent.html" class="">
+  <span class="snav__n">39</span>
+  <span class="snav__t">Reviewer Agent: Separate Builder from Marker</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/40-multi-session-handoff"><a href="40-multi-session-handoff.html" class="">
+  <span class="snav__n">40</span>
+  <span class="snav__t">Multi-Session Handoff</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/41-workbench-for-real-repos"><a href="41-workbench-for-real-repos.html" class="">
+  <span class="snav__n">41</span>
+  <span class="snav__t">The Workbench on a Real Repo</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/42-agent-workbench-capstone"><a href="42-agent-workbench-capstone.html" class="">
+  <span class="snav__n">42</span>
+  <span class="snav__t">Capstone: Ship a Reusable Agent Workbench Pack</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/43-frame-the-task-before-code"><a href="43-frame-the-task-before-code.html" class="">
+  <span class="snav__n">43</span>
+  <span class="snav__t">Frame the Task Before the Agent Writes Code</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/44-plan-from-evidence"><a href="44-plan-from-evidence.html" class="">
+  <span class="snav__n">44</span>
+  <span class="snav__t">Build an Evidence-Backed Execution Plan</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/45-delegate-with-isolation"><a href="45-delegate-with-isolation.html" class="">
+  <span class="snav__n">45</span>
+  <span class="snav__t">Delegate Agent Work with Isolation and Merge Contracts</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/46-turn-feedback-into-system"><a href="46-turn-feedback-into-system.html" class="">
+  <span class="snav__n">46</span>
+  <span class="snav__t">Turn Every Agent Correction into a System Improvement</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/47-outcomes-before-output"><a href="47-outcomes-before-output.html" class="">
+  <span class="snav__n">47</span>
+  <span class="snav__t">Define the Outcome Before You Choose the Output</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/48-discover-the-real-workflow"><a href="48-discover-the-real-workflow.html" class="">
+  <span class="snav__n">48</span>
+  <span class="snav__t">Discover the Workflow People Actually Perform</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/49-map-assumptions-and-risk"><a href="49-map-assumptions-and-risk.html" class="">
+  <span class="snav__n">49</span>
+  <span class="snav__t">Map Assumptions and Resolve the Riskiest One First</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/50-choose-the-smallest-testable-slice"><a href="50-choose-the-smallest-testable-slice.html" class="">
+  <span class="snav__n">50</span>
+  <span class="snav__t">Choose the Smallest Slice That Can Change the Decision</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/51-write-specifications-that-preserve-judgment"><a href="51-write-specifications-that-preserve-judgment.html" class="">
+  <span class="snav__n">51</span>
+  <span class="snav__t">Write Specifications That Preserve Judgment</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/52-design-success-metrics"><a href="52-design-success-metrics.html" class="">
+  <span class="snav__n">52</span>
+  <span class="snav__t">Design Success Metrics Before the Result Exists</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/53-prototype-pilot-or-production"><a href="53-prototype-pilot-or-production.html" class="">
+  <span class="snav__n">53</span>
+  <span class="snav__t">Choose Prototype, Pilot, or Production Deliberately</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/54-build-the-feedback-ratchet"><a href="54-build-the-feedback-ratchet.html" class="">
+  <span class="snav__n">54</span>
+  <span class="snav__t">Build a Feedback Ratchet with Ownership and Retirement</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Agent Engineering</a></p>
+      <h1 class="page__title">Agent Workbench Engineering: Why Capable Models Still Fail</h1>
+      <p class="page__lede">A capable model is not enough. Reliable agents need a workbench: instructions, state, scope, feedback, verification, review, and handoff. Strip those away and even a frontier model produces work that is unsafe to ship.</p>
+      <div class="page__meta">
+        <span class="chip">12 min read</span>
+        <span class="chip">2,716 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Learn + Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (stdlib)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 14 · 01 (Agent Loop), Phase 14 · 26 (Failure Modes)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~45 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Separate model capability from execution reliability.</li>
+<li>Name the seven workbench surfaces that decide whether an agent ships.</li>
+<li>Compare a prompt-only run against a workbench-guided run on a small repo task.</li>
+<li>Produce a failure-mode report that maps each missed surface to the symptom it caused.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>You drop a frontier model into a real repo and ask it to add input validation. It opens four files, writes plausible code, declares success, and stops. You run the tests. Two fail. A third file is touched that had nothing to do with validation. There is no record of what the agent assumed, what it tried first, or what is left to do.</p>
+<p>The model was not wrong about Python. It was wrong about the work. It had no idea what counted as done, where it was allowed to write, what tests were authoritative, or how the next session was supposed to pick up.</p>
+<p>This is not a model bug. It is a workbench bug. The surface around the agent is missing the parts that turn a one-shot generation into reliable, resumable engineering.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<p>A workbench is the operating environment that wraps the model during a task. It has seven surfaces:</p>
+<table>
+<thead>
+<tr>
+<th>Surface</th>
+<th>What it carries</th>
+<th>Failure when missing</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Instructions</td>
+<td>Startup rules, forbidden actions, definition of done</td>
+<td>Agent guesses what shipping means</td>
+</tr>
+<tr>
+<td>State</td>
+<td>Current task, touched files, blockers, next action</td>
+<td>Each session restarts from zero</td>
+</tr>
+<tr>
+<td>Scope</td>
+<td>Allowed files, forbidden files, acceptance criteria</td>
+<td>Edits leak into unrelated code</td>
+</tr>
+<tr>
+<td>Feedback</td>
+<td>Real command output captured into the loop</td>
+<td>Agent declares success on a 400</td>
+</tr>
+<tr>
+<td>Verification</td>
+<td>Tests, lint, smoke run, scope check</td>
+<td>&quot;Looks good&quot; reaches main</td>
+</tr>
+<tr>
+<td>Review</td>
+<td>A second pass with a different role</td>
+<td>Builder marks own homework</td>
+</tr>
+<tr>
+<td>Handoff</td>
+<td>What changed, why, what is left</td>
+<td>Next session re-discovers everything</td>
+</tr>
+</tbody></table>
+<p>The workbench is independent of the model. You can swap the model and keep the surfaces. You cannot swap the surfaces and keep reliability.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">flowchart LR
+  Task[Task] --&gt; Scope[Scope Contract]
+  Scope --&gt; State[Repo Memory]
+  State --&gt; Agent[Agent Loop]
+  Agent --&gt; Feedback[Runtime Feedback]
+  Feedback --&gt; Verify[Verification Gate]
+  Verify --&gt; Review[Reviewer]
+  Review --&gt; Handoff[Handoff]
+  Handoff --&gt; State</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>The loop closes on the state file, not on chat history. Chat is volatile. The repo is the system of record.</p>
+<h3 id="workbench-versus-prompt-engineering" class="prose-h prose-h3"><a class="prose-h__anchor" href="#workbench-versus-prompt-engineering" aria-label="Link to this section">#</a>Workbench versus prompt engineering</h3>
+<p>Prompting tells the model what you want this turn. A workbench tells the model how to do work across turns and across sessions. Most agent failure stories are workbench failures wearing prompt-engineering clothes.</p>
+<h3 id="workbench-versus-framework" class="prose-h prose-h3"><a class="prose-h__anchor" href="#workbench-versus-framework" aria-label="Link to this section">#</a>Workbench versus framework</h3>
+<p>A framework gives you a runtime (LangGraph, AutoGen, Agents SDK). A workbench gives the agent a place to work inside that runtime. You need both. This mini-track is about the second one.</p>
+<h3 id="reasoning-from-primitives-not-from-vendor-taxonomies" class="prose-h prose-h3"><a class="prose-h__anchor" href="#reasoning-from-primitives-not-from-vendor-taxonomies" aria-label="Link to this section">#</a>Reasoning from primitives, not from vendor taxonomies</h3>
+<p>There is a lot of writing on &quot;harness engineering&quot; right now. Addy Osmani, OpenAI, Anthropic, LangChain, Martin Fowler, MongoDB, HumanLayer, Augment Code, Thoughtworks, the walkinglabs awesome list, and a steady drumbeat of Medium and Hacker News pieces are all carrying it. They disagree on the boundary of what a harness is, what is in scope, and which vocabulary to use. We do not need to pick a side. The seven surfaces are a UX layer; underneath every workbench is the same set of distributed-systems primitives that hold up any reliable backend.</p>
+<p>Strip the agent label off for a moment. An agent run is computation that crosses time, processes, and machines. To make that reliable you need the same primitives any production system needs.</p>
+<table>
+<thead>
+<tr>
+<th>Primitive</th>
+<th>What it is</th>
+<th>What it carries for an agent</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Function</td>
+<td>Typed handler. Pure where possible. Owns its inputs and outputs.</td>
+<td>A tool call, a rule check, a verification step, a model invocation</td>
+</tr>
+<tr>
+<td>Worker</td>
+<td>Long-lived process that owns one or more functions and a lifecycle</td>
+<td>The builder, the reviewer, the verifier, an MCP server</td>
+</tr>
+<tr>
+<td>Trigger</td>
+<td>Event source that invokes a function</td>
+<td>Agent loop tick, HTTP request, queue message, cron, file change, hook</td>
+</tr>
+<tr>
+<td>Runtime</td>
+<td>The boundary that decides what runs where, with what timeouts and resources</td>
+<td>Claude Code&#39;s process, LangGraph&#39;s runtime, a worker container</td>
+</tr>
+<tr>
+<td>HTTP / RPC</td>
+<td>The wire between caller and worker</td>
+<td>Tool-call protocol, MCP request, model API</td>
+</tr>
+<tr>
+<td>Queue</td>
+<td>Durable buffer between trigger and worker; back-pressure, retry, idempotency</td>
+<td>The task board, the feedback log, the review inbox</td>
+</tr>
+<tr>
+<td>Session persistence</td>
+<td>State that survives crashes, restarts, model swaps</td>
+<td><code class="inline-code">agent_state.json</code>, checkpoints, KV stores, the repo itself</td>
+</tr>
+<tr>
+<td>Authorization policy</td>
+<td>Who can call what function with which scope</td>
+<td>Allowed/forbidden files, approval boundaries, MCP capability lists</td>
+</tr>
+</tbody></table>
+<p>Now map the seven workbench surfaces onto those primitives.</p>
+<ul>
+<li><strong>Instructions</strong> — policy + function metadata. Rules are checks (functions). The router (<code class="inline-code">AGENTS.md</code>) is policy attached to the runtime&#39;s startup.</li>
+<li><strong>State</strong> — session persistence. A keyed store the runtime reads at every step. File, KV, or DB; the persistence semantics matter, the storage backend does not.</li>
+<li><strong>Scope</strong> — authorization policy per task. Allowed/forbidden globs are an ACL. Approvals required are a permission lattice.</li>
+<li><strong>Feedback</strong> — invocation log written into a queue. Every shell call is a record, durable, replayable.</li>
+<li><strong>Verification</strong> — a function. Deterministic over inputs. Triggered on task close. Fails closed.</li>
+<li><strong>Review</strong> — a separate worker with read-only authz on builder artifacts and write-only authz on review reports.</li>
+<li><strong>Handoff</strong> — a durable record emitted by a session-end trigger. The next session&#39;s startup trigger reads it.</li>
+</ul>
+<p>The agent loop itself is a worker that consumes events (user message, tool result, timer tick), calls functions (the model, then the tools the model picks), writes records (state, feedback), and emits triggers (verify, review, handoff). No mystery; the same shape as a job processor.</p>
+<h3 id="patterns-in-circulation-translated-to-primitives" class="prose-h prose-h3"><a class="prose-h__anchor" href="#patterns-in-circulation-translated-to-primitives" aria-label="Link to this section">#</a>Patterns in circulation, translated to primitives</h3>
+<p>Every popular harness pattern reduces to the eight primitives. Translation table.</p>
+<table>
+<thead>
+<tr>
+<th>Vendor or community pattern</th>
+<th>What it actually is</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Ralph Loop (Claude Code, Codex, agentic_harness book) — re-inject original intent into a fresh context window when the agent tries to stop early</td>
+<td>A trigger that re-enqueues a task with a clean context; session persistence carries the goal forward</td>
+</tr>
+<tr>
+<td>Plan / Execute / Verify (PEV)</td>
+<td>Three workers, one per role, communicating via state and a queue between phases</td>
+</tr>
+<tr>
+<td>Harness-compute separation (OpenAI Agents SDK, April 2026) — split control plane from execution plane</td>
+<td>Restating control-plane / data-plane. Predates the agent label by decades</td>
+</tr>
+<tr>
+<td>Open Agent Passport (OAP, March 2026) — sign and audit every tool call against a declarative policy before execution</td>
+<td>An authorization policy enforced by a pre-action worker, with a signed audit queue</td>
+</tr>
+<tr>
+<td>Guides and Sensors (Birgitta Böckeler / Thoughtworks) — feedforward rules + feedback observability</td>
+<td>Authorization policy + verification functions + observability traces</td>
+</tr>
+<tr>
+<td>Progressive compaction, 5-stage (Claude Code reverse engineering, April 2026)</td>
+<td>A state-management worker that runs cron-like over session persistence to keep it within a budget</td>
+</tr>
+<tr>
+<td>Hooks / middleware (LangChain, Claude Code) — intercept model and tool calls</td>
+<td>Triggers + functions wrapped around the runtime&#39;s invocation path</td>
+</tr>
+<tr>
+<td>Skills as Markdown with progressive disclosure (Anthropic, Flue)</td>
+<td>A function registry where the function metadata is loaded into context just-in-time</td>
+</tr>
+<tr>
+<td>Sandbox agents (Codex, Sandcastle, Vercel Sandbox)</td>
+<td>The compute plane: a runtime with isolated filesystem, network, and lifecycle</td>
+</tr>
+<tr>
+<td>MCP servers</td>
+<td>Workers exposing functions over a stable RPC, with capability lists as authorization</td>
+</tr>
+</tbody></table>
+<p>Every entry in that table is the agent community arriving at a primitive that already had a name in distributed systems and giving it a new one. Useful labels for marketing; not useful as engineering vocabulary.</p>
+<h3 id="what-the-receipts-actually-say" class="prose-h prose-h3"><a class="prose-h__anchor" href="#what-the-receipts-actually-say" aria-label="Link to this section">#</a>What the receipts actually say</h3>
+<p>The harness-over-model claim has numbers behind it now. Worth knowing, because they are also the only honest argument against &quot;just wait for a smarter model.&quot;</p>
+<ul>
+<li>Terminal Bench 2.0 — same model, harness change moved a coding agent from outside the top 30 to rank five (LangChain, <em>Anatomy of an Agent Harness</em>).</li>
+<li>Vercel — deleted 80% of its agent&#39;s tools; success rate jumped from 80% to 100% (MongoDB).</li>
+<li>Harvey — legal agents more than doubled accuracy through harness optimization alone (MongoDB).</li>
+<li>88% of enterprise AI agent projects fail to reach production. The failures cluster around runtime, not reasoning (preprints.org, <em>Harness Engineering for Language Agents</em>, March 2026).</li>
+<li>A 2025 benchmark study across three popular open-source frameworks reported ~50% task completion; long-context WebAgent collapsed from 40-50% to under 10% in long-context conditions, mostly from infinite loops and goal loss (covered widely in early 2026 writeups).</li>
+</ul>
+<p>The takeaway is not &quot;harness wins forever.&quot; Models do absorb harness tricks over time. The takeaway is that today, the load-bearing engineering is around the model, not inside it, and the primitives that carry that load are the ones every production system has always needed.</p>
+<h3 id="where-vendor-writeups-stop-short" class="prose-h prose-h3"><a class="prose-h__anchor" href="#where-vendor-writeups-stop-short" aria-label="Link to this section">#</a>Where vendor writeups stop short</h3>
+<p>This is the part you do not need to be polite about.</p>
+<ul>
+<li>LangChain&#39;s <em>Anatomy of an Agent Harness</em> enumerates eleven components — prompts, tools, hooks, sandboxes, orchestration, memory, skills, subagents, and a runtime &quot;dumb loop.&quot; It does not name queues, workers as a deployment unit, trigger semantics, session persistence as a separate concern, or authorization policy. It treats the harness as an object you configure, not as a system you deploy.</li>
+<li>Addy Osmani&#39;s <em>Agent Harness Engineering</em> lands the framing <code class="inline-code">Agent = Model + Harness</code> and the ratchet pattern, but stops short of saying what a harness is built out of. It reads as a stance, not a spec.</li>
+<li>Anthropic and OpenAI go deepest on the surfaces but stay inside their own runtimes. The &quot;harness-compute separation&quot; announcement in the April 2026 Agents SDK is the first vendor piece that explicitly endorses the control-plane / data-plane split. That is a primitive idea, not a new one.</li>
+<li>The agentic_harness book treats harness as a config object (Jaymin West&#39;s <em>Agentic Engineering</em>, chapter 6) and the strongest line in it is &quot;the harness is the primary security boundary in an agentic system.&quot; That is just authorization policy, restated.</li>
+<li>Hacker News threads keep arriving at the same place. The April 2026 thread <em>The agent harness belongs outside the sandbox</em> argues the harness should sit &quot;more like a hypervisor that sits outside everything and authorises access based on context and user.&quot; That is, again, authorization policy as a separate plane.</li>
+</ul>
+<p>You do not need to disagree with any of these pieces to notice the gap. They are writing UX descriptions of a system that already exists. We are writing the system. When the system is built right, the seven surfaces fall out of the primitives. When it is built wrong, no amount of <code class="inline-code">AGENTS.md</code> polish fixes the missing queue.</p>
+<p>So when you hear &quot;harness engineering&quot; elsewhere, translate to primitives. Prompts and rules are policy and functions. Scaffolding is the runtime. Guardrails are authorization + verification. Hooks are triggers. Memory is session persistence. The Ralph Loop is requeue. Subagents are workers. Sandboxes are compute planes. The vocabulary changes; the engineering does not. The workbench is the agent-facing UX; the harness, in the sense that survives the next vendor reframe, is functions, workers, triggers, runtimes, queues, persistence, and policy wired together correctly.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="wb-seven-surfaces"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">wb-seven-surfaces</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> wb seven surfaces</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<p><code class="inline-code">code/main.py</code> runs a tiny repo task twice. First as prompt only, then with the seven surfaces wired in. Same model, same task. The script counts which surfaces were missing on the failed run and prints a failure-mode report.</p>
+<p>The repo task is small on purpose: add input validation to a one-file FastAPI-style handler and write a passing test.</p>
+<p>Run it:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>python3 code/main.py</code></pre>
+</figure>
+<p>Output: a side-by-side log of the two runs, a <code class="inline-code">failure_modes.json</code> summarizing the prompt-only run, and a one-line verdict for the workbench run.</p>
+<p>The agent is a tiny rule-based stub; the point is the surfaces, not the model. Across the rest of this mini-track you will rebuild each surface as a real, reusable artifact.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>Three places workbench surfaces already exist in the wild, even if no one calls them that:</p>
+<ul>
+<li><strong>Claude Code, Codex, Cursor.</strong> <code class="inline-code">AGENTS.md</code> and <code class="inline-code">CLAUDE.md</code> are the instructions surface. Slash commands are scope. Hooks are verification.</li>
+<li><strong>LangGraph, OpenAI Agents SDK.</strong> Checkpoints and session stores are the state surface. Handoffs are the handoff surface.</li>
+<li><strong>CI on a real repo.</strong> Tests, lint, and type-check are verification. The PR template is handoff. CODEOWNERS is review.</li>
+</ul>
+<p>Workbench engineering is the discipline of making those surfaces explicit and reusable, instead of leaving each team to rediscover them.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p><code class="inline-code">outputs/skill-workbench-audit.md</code> is a portable skill that audits an existing repo for the seven workbench surfaces and reports which are missing, which are partial, and which are healthy. Drop it next to any agent setup; it tells you what to fix first.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li>Pick a repo where you already run an agent. Score the seven surfaces from 0 (missing) to 2 (healthy). What is your weakest surface?</li>
+<li>Extend <code class="inline-code">main.py</code> so the prompt-only run also produces a fake &quot;success&quot; claim. Verify the verification gate would have caught it.</li>
+<li>Add an eighth surface for your own product. Justify why it does not collapse into one of the existing seven.</li>
+<li>Re-run the script with a different stub agent that hallucinates an extra file write. Which surface catches it first?</li>
+<li>Map the five industry-recurring failure modes from Phase 14 · 26 onto the seven surfaces. Which mode is each surface designed to absorb?</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Workbench</td>
+<td>&quot;The setup&quot;</td>
+<td>Engineered surfaces around the model that make work reliable</td>
+</tr>
+<tr>
+<td>Surface</td>
+<td>&quot;A doc&quot; or &quot;a script&quot;</td>
+<td>A named, machine-readable input the agent reads or writes every turn</td>
+</tr>
+<tr>
+<td>System of record</td>
+<td>&quot;The notes&quot;</td>
+<td>The file the agent treats as truth when chat history is gone</td>
+</tr>
+<tr>
+<td>Definition of done</td>
+<td>&quot;Acceptance&quot;</td>
+<td>An objective, file-backed checklist the agent cannot fake</td>
+</tr>
+<tr>
+<td>Workbench audit</td>
+<td>&quot;Repo readiness check&quot;</td>
+<td>A pass over the seven surfaces that flags missing pieces before work begins</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<p>Read these as data points, not as authorities. Each one is a partial taxonomy. Translate every concept back to a primitive (function, worker, trigger, runtime, HTTP/RPC, queue, persistence, policy) before deciding whether to adopt it.</p>
+<p>Vendor framings:</p>
+<ul>
+<li><a href="https://addyosmani.com/blog/agent-harness-engineering/" target="_blank" rel="noopener">Addy Osmani, Agent Harness Engineering</a> — <code class="inline-code">Agent = Model + Harness</code> and the ratchet pattern; thin on infrastructure</li>
+<li><a href="https://blog.langchain.com/the-anatomy-of-an-agent-harness/" target="_blank" rel="noopener">LangChain, The Anatomy of an Agent Harness</a> — eleven components: prompts, tools, hooks, orchestration, sandboxes, memory, skills, subagents, runtime; omits queues, deployment, authz</li>
+<li><a href="https://openai.com/index/harness-engineering/" target="_blank" rel="noopener">OpenAI, Harness engineering: leveraging Codex in an agent-first world</a> — Codex team&#39;s view of the surfaces around their runtime</li>
+<li><a href="https://openai.com/index/unrolling-the-codex-agent-loop/" target="_blank" rel="noopener">OpenAI, Unrolling the Codex agent loop</a> — the agent loop reduced to a <code class="inline-code">while</code> over function calls</li>
+<li><a href="https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents" target="_blank" rel="noopener">Anthropic, Effective harnesses for long-running agents</a> — long-horizon surfaces inside a specific runtime</li>
+<li><a href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank" rel="noopener">Anthropic, Harness design for long-running application development</a> — applied design notes</li>
+<li><a href="https://docs.langchain.com/oss/python/deepagents/harness" target="_blank" rel="noopener">LangChain Deep Agents harness capabilities</a> — runtime config surface</li>
+</ul>
+<p>Practitioner pieces with usable detail:</p>
+<ul>
+<li><a href="https://martinfowler.com/articles/harness-engineering.html" target="_blank" rel="noopener">Martin Fowler / Birgitta Böckeler, Harness engineering for coding agent users</a> — guides (feedforward) + sensors (feedback); the cleanest control-theory framing</li>
+<li><a href="https://www.humanlayer.dev/blog/skill-issue-harness-engineering-for-coding-agents" target="_blank" rel="noopener">HumanLayer, Skill Issue: Harness Engineering for Coding Agents</a> — &quot;it&#39;s not a model problem, it&#39;s a configuration problem&quot;</li>
+<li><a href="https://www.mongodb.com/company/blog/technical/agent-harness-why-llm-is-smallest-part-of-your-agent-system" target="_blank" rel="noopener">MongoDB, The Agent Harness: Why the LLM Is the Smallest Part of Your Agent System</a> — receipts: Vercel 80% to 100%, Harvey 2x accuracy, Terminal Bench Top 30 to Top 5</li>
+<li><a href="https://www.augmentcode.com/guides/harness-engineering-ai-coding-agents" target="_blank" rel="noopener">Augment Code, Harness Engineering for AI Coding Agents</a> — constraint-first walkthrough</li>
+<li><a href="https://sequoiacap.com/podcast/context-engineering-our-way-to-long-horizon-agents-langchains-harrison-chase/" target="_blank" rel="noopener">Sequoia podcast, Harrison Chase on Context Engineering Long-Horizon Agents</a> — runtime concerns over model concerns</li>
+</ul>
+<p>Books, papers, and reference implementations:</p>
+<ul>
+<li><a href="https://www.jayminwest.com/agentic-engineering-book/6-harnesses" target="_blank" rel="noopener">Jaymin West, Agentic Engineering — Chapter 6: Harnesses</a> — book-length treatment, treats harness as the primary security boundary</li>
+<li><a href="https://www.preprints.org/manuscript/202603.1756" target="_blank" rel="noopener">preprints.org, Harness Engineering for Language Agents (March 2026)</a> — academic framing as control / agency / runtime</li>
+<li><a href="https://github.com/walkinglabs/awesome-harness-engineering" target="_blank" rel="noopener">walkinglabs/awesome-harness-engineering</a> — curated reading list across context, evaluation, observability, orchestration</li>
+<li><a href="https://github.com/ai-boost/awesome-harness-engineering" target="_blank" rel="noopener">ai-boost/awesome-harness-engineering</a> — alternate curated list (tools, evals, memory, MCP, permissions)</li>
+<li><a href="https://github.com/andrewgarst/agentic_harness" target="_blank" rel="noopener">andrewgarst/agentic_harness</a> — production-ready reference implementation with Redis-backed memory and eval suite</li>
+<li><a href="https://github.com/HKUDS/OpenHarness" target="_blank" rel="noopener">HKUDS/OpenHarness</a> — open agent harness with built-in personal agent</li>
+</ul>
+<p>Hacker News threads worth reading for the disagreements, not the consensus:</p>
+<ul>
+<li><a href="https://news.ycombinator.com/item?id=46081704" target="_blank" rel="noopener">HN: Effective harnesses for long-running agents</a></li>
+<li><a href="https://news.ycombinator.com/item?id=46988596" target="_blank" rel="noopener">HN: Improving 15 LLMs at Coding in One Afternoon. Only the Harness Changed</a></li>
+<li><a href="https://news.ycombinator.com/item?id=47990675" target="_blank" rel="noopener">HN: The agent harness belongs outside the sandbox</a> — argues for authorization as a separate plane</li>
+</ul>
+<p>Cross-references inside this curriculum:</p>
+<ul>
+<li>Phase 14 · 23 — OpenTelemetry GenAI conventions: the observability layer the sensors literature points at</li>
+<li>Phase 14 · 26 — Failure modes catalog the seven surfaces are designed to absorb</li>
+<li>Phase 14 · 27 — Prompt injection defenses that sit at the authorization-policy primitive</li>
+<li>Phase 14 · 29 — Production runtimes (queue, event, cron): where the primitives in this lesson live in deployment</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="30-eval-driven-agent-development.html">
+  <span class="label">← Previous</span>
+  <b>Eval-Driven Agent Development</b>
+</a>
+      <a class="pager__item pager__item--next" href="32-minimal-agent-workbench.html">
+  <span class="label">Next →</span>
+  <b>The Minimal Agent Workbench</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>12 minutes</b> of Agent Engineering behind you.</p>
+      <a class="btn btn--solid" href="32-minimal-agent-workbench.html">Continue to The Minimal Agent Workbench →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#workbench-versus-prompt-engineering">Workbench versus prompt engineering</a></li><li class="mini__item mini__item--d3"><a href="#workbench-versus-framework">Workbench versus framework</a></li><li class="mini__item mini__item--d3"><a href="#reasoning-from-primitives-not-from-vendor-taxonomies">Reasoning from primitives, not from vendor taxonomies</a></li><li class="mini__item mini__item--d3"><a href="#patterns-in-circulation-translated-to-primitives">Patterns in circulation, translated to primitives</a></li><li class="mini__item mini__item--d3"><a href="#what-the-receipts-actually-say">What the receipts actually say</a></li><li class="mini__item mini__item--d3"><a href="#where-vendor-writeups-stop-short">Where vendor writeups stop short</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

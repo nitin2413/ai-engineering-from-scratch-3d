@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Function Calling Deep Dive — OpenAI, Anthropic, Gemini — Tools &amp; Protocols — AIFS</title>
+<meta name="description" content="Tools &amp; Protocols: Function Calling Deep Dive — OpenAI, Anthropic, Gemini. 7 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Function Calling Deep Dive — OpenAI, Anthropic, Gemini — Tools &amp; Protocols — AIFS">
+<meta property="og:description" content="Tools &amp; Protocols: Function Calling Deep Dive — OpenAI, Anthropic, Gemini. 7 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"function-call-args":["../assets/figures/figures-llmeng.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-llmeng.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#C6FF00" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#C6FF00;--accent-ink:#111111"
+  data-lesson-id="tools-and-protocols/02-function-calling-deep-dive" data-module="tools-and-protocols"
+  data-prev="01-the-tool-interface.html" data-next="03-parallel-and-streaming-tool-calls.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#C6FF00">
+        <span class="label">Phase 13</span>
+        <b>Tools &amp; Protocols</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="tools-and-protocols/01-the-tool-interface"><a href="01-the-tool-interface.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">The Tool Interface — Why Agents Need Structured I/O</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/02-function-calling-deep-dive"><a href="02-function-calling-deep-dive.html" class="is-current">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Function Calling Deep Dive — OpenAI, Anthropic, Gemini</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/03-parallel-and-streaming-tool-calls"><a href="03-parallel-and-streaming-tool-calls.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Parallel Tool Calls and Streaming with Tools</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/04-structured-output"><a href="04-structured-output.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Structured Output — JSON Schema, Pydantic, Zod, Constrained Decoding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/05-tool-schema-design"><a href="05-tool-schema-design.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Tool Schema Design — Naming, Descriptions, Parameter Constraints</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/06-mcp-fundamentals"><a href="06-mcp-fundamentals.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">MCP Fundamentals: Stateless Requests and JSON-RPC</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/07-building-an-mcp-server"><a href="07-building-an-mcp-server.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Building an MCP Server: Stateless Python and TypeScript</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/08-building-an-mcp-client"><a href="08-building-an-mcp-client.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Building an MCP Client: Discovery, Routing, and Dual-Era Fallback</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/09-mcp-transports"><a href="09-mcp-transports.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">MCP Transports: stdio and Stateless Streamable HTTP</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/10-mcp-resources-and-prompts"><a href="10-mcp-resources-and-prompts.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">MCP Resources and Prompts: Addressable Context for Stateless Servers</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/11-mcp-sampling"><a href="11-mcp-sampling.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">MCP Model Input: Sampling Migration and Stateless MRTR</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/12-mcp-roots-and-elicitation"><a href="12-mcp-roots-and-elicitation.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Explicit Scope and Stateless Elicitation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/13-mcp-async-tasks"><a href="13-mcp-async-tasks.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">MCP Tasks Extension: Durable Work on a Stateless Core</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/14-mcp-apps"><a href="14-mcp-apps.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">MCP Apps on the Stateless Protocol</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/15-mcp-security-tool-poisoning"><a href="15-mcp-security-tool-poisoning.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">MCP Security: Poisoned Metadata, Routing, and MRTR State</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/16-mcp-security-oauth-2-1"><a href="16-mcp-security-oauth-2-1.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">MCP Authorization: CIMD, Issuer Binding, PKCE, and Step-Up</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/17-mcp-gateways-and-registries"><a href="17-mcp-gateways-and-registries.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Stateless MCP Gateways and Registry Admission</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/18-mcp-auth-production"><a href="18-mcp-auth-production.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">MCP Auth in Production: Issuer-Bound Enrollment and Tokens</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/19-a2a-protocol"><a href="19-a2a-protocol.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">A2A — Agent-to-Agent Protocol</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/20-opentelemetry-genai"><a href="20-opentelemetry-genai.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">OpenTelemetry GenAI — Tracing Tool Calls End-to-End</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/21-llm-routing-layer"><a href="21-llm-routing-layer.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">LLM Routing Layer — LiteLLM, OpenRouter, Portkey</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/22-skills-and-agent-sdks"><a href="22-skills-and-agent-sdks.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Agent Skills: Portable Contract and Runtime Boundary</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/23-capstone-tool-ecosystem"><a href="23-capstone-tool-ecosystem.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Capstone: Stateless Tool Ecosystem</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/24-skill-discovery-and-progressive-disclosure"><a href="24-skill-discovery-and-progressive-disclosure.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Skill Discovery and Progressive Disclosure</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/25-skill-invocation-and-routing"><a href="25-skill-invocation-and-routing.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Skill Invocation and Routing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/26-skill-permissions-sandboxes-and-trust"><a href="26-skill-permissions-sandboxes-and-trust.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Skill Permissions, Sandboxes, and Trust</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/27-skill-evals-packaging-and-portability"><a href="27-skill-evals-packaging-and-portability.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">Skill Evals, Packaging, and Portability</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/28-mcp-tool-contracts-and-content"><a href="28-mcp-tool-contracts-and-content.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">MCP Tool Contracts and Content</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control"><a href="29-mcp-reliability-cancellation-and-flow-control.html" class="">
+  <span class="snav__n">29</span>
+  <span class="snav__t">MCP Reliability, Cancellation, and Flow Control</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/30-mcp-registry-supply-chain-and-drift"><a href="30-mcp-registry-supply-chain-and-drift.html" class="">
+  <span class="snav__n">30</span>
+  <span class="snav__t">MCP Registry Supply Chain: Admission, Drift, and Rollback</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/31-mcp-conformance-versioning-and-operations"><a href="31-mcp-conformance-versioning-and-operations.html" class="">
+  <span class="snav__n">31</span>
+  <span class="snav__t">MCP Conformance Engineering: Versioning, Evidence, and Operations</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Tools &amp; Protocols</a></p>
+      <h1 class="page__title">Function Calling Deep Dive — OpenAI, Anthropic, Gemini</h1>
+      <p class="page__lede">The three frontier providers converged on the same tool-call loop in 2024 and then diverged on everything else. OpenAI uses <code class="inline-code">tools</code> and <code class="inline-code">tool_calls</code>. Anthropic uses <code class="inline-code">tool_use</code> and <code class="inline-code">tool_result</code> blocks. Gemini uses <code class="inline-code">functionDeclarations</code> and unique-id correlation. This lesson diffs the three side by side so code that ships on one provider does not break when you port it.</p>
+      <div class="page__meta">
+        <span class="chip">7 min read</span>
+        <span class="chip">1,521 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (stdlib, schema translators)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 13 · 01 (the tool interface)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>State the three shape differences between OpenAI, Anthropic, and Gemini function-calling payloads (declaration, call, result).</li>
+<li>Translate one tool declaration across all three provider formats and predict where strict-mode constraints will differ.</li>
+<li>Use <code class="inline-code">tool_choice</code> in each provider to force, forbid, or auto-pick tool calls.</li>
+<li>Know the per-provider hard limits (tool count, schema depth, argument length) and the error signatures each one emits when limits are violated.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>The shape of a function-calling request differs by provider. Three concrete examples from 2026 production stacks:</p>
+<p><strong>OpenAI Chat Completions / Responses API.</strong> You pass <code class="inline-code">tools: [{type: &quot;function&quot;, function: {name, description, parameters, strict}}]</code>. The model&#39;s response contains <code class="inline-code">choices[0].message.tool_calls: [{id, type: &quot;function&quot;, function: {name, arguments}}]</code> where <code class="inline-code">arguments</code> is a JSON string you must parse. Strict mode (<code class="inline-code">strict: true</code>) enforces schema compliance via constrained decoding.</p>
+<p><strong>Anthropic Messages API.</strong> You pass <code class="inline-code">tools: [{name, description, input_schema}]</code>. The response comes back as <code class="inline-code">content: [{type: &quot;text&quot;}, {type: &quot;tool_use&quot;, id, name, input}]</code>. <code class="inline-code">input</code> is already parsed (an object, not a string). You reply with a new <code class="inline-code">user</code> message containing a <code class="inline-code">{type: &quot;tool_result&quot;, tool_use_id, content}</code> block.</p>
+<p><strong>Google Gemini API.</strong> You pass <code class="inline-code">tools: [{functionDeclarations: [{name, description, parameters}]}]</code> (nested under <code class="inline-code">functionDeclarations</code>). The response arrives as <code class="inline-code">candidates[0].content.parts: [{functionCall: {name, args, id}}]</code> where <code class="inline-code">id</code> is unique in Gemini 3 and up for parallel-call correlation. You reply with <code class="inline-code">{functionResponse: {name, id, response}}</code>.</p>
+<p>Same loop. Different field names, different nesting, different string-vs-object conventions, different correlation mechanisms. A team that writes a weather agent on OpenAI pays a two-day port to Anthropic and another day to Gemini just for the plumbing.</p>
+<p>This lesson builds a translator that unifies the three formats into one canonical tool declaration and routes at the edge. Phase 13 · 17 generalizes the same pattern into an LLM gateway.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="the-common-structure" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-common-structure" aria-label="Link to this section">#</a>The common structure</h3>
+<p>Every provider needs five things:</p>
+<ol>
+<li><strong>Tool list.</strong> Per-tool name, description, and input schema.</li>
+<li><strong>Tool choice.</strong> Force a specific tool, forbid tools, or let the model decide.</li>
+<li><strong>Call emission.</strong> Structured output naming the tool and arguments.</li>
+<li><strong>Call id.</strong> Correlate the response to the right call (matters for parallel).</li>
+<li><strong>Result injection.</strong> A message or block that ties the result back to the call.</li>
+</ol>
+<h3 id="shape-diffs-field-by-field" class="prose-h prose-h3"><a class="prose-h__anchor" href="#shape-diffs-field-by-field" aria-label="Link to this section">#</a>Shape diffs, field by field</h3>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>OpenAI</th>
+<th>Anthropic</th>
+<th>Gemini</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Declaration envelope</td>
+<td><code class="inline-code">{type: &quot;function&quot;, function: {...}}</code></td>
+<td><code class="inline-code">{name, description, input_schema}</code></td>
+<td><code class="inline-code">{functionDeclarations: [{...}]}</code></td>
+</tr>
+<tr>
+<td>Schema field</td>
+<td><code class="inline-code">parameters</code></td>
+<td><code class="inline-code">input_schema</code></td>
+<td><code class="inline-code">parameters</code></td>
+</tr>
+<tr>
+<td>Response container</td>
+<td><code class="inline-code">tool_calls[]</code> on assistant message</td>
+<td><code class="inline-code">content[]</code> of type <code class="inline-code">tool_use</code></td>
+<td><code class="inline-code">parts[]</code> of type <code class="inline-code">functionCall</code></td>
+</tr>
+<tr>
+<td>Arguments type</td>
+<td>stringified JSON</td>
+<td>parsed object</td>
+<td>parsed object</td>
+</tr>
+<tr>
+<td>Id format</td>
+<td><code class="inline-code">call_...</code> (OpenAI generates)</td>
+<td><code class="inline-code">toolu_...</code> (Anthropic)</td>
+<td>UUID (Gemini 3+)</td>
+</tr>
+<tr>
+<td>Result block</td>
+<td>role <code class="inline-code">tool</code>, <code class="inline-code">tool_call_id</code></td>
+<td><code class="inline-code">user</code> with <code class="inline-code">tool_result</code>, <code class="inline-code">tool_use_id</code></td>
+<td><code class="inline-code">functionResponse</code> with matching <code class="inline-code">id</code></td>
+</tr>
+<tr>
+<td>Force-a-tool</td>
+<td><code class="inline-code">tool_choice: {type: &quot;function&quot;, function: {name}}</code></td>
+<td><code class="inline-code">tool_choice: {type: &quot;tool&quot;, name}</code></td>
+<td><code class="inline-code">tool_config: {function_calling_config: {mode: &quot;ANY&quot;}}</code></td>
+</tr>
+<tr>
+<td>Forbid tools</td>
+<td><code class="inline-code">tool_choice: &quot;none&quot;</code></td>
+<td><code class="inline-code">tool_choice: {type: &quot;none&quot;}</code></td>
+<td><code class="inline-code">mode: &quot;NONE&quot;</code></td>
+</tr>
+<tr>
+<td>Strict schema</td>
+<td><code class="inline-code">strict: true</code></td>
+<td>schema-is-schema (always enforced)</td>
+<td><code class="inline-code">responseSchema</code> at request level</td>
+</tr>
+</tbody></table>
+<h3 id="limits-you-will-actually-hit" class="prose-h prose-h3"><a class="prose-h__anchor" href="#limits-you-will-actually-hit" aria-label="Link to this section">#</a>Limits you will actually hit</h3>
+<ul>
+<li><strong>OpenAI.</strong> 128 tools per request. Schema depth 5. Argument string &lt;= 8192 bytes. Strict mode requires no <code class="inline-code">$ref</code>, no <code class="inline-code">oneOf</code>/<code class="inline-code">anyOf</code>/<code class="inline-code">allOf</code> with overlap, every property listed in <code class="inline-code">required</code>.</li>
+<li><strong>Anthropic.</strong> 64 tools per request. Schema depth effectively unbounded but practical limit 10. No strict-mode flag; schema is a contract and the model tends to comply.</li>
+<li><strong>Gemini.</strong> 64 functions per request. Schema types are OpenAPI 3.0 subset (slight divergence from JSON Schema 2020-12). Parallel calls unique-id since Gemini 3.</li>
+</ul>
+<h3 id="toolchoice-behavior" class="prose-h prose-h3"><a class="prose-h__anchor" href="#toolchoice-behavior" aria-label="Link to this section">#</a><code class="inline-code">tool_choice</code> behavior</h3>
+<p>Three modes everyone supports, named differently.</p>
+<ul>
+<li><strong>Auto.</strong> Model picks tool or text. Default.</li>
+<li><strong>Required / Any.</strong> Model must call at least one tool.</li>
+<li><strong>None.</strong> Model must not call tools.</li>
+</ul>
+<p>Plus one mode unique to each provider:</p>
+<ul>
+<li><strong>OpenAI.</strong> Force a specific tool by name.</li>
+<li><strong>Anthropic.</strong> Force a specific tool by name; <code class="inline-code">disable_parallel_tool_use</code> flag separates single vs multi.</li>
+<li><strong>Gemini.</strong> <code class="inline-code">mode: &quot;VALIDATED&quot;</code> routes every response through a schema validator regardless of model intent.</li>
+</ul>
+<h3 id="parallel-calls" class="prose-h prose-h3"><a class="prose-h__anchor" href="#parallel-calls" aria-label="Link to this section">#</a>Parallel calls</h3>
+<p>OpenAI&#39;s <code class="inline-code">parallel_tool_calls: true</code> (default) emits multiple calls in one assistant message. You run them all and reply with a batched tool-role message containing one entry per <code class="inline-code">tool_call_id</code>. Anthropic historically did single-call; <code class="inline-code">disable_parallel_tool_use: false</code> (default as of Claude 3.5) enables multi. Gemini 2 allowed parallel calls but did not give stable ids; Gemini 3 adds UUIDs so out-of-order responses correlate cleanly.</p>
+<h3 id="streaming" class="prose-h prose-h3"><a class="prose-h__anchor" href="#streaming" aria-label="Link to this section">#</a>Streaming</h3>
+<p>All three support streamed tool calls. The wire format differs:</p>
+<ul>
+<li><strong>OpenAI.</strong> Delta chunks of <code class="inline-code">tool_calls[i].function.arguments</code> arrive incrementally. You accumulate until <code class="inline-code">finish_reason: &quot;tool_calls&quot;</code>.</li>
+<li><strong>Anthropic.</strong> Block-start / block-delta / block-stop events. <code class="inline-code">input_json_delta</code> chunks carry partial arguments.</li>
+<li><strong>Gemini.</strong> <code class="inline-code">streamFunctionCallArguments</code> (new in Gemini 3) emits chunks with a <code class="inline-code">functionCallId</code> so multiple parallel calls can interleave.</li>
+</ul>
+<p>Phase 13 · 03 goes deep on parallel + streaming reassembly. This lesson focuses on the declaration and single-call shapes.</p>
+<h3 id="errors-and-repair" class="prose-h prose-h3"><a class="prose-h__anchor" href="#errors-and-repair" aria-label="Link to this section">#</a>Errors and repair</h3>
+<p>Invalid-argument errors look different too.</p>
+<ul>
+<li><strong>OpenAI (non-strict).</strong> Model returns <code class="inline-code">arguments: &quot;{bad json}&quot;</code>, your JSON parse fails, you inject an error message and re-call.</li>
+<li><strong>OpenAI (strict).</strong> Validation happens during decoding; invalid JSON is impossible but <code class="inline-code">refusal</code> can appear.</li>
+<li><strong>Anthropic.</strong> <code class="inline-code">input</code> may contain unexpected fields; schema is advisory. Validate server-side.</li>
+<li><strong>Gemini.</strong> OpenAPI 3.0 quirk: <code class="inline-code">enum</code> on object fields silently ignored; validate yourself.</li>
+</ul>
+<h3 id="the-translator-pattern" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-translator-pattern" aria-label="Link to this section">#</a>The translator pattern</h3>
+<p>A canonical tool declaration in your code looks like this (you pick the shape):</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python">Tool<span class="token punctuation">(</span>
+    name<span class="token operator">=</span><span class="token string">"get_weather"</span><span class="token punctuation">,</span>
+    description<span class="token operator">=</span><span class="token string">"Use when ..."</span><span class="token punctuation">,</span>
+    input_schema<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"object"</span><span class="token punctuation">,</span> <span class="token string">"properties"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token string">"required"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    strict<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">,</span>
+<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Three tiny functions translate it to the three provider shapes. The harness in <code class="inline-code">code/main.py</code> does exactly this, then round-trips a fake tool call through each provider&#39;s response shape. No network required — this lesson teaches the shapes, not the HTTP.</p>
+<p>Production teams wrap this translator in <code class="inline-code">AbstractToolset</code> (Pydantic AI), <code class="inline-code">UniversalToolNode</code> (LangGraph), or <code class="inline-code">BaseTool</code> (LlamaIndex). Phase 13 · 17 ships a gateway that exposes an OpenAI-shaped API in front of any of the three.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="function-call-args"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">function-call-args</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> function call args</figcaption>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p><code class="inline-code">code/main.py</code> defines one canonical <code class="inline-code">Tool</code> dataclass and three translators that emit the OpenAI, Anthropic, and Gemini declaration JSON. It then parses a hand-crafted provider response of each shape into the same canonical call object, demonstrating that the semantics are identical under the skin. Run it and diff the three declarations side by side.</p>
+<p>What to look at:</p>
+<ul>
+<li>The three declaration blocks differ only in envelope and field names.</li>
+<li>The three response blocks differ in where the call lives (top-level <code class="inline-code">tool_calls</code>, <code class="inline-code">content[]</code> block, <code class="inline-code">parts[]</code> entry).</li>
+<li>One <code class="inline-code">canonical_call()</code> function extracts <code class="inline-code">{id, name, args}</code> from all three response shapes.</li>
+</ul>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces <code class="inline-code">outputs/skill-provider-portability-audit.md</code>. Given a function-calling integration against one provider, the skill produces a portability audit: which provider limits it relies on, which fields need renaming, and what breaks when ported to each other provider.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p>Run <code class="inline-code">code/main.py</code> and verify that the three provider declaration JSONs all serialize the same underlying <code class="inline-code">Tool</code> object. Modify the canonical tool to add an enum parameter and confirm only the Gemini translator needs to handle the OpenAPI quirk.</p>
+</li>
+<li><p>Add a <code class="inline-code">ListToolsResponse</code> parser for each provider that extracts the tool list a model returns after a <code class="inline-code">list_tools</code> or discovery call. OpenAI does not have one natively; note this asymmetry.</p>
+</li>
+<li><p>Implement <code class="inline-code">tool_choice</code> conversion: map a canonical <code class="inline-code">ToolChoice(mode=&quot;force&quot;, tool_name=&quot;x&quot;)</code> into all three provider shapes. Then map <code class="inline-code">mode=&quot;any&quot;</code> and <code class="inline-code">mode=&quot;none&quot;</code>. Check the lesson&#39;s diff table.</p>
+</li>
+<li><p>Pick one of the three providers and read its function-calling guide end to end. Find one field in its schema spec that the other two do not support. Candidates: OpenAI <code class="inline-code">strict</code>, Anthropic <code class="inline-code">disable_parallel_tool_use</code>, Gemini <code class="inline-code">function_calling_config.allowed_function_names</code>.</p>
+</li>
+<li><p>Write a test vector: a tool call whose arguments violate the declared schema. Run it through each provider&#39;s validator (the stdlib one in Lesson 01 will do as a proxy) and record which errors fire. Document which provider you would use in production for strictness.</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Function calling</td>
+<td>&quot;Tool use&quot;</td>
+<td>Provider-level API for structured tool-call emission</td>
+</tr>
+<tr>
+<td>Tool declaration</td>
+<td>&quot;Tool spec&quot;</td>
+<td>Name + description + JSON Schema input payload</td>
+</tr>
+<tr>
+<td><code class="inline-code">tool_choice</code></td>
+<td>&quot;Force / forbid&quot;</td>
+<td>Auto / required / none / specific-name modes</td>
+</tr>
+<tr>
+<td>Strict mode</td>
+<td>&quot;Schema enforcement&quot;</td>
+<td>OpenAI flag that constrains decoding to match schema</td>
+</tr>
+<tr>
+<td><code class="inline-code">tool_use</code> block</td>
+<td>&quot;Anthropic&#39;s call shape&quot;</td>
+<td>Inline content block with id, name, input</td>
+</tr>
+<tr>
+<td><code class="inline-code">functionCall</code> part</td>
+<td>&quot;Gemini&#39;s call shape&quot;</td>
+<td>A <code class="inline-code">parts[]</code> entry containing name, args, and id</td>
+</tr>
+<tr>
+<td>Arguments-as-string</td>
+<td>&quot;Stringified JSON&quot;</td>
+<td>OpenAI returns args as a JSON string, not an object</td>
+</tr>
+<tr>
+<td>Parallel tool calls</td>
+<td>&quot;Fan-out in one turn&quot;</td>
+<td>Multiple tool calls in one assistant message</td>
+</tr>
+<tr>
+<td>Refusal</td>
+<td>&quot;Model declines&quot;</td>
+<td>Strict-mode-only refusal block instead of a call</td>
+</tr>
+<tr>
+<td>OpenAPI 3.0 subset</td>
+<td>&quot;Gemini schema quirk&quot;</td>
+<td>Gemini uses a JSON-Schema-like dialect with minor differences</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://platform.openai.com/docs/guides/function-calling" target="_blank" rel="noopener">OpenAI — Function calling guide</a> — canonical reference including strict mode and parallel calls</li>
+<li><a href="https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/overview" target="_blank" rel="noopener">Anthropic — Tool use overview</a> — <code class="inline-code">tool_use</code> and <code class="inline-code">tool_result</code> block semantics</li>
+<li><a href="https://ai.google.dev/gemini-api/docs/function-calling" target="_blank" rel="noopener">Google — Gemini function calling</a> — parallel calls, unique ids, and OpenAPI subset</li>
+<li><a href="https://docs.cloud.google.com/vertex-ai/generative-ai/docs/multimodal/function-calling" target="_blank" rel="noopener">Vertex AI — Function calling reference</a> — Gemini&#39;s enterprise surface</li>
+<li><a href="https://platform.openai.com/docs/guides/structured-outputs" target="_blank" rel="noopener">OpenAI — Structured outputs</a> — strict-mode schema enforcement details</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="01-the-tool-interface.html">
+  <span class="label">← Previous</span>
+  <b>The Tool Interface — Why Agents Need Structured I/O</b>
+</a>
+      <a class="pager__item pager__item--next" href="03-parallel-and-streaming-tool-calls.html">
+  <span class="label">Next →</span>
+  <b>Parallel Tool Calls and Streaming with Tools</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>7 minutes</b> of Tools &amp; Protocols behind you.</p>
+      <a class="btn btn--solid" href="03-parallel-and-streaming-tool-calls.html">Continue to Parallel Tool Calls and Streaming with Tools →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#the-common-structure">The common structure</a></li><li class="mini__item mini__item--d3"><a href="#shape-diffs-field-by-field">Shape diffs, field by field</a></li><li class="mini__item mini__item--d3"><a href="#limits-you-will-actually-hit">Limits you will actually hit</a></li><li class="mini__item mini__item--d3"><a href="#toolchoice-behavior">tool_choice behavior</a></li><li class="mini__item mini__item--d3"><a href="#parallel-calls">Parallel calls</a></li><li class="mini__item mini__item--d3"><a href="#streaming">Streaming</a></li><li class="mini__item mini__item--d3"><a href="#errors-and-repair">Errors and repair</a></li><li class="mini__item mini__item--d3"><a href="#the-translator-pattern">The translator pattern</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

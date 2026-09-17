@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GANs — Generator vs Discriminator — Generative AI — AIFS</title>
+<meta name="description" content="Generative AI: GANs — Generator vs Discriminator. 6 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="GANs — Generator vs Discriminator — Generative AI — AIFS">
+<meta property="og:description" content="Generative AI: GANs — Generator vs Discriminator. 6 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"gan-minimax":["../assets/figures/figures-genai-rl.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-genai-rl.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#FF2D55" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#FF2D55;--accent-ink:#FFFFFF"
+  data-lesson-id="generative-ai/03-gans-generator-discriminator" data-module="generative-ai"
+  data-prev="02-autoencoders-vae.html" data-next="04-conditional-gans-pix2pix.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#FF2D55">
+        <span class="label">Phase 08</span>
+        <b>Generative AI</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="generative-ai/01-generative-models-taxonomy-history"><a href="01-generative-models-taxonomy-history.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Generative Models — Taxonomy &amp; History</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="generative-ai/02-autoencoders-vae"><a href="02-autoencoders-vae.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Autoencoders &amp; Variational Autoencoders (VAE)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="generative-ai/03-gans-generator-discriminator"><a href="03-gans-generator-discriminator.html" class="is-current">
+  <span class="snav__n">03</span>
+  <span class="snav__t">GANs — Generator vs Discriminator</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="generative-ai/04-conditional-gans-pix2pix"><a href="04-conditional-gans-pix2pix.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Conditional GANs &amp; Pix2Pix</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="generative-ai/05-stylegan"><a href="05-stylegan.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">StyleGAN</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="generative-ai/06-diffusion-ddpm-from-scratch"><a href="06-diffusion-ddpm-from-scratch.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Diffusion Models — DDPM from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="generative-ai/07-latent-diffusion-stable-diffusion"><a href="07-latent-diffusion-stable-diffusion.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Latent Diffusion &amp; Stable Diffusion</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="generative-ai/08-controlnet-lora-conditioning"><a href="08-controlnet-lora-conditioning.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">ControlNet, LoRA &amp; Conditioning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="generative-ai/09-inpainting-outpainting-editing"><a href="09-inpainting-outpainting-editing.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Inpainting, Outpainting &amp; Image Editing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="generative-ai/10-video-generation"><a href="10-video-generation.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Video Generation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="generative-ai/11-audio-generation"><a href="11-audio-generation.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Audio Generation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="generative-ai/12-3d-generation"><a href="12-3d-generation.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">3D Generation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="generative-ai/13-flow-matching-rectified-flows"><a href="13-flow-matching-rectified-flows.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Flow Matching &amp; Rectified Flows</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="generative-ai/14-evaluation-fid-clip-score"><a href="14-evaluation-fid-clip-score.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Evaluation — FID, CLIP Score, Human Preference</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="generative-ai/19-visual-autoregressive-var"><a href="19-visual-autoregressive-var.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">Visual Autoregressive Modeling (VAR): Next-Scale Prediction</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Generative AI</a></p>
+      <h1 class="page__title">GANs — Generator vs Discriminator</h1>
+      <p class="page__lede">Goodfellow's trick in 2014 was to skip density entirely. Two networks. One makes fakes. One catches them. They fight until the fakes are indistinguishable from real. It shouldn't work. It often doesn't. When it does, the samples are still the sharpest in the literature for narrow domains.</p>
+      <div class="page__meta">
+        <span class="chip">6 min read</span>
+        <span class="chip">1,309 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 3 · 02 (Backprop), Phase 3 · 08 (Optimizers), Phase 8 · 02 (VAE)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>VAEs produce blurry samples because their MSE decoder loss is Bayes-optimal for the <em>mean</em> image — and the mean of many plausible digits is a fuzzy digit. You want a loss that rewards <em>plausibility</em>, not pixel-wise proximity to any one target. There is no closed-form for plausibility. You have to learn it.</p>
+<p>Goodfellow&#39;s idea: train a classifier <code class="inline-code">D(x)</code> to distinguish real images from fakes. Train a generator <code class="inline-code">G(z)</code> to fool <code class="inline-code">D</code>. The loss signal for <code class="inline-code">G</code> is whatever <code class="inline-code">D</code> currently thinks makes something look real. This signal updates as <code class="inline-code">G</code> improves, chasing a moving target. If both networks converge, <code class="inline-code">G</code> has learned the data distribution without ever writing down <code class="inline-code">log p(x)</code>.</p>
+<p>This is adversarial training. The math is a minimax game:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>min_G max_D  E_real[log D(x)] + E_fake[log(1 - D(G(z)))]</code></pre>
+</figure>
+<p>In 2026 GANs are no longer the SOTA generator (diffusion and flow matching ate that crown). But StyleGAN 2/3 remain the sharpest face models ever shipped, GAN discriminators are used as <em>perceptual losses</em> in diffusion training, and adversarial training powers the fast 1-step distillations (SDXL-Turbo, SD3-Turbo, LCM) that let you ship real-time diffusion.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<p><img src="assets/03-gans-generator-discriminator/gan.svg" alt="GAN training: generator and discriminator in minimax" loading="lazy"></p>
+<p><strong>Generator <code class="inline-code">G(z)</code>.</strong> Maps a noise vector <code class="inline-code">z ~ N(0, I)</code> to a sample <code class="inline-code">x̂</code>. A decoder-shaped network (dense or transposed conv).</p>
+<p><strong>Discriminator <code class="inline-code">D(x)</code>.</strong> Maps a sample to a scalar probability (or score). Real → 1, fake → 0.</p>
+<p><strong>Loss.</strong> Two alternating updates:</p>
+<ul>
+<li><strong>Train <code class="inline-code">D</code>:</strong> <code class="inline-code">loss_D = -[ log D(x) + log(1 - D(G(z))) ]</code>. Binary cross-entropy on real=1, fake=0.</li>
+<li><strong>Train <code class="inline-code">G</code>:</strong> <code class="inline-code">loss_G = -log D(G(z))</code>. This is the <em>non-saturating</em> form Goodfellow used (original <code class="inline-code">log(1 - D(G(z)))</code> saturates and kills gradients when <code class="inline-code">D</code> is confident).</li>
+</ul>
+<p><strong>Training loop.</strong> One step of <code class="inline-code">D</code>, one step of <code class="inline-code">G</code>. Repeat.</p>
+<p><strong>Why it works.</strong> If <code class="inline-code">G</code> perfectly matches <code class="inline-code">p_data</code>, then <code class="inline-code">D</code> cannot do better than chance and outputs 0.5 everywhere; <code class="inline-code">G</code> gets no more gradient. Equilibrium.</p>
+<p><strong>Why it breaks.</strong> Mode collapse (<code class="inline-code">G</code> finds one mode <code class="inline-code">D</code> can&#39;t classify and mints it forever), vanishing gradient (<code class="inline-code">D</code> learns too fast and <code class="inline-code">log D</code> saturates), training instability (learning rates, batch sizes, anything).</p>
+<h2 id="variants-that-made-gans-work" class="prose-h prose-h2"><a class="prose-h__anchor" href="#variants-that-made-gans-work" aria-label="Link to this section">#</a>Variants that made GANs work</h2>
+<table>
+<thead>
+<tr>
+<th>Year</th>
+<th>Innovation</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2015</td>
+<td>DCGAN</td>
+<td>Conv/deconv, batch norm, LeakyReLU — the first stable architecture.</td>
+</tr>
+<tr>
+<td>2017</td>
+<td>WGAN, WGAN-GP</td>
+<td>Replace BCE with Wasserstein distance + gradient penalty. Fixes vanishing gradient.</td>
+</tr>
+<tr>
+<td>2017</td>
+<td>Spectral normalization</td>
+<td>Lipschitz-bound the discriminator. Still used in 2026 discriminators.</td>
+</tr>
+<tr>
+<td>2018</td>
+<td>Progressive GAN</td>
+<td>Train low-res first, add layers. First megapixel results.</td>
+</tr>
+<tr>
+<td>2019</td>
+<td>StyleGAN / StyleGAN2</td>
+<td>Mapping network + adaptive instance norm. State of the art for fixed-domain photorealism.</td>
+</tr>
+<tr>
+<td>2021</td>
+<td>StyleGAN3</td>
+<td>Alias-free, translation-equivariant — still the face gold standard in 2026.</td>
+</tr>
+<tr>
+<td>2022</td>
+<td>StyleGAN-XL</td>
+<td>Conditional, class-aware, larger scale.</td>
+</tr>
+<tr>
+<td>2024</td>
+<td>R3GAN</td>
+<td>Rebrands with stronger regularization; works on 1024² without tricks.</td>
+</tr>
+</tbody></table>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="gan-minimax"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">gan-minimax</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> gan minimax</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<p><code class="inline-code">code/main.py</code> trains a tiny GAN on 1-D data: a mixture of two Gaussians. Generator and discriminator are single-hidden-layer MLPs. We implement forward, backward, and the minimax loop by hand. The goal is to see the two key failure modes (mode collapse + vanishing gradient) as they happen.</p>
+<h3 id="step-1-non-saturating-loss" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-non-saturating-loss" aria-label="Link to this section">#</a>Step 1: non-saturating loss</h3>
+<p>The vanilla Goodfellow loss <code class="inline-code">log(1 - D(G(z)))</code> goes to 0 when D classifies G&#39;s fake as fake with high confidence. At that point the gradient for G is basically zero — G cannot improve. The non-saturating form <code class="inline-code">-log D(G(z))</code> has the opposite asymptote: it blows up when D is confident, giving G a strong signal.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">g_loss</span><span class="token punctuation">(</span>d_fake<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token comment"># maximize log D(G(z))  &lt;=>  minimize -log D(G(z))</span>
+    <span class="token keyword">return</span> <span class="token operator">-</span><span class="token builtin">sum</span><span class="token punctuation">(</span>math<span class="token punctuation">.</span>log<span class="token punctuation">(</span><span class="token builtin">max</span><span class="token punctuation">(</span>p<span class="token punctuation">,</span> <span class="token number">1e-8</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">for</span> p <span class="token keyword">in</span> d_fake<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>d_fake<span class="token punctuation">)</span></code></pre>
+</figure>
+<h3 id="step-2-one-discriminator-step-per-generator-step" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-one-discriminator-step-per-generator-step" aria-label="Link to this section">#</a>Step 2: one discriminator step per generator step</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">for</span> step <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>steps<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token comment"># train D</span>
+    real_batch <span class="token operator">=</span> sample_real<span class="token punctuation">(</span>batch_size<span class="token punctuation">)</span>
+    fake_batch <span class="token operator">=</span> <span class="token punctuation">[</span>G<span class="token punctuation">(</span>z<span class="token punctuation">)</span> <span class="token keyword">for</span> z <span class="token keyword">in</span> sample_noise<span class="token punctuation">(</span>batch_size<span class="token punctuation">)</span><span class="token punctuation">]</span>
+    update_D<span class="token punctuation">(</span>real_batch<span class="token punctuation">,</span> fake_batch<span class="token punctuation">)</span>
+
+    <span class="token comment"># train G</span>
+    fake_batch <span class="token operator">=</span> <span class="token punctuation">[</span>G<span class="token punctuation">(</span>z<span class="token punctuation">)</span> <span class="token keyword">for</span> z <span class="token keyword">in</span> sample_noise<span class="token punctuation">(</span>batch_size<span class="token punctuation">)</span><span class="token punctuation">]</span>  <span class="token comment"># fresh fakes</span>
+    update_G<span class="token punctuation">(</span>fake_batch<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Fresh fakes for G, otherwise gradients are stale.</p>
+<h3 id="step-3-watch-for-mode-collapse" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-watch-for-mode-collapse" aria-label="Link to this section">#</a>Step 3: watch for mode collapse</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">if</span> step <span class="token operator">%</span> <span class="token number">200</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+    samples <span class="token operator">=</span> <span class="token punctuation">[</span>G<span class="token punctuation">(</span>z<span class="token punctuation">)</span> <span class="token keyword">for</span> z <span class="token keyword">in</span> sample_noise<span class="token punctuation">(</span><span class="token number">500</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+    mode_a <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token keyword">for</span> s <span class="token keyword">in</span> samples <span class="token keyword">if</span> s <span class="token operator">&lt;</span> <span class="token number">0</span><span class="token punctuation">)</span>
+    mode_b <span class="token operator">=</span> <span class="token number">500</span> <span class="token operator">-</span> mode_a
+    <span class="token keyword">if</span> <span class="token builtin">min</span><span class="token punctuation">(</span>mode_a<span class="token punctuation">,</span> mode_b<span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">50</span><span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"  [!] mode collapse: one mode is starved"</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>The canonical symptom: one of the two real modes stops being generated. The discriminator stops correcting it because it&#39;s never seen as a fake.</p>
+<h2 id="pitfalls" class="prose-h prose-h2"><a class="prose-h__anchor" href="#pitfalls" aria-label="Link to this section">#</a>Pitfalls</h2>
+<ul>
+<li><strong>Discriminator too strong.</strong> Cut D&#39;s learning rate by 2-5x, or add instance/layer noise. If D reaches &gt;95% accuracy, G is dead.</li>
+<li><strong>Generator memorizes a mode.</strong> Add noise to D inputs, use a minibatch-discriminator layer, or switch to WGAN-GP.</li>
+<li><strong>Batch norm leaking statistics.</strong> Real batch + fake batch flowing through the same BN layer mixes their statistics. Use instance norm or spectral norm instead.</li>
+<li><strong>Inception-score gaming.</strong> FID and IS are noisy at low sample counts. Use ≥10k samples at eval.</li>
+<li><strong>One-shot sampling is a lie for conditional tasks.</strong> You still need CFG scales, truncation tricks, and re-sampling to get usable outputs.</li>
+</ul>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>The 2026 GAN stack:</p>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Pick</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Photoreal human faces, fixed pose</td>
+<td>StyleGAN3 (sharpest, smallest)</td>
+</tr>
+<tr>
+<td>Anime / stylized faces</td>
+<td>StyleGAN-XL or Stable Diffusion LoRA</td>
+</tr>
+<tr>
+<td>Image-to-image translation</td>
+<td>Pix2Pix / CycleGAN (Phase 8 · 04) or ControlNet (Phase 8 · 08)</td>
+</tr>
+<tr>
+<td>Fast 1-step text-to-image</td>
+<td>Adversarial distillation of diffusion (SDXL-Turbo, SD3-Turbo)</td>
+</tr>
+<tr>
+<td>Perceptual loss inside a diffusion trainer</td>
+<td>Small GAN discriminator on image crops</td>
+</tr>
+<tr>
+<td>Anything multi-modal, open-ended</td>
+<td>Don&#39;t — use diffusion or flow matching</td>
+</tr>
+</tbody></table>
+<p>GANs are sharp but narrow. Once your domain opens up — photos, arbitrary text prompts, video — switch to diffusion. The adversarial trick lives on as a component (perceptual losses, distillation), not a standalone generator.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>Save <code class="inline-code">outputs/skill-gan-debugger.md</code>. Skill takes a failing GAN run (loss curves, sample grid, dataset size) and outputs a ranked list of likely causes, one-line fixes, and a rerun protocol.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><strong>Easy.</strong> Run <code class="inline-code">code/main.py</code> with the stock settings. Then set <code class="inline-code">D_LR = 5 * G_LR</code> and rerun. How fast does G&#39;s loss collapse to a constant?</li>
+<li><strong>Medium.</strong> Replace the Goodfellow BCE loss with the WGAN loss: <code class="inline-code">loss_D = E[D(fake)] - E[D(real)]</code>, <code class="inline-code">loss_G = -E[D(fake)]</code>, and clip D&#39;s weights to <code class="inline-code">[-0.01, 0.01]</code>. Is training more stable? Compare wall-clock convergence.</li>
+<li><strong>Hard.</strong> Extend the 1-D example to 2-D data (mixture of 8 Gaussians on a ring). Track how many of the 8 modes the generator captures at steps 1k, 5k, 10k. Implement minibatch discrimination and re-measure.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Generator</td>
+<td>&quot;G&quot;</td>
+<td>Noise-to-sample network, <code class="inline-code">G: z → x̂</code>.</td>
+</tr>
+<tr>
+<td>Discriminator</td>
+<td>&quot;D&quot;</td>
+<td>Classifier <code class="inline-code">D: x → [0, 1]</code>, real vs fake.</td>
+</tr>
+<tr>
+<td>Minimax</td>
+<td>&quot;The game&quot;</td>
+<td><code class="inline-code">min_G max_D</code> of a joint objective.</td>
+</tr>
+<tr>
+<td>Non-saturating loss</td>
+<td>&quot;The fix&quot;</td>
+<td>Use <code class="inline-code">-log D(G(z))</code> for G instead of <code class="inline-code">log(1 - D(G(z)))</code>.</td>
+</tr>
+<tr>
+<td>Mode collapse</td>
+<td>&quot;G memorized one thing&quot;</td>
+<td>Generator produces few distinct outputs despite diverse data.</td>
+</tr>
+<tr>
+<td>WGAN</td>
+<td>&quot;Wasserstein&quot;</td>
+<td>Replace BCE with Earth-Mover distance + gradient penalty; smoother gradient.</td>
+</tr>
+<tr>
+<td>Spectral norm</td>
+<td>&quot;Lipschitz trick&quot;</td>
+<td>Constrain D&#39;s weight norms to bound its slope; stabilizes training.</td>
+</tr>
+<tr>
+<td>StyleGAN</td>
+<td>&quot;The one that works&quot;</td>
+<td>Mapping network + AdaIN; best-in-class for faces, still in 2026.</td>
+</tr>
+</tbody></table>
+<h2 id="production-note-one-shot-inference-is-gan-s-lasting-advantage" class="prose-h prose-h2"><a class="prose-h__anchor" href="#production-note-one-shot-inference-is-gan-s-lasting-advantage" aria-label="Link to this section">#</a>Production note: one-shot inference is GAN&#39;s lasting advantage</h2>
+<p>GANs no longer win on sample quality for open-domain generation, but they still win on inference cost. In production-inference literature vocabulary a GAN has:</p>
+<ul>
+<li><strong>No prefill, no decode stages.</strong> A single <code class="inline-code">G(z)</code> forward pass. TTFT ≈ total latency.</li>
+<li><strong>No KV-cache pressure.</strong> The only state is the weights. Batch size is bounded by activation memory, not cache.</li>
+<li><strong>Trivial continuous batching.</strong> Since every request takes the same fixed FLOPs, a static batch at the server&#39;s target occupancy is usually optimal. No in-flight scheduler needed.</li>
+</ul>
+<p>This is why GAN distillation (SDXL-Turbo, SD3-Turbo, ADD, LCM) is the dominant technique for fast text-to-image in 2026: it collapses a 20-50-step diffusion pipeline into 1-4 GAN-style forward passes while keeping the distribution of a diffusion base. The adversarial loss survives as a training-time knob for turning slow generators into fast ones.</p>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/1406.2661" target="_blank" rel="noopener">Goodfellow et al. (2014). Generative Adversarial Nets</a> — the original GAN paper.</li>
+<li><a href="https://arxiv.org/abs/1511.06434" target="_blank" rel="noopener">Radford et al. (2015). Unsupervised Representation Learning with DCGAN</a> — the first stable architecture.</li>
+<li><a href="https://arxiv.org/abs/1701.07875" target="_blank" rel="noopener">Arjovsky, Chintala, Bottou (2017). Wasserstein GAN</a> — WGAN.</li>
+<li><a href="https://arxiv.org/abs/1802.05957" target="_blank" rel="noopener">Miyato et al. (2018). Spectral Normalization for GANs</a> — SN.</li>
+<li><a href="https://arxiv.org/abs/1912.04958" target="_blank" rel="noopener">Karras et al. (2020). Analyzing and Improving the Image Quality of StyleGAN</a> — StyleGAN2.</li>
+<li><a href="https://arxiv.org/abs/2106.12423" target="_blank" rel="noopener">Karras et al. (2021). Alias-Free Generative Adversarial Networks</a> — StyleGAN3.</li>
+<li><a href="https://arxiv.org/abs/2311.17042" target="_blank" rel="noopener">Sauer et al. (2023). Adversarial Diffusion Distillation</a> — SDXL-Turbo.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="02-autoencoders-vae.html">
+  <span class="label">← Previous</span>
+  <b>Autoencoders &amp; Variational Autoencoders (VAE)</b>
+</a>
+      <a class="pager__item pager__item--next" href="04-conditional-gans-pix2pix.html">
+  <span class="label">Next →</span>
+  <b>Conditional GANs &amp; Pix2Pix</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>6 minutes</b> of Generative AI behind you.</p>
+      <a class="btn btn--solid" href="04-conditional-gans-pix2pix.html">Continue to Conditional GANs &amp; Pix2Pix →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d2"><a href="#variants-that-made-gans-work">Variants that made GANs work</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-non-saturating-loss">Step 1: non-saturating loss</a></li><li class="mini__item mini__item--d3"><a href="#step-2-one-discriminator-step-per-generator-step">Step 2: one discriminator step per generator step</a></li><li class="mini__item mini__item--d3"><a href="#step-3-watch-for-mode-collapse">Step 3: watch for mode collapse</a></li><li class="mini__item mini__item--d2"><a href="#pitfalls">Pitfalls</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#production-note-one-shot-inference-is-gan-s-lasting-advantage">Production note: one-shot inference is GAN's lasting advantage</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

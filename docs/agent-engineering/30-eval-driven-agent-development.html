@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eval-Driven Agent Development — Agent Engineering — AIFS</title>
+<meta name="description" content="Agent Engineering: Eval-Driven Agent Development. 4 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Eval-Driven Agent Development — Agent Engineering — AIFS">
+<meta property="og:description" content="Agent Engineering: Eval-Driven Agent Development. 4 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"ae-eval-three-layers":["../assets/figures/figures-agents4.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-agents4.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#0091FF" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#0091FF;--accent-ink:#FFFFFF"
+  data-lesson-id="agent-engineering/30-eval-driven-agent-development" data-module="agent-engineering"
+  data-prev="29-production-runtimes.html" data-next="31-agent-workbench-why-models-fail.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#0091FF">
+        <span class="label">Phase 14</span>
+        <b>Agent Engineering</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="agent-engineering/01-the-agent-loop"><a href="01-the-agent-loop.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">The Agent Loop: Observe, Think, Act</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/02-rewoo-plan-and-execute"><a href="02-rewoo-plan-and-execute.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">ReWOO and Plan-and-Execute: Decoupled Planning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/03-reflexion-verbal-rl"><a href="03-reflexion-verbal-rl.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Reflexion: Verbal Reinforcement Learning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/04-tree-of-thoughts-lats"><a href="04-tree-of-thoughts-lats.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Tree of Thoughts and LATS: Deliberate Search</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/05-self-refine-and-critic"><a href="05-self-refine-and-critic.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Self-Refine and CRITIC: Iterative Output Improvement</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/06-tool-use-and-function-calling"><a href="06-tool-use-and-function-calling.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Tool Use and Function Calling</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/07-memory-virtual-context-memgpt"><a href="07-memory-virtual-context-memgpt.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Agent Memory — Virtual Context and Memory Paging</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/08-memory-blocks-sleep-time-compute"><a href="08-memory-blocks-sleep-time-compute.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Memory Blocks and Sleep-Time Compute</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/09-hybrid-memory-mem0"><a href="09-hybrid-memory-mem0.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Hybrid Memory: Vector + Graph + KV</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/10-skill-libraries-voyager"><a href="10-skill-libraries-voyager.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Skill Libraries and Lifelong Learning (Voyager)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/11-planning-htn-and-evolutionary"><a href="11-planning-htn-and-evolutionary.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Planning with HTN and Evolutionary Search</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/12-anthropic-workflow-patterns"><a href="12-anthropic-workflow-patterns.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Anthropic's Workflow Patterns: Simple Over Complex</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/13-langgraph-stateful-graphs"><a href="13-langgraph-stateful-graphs.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Stateful Graph Orchestration — Durable Execution and Checkpoints</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/14-autogen-actor-model"><a href="14-autogen-actor-model.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">The Actor Model for Agents — Async Messages and Typed Runtimes</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/15-crewai-role-based-crews"><a href="15-crewai-role-based-crews.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Role-Based Agent Teams — Roles, Tasks, Processes</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/16-openai-agents-sdk"><a href="16-openai-agents-sdk.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">OpenAI Agents SDK: Handoffs, Guardrails, Tracing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/17-claude-agent-sdk"><a href="17-claude-agent-sdk.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">The Harness as a Library — Subagents and Session Store</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/18-agno-and-mastra-runtimes"><a href="18-agno-and-mastra-runtimes.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Production Agent Runtimes — Fast Instantiation and Typed Workflows</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/19-benchmarks-swebench-gaia"><a href="19-benchmarks-swebench-gaia.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">Benchmarks: SWE-bench, GAIA, AgentBench</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/20-benchmarks-webarena-osworld"><a href="20-benchmarks-webarena-osworld.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Benchmarks: WebArena and OSWorld</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/21-computer-use-agents"><a href="21-computer-use-agents.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Computer Use: Claude, OpenAI CUA, Gemini</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/22-voice-agents-pipecat-livekit"><a href="22-voice-agents-pipecat-livekit.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Voice Agents: Pipecat and LiveKit</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/23-otel-genai-conventions"><a href="23-otel-genai-conventions.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">OpenTelemetry GenAI Semantic Conventions</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/24-agent-observability-platforms"><a href="24-agent-observability-platforms.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Agent Observability: Langfuse, Phoenix, Opik</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/25-multi-agent-debate"><a href="25-multi-agent-debate.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Multi-Agent Debate and Collaboration</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/26-failure-modes-agentic"><a href="26-failure-modes-agentic.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Failure Modes: Why Agents Break</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/27-prompt-injection-defense"><a href="27-prompt-injection-defense.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">Prompt Injection and the PVE Defense</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/28-orchestration-patterns"><a href="28-orchestration-patterns.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">Orchestration Patterns: Supervisor, Swarm, Hierarchical</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/29-production-runtimes"><a href="29-production-runtimes.html" class="">
+  <span class="snav__n">29</span>
+  <span class="snav__t">Production Runtimes: Queue, Event, Cron</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/30-eval-driven-agent-development"><a href="30-eval-driven-agent-development.html" class="is-current">
+  <span class="snav__n">30</span>
+  <span class="snav__t">Eval-Driven Agent Development</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/31-agent-workbench-why-models-fail"><a href="31-agent-workbench-why-models-fail.html" class="">
+  <span class="snav__n">31</span>
+  <span class="snav__t">Agent Workbench Engineering: Why Capable Models Still Fail</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/32-minimal-agent-workbench"><a href="32-minimal-agent-workbench.html" class="">
+  <span class="snav__n">32</span>
+  <span class="snav__t">The Minimal Agent Workbench</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/33-instructions-as-executable-constraints"><a href="33-instructions-as-executable-constraints.html" class="">
+  <span class="snav__n">33</span>
+  <span class="snav__t">Agent Instructions as Executable Constraints</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/34-repo-memory-and-state"><a href="34-repo-memory-and-state.html" class="">
+  <span class="snav__n">34</span>
+  <span class="snav__t">Repo Memory and Durable State</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/35-initialization-scripts"><a href="35-initialization-scripts.html" class="">
+  <span class="snav__n">35</span>
+  <span class="snav__t">Initialization Scripts for Agents</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/36-scope-contracts"><a href="36-scope-contracts.html" class="">
+  <span class="snav__n">36</span>
+  <span class="snav__t">Scope Contracts and Task Boundaries</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/37-runtime-feedback-loops"><a href="37-runtime-feedback-loops.html" class="">
+  <span class="snav__n">37</span>
+  <span class="snav__t">Runtime Feedback Loops</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/38-verification-gates"><a href="38-verification-gates.html" class="">
+  <span class="snav__n">38</span>
+  <span class="snav__t">Verification Gates</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/39-reviewer-agent"><a href="39-reviewer-agent.html" class="">
+  <span class="snav__n">39</span>
+  <span class="snav__t">Reviewer Agent: Separate Builder from Marker</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/40-multi-session-handoff"><a href="40-multi-session-handoff.html" class="">
+  <span class="snav__n">40</span>
+  <span class="snav__t">Multi-Session Handoff</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/41-workbench-for-real-repos"><a href="41-workbench-for-real-repos.html" class="">
+  <span class="snav__n">41</span>
+  <span class="snav__t">The Workbench on a Real Repo</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/42-agent-workbench-capstone"><a href="42-agent-workbench-capstone.html" class="">
+  <span class="snav__n">42</span>
+  <span class="snav__t">Capstone: Ship a Reusable Agent Workbench Pack</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/43-frame-the-task-before-code"><a href="43-frame-the-task-before-code.html" class="">
+  <span class="snav__n">43</span>
+  <span class="snav__t">Frame the Task Before the Agent Writes Code</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/44-plan-from-evidence"><a href="44-plan-from-evidence.html" class="">
+  <span class="snav__n">44</span>
+  <span class="snav__t">Build an Evidence-Backed Execution Plan</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/45-delegate-with-isolation"><a href="45-delegate-with-isolation.html" class="">
+  <span class="snav__n">45</span>
+  <span class="snav__t">Delegate Agent Work with Isolation and Merge Contracts</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/46-turn-feedback-into-system"><a href="46-turn-feedback-into-system.html" class="">
+  <span class="snav__n">46</span>
+  <span class="snav__t">Turn Every Agent Correction into a System Improvement</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/47-outcomes-before-output"><a href="47-outcomes-before-output.html" class="">
+  <span class="snav__n">47</span>
+  <span class="snav__t">Define the Outcome Before You Choose the Output</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/48-discover-the-real-workflow"><a href="48-discover-the-real-workflow.html" class="">
+  <span class="snav__n">48</span>
+  <span class="snav__t">Discover the Workflow People Actually Perform</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/49-map-assumptions-and-risk"><a href="49-map-assumptions-and-risk.html" class="">
+  <span class="snav__n">49</span>
+  <span class="snav__t">Map Assumptions and Resolve the Riskiest One First</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/50-choose-the-smallest-testable-slice"><a href="50-choose-the-smallest-testable-slice.html" class="">
+  <span class="snav__n">50</span>
+  <span class="snav__t">Choose the Smallest Slice That Can Change the Decision</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/51-write-specifications-that-preserve-judgment"><a href="51-write-specifications-that-preserve-judgment.html" class="">
+  <span class="snav__n">51</span>
+  <span class="snav__t">Write Specifications That Preserve Judgment</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/52-design-success-metrics"><a href="52-design-success-metrics.html" class="">
+  <span class="snav__n">52</span>
+  <span class="snav__t">Design Success Metrics Before the Result Exists</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/53-prototype-pilot-or-production"><a href="53-prototype-pilot-or-production.html" class="">
+  <span class="snav__n">53</span>
+  <span class="snav__t">Choose Prototype, Pilot, or Production Deliberately</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/54-build-the-feedback-ratchet"><a href="54-build-the-feedback-ratchet.html" class="">
+  <span class="snav__n">54</span>
+  <span class="snav__t">Build a Feedback Ratchet with Ownership and Retirement</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Agent Engineering</a></p>
+      <h1 class="page__title">Eval-Driven Agent Development</h1>
+      <p class="page__lede">Anthropic's guidance: &quot;start with simple prompts, optimize them with comprehensive evaluation, and add multi-step agentic systems only when needed.&quot; Evaluation is not the last step. It's the outer loop that drives every other choice in Phase 14.</p>
+      <div class="page__meta">
+        <span class="chip">4 min read</span>
+        <span class="chip">857 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Learn + Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (stdlib)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>All of Phase 14.</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~60 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Name the three evaluation layers — static benchmarks, custom offline, online production — and what each is for.</li>
+<li>Explain the evaluator-optimizer tight loop.</li>
+<li>Describe the 2026 best practice: evals live next to code, run in CI, gate PRs.</li>
+<li>Connect every Phase 14 lesson to the eval case it generates.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Agents pass demos. They fail in production in ways demos cannot predict. Benchmarks answer &quot;is this model broadly capable?&quot; not &quot;is this agent shipping the right patches for my product?&quot; The answer: evaluation at three layers, running continuously, with every guardrail and learned rule mapped to an eval case.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="three-evaluation-layers" class="prose-h prose-h3"><a class="prose-h__anchor" href="#three-evaluation-layers" aria-label="Link to this section">#</a>Three evaluation layers</h3>
+<ol>
+<li><p><strong>Static benchmarks</strong> — SWE-bench Verified for code (Lesson 19), WebArena/OSWorld for browsing / desktop (Lesson 20), GAIA for generalist (Lesson 19), BFCL V4 for tool use (Lesson 06). Use for cross-model comparison and regression gating. Contamination is real: SWE-bench+ found 32.67% solution leakage. Always report Verified / +-audited scores.</p>
+</li>
+<li><p><strong>Custom offline evals</strong> — your product&#39;s shape:</p>
+<ul>
+<li>LLM-as-judge (Langfuse, Phoenix, Opik — Lesson 24).</li>
+<li>Execution-based (run the patch, check tests).</li>
+<li>Trajectory-based (compare action sequences against gold; OSWorld-Human shows top agents 1.4-2.7x over gold).</li>
+</ul>
+</li>
+<li><p><strong>Online evals</strong> — production:</p>
+<ul>
+<li>Session replays (Langfuse).</li>
+<li>Guardrail-triggered alerts (Lesson 16, 21).</li>
+<li>Per-step cost / latency tracking (Lesson 23 OTel spans).</li>
+</ul>
+</li>
+</ol>
+<h3 id="evaluator-optimizer-anthropic" class="prose-h prose-h3"><a class="prose-h__anchor" href="#evaluator-optimizer-anthropic" aria-label="Link to this section">#</a>Evaluator-optimizer (Anthropic)</h3>
+<p>The tight loop:</p>
+<ol>
+<li>Proposer generates output.</li>
+<li>Evaluator judges.</li>
+<li>Refine until evaluator passes.</li>
+</ol>
+<p>This is Self-Refine (Lesson 05) generalized. Any agent flow you care about can wrap in evaluator-optimizer for reliability.</p>
+<h3 id="2026-best-practice" class="prose-h prose-h3"><a class="prose-h__anchor" href="#2026-best-practice" aria-label="Link to this section">#</a>2026 best practice</h3>
+<ul>
+<li>Evals live next to code.</li>
+<li>Run in CI on every PR.</li>
+<li>Gate merge on eval scores (e.g. &quot;no regression &gt; 5% vs main&quot;).</li>
+<li>Every guardrail maps to an eval case.</li>
+<li>Every learned rule (Reflexion, pro-workflow learn-rule) maps to a failure case.</li>
+</ul>
+<h3 id="tying-phase-14-together" class="prose-h prose-h3"><a class="prose-h__anchor" href="#tying-phase-14-together" aria-label="Link to this section">#</a>Tying Phase 14 together</h3>
+<p>Every lesson in Phase 14 generates eval cases:</p>
+<table>
+<thead>
+<tr>
+<th>Lesson</th>
+<th>Eval case it generates</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>01 Agent Loop</td>
+<td>Budget-exhausted, infinite-loop guard</td>
+</tr>
+<tr>
+<td>02 ReWOO</td>
+<td>Planner replans correctly when a tool fails</td>
+</tr>
+<tr>
+<td>03 Reflexion</td>
+<td>Learned reflections apply on retry</td>
+</tr>
+<tr>
+<td>05 Self-Refine/CRITIC</td>
+<td>Judge passes refined output</td>
+</tr>
+<tr>
+<td>06 Tool Use</td>
+<td>Argument coercion works; unknown tools rejected</td>
+</tr>
+<tr>
+<td>07-10 Memory</td>
+<td>Retrieval citations match sources; stale facts invalidate</td>
+</tr>
+<tr>
+<td>12 Workflow Patterns</td>
+<td>Each pattern produces correct output</td>
+</tr>
+<tr>
+<td>13 LangGraph</td>
+<td>Resume reproduces state exactly</td>
+</tr>
+<tr>
+<td>14 AutoGen Actors</td>
+<td>DLQ catches crashed handlers</td>
+</tr>
+<tr>
+<td>16 OpenAI Agents SDK</td>
+<td>Guardrail trips on the right inputs</td>
+</tr>
+<tr>
+<td>17 Claude Agent SDK</td>
+<td>Subagent results return to orchestrator</td>
+</tr>
+<tr>
+<td>19-20 Benchmarks</td>
+<td>SWE-bench Verified score, WebArena success rate, OSWorld efficiency</td>
+</tr>
+<tr>
+<td>21 Computer Use</td>
+<td>Per-step safety catches injected DOM</td>
+</tr>
+<tr>
+<td>23 OTel</td>
+<td>Spans emit required attributes</td>
+</tr>
+<tr>
+<td>26 Failure Modes</td>
+<td>Detectors tag known failures</td>
+</tr>
+<tr>
+<td>27 Prompt Injection</td>
+<td>PVE refuses poisoned retrievals</td>
+</tr>
+<tr>
+<td>28 Orchestration</td>
+<td>Supervisor routes to the right specialist</td>
+</tr>
+<tr>
+<td>29 Runtime Shapes</td>
+<td>DLQ handles N% failure</td>
+</tr>
+</tbody></table>
+<p>If your eval suite has cases for each, you have covered Phase 14.</p>
+<h3 id="where-eval-driven-development-fails" class="prose-h prose-h3"><a class="prose-h__anchor" href="#where-eval-driven-development-fails" aria-label="Link to this section">#</a>Where eval-driven development fails</h3>
+<ul>
+<li><strong>No baseline.</strong> Evals without a last-known-good are unreadable. Store baselines.</li>
+<li><strong>LLM-judge without grounding.</strong> Judges hallucinate too. CRITIC pattern (Lesson 05) — judge grounds on external tools.</li>
+<li><strong>Over-fitting to evals.</strong> Optimizing for the eval diverges from production usefulness. Rotate cases.</li>
+<li><strong>Flaky evals.</strong> Non-deterministic cases cause false alarms. Pin seeds, snapshot state.</li>
+</ul>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="ae-eval-three-layers"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">ae-eval-three-layers</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> ae eval three layers</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<p><code class="inline-code">code/main.py</code> is a stdlib eval harness:</p>
+<ul>
+<li>Case registry with categories (benchmark, custom, online).</li>
+<li>A scripted agent under test.</li>
+<li>Evaluator-optimizer loop: propose, judge, refine until pass or max rounds.</li>
+<li>CI gate: aggregate pass rate + regression against baseline.</li>
+</ul>
+<p>Run it:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>python3 code/main.py</code></pre>
+</figure>
+<p>Output: per-case pass/fail, regression flag, CI gate verdict.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<ul>
+<li>Write eval cases in the same repo as your agent code.</li>
+<li>Run them on every PR via CI.</li>
+<li>Fail the build on regression.</li>
+<li>Track pass rate over time.</li>
+<li>Tie every production failure to a new case.</li>
+</ul>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p><code class="inline-code">outputs/skill-eval-suite.md</code> builds a three-layer eval suite for an agent product with CI gates and regression tracking.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li>Take one of your production failures. Write an eval case that reproduces it. Does your agent pass it now?</li>
+<li>Build an LLM-judge rubric for your domain with three dimensions (factual, tone, scope). Score 50 sessions.</li>
+<li>Wire the eval suite into CI. Fail the build on &gt;=5% regression.</li>
+<li>Add a trajectory-efficiency metric: how many steps did the agent take vs a gold trajectory?</li>
+<li>Map every Phase 14 lesson to an eval case in your suite. Any missing? That&#39;s a gap to close.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Static benchmark</td>
+<td>&quot;Off-the-shelf eval&quot;</td>
+<td>SWE-bench, GAIA, AgentBench, WebArena, OSWorld</td>
+</tr>
+<tr>
+<td>Custom offline eval</td>
+<td>&quot;Domain eval&quot;</td>
+<td>LLM-as-judge / exec / trajectory on your product shape</td>
+</tr>
+<tr>
+<td>Online eval</td>
+<td>&quot;Production eval&quot;</td>
+<td>Session replay, guardrail alerts, cost/latency tracking</td>
+</tr>
+<tr>
+<td>Evaluator-optimizer</td>
+<td>&quot;Propose-judge-refine&quot;</td>
+<td>Iterate until judge passes</td>
+</tr>
+<tr>
+<td>CI gate</td>
+<td>&quot;Merge blocker&quot;</td>
+<td>Fail the build on eval regression</td>
+</tr>
+<tr>
+<td>Baseline</td>
+<td>&quot;Last-known-good&quot;</td>
+<td>Reference score to detect regression</td>
+</tr>
+<tr>
+<td>Trajectory efficiency</td>
+<td>&quot;Steps over gold&quot;</td>
+<td>Agent step count divided by human expert minimum</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Anthropic, Building Effective Agents</a> — &quot;start simple, optimize with evals&quot;</li>
+<li><a href="https://openai.com/index/introducing-swe-bench-verified/" target="_blank" rel="noopener">OpenAI, SWE-bench Verified</a> — the curated benchmark</li>
+<li><a href="https://gorilla.cs.berkeley.edu/leaderboard.html" target="_blank" rel="noopener">Berkeley Function Calling Leaderboard</a> — tool-use benchmark</li>
+<li><a href="https://langfuse.com/" target="_blank" rel="noopener">Langfuse docs</a> — evals + session replay in practice</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="29-production-runtimes.html">
+  <span class="label">← Previous</span>
+  <b>Production Runtimes: Queue, Event, Cron</b>
+</a>
+      <a class="pager__item pager__item--next" href="31-agent-workbench-why-models-fail.html">
+  <span class="label">Next →</span>
+  <b>Agent Workbench Engineering: Why Capable Models Still Fail</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>4 minutes</b> of Agent Engineering behind you.</p>
+      <a class="btn btn--solid" href="31-agent-workbench-why-models-fail.html">Continue to Agent Workbench Engineering: Why Capable Models Still Fail →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#three-evaluation-layers">Three evaluation layers</a></li><li class="mini__item mini__item--d3"><a href="#evaluator-optimizer-anthropic">Evaluator-optimizer (Anthropic)</a></li><li class="mini__item mini__item--d3"><a href="#2026-best-practice">2026 best practice</a></li><li class="mini__item mini__item--d3"><a href="#tying-phase-14-together">Tying Phase 14 together</a></li><li class="mini__item mini__item--d3"><a href="#where-eval-driven-development-fails">Where eval-driven development fails</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

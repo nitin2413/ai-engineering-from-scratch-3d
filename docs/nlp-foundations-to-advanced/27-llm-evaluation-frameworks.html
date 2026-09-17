@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLM Evaluation — RAGAS, DeepEval, G-Eval — NLP, Foundations to Advanced — AIFS</title>
+<meta name="description" content="NLP, Foundations to Advanced: LLM Evaluation — RAGAS, DeepEval, G-Eval. 4 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="LLM Evaluation — RAGAS, DeepEval, G-Eval — NLP, Foundations to Advanced — AIFS">
+<meta property="og:description" content="NLP, Foundations to Advanced: LLM Evaluation — RAGAS, DeepEval, G-Eval. 4 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"n5-judge-gauge":["../assets/figures/figures-nlp5.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-nlp5.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#B8FF3C" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#B8FF3C;--accent-ink:#111111"
+  data-lesson-id="nlp-foundations-to-advanced/27-llm-evaluation-frameworks" data-module="nlp-foundations-to-advanced"
+  data-prev="26-relation-extraction-kg.html" data-next="28-long-context-evaluation.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#B8FF3C">
+        <span class="label">Phase 05</span>
+        <b>NLP, Foundations to Advanced</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="nlp-foundations-to-advanced/01-text-processing"><a href="01-text-processing.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Text Processing — Tokenization, Stemming, Lemmatization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/02-bag-of-words-tfidf"><a href="02-bag-of-words-tfidf.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Bag of Words, TF-IDF, and Text Representation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/03-word-embeddings-word2vec"><a href="03-word-embeddings-word2vec.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Word Embeddings — Word2Vec from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/04-glove-fasttext-subword"><a href="04-glove-fasttext-subword.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">GloVe, FastText, and Subword Embeddings</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/05-sentiment-analysis"><a href="05-sentiment-analysis.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Sentiment Analysis</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/06-named-entity-recognition"><a href="06-named-entity-recognition.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Named Entity Recognition</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/07-pos-tagging-parsing"><a href="07-pos-tagging-parsing.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">POS Tagging and Syntactic Parsing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/08-cnns-rnns-for-text"><a href="08-cnns-rnns-for-text.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">CNNs and RNNs for Text</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/09-sequence-to-sequence"><a href="09-sequence-to-sequence.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Sequence-to-Sequence Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/10-attention-mechanism"><a href="10-attention-mechanism.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Attention Mechanism — The Breakthrough</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/11-machine-translation"><a href="11-machine-translation.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Machine Translation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/12-text-summarization"><a href="12-text-summarization.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Text Summarization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/13-question-answering"><a href="13-question-answering.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Question Answering Systems</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/14-information-retrieval-search"><a href="14-information-retrieval-search.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Information Retrieval and Search</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/15-topic-modeling"><a href="15-topic-modeling.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Topic Modeling — LDA and BERTopic</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/16-text-generation-pre-transformer"><a href="16-text-generation-pre-transformer.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Text Generation Before Transformers — N-gram Language Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/17-chatbots-rule-to-neural"><a href="17-chatbots-rule-to-neural.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Chatbots — Rule-Based to Neural to LLM Agents</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/18-multilingual-nlp"><a href="18-multilingual-nlp.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Multilingual NLP</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/19-subword-tokenization"><a href="19-subword-tokenization.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">Subword Tokenization — BPE, WordPiece, Unigram, SentencePiece</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/20-structured-outputs-constrained-decoding"><a href="20-structured-outputs-constrained-decoding.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Structured Outputs &amp; Constrained Decoding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/21-nli-textual-entailment"><a href="21-nli-textual-entailment.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Natural Language Inference — Textual Entailment</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/22-embedding-models-deep-dive"><a href="22-embedding-models-deep-dive.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Embedding Models — The 2026 Deep Dive</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/23-chunking-strategies-rag"><a href="23-chunking-strategies-rag.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Chunking Strategies for RAG</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/24-coreference-resolution"><a href="24-coreference-resolution.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Coreference Resolution</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/25-entity-linking"><a href="25-entity-linking.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Entity Linking &amp; Disambiguation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/26-relation-extraction-kg"><a href="26-relation-extraction-kg.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Relation Extraction &amp; Knowledge Graph Construction</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/27-llm-evaluation-frameworks"><a href="27-llm-evaluation-frameworks.html" class="is-current">
+  <span class="snav__n">27</span>
+  <span class="snav__t">LLM Evaluation — RAGAS, DeepEval, G-Eval</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/28-long-context-evaluation"><a href="28-long-context-evaluation.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">Long-Context Evaluation — NIAH, RULER, LongBench, MRCR</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/29-dialogue-state-tracking"><a href="29-dialogue-state-tracking.html" class="">
+  <span class="snav__n">29</span>
+  <span class="snav__t">Dialogue State Tracking</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">NLP, Foundations to Advanced</a></p>
+      <h1 class="page__title">LLM Evaluation — RAGAS, DeepEval, G-Eval</h1>
+      <p class="page__lede">Exact-match and F1 miss semantic equivalence. Human review does not scale. LLM-as-judge is the production answer — with enough calibration to trust the number.</p>
+      <div class="page__meta">
+        <span class="chip">4 min read</span>
+        <span class="chip">945 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 5 · 13 (Question Answering), Phase 5 · 14 (Information Retrieval)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Your RAG system answers: &quot;June 29th, 2007.&quot;
+The gold reference is: &quot;June 29, 2007.&quot;
+Exact Match scores 0. F1 scores ~75%. A human would score 100%.</p>
+<p>Now multiply by 10,000 test cases. Multiply again by every change to the retriever, chunking, prompt, or model. You need an evaluator that understands meaning, runs cheaply at scale, does not lie about regressions, and surfaces the right failure modes.</p>
+<p>2026 has three frameworks that own this problem.</p>
+<ul>
+<li><strong>RAGAS.</strong> Retrieval-Augmented Generation ASsessment. Four RAG metrics (faithfulness, answer-relevance, context-precision, context-recall) with NLI + LLM-judge backends. Research-backed, lightweight.</li>
+<li><strong>DeepEval.</strong> Pytest for LLMs. G-Eval, task-completion, hallucination, bias metrics. CI/CD-native.</li>
+<li><strong>G-Eval.</strong> A method (and a DeepEval metric): LLM-as-judge with chain-of-thought, custom criteria, 0-1 score.</li>
+</ul>
+<p>All three lean on LLM-as-judge. This lesson builds intuition for the method and the trust layer around it.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<p><img src="assets/27-llm-evaluation-frameworks/llm-evaluation.svg" alt="Four evaluation dimensions, LLM-as-judge architecture" loading="lazy"></p>
+<p><strong>LLM-as-judge.</strong> Replace a static metric with an LLM that scores outputs given a rubric. Given <code class="inline-code">(query, context, answer)</code>, prompt a judge LLM: &quot;Score 0-1 on faithfulness.&quot; Return the score.</p>
+<p>Why it works: LLMs approximate human judgment at a tiny fraction of the cost. GPT-4o-mini at ~$0.003 per scored case enables 1000-sample regression eval runs for under $5.</p>
+<p>Why it fails silently:</p>
+<ol>
+<li><strong>Judge bias.</strong> Judges prefer longer answers, answers from their own model family, answers that match the prompt style.</li>
+<li><strong>JSON parsing failures.</strong> Bad JSON → NaN score → silently excluded from the aggregate. RAGAS users know this pain. Gate with try/except + explicit failure mode.</li>
+<li><strong>Drift over model versions.</strong> Upgrading the judge changes every metric. Freeze judge model + version.</li>
+</ol>
+<p><strong>The RAG four.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Question</th>
+<th>Backend</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Faithfulness</td>
+<td>Does each claim in the answer come from the retrieved context?</td>
+<td>NLI-based entailment</td>
+</tr>
+<tr>
+<td>Answer relevance</td>
+<td>Does the answer address the question?</td>
+<td>Generate hypothetical questions from answer; compare to real question</td>
+</tr>
+<tr>
+<td>Context precision</td>
+<td>Of retrieved chunks, what fraction were relevant?</td>
+<td>LLM-judge</td>
+</tr>
+<tr>
+<td>Context recall</td>
+<td>Did retrieval return everything needed?</td>
+<td>LLM-judge against gold answer</td>
+</tr>
+</tbody></table>
+<p><strong>G-Eval.</strong> Define a custom criterion: &quot;Did the answer cite the correct source?&quot; The framework auto-expands into chain-of-thought evaluation steps, then scores 0-1. Good for domain-specific quality dimensions RAGAS does not cover.</p>
+<p><strong>Calibration.</strong> Never trust the raw judge score until you have a correlation against human labels. Run 100 hand-labeled examples. Plot judge vs human. Compute Spearman rho. If rho &lt; 0.7, your judge rubric needs work.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="n5-judge-gauge"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">n5-judge-gauge</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> n5 judge gauge</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-faithfulness-with-nli-ragas-style" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-faithfulness-with-nli-ragas-style" aria-label="Link to this section">#</a>Step 1: faithfulness with NLI (RAGAS-style)</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> typing <span class="token keyword">import</span> Callable
+<span class="token keyword">from</span> transformers <span class="token keyword">import</span> pipeline
+
+nli <span class="token operator">=</span> pipeline<span class="token punctuation">(</span><span class="token string">"text-classification"</span><span class="token punctuation">,</span>
+               model<span class="token operator">=</span><span class="token string">"MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli"</span><span class="token punctuation">,</span>
+               top_k<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">)</span>
+
+<span class="token comment"># `llm` is any callable: prompt str -> generated str.</span>
+<span class="token comment"># Example: llm = lambda p: client.messages.create(model="claude-haiku-4-5", ...).content[0].text</span>
+LLM <span class="token operator">=</span> Callable<span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token builtin">str</span><span class="token punctuation">]</span>
+
+
+<span class="token keyword">def</span> <span class="token function">atomic_claims</span><span class="token punctuation">(</span>answer<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">,</span> llm<span class="token punctuation">:</span> LLM<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token builtin">list</span><span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
+    prompt <span class="token operator">=</span> <span class="token string-interpolation"><span class="token string">f"""Break this answer into simple factual claims (one per line):
+</span><span class="token interpolation"><span class="token punctuation">{</span>answer<span class="token punctuation">}</span></span><span class="token string">
+"""</span></span>
+    <span class="token keyword">return</span> llm<span class="token punctuation">(</span>prompt<span class="token punctuation">)</span><span class="token punctuation">.</span>splitlines<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+
+<span class="token keyword">def</span> <span class="token function">faithfulness</span><span class="token punctuation">(</span>answer<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">,</span> context<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">,</span> llm<span class="token punctuation">:</span> LLM<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token builtin">float</span><span class="token punctuation">:</span>
+    claims <span class="token operator">=</span> atomic_claims<span class="token punctuation">(</span>answer<span class="token punctuation">,</span> llm<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> <span class="token keyword">not</span> claims<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token number">0.0</span>
+    supported <span class="token operator">=</span> <span class="token number">0</span>
+    <span class="token keyword">for</span> claim <span class="token keyword">in</span> claims<span class="token punctuation">:</span>
+        result <span class="token operator">=</span> nli<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"text"</span><span class="token punctuation">:</span> context<span class="token punctuation">,</span> <span class="token string">"text_pair"</span><span class="token punctuation">:</span> claim<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+        entail <span class="token operator">=</span> <span class="token builtin">next</span><span class="token punctuation">(</span><span class="token punctuation">(</span>s <span class="token keyword">for</span> s <span class="token keyword">in</span> result <span class="token keyword">if</span> s<span class="token punctuation">[</span><span class="token string">"label"</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token string">"entailment"</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token boolean">None</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> entail <span class="token keyword">and</span> entail<span class="token punctuation">[</span><span class="token string">"score"</span><span class="token punctuation">]</span> <span class="token operator">></span> <span class="token number">0.5</span><span class="token punctuation">:</span>
+            supported <span class="token operator">+=</span> <span class="token number">1</span>
+    <span class="token keyword">return</span> supported <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>claims<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Decompose the answer into atomic claims. NLI-check each claim against the retrieved context. Faithfulness = fraction supported.</p>
+<h3 id="step-2-answer-relevance" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-answer-relevance" aria-label="Link to this section">#</a>Step 2: answer relevance</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+<span class="token keyword">from</span> sentence_transformers <span class="token keyword">import</span> SentenceTransformer
+
+<span class="token comment"># encoder: any model implementing .encode(texts, normalize_embeddings=True) -> ndarray</span>
+<span class="token comment"># e.g., encoder = SentenceTransformer("BAAI/bge-small-en-v1.5")</span>
+
+<span class="token keyword">def</span> <span class="token function">answer_relevance</span><span class="token punctuation">(</span>question<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">,</span> answer<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">,</span> encoder<span class="token punctuation">,</span> llm<span class="token punctuation">:</span> LLM<span class="token punctuation">,</span> n<span class="token punctuation">:</span> <span class="token builtin">int</span> <span class="token operator">=</span> <span class="token number">3</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token builtin">float</span><span class="token punctuation">:</span>
+    prompt <span class="token operator">=</span> <span class="token string-interpolation"><span class="token string">f"Write </span><span class="token interpolation"><span class="token punctuation">{</span>n<span class="token punctuation">}</span></span><span class="token string"> questions this answer could be the answer to:\n</span><span class="token interpolation"><span class="token punctuation">{</span>answer<span class="token punctuation">}</span></span><span class="token string">"</span></span>
+    generated <span class="token operator">=</span> <span class="token punctuation">[</span>line <span class="token keyword">for</span> line <span class="token keyword">in</span> llm<span class="token punctuation">(</span>prompt<span class="token punctuation">)</span><span class="token punctuation">.</span>splitlines<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">if</span> line<span class="token punctuation">.</span>strip<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">:</span>n<span class="token punctuation">]</span>
+    <span class="token keyword">if</span> <span class="token keyword">not</span> generated<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token number">0.0</span>
+    q_emb <span class="token operator">=</span> np<span class="token punctuation">.</span>asarray<span class="token punctuation">(</span>encoder<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token punctuation">[</span>question<span class="token punctuation">]</span><span class="token punctuation">,</span> normalize_embeddings<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    g_embs <span class="token operator">=</span> np<span class="token punctuation">.</span>asarray<span class="token punctuation">(</span>encoder<span class="token punctuation">.</span>encode<span class="token punctuation">(</span>generated<span class="token punctuation">,</span> normalize_embeddings<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    sims <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token builtin">float</span><span class="token punctuation">(</span>q_emb @ g_emb<span class="token punctuation">)</span> <span class="token keyword">for</span> g_emb <span class="token keyword">in</span> g_embs<span class="token punctuation">]</span>
+    <span class="token keyword">return</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>sims<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>sims<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>If the answer implies different questions than the one asked, relevance drops.</p>
+<h3 id="step-3-g-eval-custom-metric" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-g-eval-custom-metric" aria-label="Link to this section">#</a>Step 3: G-Eval custom metric</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> deepeval<span class="token punctuation">.</span>metrics <span class="token keyword">import</span> GEval
+<span class="token keyword">from</span> deepeval<span class="token punctuation">.</span>test_case <span class="token keyword">import</span> LLMTestCaseParams<span class="token punctuation">,</span> LLMTestCase
+
+metric <span class="token operator">=</span> GEval<span class="token punctuation">(</span>
+    name<span class="token operator">=</span><span class="token string">"Correctness"</span><span class="token punctuation">,</span>
+    criteria<span class="token operator">=</span><span class="token string">"The answer should be factually accurate and match the expected output."</span><span class="token punctuation">,</span>
+    evaluation_steps<span class="token operator">=</span><span class="token punctuation">[</span>
+        <span class="token string">"Read the expected output."</span><span class="token punctuation">,</span>
+        <span class="token string">"Read the actual output."</span><span class="token punctuation">,</span>
+        <span class="token string">"List factual claims in the actual output."</span><span class="token punctuation">,</span>
+        <span class="token string">"For each claim, mark supported or unsupported by the expected output."</span><span class="token punctuation">,</span>
+        <span class="token string">"Return score = fraction supported."</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    evaluation_params<span class="token operator">=</span><span class="token punctuation">[</span>LLMTestCaseParams<span class="token punctuation">.</span>INPUT<span class="token punctuation">,</span> LLMTestCaseParams<span class="token punctuation">.</span>ACTUAL_OUTPUT<span class="token punctuation">,</span> LLMTestCaseParams<span class="token punctuation">.</span>EXPECTED_OUTPUT<span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">)</span>
+
+test <span class="token operator">=</span> LLMTestCase<span class="token punctuation">(</span><span class="token builtin">input</span><span class="token operator">=</span><span class="token string">"When was the first iPhone released?"</span><span class="token punctuation">,</span>
+                   actual_output<span class="token operator">=</span><span class="token string">"June 29th, 2007."</span><span class="token punctuation">,</span>
+                   expected_output<span class="token operator">=</span><span class="token string">"June 29, 2007."</span><span class="token punctuation">)</span>
+metric<span class="token punctuation">.</span>measure<span class="token punctuation">(</span>test<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>metric<span class="token punctuation">.</span>score<span class="token punctuation">,</span> metric<span class="token punctuation">.</span>reason<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>The evaluation steps are the rubric. Explicit steps are more stable than implicit &quot;score 0-1&quot; prompts.</p>
+<h3 id="step-4-ci-gate" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-ci-gate" aria-label="Link to this section">#</a>Step 4: CI gate</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> deepeval
+<span class="token keyword">from</span> deepeval<span class="token punctuation">.</span>metrics <span class="token keyword">import</span> FaithfulnessMetric<span class="token punctuation">,</span> ContextualRelevancyMetric
+
+
+<span class="token keyword">def</span> <span class="token function">test_rag_system</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    cases <span class="token operator">=</span> load_regression_cases<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    faith <span class="token operator">=</span> FaithfulnessMetric<span class="token punctuation">(</span>threshold<span class="token operator">=</span><span class="token number">0.85</span><span class="token punctuation">)</span>
+    rel <span class="token operator">=</span> ContextualRelevancyMetric<span class="token punctuation">(</span>threshold<span class="token operator">=</span><span class="token number">0.7</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> <span class="token keyword">case</span> <span class="token keyword">in</span> cases<span class="token punctuation">:</span>
+        faith<span class="token punctuation">.</span>measure<span class="token punctuation">(</span><span class="token keyword">case</span><span class="token punctuation">)</span>
+        <span class="token keyword">assert</span> faith<span class="token punctuation">.</span>score <span class="token operator">>=</span> <span class="token number">0.85</span><span class="token punctuation">,</span> <span class="token string-interpolation"><span class="token string">f"faithfulness regression on </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token keyword">case</span><span class="token punctuation">.</span><span class="token builtin">id</span><span class="token punctuation">}</span></span><span class="token string">"</span></span>
+        rel<span class="token punctuation">.</span>measure<span class="token punctuation">(</span><span class="token keyword">case</span><span class="token punctuation">)</span>
+        <span class="token keyword">assert</span> rel<span class="token punctuation">.</span>score <span class="token operator">>=</span> <span class="token number">0.7</span><span class="token punctuation">,</span> <span class="token string-interpolation"><span class="token string">f"relevancy regression on </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token keyword">case</span><span class="token punctuation">.</span><span class="token builtin">id</span><span class="token punctuation">}</span></span><span class="token string">"</span></span></code></pre>
+</figure>
+<p>Ship as a pytest file. Run on every PR. Block merges on regressions.</p>
+<h3 id="step-5-toy-eval-from-scratch" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-toy-eval-from-scratch" aria-label="Link to this section">#</a>Step 5: toy eval from scratch</h3>
+<p>See <code class="inline-code">code/main.py</code>. Stdlib-only approximations of faithfulness (overlap of answer claims with context) and relevance (overlap of answer tokens with question tokens). Not production. Shows the shape.</p>
+<h2 id="pitfalls" class="prose-h prose-h2"><a class="prose-h__anchor" href="#pitfalls" aria-label="Link to this section">#</a>Pitfalls</h2>
+<ul>
+<li><strong>No calibration.</strong> A judge with 0.3 correlation to human labels is noise. Require a calibration run before shipping.</li>
+<li><strong>Self-evaluation.</strong> Using the same LLM to generate and judge inflates scores by 10-20%. Use a different model family for the judge.</li>
+<li><strong>Positional bias in pairwise judging.</strong> Judges prefer the first option presented. Always randomize order and run both.</li>
+<li><strong>Raw aggregate hides failures.</strong> Mean score 0.85 often hides 5% catastrophic failures. Always inspect the bottom quantile.</li>
+<li><strong>Golden dataset rot.</strong> Unversioned eval sets that drift over time break longitudinal comparison. Tag the dataset with every change.</li>
+<li><strong>LLM cost.</strong> At scale, judge calls dominate cost. Use the cheapest model that meets calibration threshold. GPT-4o-mini, Claude Haiku, Mistral-small.</li>
+</ul>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>The 2026 stack:</p>
+<table>
+<thead>
+<tr>
+<th>Use case</th>
+<th>Framework</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>RAG quality monitoring</td>
+<td>RAGAS (4 metrics)</td>
+</tr>
+<tr>
+<td>CI/CD regression gates</td>
+<td>DeepEval + pytest</td>
+</tr>
+<tr>
+<td>Custom domain criteria</td>
+<td>G-Eval within DeepEval</td>
+</tr>
+<tr>
+<td>Online live-traffic monitoring</td>
+<td>RAGAS with reference-free mode</td>
+</tr>
+<tr>
+<td>Human-in-the-loop spot checks</td>
+<td>LangSmith or Phoenix with annotation UI</td>
+</tr>
+<tr>
+<td>Red-teaming / safety eval</td>
+<td>Promptfoo + DeepEval</td>
+</tr>
+</tbody></table>
+<p>Typical stack: RAGAS for monitoring, DeepEval for CI, G-Eval for novel dimensions. Run all three; they disagree usefully.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>Save as <code class="inline-code">outputs/skill-eval-architect.md</code>:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">markdown</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-markdown"><span class="token front-matter-block"><span class="token punctuation">---</span>
+<span class="token front-matter yaml language-yaml"><span class="token key atrule">name</span><span class="token punctuation">:</span> eval<span class="token punctuation">-</span>architect
+<span class="token key atrule">description</span><span class="token punctuation">:</span> Design an LLM evaluation plan with calibrated judge and CI gates.
+<span class="token key atrule">version</span><span class="token punctuation">:</span> 1.0.0
+<span class="token key atrule">phase</span><span class="token punctuation">:</span> <span class="token number">5</span>
+<span class="token key atrule">lesson</span><span class="token punctuation">:</span> <span class="token number">27</span>
+<span class="token key atrule">tags</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>nlp<span class="token punctuation">,</span> evaluation<span class="token punctuation">,</span> rag<span class="token punctuation">]</span></span>
+<span class="token punctuation">---</span></span>
+
+Given a use case (RAG / agent / generative task), output:
+
+<span class="token list punctuation">1.</span> Metrics. Faithfulness / relevance / context-precision / context-recall + any custom G-Eval metrics with criteria.
+<span class="token list punctuation">2.</span> Judge model. Named model + version, rationale for cost vs accuracy.
+<span class="token list punctuation">3.</span> Calibration. Hand-labeled set size, target Spearman rho vs human > 0.7.
+<span class="token list punctuation">4.</span> Dataset versioning. Tag strategy, change log, stratification.
+<span class="token list punctuation">5.</span> CI gate. Thresholds per metric, regression-window logic, bottom-quantile alert.
+
+Refuse to rely on a judge untested against ≥50 human-labeled examples. Refuse self-evaluation (same model generates + judges). Refuse aggregate-only reporting without bottom-10% surfacing. Flag any pipeline where judge upgrade lands without parallel baseline eval.</code></pre>
+</figure>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><strong>Easy.</strong> Use RAGAS on 10 RAG examples with known hallucinations. Verify the faithfulness metric catches each one.</li>
+<li><strong>Medium.</strong> Hand-label 50 QA answers 0-1 for correctness. Score with G-Eval. Measure Spearman rho between judge and human.</li>
+<li><strong>Hard.</strong> Build a pytest CI gate with DeepEval. Intentionally regress the retriever. Verify the gate fails. Add bottom-quantile alerting via threshold check on the lowest 10%.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>LLM-as-judge</td>
+<td>Scoring with an LLM</td>
+<td>Prompt a judge model to score outputs 0-1 given a rubric.</td>
+</tr>
+<tr>
+<td>RAGAS</td>
+<td>The RAG metric library</td>
+<td>Open-source eval framework with 4 reference-free RAG metrics.</td>
+</tr>
+<tr>
+<td>Faithfulness</td>
+<td>Is the answer grounded?</td>
+<td>Fraction of answer claims entailed by retrieved context.</td>
+</tr>
+<tr>
+<td>Context precision</td>
+<td>Were retrieved chunks relevant?</td>
+<td>Fraction of top-K chunks that actually mattered.</td>
+</tr>
+<tr>
+<td>Context recall</td>
+<td>Did retrieval find everything?</td>
+<td>Fraction of gold-answer claims supported by retrieved chunks.</td>
+</tr>
+<tr>
+<td>G-Eval</td>
+<td>Custom LLM judge</td>
+<td>Rubric + chain-of-thought eval steps + 0-1 score.</td>
+</tr>
+<tr>
+<td>Calibration</td>
+<td>Trust but verify</td>
+<td>Spearman correlation between judge score and human score.</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2309.15217" target="_blank" rel="noopener">Es et al. (2023). RAGAS: Automated Evaluation of Retrieval Augmented Generation</a> — the RAGAS paper.</li>
+<li><a href="https://arxiv.org/abs/2303.16634" target="_blank" rel="noopener">Liu et al. (2023). G-Eval: NLG Evaluation using GPT-4 with Better Human Alignment</a> — the G-Eval paper.</li>
+<li><a href="https://deepeval.com/docs/metrics-introduction" target="_blank" rel="noopener">DeepEval docs</a> — open production stack.</li>
+<li><a href="https://arxiv.org/abs/2306.05685" target="_blank" rel="noopener">Zheng et al. (2023). Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena</a> — biases, calibration, limits.</li>
+<li><a href="https://mlflow.org/blog/third-party-scorers" target="_blank" rel="noopener">MLflow GenAI Scorer</a> — unifying framework that integrates RAGAS, DeepEval, Phoenix.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="26-relation-extraction-kg.html">
+  <span class="label">← Previous</span>
+  <b>Relation Extraction &amp; Knowledge Graph Construction</b>
+</a>
+      <a class="pager__item pager__item--next" href="28-long-context-evaluation.html">
+  <span class="label">Next →</span>
+  <b>Long-Context Evaluation — NIAH, RULER, LongBench, MRCR</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>4 minutes</b> of NLP, Foundations to Advanced behind you.</p>
+      <a class="btn btn--solid" href="28-long-context-evaluation.html">Continue to Long-Context Evaluation — NIAH, RULER, LongBench, MRCR →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-faithfulness-with-nli-ragas-style">Step 1: faithfulness with NLI (RAGAS-style)</a></li><li class="mini__item mini__item--d3"><a href="#step-2-answer-relevance">Step 2: answer relevance</a></li><li class="mini__item mini__item--d3"><a href="#step-3-g-eval-custom-metric">Step 3: G-Eval custom metric</a></li><li class="mini__item mini__item--d3"><a href="#step-4-ci-gate">Step 4: CI gate</a></li><li class="mini__item mini__item--d3"><a href="#step-5-toy-eval-from-scratch">Step 5: toy eval from scratch</a></li><li class="mini__item mini__item--d2"><a href="#pitfalls">Pitfalls</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

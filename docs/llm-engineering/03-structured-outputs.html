@@ -1,0 +1,771 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structured Outputs: JSON, Schema Validation, Constrained Decoding — LLM Engineering — AIFS</title>
+<meta name="description" content="LLM Engineering: Structured Outputs: JSON, Schema Validation, Constrained Decoding. 9 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Structured Outputs: JSON, Schema Validation, Constrained Decoding — LLM Engineering — AIFS">
+<meta property="og:description" content="LLM Engineering: Structured Outputs: JSON, Schema Validation, Constrained Decoding. 9 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"mx-schema-funnel":["../assets/figures/figures-misc2.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-misc2.js"];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#00E0C6" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#00E0C6;--accent-ink:#111111"
+  data-lesson-id="llm-engineering/03-structured-outputs" data-module="llm-engineering"
+  data-prev="02-few-shot-cot.html" data-next="04-embeddings.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#00E0C6">
+        <span class="label">Phase 11</span>
+        <b>LLM Engineering</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="llm-engineering/01-prompt-engineering"><a href="01-prompt-engineering.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Prompt Engineering: Techniques &amp; Patterns</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/02-few-shot-cot"><a href="02-few-shot-cot.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Few-Shot, Chain-of-Thought, Tree-of-Thought</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/03-structured-outputs"><a href="03-structured-outputs.html" class="is-current">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Structured Outputs: JSON, Schema Validation, Constrained Decoding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/04-embeddings"><a href="04-embeddings.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Embeddings &amp; Vector Representations</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/05-context-engineering"><a href="05-context-engineering.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Context Engineering: Windows, Budgets, Memory, and Retrieval</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/06-rag"><a href="06-rag.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">RAG (Retrieval-Augmented Generation)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/07-advanced-rag"><a href="07-advanced-rag.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Advanced RAG (Chunking, Reranking, Hybrid Search)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/08-fine-tuning-lora"><a href="08-fine-tuning-lora.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Fine-Tuning with LoRA &amp; QLoRA</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/09-function-calling"><a href="09-function-calling.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Function Calling &amp; Tool Use</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/10-evaluation"><a href="10-evaluation.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Evaluation &amp; Testing LLM Applications</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/11-caching-cost"><a href="11-caching-cost.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Caching, Rate Limiting &amp; Cost Optimization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/12-guardrails"><a href="12-guardrails.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Guardrails, Safety &amp; Content Filtering</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/13-production-app"><a href="13-production-app.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Building a Production LLM Application</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/14-model-context-protocol"><a href="14-model-context-protocol.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Model Context Protocol (MCP)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/15-prompt-caching"><a href="15-prompt-caching.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Prompt Caching and Context Caching</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/16-langgraph-state-machines"><a href="16-langgraph-state-machines.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Agent State Machines — Graphs, Nodes, Checkpoints</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/17-agent-framework-tradeoffs"><a href="17-agent-framework-tradeoffs.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Agent Framework Tradeoffs — Graph, Role, and Actor Orchestration</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">LLM Engineering</a></p>
+      <h1 class="page__title">Structured Outputs: JSON, Schema Validation, Constrained Decoding</h1>
+      <p class="page__lede">Your LLM returns a string. Your application needs JSON. That gap has crashed more production systems than any model hallucination. Structured output is the bridge between natural language and typed data. Get it right and your LLM becomes a reliable API. Get it wrong and you're parsing free-text with regex at 3am.</p>
+      <div class="page__meta">
+        <span class="chip">9 min read</span>
+        <span class="chip">1,891 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 10, Lessons 01-05 (LLMs from Scratch)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~90 minutes</dd></div><div class="facts__pair"><dt class="label">Related</dt><dd>Phase 5 · 20 (Structured Outputs &amp; Constrained Decoding) covers the decoder-level theory (FSM/CFG logit processors, Outlines, XGrammar). This lesson focuses on the production SDK surface (OpenAI <code class="inline-code">response_format</code>, Anthropic tool use, Instructor) — read Phase 5 · 20 first if you want to understand what is happening below the API.</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Implement JSON-mode and schema-constrained outputs using OpenAI and Anthropic API parameters</li>
+<li>Build a Pydantic validation layer that rejects malformed LLM outputs and retries with error feedback</li>
+<li>Explain how constrained decoding forces valid JSON at the token level without post-processing</li>
+<li>Design robust extraction prompts that reliably convert unstructured text into typed data structures</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>You ask an LLM: &quot;Extract the product name, price, and availability from this text.&quot; It responds:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>The product is the Sony WH-1000XM5 headphones, which cost $348.00 and are currently in stock.</code></pre>
+</figure>
+<p>That is a perfectly correct answer. It is also completely useless to your application. Your inventory system needs <code class="inline-code">{&quot;product&quot;: &quot;Sony WH-1000XM5&quot;, &quot;price&quot;: 348.00, &quot;in_stock&quot;: true}</code>. You need a JSON object with specific keys, specific types, and specific value constraints. You do not need a sentence.</p>
+<p>The naive solution: add &quot;Respond in JSON&quot; to your prompt. This works 90% of the time. The other 10% the model wraps the JSON in markdown code fences, or adds a preamble like &quot;Here&#39;s the JSON:&quot;, or produces syntactically invalid JSON because it closed a bracket early. Your JSON parser crashes. Your pipeline breaks. You add try/except and a retry loop. The retry sometimes produces different data. Now you have a consistency problem on top of a parsing problem.</p>
+<p>This is not a prompt engineering problem. It is a decoding problem. The model generates tokens left to right. At each position, it picks the most likely next token from a vocabulary of 100K+ options. Most of those options would produce invalid JSON at any given position. If the model just emitted <code class="inline-code">{&quot;price&quot;:</code>, the next token must be a digit, a quote (for string), <code class="inline-code">null</code>, <code class="inline-code">true</code>, <code class="inline-code">false</code>, or a negative sign. Anything else produces invalid JSON. Without constraints, the model might pick a perfectly reasonable English word that is catastrophically wrong syntactically.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="the-structured-output-spectrum" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-structured-output-spectrum" aria-label="Link to this section">#</a>The Structured Output Spectrum</h3>
+<p>There are four levels of structured output control, each more reliable than the last.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph LR
+    subgraph Spectrum[&quot;Structured Output Spectrum&quot;]
+        direction LR
+        A[&quot;Prompt-based&lt;br/&gt;'Return JSON'&lt;br/&gt;~90% valid&quot;] --&gt; B[&quot;JSON Mode&lt;br/&gt;Guaranteed valid JSON&lt;br/&gt;No schema guarantee&quot;]
+        B --&gt; C[&quot;Schema Mode&lt;br/&gt;JSON + matches schema&lt;br/&gt;Guaranteed compliance&quot;]
+        C --&gt; D[&quot;Constrained Decoding&lt;br/&gt;Token-level enforcement&lt;br/&gt;100% compliance&quot;]
+    end
+
+    style A fill:#1a1a2e,stroke:#ff6b6b,color:#fff
+    style B fill:#1a1a2e,stroke:#ffa500,color:#fff
+    style C fill:#1a1a2e,stroke:#51cf66,color:#fff
+    style D fill:#1a1a2e,stroke:#0f3460,color:#fff</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p><strong>Prompt-based</strong> (&quot;Respond in valid JSON&quot;): no enforcement. The model usually complies but sometimes does not. Reliability: ~90%. Failure mode: markdown fences, preamble text, truncated output, wrong structure.</p>
+<p><strong>JSON mode</strong>: the API guarantees the output is valid JSON. OpenAI&#39;s <code class="inline-code">response_format: { type: &quot;json_object&quot; }</code> enables this. The output will parse without errors. But it may not match your expected schema -- extra keys, wrong types, missing fields.</p>
+<p><strong>Schema mode</strong>: the API takes a JSON Schema and guarantees the output matches it. In 2026 every major provider supports this natively: OpenAI&#39;s <code class="inline-code">response_format: { type: &quot;json_schema&quot;, json_schema: {...} }</code> (also as <code class="inline-code">tool_choice=&quot;required&quot;</code>), Anthropic&#39;s tool use with <code class="inline-code">input_schema</code>, and Gemini&#39;s <code class="inline-code">response_schema</code> + <code class="inline-code">response_mime_type: &quot;application/json&quot;</code>. The output has the exact keys, types, and constraints you specified.</p>
+<p><strong>Constrained decoding</strong>: at each token position during generation, the decoder masks out all tokens that would produce invalid output. If the schema requires a number and the model is about to emit a letter, that token is set to probability zero. The model can only produce tokens that lead to valid output. This is what OpenAI&#39;s structured output mode and libraries like Outlines and Guidance implement under the hood.</p>
+<h3 id="json-schema-the-contract-language" class="prose-h prose-h3"><a class="prose-h__anchor" href="#json-schema-the-contract-language" aria-label="Link to this section">#</a>JSON Schema: The Contract Language</h3>
+<p>JSON Schema is how you tell the model (or validation layer) what shape the output must have. Every major structured output system uses it.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"object"</span><span class="token punctuation">,</span>
+  <span class="token property">"properties"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"product"</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"string"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token property">"price"</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"number"</span><span class="token punctuation">,</span> <span class="token property">"minimum"</span><span class="token operator">:</span> <span class="token number">0</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token property">"in_stock"</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"boolean"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token property">"categories"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"array"</span><span class="token punctuation">,</span>
+      <span class="token property">"items"</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"string"</span> <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">"required"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"product"</span><span class="token punctuation">,</span> <span class="token string">"price"</span><span class="token punctuation">,</span> <span class="token string">"in_stock"</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<p>This schema says: the output must be an object with a string <code class="inline-code">product</code>, a non-negative number <code class="inline-code">price</code>, a boolean <code class="inline-code">in_stock</code>, and an optional array of string <code class="inline-code">categories</code>. Any output that does not match gets rejected.</p>
+<p>Schemas handle the hard cases: nested objects, arrays with typed items, enums (constrain a string to specific values), pattern matching (regex on strings), and combinators (oneOf, anyOf, allOf for polymorphic outputs).</p>
+<h3 id="the-pydantic-pattern" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-pydantic-pattern" aria-label="Link to this section">#</a>The Pydantic Pattern</h3>
+<p>In Python, you do not write JSON Schema by hand. You define a Pydantic model and it generates the schema for you.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> pydantic <span class="token keyword">import</span> BaseModel
+
+<span class="token keyword">class</span> <span class="token class-name">Product</span><span class="token punctuation">(</span>BaseModel<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    product<span class="token punctuation">:</span> <span class="token builtin">str</span>
+    price<span class="token punctuation">:</span> <span class="token builtin">float</span>
+    in_stock<span class="token punctuation">:</span> <span class="token builtin">bool</span>
+    categories<span class="token punctuation">:</span> <span class="token builtin">list</span><span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span></code></pre>
+</figure>
+<p>This produces the same JSON Schema as above. The Instructor library (and OpenAI&#39;s SDK) accept Pydantic models directly: pass the model class, get back a validated instance. If the LLM output does not match, Instructor retries automatically.</p>
+<h3 id="function-calling-tool-use" class="prose-h prose-h3"><a class="prose-h__anchor" href="#function-calling-tool-use" aria-label="Link to this section">#</a>Function Calling / Tool Use</h3>
+<p>An alternative interface for the same problem. Instead of asking the model to produce JSON directly, you define &quot;tools&quot; (functions) with typed parameters. The model outputs a function call with structured arguments. OpenAI calls this &quot;function calling.&quot; Anthropic calls it &quot;tool use.&quot; The result is the same: structured data.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph TD
+    subgraph ToolUse[&quot;Tool Use Flow&quot;]
+        U[&quot;User: Extract product info&lt;br/&gt;from this review text&quot;] --&gt; M[&quot;Model processes input&quot;]
+        M --&gt; TC[&quot;Tool Call:&lt;br/&gt;extract_product(&lt;br/&gt;  product='Sony WH-1000XM5',&lt;br/&gt;  price=348.00,&lt;br/&gt;  in_stock=true&lt;br/&gt;)&quot;]
+        TC --&gt; V[&quot;Validate against&lt;br/&gt;function schema&quot;]
+        V --&gt; R[&quot;Structured Result:&lt;br/&gt;{product, price, in_stock}&quot;]
+    end
+
+    style U fill:#1a1a2e,stroke:#0f3460,color:#fff
+    style TC fill:#1a1a2e,stroke:#e94560,color:#fff
+    style V fill:#1a1a2e,stroke:#ffa500,color:#fff
+    style R fill:#1a1a2e,stroke:#51cf66,color:#fff</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>Tool use is preferred when the model needs to choose which function to call, not just fill in parameters. If you have 10 different extraction schemas and the model must pick the right one based on the input, tool use gives you both the schema selection and the structured output.</p>
+<h3 id="common-failure-modes" class="prose-h prose-h3"><a class="prose-h__anchor" href="#common-failure-modes" aria-label="Link to this section">#</a>Common Failure Modes</h3>
+<p>Even with schema enforcement, structured outputs can fail in subtle ways.</p>
+<p><strong>Hallucinated values</strong>: the output matches the schema but contains invented data. The model produces <code class="inline-code">{&quot;price&quot;: 299.99}</code> when the text says $348. Schema validation cannot catch this -- the type is correct, the value is wrong.</p>
+<p><strong>Enum confusion</strong>: you constrain a field to <code class="inline-code">[&quot;in_stock&quot;, &quot;out_of_stock&quot;, &quot;preorder&quot;]</code>. The model outputs <code class="inline-code">&quot;available&quot;</code> -- semantically correct, but not in the allowed set. Good constrained decoding prevents this. Prompt-based approaches do not.</p>
+<p><strong>Nested object depth</strong>: deeply nested schemas (4+ levels) produce more errors. Each level of nesting is another place where the model can lose track of structure.</p>
+<p><strong>Array length</strong>: the model may produce too many or too few items in an array. Schemas support <code class="inline-code">minItems</code> and <code class="inline-code">maxItems</code> but not all providers enforce them at the decoding level.</p>
+<p><strong>Optional field omission</strong>: the model omits fields that are technically optional but semantically important for your use case. Set them as required in the schema even if the data is sometimes missing -- force the model to produce <code class="inline-code">null</code> explicitly.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="mx-schema-funnel"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">mx-schema-funnel</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> mx schema funnel</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-json-schema-validator" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-json-schema-validator" aria-label="Link to this section">#</a>Step 1: JSON Schema Validator</h3>
+<p>Build a validator from scratch that checks whether a Python object matches a JSON Schema. This is what runs on the output side to verify compliance.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> json
+
+<span class="token keyword">def</span> <span class="token function">validate_schema</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> schema<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    errors <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    _validate<span class="token punctuation">(</span>data<span class="token punctuation">,</span> schema<span class="token punctuation">,</span> <span class="token string">""</span><span class="token punctuation">,</span> errors<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> errors
+
+<span class="token keyword">def</span> <span class="token function">_validate</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> schema<span class="token punctuation">,</span> path<span class="token punctuation">,</span> errors<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    schema_type <span class="token operator">=</span> schema<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"type"</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">if</span> schema_type <span class="token operator">==</span> <span class="token string">"object"</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> <span class="token keyword">not</span> <span class="token builtin">isinstance</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> <span class="token builtin">dict</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            errors<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>path<span class="token punctuation">}</span></span><span class="token string">: expected object, got </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">type</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">.</span>__name__<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span>
+        <span class="token keyword">for</span> key <span class="token keyword">in</span> schema<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"required"</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> key <span class="token keyword">not</span> <span class="token keyword">in</span> data<span class="token punctuation">:</span>
+                errors<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>path<span class="token punctuation">}</span></span><span class="token string">.</span><span class="token interpolation"><span class="token punctuation">{</span>key<span class="token punctuation">}</span></span><span class="token string">: required field missing"</span></span><span class="token punctuation">)</span>
+        properties <span class="token operator">=</span> schema<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"properties"</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+        <span class="token keyword">for</span> key<span class="token punctuation">,</span> value <span class="token keyword">in</span> data<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> key <span class="token keyword">in</span> properties<span class="token punctuation">:</span>
+                _validate<span class="token punctuation">(</span>value<span class="token punctuation">,</span> properties<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>path<span class="token punctuation">}</span></span><span class="token string">.</span><span class="token interpolation"><span class="token punctuation">{</span>key<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">,</span> errors<span class="token punctuation">)</span>
+
+    <span class="token keyword">elif</span> schema_type <span class="token operator">==</span> <span class="token string">"array"</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> <span class="token keyword">not</span> <span class="token builtin">isinstance</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> <span class="token builtin">list</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            errors<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>path<span class="token punctuation">}</span></span><span class="token string">: expected array, got </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">type</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">.</span>__name__<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span>
+        min_items <span class="token operator">=</span> schema<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"minItems"</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
+        max_items <span class="token operator">=</span> schema<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"maxItems"</span><span class="token punctuation">,</span> <span class="token builtin">float</span><span class="token punctuation">(</span><span class="token string">"inf"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span> <span class="token operator">&lt;</span> min_items<span class="token punctuation">:</span>
+            errors<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>path<span class="token punctuation">}</span></span><span class="token string">: array has </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">len</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string"> items, minimum is </span><span class="token interpolation"><span class="token punctuation">{</span>min_items<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span> <span class="token operator">></span> max_items<span class="token punctuation">:</span>
+            errors<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>path<span class="token punctuation">}</span></span><span class="token string">: array has </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">len</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string"> items, maximum is </span><span class="token interpolation"><span class="token punctuation">{</span>max_items<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+        items_schema <span class="token operator">=</span> schema<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"items"</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+        <span class="token keyword">for</span> i<span class="token punctuation">,</span> item <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            _validate<span class="token punctuation">(</span>item<span class="token punctuation">,</span> items_schema<span class="token punctuation">,</span> <span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>path<span class="token punctuation">}</span></span><span class="token string">[</span><span class="token interpolation"><span class="token punctuation">{</span>i<span class="token punctuation">}</span></span><span class="token string">]"</span></span><span class="token punctuation">,</span> errors<span class="token punctuation">)</span>
+
+    <span class="token keyword">elif</span> schema_type <span class="token operator">==</span> <span class="token string">"string"</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> <span class="token keyword">not</span> <span class="token builtin">isinstance</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> <span class="token builtin">str</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            errors<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>path<span class="token punctuation">}</span></span><span class="token string">: expected string, got </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">type</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">.</span>__name__<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span>
+        enum_values <span class="token operator">=</span> schema<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"enum"</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> enum_values <span class="token keyword">and</span> data <span class="token keyword">not</span> <span class="token keyword">in</span> enum_values<span class="token punctuation">:</span>
+            errors<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>path<span class="token punctuation">}</span></span><span class="token string">: '</span><span class="token interpolation"><span class="token punctuation">{</span>data<span class="token punctuation">}</span></span><span class="token string">' not in allowed values </span><span class="token interpolation"><span class="token punctuation">{</span>enum_values<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">elif</span> schema_type <span class="token operator">==</span> <span class="token string">"number"</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> <span class="token keyword">not</span> <span class="token builtin">isinstance</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token builtin">int</span><span class="token punctuation">,</span> <span class="token builtin">float</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            errors<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>path<span class="token punctuation">}</span></span><span class="token string">: expected number, got </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">type</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">.</span>__name__<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span>
+        minimum <span class="token operator">=</span> schema<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"minimum"</span><span class="token punctuation">)</span>
+        maximum <span class="token operator">=</span> schema<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"maximum"</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> minimum <span class="token keyword">is</span> <span class="token keyword">not</span> <span class="token boolean">None</span> <span class="token keyword">and</span> data <span class="token operator">&lt;</span> minimum<span class="token punctuation">:</span>
+            errors<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>path<span class="token punctuation">}</span></span><span class="token string">: </span><span class="token interpolation"><span class="token punctuation">{</span>data<span class="token punctuation">}</span></span><span class="token string"> is less than minimum </span><span class="token interpolation"><span class="token punctuation">{</span>minimum<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> maximum <span class="token keyword">is</span> <span class="token keyword">not</span> <span class="token boolean">None</span> <span class="token keyword">and</span> data <span class="token operator">></span> maximum<span class="token punctuation">:</span>
+            errors<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>path<span class="token punctuation">}</span></span><span class="token string">: </span><span class="token interpolation"><span class="token punctuation">{</span>data<span class="token punctuation">}</span></span><span class="token string"> is greater than maximum </span><span class="token interpolation"><span class="token punctuation">{</span>maximum<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">elif</span> schema_type <span class="token operator">==</span> <span class="token string">"boolean"</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> <span class="token keyword">not</span> <span class="token builtin">isinstance</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> <span class="token builtin">bool</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            errors<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>path<span class="token punctuation">}</span></span><span class="token string">: expected boolean, got </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">type</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">.</span>__name__<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">elif</span> schema_type <span class="token operator">==</span> <span class="token string">"integer"</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> <span class="token keyword">not</span> <span class="token builtin">isinstance</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token keyword">or</span> <span class="token builtin">isinstance</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> <span class="token builtin">bool</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            errors<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>path<span class="token punctuation">}</span></span><span class="token string">: expected integer, got </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">type</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">.</span>__name__<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h3 id="step-2-pydantic-style-model-to-schema" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-pydantic-style-model-to-schema" aria-label="Link to this section">#</a>Step 2: Pydantic-Style Model to Schema</h3>
+<p>Build a minimal class-to-schema converter. Define a Python class and generate its JSON Schema automatically.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">SchemaField</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> field_type<span class="token punctuation">,</span> required<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">,</span> default<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">,</span> enum<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">,</span> minimum<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">,</span> maximum<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>field_type <span class="token operator">=</span> field_type
+        self<span class="token punctuation">.</span>required <span class="token operator">=</span> required
+        self<span class="token punctuation">.</span>default <span class="token operator">=</span> default
+        self<span class="token punctuation">.</span>enum <span class="token operator">=</span> enum
+        self<span class="token punctuation">.</span>minimum <span class="token operator">=</span> minimum
+        self<span class="token punctuation">.</span>maximum <span class="token operator">=</span> maximum
+
+<span class="token keyword">def</span> <span class="token function">python_type_to_schema</span><span class="token punctuation">(</span>field<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    type_map <span class="token operator">=</span> <span class="token punctuation">{</span>
+        <span class="token builtin">str</span><span class="token punctuation">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+        <span class="token builtin">int</span><span class="token punctuation">:</span> <span class="token string">"integer"</span><span class="token punctuation">,</span>
+        <span class="token builtin">float</span><span class="token punctuation">:</span> <span class="token string">"number"</span><span class="token punctuation">,</span>
+        <span class="token builtin">bool</span><span class="token punctuation">:</span> <span class="token string">"boolean"</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span>
+
+    schema <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+
+    <span class="token keyword">if</span> field<span class="token punctuation">.</span>field_type <span class="token keyword">in</span> type_map<span class="token punctuation">:</span>
+        schema<span class="token punctuation">[</span><span class="token string">"type"</span><span class="token punctuation">]</span> <span class="token operator">=</span> type_map<span class="token punctuation">[</span>field<span class="token punctuation">.</span>field_type<span class="token punctuation">]</span>
+    <span class="token keyword">elif</span> field<span class="token punctuation">.</span>field_type <span class="token operator">==</span> <span class="token builtin">list</span><span class="token punctuation">:</span>
+        schema<span class="token punctuation">[</span><span class="token string">"type"</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">"array"</span>
+        schema<span class="token punctuation">[</span><span class="token string">"items"</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"string"</span><span class="token punctuation">}</span>
+    <span class="token keyword">elif</span> <span class="token builtin">isinstance</span><span class="token punctuation">(</span>field<span class="token punctuation">.</span>field_type<span class="token punctuation">,</span> <span class="token builtin">dict</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        schema <span class="token operator">=</span> field<span class="token punctuation">.</span>field_type
+
+    <span class="token keyword">if</span> field<span class="token punctuation">.</span>enum<span class="token punctuation">:</span>
+        schema<span class="token punctuation">[</span><span class="token string">"enum"</span><span class="token punctuation">]</span> <span class="token operator">=</span> field<span class="token punctuation">.</span>enum
+    <span class="token keyword">if</span> field<span class="token punctuation">.</span>minimum <span class="token keyword">is</span> <span class="token keyword">not</span> <span class="token boolean">None</span><span class="token punctuation">:</span>
+        schema<span class="token punctuation">[</span><span class="token string">"minimum"</span><span class="token punctuation">]</span> <span class="token operator">=</span> field<span class="token punctuation">.</span>minimum
+    <span class="token keyword">if</span> field<span class="token punctuation">.</span>maximum <span class="token keyword">is</span> <span class="token keyword">not</span> <span class="token boolean">None</span><span class="token punctuation">:</span>
+        schema<span class="token punctuation">[</span><span class="token string">"maximum"</span><span class="token punctuation">]</span> <span class="token operator">=</span> field<span class="token punctuation">.</span>maximum
+
+    <span class="token keyword">return</span> schema
+
+<span class="token keyword">def</span> <span class="token function">model_to_schema</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span> fields<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    properties <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+    required <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">for</span> field_name<span class="token punctuation">,</span> field <span class="token keyword">in</span> fields<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        properties<span class="token punctuation">[</span>field_name<span class="token punctuation">]</span> <span class="token operator">=</span> python_type_to_schema<span class="token punctuation">(</span>field<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> field<span class="token punctuation">.</span>required<span class="token punctuation">:</span>
+            required<span class="token punctuation">.</span>append<span class="token punctuation">(</span>field_name<span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> <span class="token punctuation">{</span>
+        <span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"object"</span><span class="token punctuation">,</span>
+        <span class="token string">"properties"</span><span class="token punctuation">:</span> properties<span class="token punctuation">,</span>
+        <span class="token string">"required"</span><span class="token punctuation">:</span> required<span class="token punctuation">,</span>
+    <span class="token punctuation">}</span></code></pre>
+</figure>
+<h3 id="step-3-constrained-token-filter" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-constrained-token-filter" aria-label="Link to this section">#</a>Step 3: Constrained Token Filter</h3>
+<p>Simulate constrained decoding. Given a partial JSON string and a schema, determine which token categories are valid at the current position.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">next_valid_tokens</span><span class="token punctuation">(</span>partial_json<span class="token punctuation">,</span> schema<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    stripped <span class="token operator">=</span> partial_json<span class="token punctuation">.</span>strip<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">if</span> <span class="token keyword">not</span> stripped<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token string">"{"</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        json<span class="token punctuation">.</span>loads<span class="token punctuation">(</span>stripped<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token string">"&lt;EOS>"</span><span class="token punctuation">]</span>
+    <span class="token keyword">except</span> json<span class="token punctuation">.</span>JSONDecodeError<span class="token punctuation">:</span>
+        <span class="token keyword">pass</span>
+
+    last_char <span class="token operator">=</span> stripped<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token keyword">if</span> stripped <span class="token keyword">else</span> <span class="token string">""</span>
+
+    <span class="token keyword">if</span> last_char <span class="token operator">==</span> <span class="token string">"{"</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token string">'"'</span><span class="token punctuation">,</span> <span class="token string">"}"</span><span class="token punctuation">]</span>
+    <span class="token keyword">elif</span> last_char <span class="token operator">==</span> <span class="token string">'"'</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> stripped<span class="token punctuation">.</span>endswith<span class="token punctuation">(</span><span class="token string">'":'</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token string">'"'</span><span class="token punctuation">,</span> <span class="token string">"0-9"</span><span class="token punctuation">,</span> <span class="token string">"true"</span><span class="token punctuation">,</span> <span class="token string">"false"</span><span class="token punctuation">,</span> <span class="token string">"null"</span><span class="token punctuation">,</span> <span class="token string">"["</span><span class="token punctuation">,</span> <span class="token string">"{"</span><span class="token punctuation">]</span>
+        <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token string">"a-z"</span><span class="token punctuation">,</span> <span class="token string">'"'</span><span class="token punctuation">]</span>
+    <span class="token keyword">elif</span> last_char <span class="token operator">==</span> <span class="token string">":"</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token string">" "</span><span class="token punctuation">,</span> <span class="token string">'"'</span><span class="token punctuation">,</span> <span class="token string">"0-9"</span><span class="token punctuation">,</span> <span class="token string">"true"</span><span class="token punctuation">,</span> <span class="token string">"false"</span><span class="token punctuation">,</span> <span class="token string">"null"</span><span class="token punctuation">,</span> <span class="token string">"["</span><span class="token punctuation">,</span> <span class="token string">"{"</span><span class="token punctuation">]</span>
+    <span class="token keyword">elif</span> last_char <span class="token operator">==</span> <span class="token string">","</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token string">" "</span><span class="token punctuation">,</span> <span class="token string">'"'</span><span class="token punctuation">,</span> <span class="token string">"{"</span><span class="token punctuation">,</span> <span class="token string">"["</span><span class="token punctuation">]</span>
+    <span class="token keyword">elif</span> last_char <span class="token keyword">in</span> <span class="token string">"0123456789"</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token string">"0-9"</span><span class="token punctuation">,</span> <span class="token string">"."</span><span class="token punctuation">,</span> <span class="token string">","</span><span class="token punctuation">,</span> <span class="token string">"}"</span><span class="token punctuation">,</span> <span class="token string">"]"</span><span class="token punctuation">]</span>
+    <span class="token keyword">elif</span> last_char <span class="token operator">==</span> <span class="token string">"}"</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token string">","</span><span class="token punctuation">,</span> <span class="token string">"}"</span><span class="token punctuation">,</span> <span class="token string">"]"</span><span class="token punctuation">,</span> <span class="token string">"&lt;EOS>"</span><span class="token punctuation">]</span>
+    <span class="token keyword">elif</span> last_char <span class="token operator">==</span> <span class="token string">"]"</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token string">","</span><span class="token punctuation">,</span> <span class="token string">"}"</span><span class="token punctuation">,</span> <span class="token string">"&lt;EOS>"</span><span class="token punctuation">]</span>
+    <span class="token keyword">elif</span> last_char <span class="token operator">==</span> <span class="token string">"["</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token string">'"'</span><span class="token punctuation">,</span> <span class="token string">"0-9"</span><span class="token punctuation">,</span> <span class="token string">"true"</span><span class="token punctuation">,</span> <span class="token string">"false"</span><span class="token punctuation">,</span> <span class="token string">"null"</span><span class="token punctuation">,</span> <span class="token string">"{"</span><span class="token punctuation">,</span> <span class="token string">"["</span><span class="token punctuation">,</span> <span class="token string">"]"</span><span class="token punctuation">]</span>
+    <span class="token keyword">else</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token string">"any"</span><span class="token punctuation">]</span>
+
+<span class="token keyword">def</span> <span class="token function">demonstrate_constrained_decoding</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    partial_states <span class="token operator">=</span> <span class="token punctuation">[</span>
+        <span class="token string">''</span><span class="token punctuation">,</span>
+        <span class="token string">'{'</span><span class="token punctuation">,</span>
+        <span class="token string">'{"product"'</span><span class="token punctuation">,</span>
+        <span class="token string">'{"product":'</span><span class="token punctuation">,</span>
+        <span class="token string">'{"product": "Sony"'</span><span class="token punctuation">,</span>
+        <span class="token string">'{"product": "Sony",'</span><span class="token punctuation">,</span>
+        <span class="token string">'{"product": "Sony", "price":'</span><span class="token punctuation">,</span>
+        <span class="token string">'{"product": "Sony", "price": 348'</span><span class="token punctuation">,</span>
+        <span class="token string">'{"product": "Sony", "price": 348}'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'Partial JSON'</span><span class="token punctuation">:</span><span class="token format-spec">&lt;45</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'Valid Next Tokens'</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"-"</span> <span class="token operator">*</span> <span class="token number">80</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> state <span class="token keyword">in</span> partial_states<span class="token punctuation">:</span>
+        valid <span class="token operator">=</span> next_valid_tokens<span class="token punctuation">(</span>state<span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+        display <span class="token operator">=</span> state <span class="token keyword">if</span> state <span class="token keyword">else</span> <span class="token string">"(empty)"</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>display<span class="token punctuation">:</span><span class="token format-spec">&lt;45</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span>valid<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h3 id="step-4-extraction-pipeline" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-extraction-pipeline" aria-label="Link to this section">#</a>Step 4: Extraction Pipeline</h3>
+<p>Combine everything into an extraction pipeline: define a schema, simulate an LLM producing structured output, validate the output, and handle retries.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">simulate_llm_extraction</span><span class="token punctuation">(</span>text<span class="token punctuation">,</span> schema<span class="token punctuation">,</span> attempt<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> <span class="token string">"headphones"</span> <span class="token keyword">in</span> text<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">or</span> <span class="token string">"sony"</span> <span class="token keyword">in</span> text<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> attempt <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+            <span class="token keyword">return</span> <span class="token string">'{"product": "Sony WH-1000XM5", "price": 348.00, "in_stock": true, "categories": ["audio", "headphones"]}'</span>
+        <span class="token keyword">return</span> <span class="token string">'{"product": "Sony WH-1000XM5", "price": 348.00, "in_stock": true}'</span>
+
+    <span class="token keyword">if</span> <span class="token string">"laptop"</span> <span class="token keyword">in</span> text<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token string">'{"product": "MacBook Pro 16", "price": 2499.00, "in_stock": false, "categories": ["computers"]}'</span>
+
+    <span class="token keyword">return</span> <span class="token string">'{"product": "Unknown", "price": 0, "in_stock": false}'</span>
+
+<span class="token keyword">def</span> <span class="token function">extract_with_retry</span><span class="token punctuation">(</span>text<span class="token punctuation">,</span> schema<span class="token punctuation">,</span> max_retries<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">for</span> attempt <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>max_retries<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        raw <span class="token operator">=</span> simulate_llm_extraction<span class="token punctuation">(</span>text<span class="token punctuation">,</span> schema<span class="token punctuation">,</span> attempt<span class="token punctuation">)</span>
+
+        <span class="token keyword">try</span><span class="token punctuation">:</span>
+            data <span class="token operator">=</span> json<span class="token punctuation">.</span>loads<span class="token punctuation">(</span>raw<span class="token punctuation">)</span>
+        <span class="token keyword">except</span> json<span class="token punctuation">.</span>JSONDecodeError <span class="token keyword">as</span> e<span class="token punctuation">:</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Attempt </span><span class="token interpolation"><span class="token punctuation">{</span>attempt <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">}</span></span><span class="token string">: JSON parse error -- </span><span class="token interpolation"><span class="token punctuation">{</span>e<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+            <span class="token keyword">continue</span>
+
+        errors <span class="token operator">=</span> validate_schema<span class="token punctuation">(</span>data<span class="token punctuation">,</span> schema<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> <span class="token keyword">not</span> errors<span class="token punctuation">:</span>
+            <span class="token keyword">return</span> data
+
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Attempt </span><span class="token interpolation"><span class="token punctuation">{</span>attempt <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">}</span></span><span class="token string">: Schema validation errors -- </span><span class="token interpolation"><span class="token punctuation">{</span>errors<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> <span class="token boolean">None</span>
+
+product_schema <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"object"</span><span class="token punctuation">,</span>
+    <span class="token string">"properties"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        <span class="token string">"product"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"string"</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token string">"price"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"number"</span><span class="token punctuation">,</span> <span class="token string">"minimum"</span><span class="token punctuation">:</span> <span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token string">"in_stock"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"boolean"</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token string">"categories"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"array"</span><span class="token punctuation">,</span> <span class="token string">"items"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"string"</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token string">"required"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">"product"</span><span class="token punctuation">,</span> <span class="token string">"price"</span><span class="token punctuation">,</span> <span class="token string">"in_stock"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<h3 id="step-5-run-the-full-pipeline" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-run-the-full-pipeline" aria-label="Link to this section">#</a>Step 5: Run the Full Pipeline</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">run_demo</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">60</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"  Structured Output Pipeline Demo"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">60</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n--- Schema Definition ---"</span><span class="token punctuation">)</span>
+    product_fields <span class="token operator">=</span> <span class="token punctuation">{</span>
+        <span class="token string">"product"</span><span class="token punctuation">:</span> SchemaField<span class="token punctuation">(</span><span class="token builtin">str</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token string">"price"</span><span class="token punctuation">:</span> SchemaField<span class="token punctuation">(</span><span class="token builtin">float</span><span class="token punctuation">,</span> minimum<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token string">"in_stock"</span><span class="token punctuation">:</span> SchemaField<span class="token punctuation">(</span><span class="token builtin">bool</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token string">"categories"</span><span class="token punctuation">:</span> SchemaField<span class="token punctuation">(</span><span class="token builtin">list</span><span class="token punctuation">,</span> required<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span>
+    generated_schema <span class="token operator">=</span> model_to_schema<span class="token punctuation">(</span><span class="token string">"Product"</span><span class="token punctuation">,</span> product_fields<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span>json<span class="token punctuation">.</span>dumps<span class="token punctuation">(</span>generated_schema<span class="token punctuation">,</span> indent<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n--- Schema Validation ---"</span><span class="token punctuation">)</span>
+    test_cases <span class="token operator">=</span> <span class="token punctuation">[</span>
+        <span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"product"</span><span class="token punctuation">:</span> <span class="token string">"Test"</span><span class="token punctuation">,</span> <span class="token string">"price"</span><span class="token punctuation">:</span> <span class="token number">10.0</span><span class="token punctuation">,</span> <span class="token string">"in_stock"</span><span class="token punctuation">:</span> <span class="token boolean">True</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token string">"Valid object"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"product"</span><span class="token punctuation">:</span> <span class="token string">"Test"</span><span class="token punctuation">,</span> <span class="token string">"price"</span><span class="token punctuation">:</span> <span class="token operator">-</span><span class="token number">5.0</span><span class="token punctuation">,</span> <span class="token string">"in_stock"</span><span class="token punctuation">:</span> <span class="token boolean">True</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token string">"Negative price"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"product"</span><span class="token punctuation">:</span> <span class="token string">"Test"</span><span class="token punctuation">,</span> <span class="token string">"in_stock"</span><span class="token punctuation">:</span> <span class="token boolean">True</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token string">"Missing price"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"product"</span><span class="token punctuation">:</span> <span class="token string">"Test"</span><span class="token punctuation">,</span> <span class="token string">"price"</span><span class="token punctuation">:</span> <span class="token string">"ten"</span><span class="token punctuation">,</span> <span class="token string">"in_stock"</span><span class="token punctuation">:</span> <span class="token boolean">True</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token string">"String as price"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">(</span><span class="token string">"not an object"</span><span class="token punctuation">,</span> <span class="token string">"String instead of object"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span>
+
+    <span class="token keyword">for</span> data<span class="token punctuation">,</span> label <span class="token keyword">in</span> test_cases<span class="token punctuation">:</span>
+        errors <span class="token operator">=</span> validate_schema<span class="token punctuation">(</span>data<span class="token punctuation">,</span> product_schema<span class="token punctuation">)</span>
+        status <span class="token operator">=</span> <span class="token string">"PASS"</span> <span class="token keyword">if</span> <span class="token keyword">not</span> errors <span class="token keyword">else</span> <span class="token string-interpolation"><span class="token string">f"FAIL: </span><span class="token interpolation"><span class="token punctuation">{</span>errors<span class="token punctuation">}</span></span><span class="token string">"</span></span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  </span><span class="token interpolation"><span class="token punctuation">{</span>label<span class="token punctuation">}</span></span><span class="token string">: </span><span class="token interpolation"><span class="token punctuation">{</span>status<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n--- Constrained Decoding Simulation ---"</span><span class="token punctuation">)</span>
+    demonstrate_constrained_decoding<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n--- Extraction Pipeline ---"</span><span class="token punctuation">)</span>
+    texts <span class="token operator">=</span> <span class="token punctuation">[</span>
+        <span class="token string">"The Sony WH-1000XM5 headphones are priced at $348 and currently available."</span><span class="token punctuation">,</span>
+        <span class="token string">"The new MacBook Pro 16-inch laptop costs $2499 but is sold out."</span><span class="token punctuation">,</span>
+        <span class="token string">"This is a random sentence with no product info."</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span>
+
+    <span class="token keyword">for</span> text <span class="token keyword">in</span> texts<span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"\n  Input: </span><span class="token interpolation"><span class="token punctuation">{</span>text<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token format-spec">60]</span><span class="token punctuation">}</span></span><span class="token string">..."</span></span><span class="token punctuation">)</span>
+        result <span class="token operator">=</span> extract_with_retry<span class="token punctuation">(</span>text<span class="token punctuation">,</span> product_schema<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> result<span class="token punctuation">:</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Output: </span><span class="token interpolation"><span class="token punctuation">{</span>json<span class="token punctuation">.</span>dumps<span class="token punctuation">(</span>result<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Output: FAILED after retries"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<h3 id="openai-structured-outputs" class="prose-h prose-h3"><a class="prose-h__anchor" href="#openai-structured-outputs" aria-label="Link to this section">#</a>OpenAI Structured Outputs</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token comment"># from openai import OpenAI</span>
+<span class="token comment"># from pydantic import BaseModel</span>
+<span class="token comment">#</span>
+<span class="token comment"># client = OpenAI()</span>
+<span class="token comment">#</span>
+<span class="token comment"># class Product(BaseModel):</span>
+<span class="token comment">#     product: str</span>
+<span class="token comment">#     price: float</span>
+<span class="token comment">#     in_stock: bool</span>
+<span class="token comment">#</span>
+<span class="token comment"># response = client.beta.chat.completions.parse(</span>
+<span class="token comment">#     model="gpt-5-mini",</span>
+<span class="token comment">#     messages=[</span>
+<span class="token comment">#         {"role": "system", "content": "Extract product information."},</span>
+<span class="token comment">#         {"role": "user", "content": "Sony WH-1000XM5, $348, in stock"},</span>
+<span class="token comment">#     ],</span>
+<span class="token comment">#     response_format=Product,</span>
+<span class="token comment"># )</span>
+<span class="token comment">#</span>
+<span class="token comment"># product = response.choices[0].message.parsed</span>
+<span class="token comment"># print(product.product, product.price, product.in_stock)</span></code></pre>
+</figure>
+<p>OpenAI&#39;s structured output mode uses constrained decoding internally. Every token the model generates is guaranteed to produce output matching the Pydantic schema. No retries needed. No validation needed. The constraint is baked into the decoding process.</p>
+<h3 id="anthropic-tool-use" class="prose-h prose-h3"><a class="prose-h__anchor" href="#anthropic-tool-use" aria-label="Link to this section">#</a>Anthropic Tool Use</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token comment"># import anthropic</span>
+<span class="token comment">#</span>
+<span class="token comment"># client = anthropic.Anthropic()</span>
+<span class="token comment">#</span>
+<span class="token comment"># response = client.messages.create(</span>
+<span class="token comment">#     model="claude-opus-4-7",</span>
+<span class="token comment">#     max_tokens=1024,</span>
+<span class="token comment">#     tools=[{</span>
+<span class="token comment">#         "name": "extract_product",</span>
+<span class="token comment">#         "description": "Extract product information from text",</span>
+<span class="token comment">#         "input_schema": {</span>
+<span class="token comment">#             "type": "object",</span>
+<span class="token comment">#             "properties": {</span>
+<span class="token comment">#                 "product": {"type": "string"},</span>
+<span class="token comment">#                 "price": {"type": "number"},</span>
+<span class="token comment">#                 "in_stock": {"type": "boolean"},</span>
+<span class="token comment">#             },</span>
+<span class="token comment">#             "required": ["product", "price", "in_stock"],</span>
+<span class="token comment">#         },</span>
+<span class="token comment">#     }],</span>
+<span class="token comment">#     messages=[{"role": "user", "content": "Extract: Sony WH-1000XM5, $348, in stock"}],</span>
+<span class="token comment"># )</span></code></pre>
+</figure>
+<p>Anthropic achieves structured output through tool use. The model emits a tool call with structured arguments that match the input_schema. Same result, different API surface.</p>
+<h3 id="instructor-library" class="prose-h prose-h3"><a class="prose-h__anchor" href="#instructor-library" aria-label="Link to this section">#</a>Instructor Library</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token comment"># pip install instructor</span>
+<span class="token comment"># import instructor</span>
+<span class="token comment"># from openai import OpenAI</span>
+<span class="token comment"># from pydantic import BaseModel</span>
+<span class="token comment">#</span>
+<span class="token comment"># client = instructor.from_openai(OpenAI())</span>
+<span class="token comment">#</span>
+<span class="token comment"># class Product(BaseModel):</span>
+<span class="token comment">#     product: str</span>
+<span class="token comment">#     price: float</span>
+<span class="token comment">#     in_stock: bool</span>
+<span class="token comment">#</span>
+<span class="token comment"># product = client.chat.completions.create(</span>
+<span class="token comment">#     model="gpt-5-mini",</span>
+<span class="token comment">#     response_model=Product,</span>
+<span class="token comment">#     messages=[{"role": "user", "content": "Sony WH-1000XM5, $348, in stock"}],</span>
+<span class="token comment"># )</span></code></pre>
+</figure>
+<p>Instructor wraps any LLM client and adds automatic retries with validation. If the first attempt fails validation, it sends the errors back to the model as context and asks it to fix the output. This works with any provider, not just OpenAI.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces <code class="inline-code">outputs/prompt-structured-extractor.md</code> -- a reusable prompt template that extracts structured data from any text given a schema definition. Feed it a JSON Schema and unstructured text, and it returns validated JSON.</p>
+<p>It also produces <code class="inline-code">outputs/skill-structured-outputs.md</code> -- a decision framework for choosing the right structured output strategy based on your provider, reliability requirements, and schema complexity.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p>Extend the schema validator to support <code class="inline-code">oneOf</code> (the data must match exactly one of several schemas). This handles polymorphic outputs -- for example, a field that can be either a <code class="inline-code">Product</code> or a <code class="inline-code">Service</code> object with different shapes.</p>
+</li>
+<li><p>Build a &quot;schema diff&quot; tool that compares two schemas and identifies breaking changes (removed required fields, changed types) versus non-breaking changes (added optional fields, relaxed constraints). This is essential for versioning your extraction schemas in production.</p>
+</li>
+<li><p>Implement a more realistic constrained decoding simulator. Given a JSON Schema and a vocabulary of 100 tokens (letters, digits, punctuation, keywords), walk through generation step by step, masking invalid tokens at each position. Measure what percentage of the vocabulary is valid at each step.</p>
+</li>
+<li><p>Build an extraction eval suite. Create 50 product descriptions with hand-labeled JSON outputs. Run your extraction pipeline on all 50 and measure exact match, field-level accuracy, and type compliance. Identify which fields are hardest to extract correctly.</p>
+</li>
+<li><p>Add &quot;confidence scores&quot; to your extraction pipeline. For each extracted field, estimate how confident the model is (based on token probabilities, or by running extraction 3 times and measuring consistency). Flag low-confidence fields for human review.</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>JSON mode</td>
+<td>&quot;Returns JSON&quot;</td>
+<td>API flag that guarantees syntactically valid JSON output, but does not enforce any particular schema</td>
+</tr>
+<tr>
+<td>Structured output</td>
+<td>&quot;Typed JSON&quot;</td>
+<td>Output that matches a specific JSON Schema with correct keys, types, and constraints</td>
+</tr>
+<tr>
+<td>Constrained decoding</td>
+<td>&quot;Guided generation&quot;</td>
+<td>At each token position, mask out tokens that would produce invalid output -- guarantees 100% schema compliance</td>
+</tr>
+<tr>
+<td>JSON Schema</td>
+<td>&quot;A JSON template&quot;</td>
+<td>A declarative language for describing the structure, types, and constraints of JSON data (used by OpenAPI, JSON Forms, etc.)</td>
+</tr>
+<tr>
+<td>Pydantic</td>
+<td>&quot;Python dataclasses+&quot;</td>
+<td>Python library that defines data models with type validation, used by FastAPI and Instructor to generate JSON Schemas</td>
+</tr>
+<tr>
+<td>Function calling</td>
+<td>&quot;Tool use&quot;</td>
+<td>LLM outputs a structured function invocation (name + typed arguments) instead of free text -- OpenAI and Anthropic both support this</td>
+</tr>
+<tr>
+<td>Instructor</td>
+<td>&quot;Pydantic for LLMs&quot;</td>
+<td>Python library that wraps LLM clients to return validated Pydantic instances, with automatic retry on validation failure</td>
+</tr>
+<tr>
+<td>Token masking</td>
+<td>&quot;Filtering the vocabulary&quot;</td>
+<td>Setting specific token probabilities to zero during generation so the model cannot produce them</td>
+</tr>
+<tr>
+<td>Schema compliance</td>
+<td>&quot;Matches the shape&quot;</td>
+<td>The output has every required field, correct types, values within constraints, and no extra disallowed fields</td>
+</tr>
+<tr>
+<td>Retry loop</td>
+<td>&quot;Try again until it works&quot;</td>
+<td>Send validation errors back to the model and ask it to fix the output -- Instructor does this automatically, up to a configurable max</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://platform.openai.com/docs/guides/structured-outputs" target="_blank" rel="noopener">OpenAI Structured Outputs Guide</a> -- official documentation for JSON Schema-based constrained decoding in the OpenAI API</li>
+<li><a href="https://arxiv.org/abs/2307.09702" target="_blank" rel="noopener">Willard &amp; Louf, 2023 -- &quot;Efficient Guided Generation for Large Language Models&quot;</a> -- the Outlines paper, describing how to compile JSON Schemas into finite state machines for token-level constraints</li>
+<li><a href="https://python.useinstructor.com/" target="_blank" rel="noopener">Instructor documentation</a> -- the standard library for getting structured outputs from any LLM with Pydantic validation and retries</li>
+<li><a href="https://docs.anthropic.com/en/docs/tool-use" target="_blank" rel="noopener">Anthropic Tool Use Guide</a> -- how Claude implements structured output via tool use with JSON Schema input_schema</li>
+<li><a href="https://json-schema.org/" target="_blank" rel="noopener">JSON Schema specification</a> -- the full spec for the schema language used by every major structured output system</li>
+<li><a href="https://github.com/outlines-dev/outlines" target="_blank" rel="noopener">Outlines library</a> -- open-source constrained generation using regex and JSON Schema compiled to finite state machines</li>
+<li><a href="https://arxiv.org/abs/2411.15100" target="_blank" rel="noopener">Dong et al., &quot;XGrammar: Flexible and Efficient Structured Generation Engine for Large Language Models&quot; (MLSys 2025)</a> -- the current state-of-the-art grammar engine; pushdown-automaton compilation that masks tokens at ~100 ns / token.</li>
+<li><a href="https://arxiv.org/abs/2212.06094" target="_blank" rel="noopener">Beurer-Kellner et al., &quot;Prompting Is Programming: A Query Language for Large Language Models&quot; (LMQL)</a> -- the LMQL paper framing constrained decoding as a query language with type and value constraints.</li>
+<li><a href="https://github.com/guidance-ai/guidance" target="_blank" rel="noopener">Microsoft Guidance (framework docs)</a> -- template-driven constrained generation; vendor-agnostic complement to Outlines and XGrammar.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="02-few-shot-cot.html">
+  <span class="label">← Previous</span>
+  <b>Few-Shot, Chain-of-Thought, Tree-of-Thought</b>
+</a>
+      <a class="pager__item pager__item--next" href="04-embeddings.html">
+  <span class="label">Next →</span>
+  <b>Embeddings &amp; Vector Representations</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>9 minutes</b> of LLM Engineering behind you.</p>
+      <a class="btn btn--solid" href="04-embeddings.html">Continue to Embeddings &amp; Vector Representations →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#the-structured-output-spectrum">The Structured Output Spectrum</a></li><li class="mini__item mini__item--d3"><a href="#json-schema-the-contract-language">JSON Schema: The Contract Language</a></li><li class="mini__item mini__item--d3"><a href="#the-pydantic-pattern">The Pydantic Pattern</a></li><li class="mini__item mini__item--d3"><a href="#function-calling-tool-use">Function Calling / Tool Use</a></li><li class="mini__item mini__item--d3"><a href="#common-failure-modes">Common Failure Modes</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-json-schema-validator">Step 1: JSON Schema Validator</a></li><li class="mini__item mini__item--d3"><a href="#step-2-pydantic-style-model-to-schema">Step 2: Pydantic-Style Model to Schema</a></li><li class="mini__item mini__item--d3"><a href="#step-3-constrained-token-filter">Step 3: Constrained Token Filter</a></li><li class="mini__item mini__item--d3"><a href="#step-4-extraction-pipeline">Step 4: Extraction Pipeline</a></li><li class="mini__item mini__item--d3"><a href="#step-5-run-the-full-pipeline">Step 5: Run the Full Pipeline</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d3"><a href="#openai-structured-outputs">OpenAI Structured Outputs</a></li><li class="mini__item mini__item--d3"><a href="#anthropic-tool-use">Anthropic Tool Use</a></li><li class="mini__item mini__item--d3"><a href="#instructor-library">Instructor Library</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

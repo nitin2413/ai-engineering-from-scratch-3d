@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Production Serving Stack — KV Offloading and Cache-Aware Routing — Infrastructure &amp; Production — AIFS</title>
+<meta name="description" content="Infrastructure &amp; Production: Production Serving Stack — KV Offloading and Cache-Aware Routing. 4 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Production Serving Stack — KV Offloading and Cache-Aware Routing — Infrastructure &amp; Production — AIFS">
+<meta property="og:description" content="Infrastructure &amp; Production: Production Serving Stack — KV Offloading and Cache-Aware Routing. 4 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"zero-sharding":["../assets/figures/figures-infra.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-infra.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#C79BFF" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#C79BFF;--accent-ink:#111111"
+  data-lesson-id="infrastructure-and-production/18-vllm-production-stack-lmcache" data-module="infrastructure-and-production"
+  data-prev="17-disaggregated-prefill-decode.html" data-next="19-ai-gateways.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#C79BFF">
+        <span class="label">Phase 17</span>
+        <b>Infrastructure &amp; Production</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="infrastructure-and-production/01-managed-llm-platforms"><a href="01-managed-llm-platforms.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Managed LLM Platforms — Bedrock, Vertex AI, Azure OpenAI</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/02-inference-platform-economics"><a href="02-inference-platform-economics.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Inference Platform Economics — Fireworks, Together, Baseten, Modal, Replicate, Anyscale</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/03-gpu-autoscaling-kubernetes"><a href="03-gpu-autoscaling-kubernetes.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">GPU Autoscaling on Kubernetes — Karpenter, KAI Scheduler, Gang Scheduling</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/04-vllm-serving-internals"><a href="04-vllm-serving-internals.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Serving Engine Internals — PagedAttention, Continuous Batching, Chunked Prefill</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/05-eagle3-speculative-decoding"><a href="05-eagle3-speculative-decoding.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">EAGLE-3 Speculative Decoding in Production</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/06-sglang-radixattention"><a href="06-sglang-radixattention.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Prefix-Cache Serving — RadixAttention and KV Reuse</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/07-tensorrt-llm-blackwell"><a href="07-tensorrt-llm-blackwell.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Hardware-Specialized Inference Compilation — FP8 and NVFP4 on Blackwell</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/08-inference-metrics-goodput"><a href="08-inference-metrics-goodput.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Inference Metrics — TTFT, TPOT, ITL, Goodput, P99</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/09-production-quantization"><a href="09-production-quantization.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Production Quantization — AWQ, GPTQ, GGUF K-quants, FP8, MXFP4/NVFP4</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/10-cold-start-mitigation"><a href="10-cold-start-mitigation.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Cold Start Mitigation for Serverless LLMs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/11-multi-region-kv-locality"><a href="11-multi-region-kv-locality.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Multi-Region LLM Serving and KV Cache Locality</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/12-edge-inference"><a href="12-edge-inference.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Edge Inference — Apple Neural Engine, Qualcomm Hexagon, WebGPU/WebLLM, Jetson</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/13-llm-observability"><a href="13-llm-observability.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">LLM Observability Stack Selection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/14-prompt-semantic-caching"><a href="14-prompt-semantic-caching.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Prompt Caching and Semantic Caching Economics</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/15-batch-apis"><a href="15-batch-apis.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Batch APIs — the 50% Discount as Industry Standard</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/16-model-routing"><a href="16-model-routing.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Model Routing as a Cost-Reduction Primitive</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/17-disaggregated-prefill-decode"><a href="17-disaggregated-prefill-decode.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Disaggregated Prefill/Decode — NVIDIA Dynamo and llm-d</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/18-vllm-production-stack-lmcache"><a href="18-vllm-production-stack-lmcache.html" class="is-current">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Production Serving Stack — KV Offloading and Cache-Aware Routing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/19-ai-gateways"><a href="19-ai-gateways.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">AI Gateways — LiteLLM, Portkey, Kong AI Gateway, Bifrost</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/20-shadow-canary-progressive"><a href="20-shadow-canary-progressive.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Shadow Traffic, Canary Rollout, and Progressive Deployment for LLMs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/21-ab-testing-llm-features"><a href="21-ab-testing-llm-features.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">A/B Testing LLM Features — GrowthBook, Statsig, and the Vibes Problem</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/22-load-testing-llm-apis"><a href="22-load-testing-llm-apis.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Load Testing LLM APIs — Why k6 and Locust Lie</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/23-sre-for-ai"><a href="23-sre-for-ai.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">SRE for AI — Multi-Agent Incident Response, Runbooks, Predictive Detection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/24-chaos-engineering-llm"><a href="24-chaos-engineering-llm.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Chaos Engineering for LLM Production</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/25-security-secrets-audit"><a href="25-security-secrets-audit.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Security — Secrets, API Key Rotation, Audit Logs, Guardrails</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/26-compliance-frameworks"><a href="26-compliance-frameworks.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Compliance — SOC 2, HIPAA, GDPR, PCI-DSS, EU AI Act, ISO 42001</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/27-finops-llms"><a href="27-finops-llms.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">FinOps for LLMs — Unit Economics and Multi-Tenant Attribution</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/28-self-hosted-serving-selection"><a href="28-self-hosted-serving-selection.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">Self-Hosted Serving Selection — Matching Engine to Hardware and Scale</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Infrastructure &amp; Production</a></p>
+      <h1 class="page__title">Production Serving Stack — KV Offloading and Cache-Aware Routing</h1>
+      <p class="page__lede">A production serving stack wires router, engines, and observability into one Kubernetes deployment — and treats KV cache as a resource that can leave the GPU. KV offloading extracts KV cache out of GPU memory and reuses it across queries and engines (CPU DRAM, then disk/Ceph). vLLM's production-stack is the reference deployment; LMCache is the offloading layer. The vLLM 0.11.0 KV Offloading Connector (January 2026) makes this asynchronous and pluggable via the Connector API (v0.9.0+). The offload path is usually hidden from the request path, though cache misses and promotions can add end-to-end latency. LMCache is valuable even without shared prefixes — when a GPU runs out of KV slots, preempted requests can be restored from CPU instead of recomputing prefill. Published benchmarks on 16x H100 (80GB HBM) across 4 a3-highgpu-4g: when KV cache exceeds HBM, both native CPU offload and LMCache substantially improve throughput; at low KV footprint, all configs match baseline with small overhead.</p>
+      <div class="page__meta">
+        <span class="chip">4 min read</span>
+        <span class="chip">929 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Learn</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (stdlib, toy KV-spill simulator)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 17 · 04 (Serving Engine Internals), Phase 17 · 06 (SGLang/RadixAttention)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~60 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Diagram the vLLM production-stack layers: router, engines, KV offload, observability.</li>
+<li>Explain the KV Offloading Connector API (v0.9.0+) and how the 0.11.0 asynchronous path hides offload latency.</li>
+<li>Quantify when LMCache CPU-DRAM helps (KV &gt; HBM) vs adds overhead (KV small enough to fit HBM).</li>
+<li>Pick between native vLLM CPU offload and LMCache connector given deployment constraints.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Your vLLM serving shows GPUs at 100% HBM with preemption events whenever concurrency climbs. Requests get evicted, requeued, and you re-prefill the same 2K-token prompt four times in a minute. GPU compute is spent on redundant prefills; goodput is well below raw throughput.</p>
+<p>Adding more GPUs costs linearly. Adding more HBM is not possible. But CPU DRAM is cheap — one socket has 512 GB+ at latency orders of magnitude worse than HBM but fine for &quot;temporarily warm&quot; KV cache.</p>
+<p>LMCache extracts KV cache to CPU DRAM so preempted requests recover fast, and repeated prefixes across engines share cache without each engine re-prefilling.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="vllm-production-stack" class="prose-h prose-h3"><a class="prose-h__anchor" href="#vllm-production-stack" aria-label="Link to this section">#</a>vLLM production-stack</h3>
+<p><code class="inline-code">github.com/vllm-project/production-stack</code> is the reference Kubernetes deployment:</p>
+<ul>
+<li><strong>Router</strong> — cache-aware (Phase 17 · 11). Consumes KV events.</li>
+<li><strong>Engines</strong> — vLLM workers. One per GPU or per TP/PP group.</li>
+<li><strong>KV cache offload</strong> — LMCache deployment or native connector.</li>
+<li><strong>Observability</strong> — Prometheus scrape, Grafana dashboards, OTel traces.</li>
+<li><strong>Control plane</strong> — service discovery, config, rolling updates.</li>
+</ul>
+<p>Shipped as Helm chart + operator.</p>
+<h3 id="the-kv-offloading-connector-api-v0-9-0" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-kv-offloading-connector-api-v0-9-0" aria-label="Link to this section">#</a>The KV Offloading Connector API (v0.9.0+)</h3>
+<p>vLLM 0.9.0 introduced a Connector API for pluggable KV cache backends. Your engine offloads blocks to the connector; connector stores them (RAM, disk, object storage, LMCache). Request needs a block, connector loads it back.</p>
+<p>vLLM 0.11.0 (January 2026) adds an asynchronous offload path — offload can happen in the background so the engine does not block on it in the common case. End-to-end latency and throughput still depend on workload shape, KV cache hit rate, and system pressure; vLLM&#39;s own notes call out that custom-kernel offload can degrade throughput at low hit rates and that async scheduling has known interaction issues with speculative decoding.</p>
+<h3 id="native-cpu-offload-vs-lmcache" class="prose-h prose-h3"><a class="prose-h__anchor" href="#native-cpu-offload-vs-lmcache" aria-label="Link to this section">#</a>Native CPU offload vs LMCache</h3>
+<p><strong>Native vLLM CPU offload</strong>: engine-local. Stores KV blocks in host RAM. Fast to implement, zero network hop. Does not cross engines.</p>
+<p><strong>LMCache connector</strong>: cluster-scale. Stores blocks in a shared LMCache server (CPU DRAM + Ceph/S3 tier). Blocks are accessible to any engine. 16x H100 benchmarks published.</p>
+<p>Pick native when a single engine has HBM pressure. Pick LMCache when multiple engines share prefixes (RAG with common system prompts, multi-tenant with shared templates).</p>
+<h3 id="benchmark-behavior" class="prose-h prose-h3"><a class="prose-h__anchor" href="#benchmark-behavior" aria-label="Link to this section">#</a>Benchmark behavior</h3>
+<p>The 16x H100 (80 GB HBM) spread across 4 a3-highgpu-4g test:</p>
+<ul>
+<li>Low KV footprint (short prompts, low concurrency): all configs match baseline, LMCache adds ~3-5% overhead.</li>
+<li>Moderate footprint: LMCache starts to help on prefix reuse across engines.</li>
+<li>KV exceeds HBM: native CPU offload and LMCache both improve throughput substantially; LMCache larger gain because cross-engine sharing.</li>
+</ul>
+<h3 id="when-lmcache-is-decisive" class="prose-h prose-h3"><a class="prose-h__anchor" href="#when-lmcache-is-decisive" aria-label="Link to this section">#</a>When LMCache is decisive</h3>
+<ul>
+<li>Multi-tenant serving where system prompts are shared across tenants.</li>
+<li>RAG where document chunks repeat across queries.</li>
+<li>Fine-tuned variants (LoRA) on the same base where base-model KV reuse cuts redundant work.</li>
+<li>Preemption-heavy workloads: restore from CPU cheaper than re-prefill.</li>
+</ul>
+<h3 id="when-not-to-enable" class="prose-h prose-h3"><a class="prose-h__anchor" href="#when-not-to-enable" aria-label="Link to this section">#</a>When NOT to enable</h3>
+<ul>
+<li>Small HBM pressure — you pay overhead without benefit.</li>
+<li>Short contexts (&lt;1K tokens) — transfer time &gt; re-prefill.</li>
+<li>Single-tenant single-prompt workload — no reuse to capture.</li>
+</ul>
+<h3 id="integration-with-disaggregated-serving" class="prose-h prose-h3"><a class="prose-h__anchor" href="#integration-with-disaggregated-serving" aria-label="Link to this section">#</a>Integration with disaggregated serving</h3>
+<p>Phase 17 · 17 disaggregated serving + LMCache compounds: KV transfers from prefill pool to decode pool land in LMCache if not used; subsequent queries pull from LMCache. Phase 17 · 11 cache-aware router can route to the engine whose local OR LMCache-shared cache matches.</p>
+<h3 id="numbers-you-should-remember" class="prose-h prose-h3"><a class="prose-h__anchor" href="#numbers-you-should-remember" aria-label="Link to this section">#</a>Numbers you should remember</h3>
+<ul>
+<li>vLLM 0.9.0: Connector API shipped.</li>
+<li>vLLM 0.11.0 (Jan 2026): asynchronous offload path; end-to-end latency impact depends on workload, KV hit rate, and system pressure (not an absolute guarantee).</li>
+<li>16x H100 benchmark: LMCache helps when KV footprint exceeds HBM.</li>
+<li>Small HBM pressure: 3-5% overhead without benefit.</li>
+</ul>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="zero-sharding"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">zero-sharding</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> zero sharding</figcaption>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p><code class="inline-code">code/main.py</code> simulates a preemption-heavy workload with and without LMCache. Reports re-prefills avoided, throughput gain, and the break-even HBM utilization.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces <code class="inline-code">outputs/skill-vllm-stack-decider.md</code>. Given workload shape and vLLM deployment, decides native vs LMCache vs neither.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li>Run <code class="inline-code">code/main.py</code>. At what HBM utilization does LMCache start paying?</li>
+<li>A tenant shares a 6K-token system prompt across 200 queries/hour. Compute expected LMCache savings per tenant.</li>
+<li>The LMCache server is a single point of failure. Design the HA strategy (replicas, fallback to native).</li>
+<li>LMCache stores to Ceph on spinning disk. For a 4K-token KV at 70B FP8 (500 MB), what&#39;s the read time vs re-prefill?</li>
+<li>Argue whether the vLLM 0.11.0 asynchronous path is &quot;free&quot; — where does the overhead hide?</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Production-stack</td>
+<td>&quot;the reference deployment&quot;</td>
+<td>vLLM&#39;s Kubernetes Helm chart + operator</td>
+</tr>
+<tr>
+<td>Connector API</td>
+<td>&quot;KV backend interface&quot;</td>
+<td>vLLM 0.9.0+ pluggable KV store interface</td>
+</tr>
+<tr>
+<td>Native CPU offload</td>
+<td>&quot;engine-local spill&quot;</td>
+<td>Store KV in host RAM of same engine</td>
+</tr>
+<tr>
+<td>LMCache</td>
+<td>&quot;cluster KV cache&quot;</td>
+<td>Cross-engine KV cache server on CPU DRAM + disk</td>
+</tr>
+<tr>
+<td>0.11.0 async</td>
+<td>&quot;non-blocking offload&quot;</td>
+<td>Offload hidden behind engine stream</td>
+</tr>
+<tr>
+<td>Preemption</td>
+<td>&quot;evict to make room&quot;</td>
+<td>KV cache shuffle when HBM full</td>
+</tr>
+<tr>
+<td>Prefix reuse</td>
+<td>&quot;same system prompt&quot;</td>
+<td>Multiple queries share beginning; cache hit</td>
+</tr>
+<tr>
+<td>Ceph tier</td>
+<td>&quot;disk tier&quot;</td>
+<td>Durable storage below DRAM in the cache hierarchy</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://blog.vllm.ai/2026/01/08/kv-offloading-connector.html" target="_blank" rel="noopener">vLLM Blog — KV Offloading Connector (Jan 2026)</a></li>
+<li><a href="https://github.com/vllm-project/production-stack" target="_blank" rel="noopener">vLLM Production Stack GitHub</a> — Helm chart + operator.</li>
+<li><a href="https://arxiv.org/html/2510.09665v2" target="_blank" rel="noopener">LMCache for Enterprise-Scale LLM Inference (arXiv:2510.09665)</a></li>
+<li><a href="https://github.com/LMCache/LMCache" target="_blank" rel="noopener">LMCache GitHub</a> — Connector implementation.</li>
+<li><a href="https://github.com/vllm-project/vllm/releases" target="_blank" rel="noopener">vLLM 0.11.0 release notes</a> — asynchronous path details.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="17-disaggregated-prefill-decode.html">
+  <span class="label">← Previous</span>
+  <b>Disaggregated Prefill/Decode — NVIDIA Dynamo and llm-d</b>
+</a>
+      <a class="pager__item pager__item--next" href="19-ai-gateways.html">
+  <span class="label">Next →</span>
+  <b>AI Gateways — LiteLLM, Portkey, Kong AI Gateway, Bifrost</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>4 minutes</b> of Infrastructure &amp; Production behind you.</p>
+      <a class="btn btn--solid" href="19-ai-gateways.html">Continue to AI Gateways — LiteLLM, Portkey, Kong AI Gateway, Bifrost →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#vllm-production-stack">vLLM production-stack</a></li><li class="mini__item mini__item--d3"><a href="#the-kv-offloading-connector-api-v0-9-0">The KV Offloading Connector API (v0.9.0+)</a></li><li class="mini__item mini__item--d3"><a href="#native-cpu-offload-vs-lmcache">Native CPU offload vs LMCache</a></li><li class="mini__item mini__item--d3"><a href="#benchmark-behavior">Benchmark behavior</a></li><li class="mini__item mini__item--d3"><a href="#when-lmcache-is-decisive">When LMCache is decisive</a></li><li class="mini__item mini__item--d3"><a href="#when-not-to-enable">When NOT to enable</a></li><li class="mini__item mini__item--d3"><a href="#integration-with-disaggregated-serving">Integration with disaggregated serving</a></li><li class="mini__item mini__item--d3"><a href="#numbers-you-should-remember">Numbers you should remember</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

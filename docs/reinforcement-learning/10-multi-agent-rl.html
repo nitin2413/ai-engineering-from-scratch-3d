@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Multi-Agent RL — Reinforcement Learning — AIFS</title>
+<meta name="description" content="Reinforcement Learning: Multi-Agent RL. 7 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Multi-Agent RL — Reinforcement Learning — AIFS">
+<meta property="og:description" content="Reinforcement Learning: Multi-Agent RL. 7 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"f3-marl-orbit":["../assets/figures/figures-foundations3.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-foundations3.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#FFB800" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#FFB800;--accent-ink:#111111"
+  data-lesson-id="reinforcement-learning/10-multi-agent-rl" data-module="reinforcement-learning"
+  data-prev="09-reward-modeling-rlhf.html" data-next="11-sim-to-real-transfer.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#FFB800">
+        <span class="label">Phase 09</span>
+        <b>Reinforcement Learning</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="reinforcement-learning/01-mdps-states-actions-rewards"><a href="01-mdps-states-actions-rewards.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">MDPs, States, Actions &amp; Rewards</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/02-dynamic-programming"><a href="02-dynamic-programming.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Dynamic Programming — Policy Iteration &amp; Value Iteration</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/03-monte-carlo-methods"><a href="03-monte-carlo-methods.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Monte Carlo Methods — Learning from Complete Episodes</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/04-q-learning-sarsa"><a href="04-q-learning-sarsa.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Temporal Difference — Q-Learning &amp; SARSA</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/05-dqn"><a href="05-dqn.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Deep Q-Networks (DQN)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/06-policy-gradients-reinforce"><a href="06-policy-gradients-reinforce.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Policy Gradient — REINFORCE from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/07-actor-critic-a2c-a3c"><a href="07-actor-critic-a2c-a3c.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Actor-Critic — A2C and A3C</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/08-ppo"><a href="08-ppo.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Proximal Policy Optimization (PPO)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/09-reward-modeling-rlhf"><a href="09-reward-modeling-rlhf.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Reward Modeling &amp; RLHF</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/10-multi-agent-rl"><a href="10-multi-agent-rl.html" class="is-current">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Multi-Agent RL</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/11-sim-to-real-transfer"><a href="11-sim-to-real-transfer.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Sim-to-Real Transfer</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/12-rl-for-games"><a href="12-rl-for-games.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">RL for Games — AlphaZero, MuZero, and the LLM-Reasoning Era</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Reinforcement Learning</a></p>
+      <h1 class="page__title">Multi-Agent RL</h1>
+      <p class="page__lede">Single-agent RL assumes the environment is stationary. Put two learning agents in the same world and that assumption breaks: each agent is part of the other's environment, and both are changing. Multi-agent RL is the set of tricks to make learning converge when the Markov assumption no longer holds.</p>
+      <div class="page__meta">
+        <span class="chip">7 min read</span>
+        <span class="chip">1,526 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 9 · 04 (Q-learning), Phase 9 · 06 (REINFORCE), Phase 9 · 07 (Actor-Critic)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~45 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>A robot learning to navigate a room is a single-agent RL problem. A soccer team is not. AlphaStar vs StarCraft opponents is not. A marketplace of bidding agents is not. Two cars negotiating a four-way stop is not. Many-on-many real-world problems are not.</p>
+<p>In every multi-agent setting, from the perspective of any one agent, the other agents <em>are</em> part of the environment. As they learn and change their behavior, the environment becomes non-stationary. The Markov property — &quot;next state depends only on current state and my action&quot; — gets violated because the next state also depends on what the <em>other</em> agents chose, and their policies are moving targets.</p>
+<p>This breaks tabular convergence proofs (Q-learning&#39;s guarantee assumes a stationary environment). It breaks naive deep RL too: agents chase each other in loops, never converge to a stable policy. You need multi-agent-specific techniques: centralized training / decentralized execution, counterfactual baselines, league play, self-play.</p>
+<p>2026 applications: robot swarms, traffic routing, autonomous vehicle fleets, market simulators, multi-agent LLM systems (Phase 16), and any game with more than one intelligent player.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<p><img src="assets/10-multi-agent-rl/marl.svg" alt="Four MARL regimes: indep, centralized critic, self-play, league" loading="lazy"></p>
+<p><strong>Formalism: Markov Game.</strong> A generalization of MDP: states <code class="inline-code">S</code>, a joint action <code class="inline-code">a = (a_1, …, a_n)</code>, transition <code class="inline-code">P(s' | s, a)</code>, and per-agent rewards <code class="inline-code">R_i(s, a, s')</code>. Each agent <code class="inline-code">i</code> maximizes its own return under its own policy <code class="inline-code">π_i</code>. If rewards are identical, it is <strong>fully cooperative</strong>. If zero-sum, it is <strong>adversarial</strong>. If mixed, it is <strong>general-sum</strong>.</p>
+<p><strong>Core challenges:</strong></p>
+<ul>
+<li><strong>Non-stationarity.</strong> <code class="inline-code">P(s' | s, a_i)</code> from agent <code class="inline-code">i</code>&#39;s view depends on <code class="inline-code">π_{-i}</code>, which is changing.</li>
+<li><strong>Credit assignment.</strong> With a shared reward, which agent caused it?</li>
+<li><strong>Exploration coordination.</strong> Agents must explore complementary strategies, not redundantly explore the same state.</li>
+<li><strong>Scalability.</strong> The joint action space grows exponentially in <code class="inline-code">n</code>.</li>
+<li><strong>Partial observability.</strong> Each agent sees only its own observation; the global state is hidden.</li>
+</ul>
+<p><strong>Four dominant regimes:</strong></p>
+<p><strong>1. Independent Q-learning / independent PPO (IQL, IPPO).</strong> Each agent learns its own Q or policy, treating others as part of the environment. Simple, sometimes it works (especially with experience replay acting as a smoothing agent-modeling trick). Theoretical convergence: none. In practice: fine for loosely-coupled tasks, bad for tightly-coupled ones.</p>
+<p><strong>2. Centralized training, decentralized execution (CTDE).</strong> Most common modern paradigm. Each agent has its own <em>policy</em> <code class="inline-code">π_i</code> that conditions on local observation <code class="inline-code">o_i</code> — standard decentralized execution at deployment. During <em>training</em>, a centralized critic <code class="inline-code">Q(s, a_1, …, a_n)</code> conditions on the full global state and joint action. Examples:</p>
+<ul>
+<li><strong>MADDPG</strong> (Lowe et al. 2017): DDPG with a centralized critic per agent.</li>
+<li><strong>COMA</strong> (Foerster et al. 2017): counterfactual baseline — ask &quot;what would my reward have been if I&#39;d taken action <code class="inline-code">a'</code> instead?&quot; — isolates my contribution.</li>
+<li><strong>MAPPO</strong> / <strong>IPPO</strong> with shared critic (Yu et al. 2022): PPO with a centralized value function. Dominant in 2026 for cooperative MARL.</li>
+<li><strong>QMIX</strong> (Rashid et al. 2018): value decomposition — <code class="inline-code">Q_tot(s, a) = f(Q_1(s, a_1), …, Q_n(s, a_n))</code> with monotonic mixing.</li>
+</ul>
+<p><strong>3. Self-play.</strong> Two copies of the same agent play each other. The opponent&#39;s policy <em>is</em> my policy from a past snapshot. AlphaGo / AlphaZero / MuZero. OpenAI Five. Works best for zero-sum games; the training signal is symmetric.</p>
+<p><strong>4. League play.</strong> An extension of self-play to general-sum / adversarial environments: keep a population of past and current policies, sample an opponent from the league, train against them. Adds exploiters (specialize in beating the current best) and main exploiters (specialize in beating exploiters). AlphaStar (StarCraft II). Needed when the game admits &quot;rock-paper-scissors&quot; strategy cycles.</p>
+<p><strong>Communication.</strong> Allow agents to send learned messages <code class="inline-code">m_i</code> to each other. Works in cooperative settings. Foerster et al. (2016) showed that differentiable inter-agent communication can be trained end-to-end. Today&#39;s LLM-based multi-agent systems (Phase 16) essentially communicate in natural language.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="f3-marl-orbit"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">f3-marl-orbit</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> f3 marl orbit</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<p>This lesson uses a 6×6 GridWorld with two cooperative agents. They start in opposite corners and must reach a shared goal. Shared reward: <code class="inline-code">-1</code> per step while either agent is still moving, <code class="inline-code">+10</code> when both arrive. See <code class="inline-code">code/main.py</code>.</p>
+<h3 id="step-1-the-multi-agent-env" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-the-multi-agent-env" aria-label="Link to this section">#</a>Step 1: the multi-agent env</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">CoopGridWorld</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>size <span class="token operator">=</span> <span class="token number">6</span>
+        self<span class="token punctuation">.</span>goal <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">reset</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span>  <span class="token comment"># two agents</span>
+
+    <span class="token keyword">def</span> <span class="token function">step</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> state<span class="token punctuation">,</span> actions<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        a1<span class="token punctuation">,</span> a2 <span class="token operator">=</span> state
+        new1 <span class="token operator">=</span> move<span class="token punctuation">(</span>a1<span class="token punctuation">,</span> actions<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+        new2 <span class="token operator">=</span> move<span class="token punctuation">(</span>a2<span class="token punctuation">,</span> actions<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+        done <span class="token operator">=</span> <span class="token punctuation">(</span>new1 <span class="token operator">==</span> self<span class="token punctuation">.</span>goal<span class="token punctuation">)</span> <span class="token keyword">and</span> <span class="token punctuation">(</span>new2 <span class="token operator">==</span> self<span class="token punctuation">.</span>goal<span class="token punctuation">)</span>
+        reward <span class="token operator">=</span> <span class="token number">10.0</span> <span class="token keyword">if</span> done <span class="token keyword">else</span> <span class="token operator">-</span><span class="token number">1.0</span>
+        <span class="token keyword">return</span> <span class="token punctuation">(</span>new1<span class="token punctuation">,</span> new2<span class="token punctuation">)</span><span class="token punctuation">,</span> reward<span class="token punctuation">,</span> done</code></pre>
+</figure>
+<p>The <em>joint</em> action space is <code class="inline-code">|A|² = 16</code>. The global state is two positions.</p>
+<h3 id="step-2-independent-q-learning" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-independent-q-learning" aria-label="Link to this section">#</a>Step 2: independent Q-learning</h3>
+<p>Each agent runs its own Q-table keyed on joint state. At each step: both pick ε-greedy actions, collect joint transition, each updates its own Q with the shared reward.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">independent_q</span><span class="token punctuation">(</span>env<span class="token punctuation">,</span> episodes<span class="token punctuation">,</span> alpha<span class="token punctuation">,</span> gamma<span class="token punctuation">,</span> epsilon<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    Q1<span class="token punctuation">,</span> Q2 <span class="token operator">=</span> defaultdict<span class="token punctuation">(</span>default_q<span class="token punctuation">)</span><span class="token punctuation">,</span> defaultdict<span class="token punctuation">(</span>default_q<span class="token punctuation">)</span>
+    <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>episodes<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        s <span class="token operator">=</span> env<span class="token punctuation">.</span>reset<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">while</span> <span class="token keyword">not</span> done<span class="token punctuation">:</span>
+            a1 <span class="token operator">=</span> epsilon_greedy<span class="token punctuation">(</span>Q1<span class="token punctuation">,</span> s<span class="token punctuation">,</span> epsilon<span class="token punctuation">)</span>
+            a2 <span class="token operator">=</span> epsilon_greedy<span class="token punctuation">(</span>Q2<span class="token punctuation">,</span> s<span class="token punctuation">,</span> epsilon<span class="token punctuation">)</span>
+            s_next<span class="token punctuation">,</span> r<span class="token punctuation">,</span> done <span class="token operator">=</span> env<span class="token punctuation">.</span>step<span class="token punctuation">(</span>s<span class="token punctuation">,</span> <span class="token punctuation">(</span>a1<span class="token punctuation">,</span> a2<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            target1 <span class="token operator">=</span> r <span class="token operator">+</span> gamma <span class="token operator">*</span> <span class="token builtin">max</span><span class="token punctuation">(</span>Q1<span class="token punctuation">[</span>s_next<span class="token punctuation">]</span><span class="token punctuation">.</span>values<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            target2 <span class="token operator">=</span> r <span class="token operator">+</span> gamma <span class="token operator">*</span> <span class="token builtin">max</span><span class="token punctuation">(</span>Q2<span class="token punctuation">[</span>s_next<span class="token punctuation">]</span><span class="token punctuation">.</span>values<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            Q1<span class="token punctuation">[</span>s<span class="token punctuation">]</span><span class="token punctuation">[</span>a1<span class="token punctuation">]</span> <span class="token operator">+=</span> alpha <span class="token operator">*</span> <span class="token punctuation">(</span>target1 <span class="token operator">-</span> Q1<span class="token punctuation">[</span>s<span class="token punctuation">]</span><span class="token punctuation">[</span>a1<span class="token punctuation">]</span><span class="token punctuation">)</span>
+            Q2<span class="token punctuation">[</span>s<span class="token punctuation">]</span><span class="token punctuation">[</span>a2<span class="token punctuation">]</span> <span class="token operator">+=</span> alpha <span class="token operator">*</span> <span class="token punctuation">(</span>target2 <span class="token operator">-</span> Q2<span class="token punctuation">[</span>s<span class="token punctuation">]</span><span class="token punctuation">[</span>a2<span class="token punctuation">]</span><span class="token punctuation">)</span>
+            s <span class="token operator">=</span> s_next</code></pre>
+</figure>
+<p>Works on this task because rewards are dense and aligned. Fails on tightly-coupled tasks (e.g., where one agent has to <em>wait</em> for the other).</p>
+<h3 id="step-3-centralized-q-with-decomposed-value-update" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-centralized-q-with-decomposed-value-update" aria-label="Link to this section">#</a>Step 3: centralized Q with decomposed-value update</h3>
+<p>Use one Q over joint actions <code class="inline-code">Q(s, a_1, a_2)</code>. Update from shared reward. Decentralize at execution by marginalizing: <code class="inline-code">π_i(s) = argmax_{a_i} max_{a_{-i}} Q(s, a_1, a_2)</code>. Trades exponential joint action space for a <em>correct</em> global view.</p>
+<h3 id="step-4-simple-self-play-adversarial-2-agent" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-simple-self-play-adversarial-2-agent" aria-label="Link to this section">#</a>Step 4: simple self-play (adversarial 2-agent)</h3>
+<p>Same agent, two roles. Train agent A against agent B; after <code class="inline-code">K</code> episodes, copy A&#39;s weights into B. Symmetric training, consistent progress. The AlphaZero recipe in miniature.</p>
+<h2 id="pitfalls" class="prose-h prose-h2"><a class="prose-h__anchor" href="#pitfalls" aria-label="Link to this section">#</a>Pitfalls</h2>
+<ul>
+<li><strong>Non-stationary replay.</strong> Experience replay with independent agents is worse than single-agent because old transitions were generated by now-obsolete opponents. Fix: relabel or weight by recency.</li>
+<li><strong>Credit assignment ambiguity.</strong> Shared reward after a long episode; no clear way to say which agent contributed. Fix: counterfactual baselines (COMA), or reward shaping per agent.</li>
+<li><strong>Policy drift / chasing.</strong> Each agent&#39;s best response changes with each other&#39;s update. Fix: centralized critic, slow learning rates, or freeze-one-at-a-time.</li>
+<li><strong>Reward hacking via coordination.</strong> Agents find coordinated exploits the designer did not anticipate. Auction agents converge to bid zero. Fix: careful reward design, behavioral constraints.</li>
+<li><strong>Exploration redundancy.</strong> Both agents explore the same state-action pairs. Fix: entropy bonuses per-agent, or role-conditioning.</li>
+<li><strong>League cycles.</strong> Pure self-play can get stuck in a dominance cycle. Fix: league play with diverse opponents.</li>
+<li><strong>Sample explosion.</strong> <code class="inline-code">n</code> agents × state space × joint actions. Approximate with function approximation; factored action spaces (one policy output head per agent).</li>
+</ul>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>The 2026 MARL application map:</p>
+<table>
+<thead>
+<tr>
+<th>Domain</th>
+<th>Method</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Cooperative navigation / manipulation</td>
+<td>MAPPO / QMIX</td>
+<td>CTDE; shared critic + decentralized actors.</td>
+</tr>
+<tr>
+<td>Two-player games (chess, Go, poker)</td>
+<td>Self-play with MCTS (AlphaZero)</td>
+<td>Zero-sum; symmetric training.</td>
+</tr>
+<tr>
+<td>Complex multiplayer (Dota, StarCraft)</td>
+<td>League play + imitation pretraining</td>
+<td>OpenAI Five, AlphaStar.</td>
+</tr>
+<tr>
+<td>Autonomous-vehicle fleets</td>
+<td>CTDE MAPPO / PPO with attention</td>
+<td>Partial obs; variable team sizes.</td>
+</tr>
+<tr>
+<td>Auction markets</td>
+<td>Game-theoretic equilibrium + RL</td>
+<td>Mean-field RL when <code class="inline-code">n</code> → ∞.</td>
+</tr>
+<tr>
+<td>LLM multi-agent systems (Phase 16)</td>
+<td>Natural-language comm + role conditioning</td>
+<td>RL loop at the agent-planning layer.</td>
+</tr>
+</tbody></table>
+<p>In 2026, MARL&#39;s biggest growth area is LLM-based: swarms of language-model agents negotiating, debating, building software. The RL shows up as preference optimization on <em>trajectory-level</em> outputs, not token-level (Phase 16 · 03).</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>Save as <code class="inline-code">outputs/skill-marl-architect.md</code>:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">markdown</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-markdown"><span class="token front-matter-block"><span class="token punctuation">---</span>
+<span class="token front-matter yaml language-yaml"><span class="token key atrule">name</span><span class="token punctuation">:</span> marl<span class="token punctuation">-</span>architect
+<span class="token key atrule">description</span><span class="token punctuation">:</span> Pick the right multi<span class="token punctuation">-</span>agent RL regime (IPPO<span class="token punctuation">,</span> CTDE<span class="token punctuation">,</span> self<span class="token punctuation">-</span>play<span class="token punctuation">,</span> league) for a given task.
+<span class="token key atrule">version</span><span class="token punctuation">:</span> 1.0.0
+<span class="token key atrule">phase</span><span class="token punctuation">:</span> <span class="token number">9</span>
+<span class="token key atrule">lesson</span><span class="token punctuation">:</span> <span class="token number">10</span>
+<span class="token key atrule">tags</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>rl<span class="token punctuation">,</span> multi<span class="token punctuation">-</span>agent<span class="token punctuation">,</span> marl<span class="token punctuation">,</span> self<span class="token punctuation">-</span>play<span class="token punctuation">]</span></span>
+<span class="token punctuation">---</span></span>
+
+Given a task with <span class="token code-snippet code keyword">`n`</span> agents, output:
+
+<span class="token list punctuation">1.</span> Regime classification. Cooperative / adversarial / general-sum. Justify.
+<span class="token list punctuation">2.</span> Algorithm. IPPO / MAPPO / QMIX / self-play / league. Reason tied to coupling tightness and reward structure.
+<span class="token list punctuation">3.</span> Information access. Centralized training (what global info goes to the critic)? Decentralized execution?
+<span class="token list punctuation">4.</span> Credit assignment. Counterfactual baseline, value decomposition, or reward shaping.
+<span class="token list punctuation">5.</span> Exploration plan. Per-agent entropy, population-based training, or league.
+
+Refuse independent Q-learning on tightly-coupled cooperative tasks. Refuse to recommend self-play for general-sum with cycle risks. Flag any MARL pipeline without a fixed-opponent eval (cherry-picked self-play numbers are common).</code></pre>
+</figure>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><strong>Easy.</strong> Train independent Q-learning on the 2-agent cooperative GridWorld. How many episodes until mean return &gt; 0? Plot the joint learning curve.</li>
+<li><strong>Medium.</strong> Add a &quot;coordination&quot; task: the goal is reached only when both agents step onto it on the same turn. Does independent Q still converge? What breaks?</li>
+<li><strong>Hard.</strong> Implement a centralized critic for MAPPO-style training and compare convergence speed to independent PPO on the coordination task.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Markov game</td>
+<td>&quot;Multi-agent MDP&quot;</td>
+<td><code class="inline-code">(S, A_1, …, A_n, P, R_1, …, R_n)</code>; each agent has its own reward.</td>
+</tr>
+<tr>
+<td>CTDE</td>
+<td>&quot;Centralized training, decentralized execution&quot;</td>
+<td>Joint critic at training time; each agent&#39;s policy uses only local obs.</td>
+</tr>
+<tr>
+<td>IPPO</td>
+<td>&quot;Independent PPO&quot;</td>
+<td>Each agent runs PPO separately. Simple baseline; often underrated.</td>
+</tr>
+<tr>
+<td>MAPPO</td>
+<td>&quot;Multi-agent PPO&quot;</td>
+<td>PPO with a centralized value function conditioned on global state.</td>
+</tr>
+<tr>
+<td>QMIX</td>
+<td>&quot;Monotonic value decomposition&quot;</td>
+<td><code class="inline-code">Q_tot = f_monotone(Q_1, …, Q_n)</code> allows decentralized argmax.</td>
+</tr>
+<tr>
+<td>COMA</td>
+<td>&quot;Counterfactual multi-agent&quot;</td>
+<td>Advantage = my Q minus expected Q marginalizing over my action.</td>
+</tr>
+<tr>
+<td>Self-play</td>
+<td>&quot;Agent vs past self&quot;</td>
+<td>Single agent, two roles; standard for zero-sum games.</td>
+</tr>
+<tr>
+<td>League play</td>
+<td>&quot;Population training&quot;</td>
+<td>Cache past policies, sample opponents from the pool; handles strategy cycles.</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/1706.02275" target="_blank" rel="noopener">Lowe et al. (2017). Multi-Agent Actor-Critic for Mixed Cooperative-Competitive Environments (MADDPG)</a> — CTDE with a centralized critic.</li>
+<li><a href="https://arxiv.org/abs/1705.08926" target="_blank" rel="noopener">Foerster et al. (2017). Counterfactual Multi-Agent Policy Gradients (COMA)</a> — counterfactual baselines for credit assignment.</li>
+<li><a href="https://arxiv.org/abs/1803.11485" target="_blank" rel="noopener">Rashid et al. (2018). QMIX: Monotonic Value Function Factorisation</a> — value decomposition with monotonicity.</li>
+<li><a href="https://arxiv.org/abs/2103.01955" target="_blank" rel="noopener">Yu et al. (2022). The Surprising Effectiveness of PPO in Cooperative Multi-Agent Games (MAPPO)</a> — PPO is surprisingly strong for MARL.</li>
+<li><a href="https://www.nature.com/articles/s41586-019-1724-z" target="_blank" rel="noopener">Vinyals et al. (2019). Grandmaster level in StarCraft II using multi-agent reinforcement learning (AlphaStar)</a> — league play at scale.</li>
+<li><a href="https://www.nature.com/articles/nature24270" target="_blank" rel="noopener">Silver et al. (2017). Mastering the game of Go without human knowledge (AlphaGo Zero)</a> — pure self-play in zero-sum games.</li>
+<li><a href="http://incompleteideas.net/book/RLbook2020.pdf" target="_blank" rel="noopener">Sutton &amp; Barto (2018). Ch. 15 — Neuroscience &amp; Ch. 17 — Frontiers</a> — includes the textbook&#39;s short treatment of multi-agent settings and the non-stationarity problem that CTDE is designed to solve.</li>
+<li><a href="https://arxiv.org/abs/1911.10635" target="_blank" rel="noopener">Zhang, Yang &amp; Başar (2021). Multi-Agent Reinforcement Learning: A Selective Overview</a> — survey covering cooperative, competitive, and mixed MARL with convergence results.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="09-reward-modeling-rlhf.html">
+  <span class="label">← Previous</span>
+  <b>Reward Modeling &amp; RLHF</b>
+</a>
+      <a class="pager__item pager__item--next" href="11-sim-to-real-transfer.html">
+  <span class="label">Next →</span>
+  <b>Sim-to-Real Transfer</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>7 minutes</b> of Reinforcement Learning behind you.</p>
+      <a class="btn btn--solid" href="11-sim-to-real-transfer.html">Continue to Sim-to-Real Transfer →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-the-multi-agent-env">Step 1: the multi-agent env</a></li><li class="mini__item mini__item--d3"><a href="#step-2-independent-q-learning">Step 2: independent Q-learning</a></li><li class="mini__item mini__item--d3"><a href="#step-3-centralized-q-with-decomposed-value-update">Step 3: centralized Q with decomposed-value update</a></li><li class="mini__item mini__item--d3"><a href="#step-4-simple-self-play-adversarial-2-agent">Step 4: simple self-play (adversarial 2-agent)</a></li><li class="mini__item mini__item--d2"><a href="#pitfalls">Pitfalls</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

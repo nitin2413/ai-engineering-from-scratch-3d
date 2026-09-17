@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>From CLIP to BLIP-2 — Q-Former as Modality Bridge — Multimodal AI — AIFS</title>
+<meta name="description" content="Multimodal AI: From CLIP to BLIP-2 — Q-Former as Modality Bridge. 7 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="From CLIP to BLIP-2 — Q-Former as Modality Bridge — Multimodal AI — AIFS">
+<meta property="og:description" content="Multimodal AI: From CLIP to BLIP-2 — Q-Former as Modality Bridge. 7 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"modality-projection":["../assets/figures/figures-multimodal.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-multimodal.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#FF8FB1" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#FF8FB1;--accent-ink:#111111"
+  data-lesson-id="multimodal-ai/03-blip2-qformer-bridge" data-module="multimodal-ai"
+  data-prev="02-clip-contrastive-pretraining.html" data-next="04-flamingo-gated-cross-attention.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#FF8FB1">
+        <span class="label">Phase 12</span>
+        <b>Multimodal AI</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="multimodal-ai/01-vision-transformer-patch-tokens"><a href="01-vision-transformer-patch-tokens.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Vision Transformers and the Patch-Token Primitive</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/02-clip-contrastive-pretraining"><a href="02-clip-contrastive-pretraining.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">CLIP and Contrastive Vision-Language Pretraining</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/03-blip2-qformer-bridge"><a href="03-blip2-qformer-bridge.html" class="is-current">
+  <span class="snav__n">03</span>
+  <span class="snav__t">From CLIP to BLIP-2 — Q-Former as Modality Bridge</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/04-flamingo-gated-cross-attention"><a href="04-flamingo-gated-cross-attention.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Flamingo and Gated Cross-Attention for Few-Shot VLMs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/05-llava-visual-instruction-tuning"><a href="05-llava-visual-instruction-tuning.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">LLaVA and Visual Instruction Tuning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/06-any-resolution-patch-n-pack"><a href="06-any-resolution-patch-n-pack.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Any-Resolution Vision: Patch-n'-Pack and NaFlex</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/07-open-weight-vlm-recipes"><a href="07-open-weight-vlm-recipes.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Open-Weight VLM Recipes: What Actually Matters</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/08-llava-onevision-single-multi-video"><a href="08-llava-onevision-single-multi-video.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">LLaVA-OneVision: Single-Image, Multi-Image, Video in One Model</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/09-qwen-vl-family-dynamic-fps"><a href="09-qwen-vl-family-dynamic-fps.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Qwen-VL Family and Dynamic-FPS Video</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/10-internvl3-native-multimodal"><a href="10-internvl3-native-multimodal.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">InternVL3: Native Multimodal Pretraining</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/11-chameleon-early-fusion-tokens"><a href="11-chameleon-early-fusion-tokens.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Chameleon and Early-Fusion Token-Only Multimodal Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/12-emu3-next-token-for-generation"><a href="12-emu3-next-token-for-generation.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Emu3: Next-Token Prediction for Image and Video Generation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/13-transfusion-autoregressive-diffusion"><a href="13-transfusion-autoregressive-diffusion.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Transfusion: Autoregressive Text + Diffusion Image in One Transformer</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/14-show-o-discrete-diffusion-unified"><a href="14-show-o-discrete-diffusion-unified.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Show-o and Discrete-Diffusion Unified Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/15-janus-pro-decoupled-encoders"><a href="15-janus-pro-decoupled-encoders.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Janus-Pro: Decoupled Encoders for Unified Multimodal Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/16-mio-any-to-any-streaming"><a href="16-mio-any-to-any-streaming.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">MIO and Any-to-Any Streaming Multimodal Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/17-video-language-temporal-grounding"><a href="17-video-language-temporal-grounding.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Video-Language Models: Temporal Tokens and Grounding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/18-long-video-million-token"><a href="18-long-video-million-token.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Long-Video Understanding at Million-Token Context</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/19-audio-language-whisper-to-af3"><a href="19-audio-language-whisper-to-af3.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">Audio-Language Models: the Whisper to Audio Flamingo 3 Arc</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/20-omni-models-thinker-talker"><a href="20-omni-models-thinker-talker.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Omni Models: Qwen2.5-Omni and the Thinker-Talker Split</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/21-embodied-vlas-openvla-pi0-groot"><a href="21-embodied-vlas-openvla-pi0-groot.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Embodied VLAs: RT-2, OpenVLA, π0, GR00T</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/22-document-diagram-understanding"><a href="22-document-diagram-understanding.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Document and Diagram Understanding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/23-colpali-vision-native-rag"><a href="23-colpali-vision-native-rag.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">ColPali and Vision-Native Document RAG</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/24-multimodal-rag-cross-modal"><a href="24-multimodal-rag-cross-modal.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Multimodal RAG and Cross-Modal Retrieval</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/25-multimodal-agents-computer-use"><a href="25-multimodal-agents-computer-use.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Multimodal Agents and Computer-Use (Capstone)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Multimodal AI</a></p>
+      <h1 class="page__title">From CLIP to BLIP-2 — Q-Former as Modality Bridge</h1>
+      <p class="page__lede">CLIP aligns image and text but cannot generate captions, answer questions, or hold a conversation. BLIP-2 (Salesforce, 2023) solved that with a small trainable bridge: 32 learnable query vectors attend over a frozen ViT's features via cross-attention, then slot directly into a frozen LLM's input stream. 188M parameters of bridge connected an 11B LLM to a ViT-g/14. Every adapter-based VLM through 2026 — MiniGPT-4, InstructBLIP, LLaVA's cousins — is a descendant. This lesson reads the Q-Former's architecture, explains its two-stage training, and builds a toy version that feeds visual tokens into a frozen text decoder.</p>
+      <div class="page__meta">
+        <span class="chip">7 min read</span>
+        <span class="chip">1,546 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (stdlib, cross-attention + learnable-query demo)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 12 · 02 (CLIP), Phase 7 (Transformers)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~180 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Explain why a trainable bottleneck between a frozen vision encoder and frozen LLM beats end-to-end finetuning in cost and stability.</li>
+<li>Implement a cross-attention block where a fixed set of learnable queries attend to external image features.</li>
+<li>Walk through BLIP-2&#39;s two-stage pretraining: representation (ITC + ITM + ITG) then generative (LM loss with frozen decoder).</li>
+<li>Compare Q-Former to the simpler MLP projector used in LLaVA and argue when each choice wins.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>You have a frozen ViT that produces 256 patch tokens of dim 1408 per image. You have a frozen 7B LLM that expects token embeddings of dim 4096. The obvious bridge — a linear layer from 1408 to 4096 — works, but feeding all 256 patch tokens into the LLM&#39;s context costs 256 extra tokens per image. Over a batch of 32 images that is 8192 tokens consumed by the visual modality alone.</p>
+<p>The BLIP-2 question: can you compress the 256-token image representation into far fewer tokens (say 32) while preserving enough information for the LLM to caption, answer questions, and reason about the image? And can you train this bridge without touching the frozen backbones, keeping the training cost at just the bridge&#39;s parameters?</p>
+<p>The answer: a Q-Former. 32 learnable &quot;query&quot; vectors that cross-attend to the ViT&#39;s patch tokens, producing a 32-token visual summary that the LLM consumes. 188M parameters total. Trained with contrastive, matching, and generative objectives before ever touching the LLM.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="learnable-queries" class="prose-h prose-h3"><a class="prose-h__anchor" href="#learnable-queries" aria-label="Link to this section">#</a>Learnable queries</h3>
+<p>The Q-Former&#39;s core trick: instead of letting the LLM&#39;s text tokens attend to image patches, introduce a new set of 32 learnable query vectors <code class="inline-code">Q</code> and let <em>them</em> attend to image patches. The queries are parameters of the model — they are learned during training and the same 32 queries are used for every image.</p>
+<p>After cross-attention, each query holds a compressed summary of the image — &quot;describe the main object&quot;, &quot;describe the background&quot;, &quot;count the objects&quot;, etc. The queries do not literally specialize on semantic labels; they learn whatever encoding makes downstream losses drop.</p>
+<h3 id="architecture" class="prose-h prose-h3"><a class="prose-h__anchor" href="#architecture" aria-label="Link to this section">#</a>Architecture</h3>
+<p>The Q-Former is a small transformer (12 layers, ~100M params) with two paths:</p>
+<ol>
+<li>Query path: 32 query vectors flow through self-attention (among themselves), then cross-attention over the frozen ViT&#39;s patch tokens, then FFN.</li>
+<li>Text path: a BERT-like text encoder shares the self-attention and FFN weights with the query path. Cross-attention is disabled for the text path.</li>
+</ol>
+<p>At training time both paths run. The queries and text interact through shared self-attention, which means the queries can condition on text for tasks that need it (ITM, ITG). At inference time for VLM handoff, only the queries flow through, yielding 32 visual tokens.</p>
+<h3 id="two-stage-training" class="prose-h prose-h3"><a class="prose-h__anchor" href="#two-stage-training" aria-label="Link to this section">#</a>Two-stage training</h3>
+<p>BLIP-2 pretrains in two stages:</p>
+<p>Stage 1: representation learning (no LLM). Three losses:</p>
+<ul>
+<li>ITC (image-text contrastive): CLIP-style contrastive between pooled query tokens and text CLS token.</li>
+<li>ITM (image-text matching): binary classifier — is this image-text pair a match? Hard-negative-mined.</li>
+<li>ITG (image-grounded text generation): causal LM head on text, conditioned on the queries. Forces queries to encode text-generatable content.</li>
+</ul>
+<p>Only the Q-Former trains. The ViT is frozen. No LLM involved.</p>
+<p>Stage 2: generative learning. Attach a frozen LLM (OPT-2.7B or Flan-T5-XL, etc.). Project the 32 query outputs to the LLM&#39;s embedding dim via a small linear layer. Prepend them to the text prompt. Train only the linear projection and the Q-Former on LM loss over the concatenated prompt + image + caption sequence.</p>
+<p>After stage 2, the Q-Former + projection is the full visual adapter. At inference: image → ViT → Q-Former → linear proj → prepended to text → frozen LLM emits output.</p>
+<h3 id="parameter-economics" class="prose-h prose-h3"><a class="prose-h__anchor" href="#parameter-economics" aria-label="Link to this section">#</a>Parameter economics</h3>
+<p>BLIP-2 with ViT-g/14 (1.1B, frozen) + OPT-6.7B (6.7B, frozen) + Q-Former (188M, trained) = 8B total, 188M trained. The Q-Former alone is ~2.4% of the full stack&#39;s parameters. Training cost reflects this: days on a handful of A100s vs weeks for end-to-end.</p>
+<p>Quality: BLIP-2 matches or beats Flamingo-80B on zero-shot VQA while being 50x smaller. The bridge works.</p>
+<h3 id="instructblip-and-the-instruction-aware-q-former" class="prose-h prose-h3"><a class="prose-h__anchor" href="#instructblip-and-the-instruction-aware-q-former" aria-label="Link to this section">#</a>InstructBLIP and the instruction-aware Q-Former</h3>
+<p>InstructBLIP (2023) extends the Q-Former with an extra input: the instruction text itself. At cross-attention time, the queries now have access to both the image patches and the instruction. The queries can specialize per-instruction (&quot;count the cars&quot;, &quot;describe the mood&quot;) rather than learning a single fixed summary. Benchmark gains on held-out tasks.</p>
+<h3 id="minigpt-4-and-the-projector-only-approach" class="prose-h prose-h3"><a class="prose-h__anchor" href="#minigpt-4-and-the-projector-only-approach" aria-label="Link to this section">#</a>MiniGPT-4 and the projector-only approach</h3>
+<p>MiniGPT-4 kept the Q-Former but trained only the output linear projection while freezing everything else. Cheap, but cost is quality — the queries were BLIP-2&#39;s, not yours. Good for rapid iteration, not the best architecture.</p>
+<h3 id="why-llava-went-simpler" class="prose-h prose-h3"><a class="prose-h__anchor" href="#why-llava-went-simpler" aria-label="Link to this section">#</a>Why LLaVA went simpler</h3>
+<p>LLaVA (2023, Lesson 12.05) replaced the Q-Former with a plain 2-layer MLP that projects every ViT patch token into LLM space — 576 tokens per image for a 24x24 grid, all fed to the LLM. Worse compression but lets the LLM attend over raw patches. At the time this was controversial; by late 2023 it was dominant because visual instruction data (LLaVA-Instruct-150k) proved that the MLP could be trained to preserve enough signal. The tradeoff: LLaVA&#39;s context fills faster, but it scales naturally to multi-image and video.</p>
+<p>By 2026 the field split: Q-Former survives where token budget matters (long video, many images); MLP projector dominates where raw quality per token is the priority.</p>
+<h3 id="gated-cross-attention-flamingo-the-ancestor" class="prose-h prose-h3"><a class="prose-h__anchor" href="#gated-cross-attention-flamingo-the-ancestor" aria-label="Link to this section">#</a>Gated cross-attention: Flamingo, the ancestor</h3>
+<p>Flamingo (Lesson 12.04) predated BLIP-2 and used the same cross-attention idea but at every frozen LLM layer, not as a single bridge. BLIP-2 showed you can compress to the input layer only and still work. Gemini and Idefics combine both: interleaved input tokens plus optional gated cross-attention for in-context few-shot.</p>
+<h3 id="the-2026-descendants" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-2026-descendants" aria-label="Link to this section">#</a>The 2026 descendants</h3>
+<ul>
+<li>Q-Former: BLIP-2, InstructBLIP, MiniGPT-4, and most video-language models for token budget reasons.</li>
+<li>Perceiver resampler: Flamingo&#39;s variant (Lesson 12.04); Idefics family, Eagle, OmniMAE.</li>
+<li>MLP projector: LLaVA, LLaVA-NeXT, LLaVA-OneVision, Cambrian-1.</li>
+<li>Attention pool: VILA, PaliGemma.</li>
+</ul>
+<p>All four are valid. The deciding question is whether you are constrained on token budget or on quality-per-token.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="modality-projection"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">modality-projection</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> modality projection</figcaption>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p><code class="inline-code">code/main.py</code> builds a stdlib Q-Former-style cross-attention:</p>
+<ol>
+<li>Simulate 256 image patch tokens (dim 128).</li>
+<li>Instantiate 32 learnable queries (dim 128).</li>
+<li>Run scaled-dot-product cross-attention (Q from queries, K/V from patches).</li>
+<li>Project to LLM-dim (512) via a linear layer.</li>
+<li>Output the 32 LLM-ready visual tokens.</li>
+</ol>
+<p>All math in pure Python (nested loops over vectors). Toy but correct shape. The attention-weight matrix is printed so you can see which patches each query pulled from.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces <code class="inline-code">outputs/skill-modality-bridge-picker.md</code>. Given a target VLM configuration (vision encoder token count, LLM context budget, deployment constraints, quality target), it recommends Q-Former vs MLP vs Perceiver resampler with a short justification and a parameter-count estimate for each bridge.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p>Implement the cross-attention block in PyTorch. Verify that with 32 queries and 256 keys/values, the attention-weight matrix is 32 x 256 and each row sums to 1 after softmax.</p>
+</li>
+<li><p>In BLIP-2 stage 1 the Q-Former runs three losses simultaneously: ITC, ITM, ITG. Write the forward signature for each in pseudo-code. Which one requires the text encoder path to be active?</p>
+</li>
+<li><p>Compare parameter counts: Q-Former (12 layers, 768 hidden) vs a 2-layer MLP projector (1408 → 4096, two layers). At what LLM scale does the 188M Q-Former cost pay back in training efficiency?</p>
+</li>
+<li><p>Read Section 3.2 of the BLIP-2 paper (arXiv:2301.12597) on how the Q-Former is initialized. Explain why initializing from BERT-base (not random) accelerates convergence.</p>
+</li>
+<li><p>For a 10-minute video at 1 FPS sampled to 60 frames, compute the per-frame token cost at (Q-Former → 32 tokens/frame) vs (MLP projector → 576 tokens/frame). Which fits into a 128k-token LLM context window?</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Q-Former</td>
+<td>&quot;Querying transformer&quot;</td>
+<td>Small transformer with 32 learnable query vectors that cross-attend to frozen ViT features</td>
+</tr>
+<tr>
+<td>Learnable queries</td>
+<td>&quot;Soft prompt for vision&quot;</td>
+<td>A fixed set of parameters that serve as the query side of cross-attention; learned per model, shared across all inputs</td>
+</tr>
+<tr>
+<td>Cross-attention</td>
+<td>&quot;Q from here, K/V from there&quot;</td>
+<td>Attention where query, key, and value come from different sources; how the queries pull from ViT patches</td>
+</tr>
+<tr>
+<td>ITC</td>
+<td>&quot;Image-text contrastive&quot;</td>
+<td>CLIP-style loss applied to Q-Former pooled queries vs text CLS</td>
+</tr>
+<tr>
+<td>ITM</td>
+<td>&quot;Image-text matching&quot;</td>
+<td>Binary classifier on hard-negative-mined pairs; forces the queries to discriminate fine-grained mismatches</td>
+</tr>
+<tr>
+<td>ITG</td>
+<td>&quot;Image-grounded text generation&quot;</td>
+<td>Causal LM loss where text is generated conditioned on queries; forces queries to encode text-decodable content</td>
+</tr>
+<tr>
+<td>Two-stage pretraining</td>
+<td>&quot;Representation then generative&quot;</td>
+<td>Stage 1 trains Q-Former alone (ITC/ITM/ITG); Stage 2 attaches frozen LLM and trains only the projection + Q-Former</td>
+</tr>
+<tr>
+<td>Frozen backbone</td>
+<td>&quot;Do not finetune&quot;</td>
+<td>The vision encoder and LLM weights are fixed; only the bridge trains</td>
+</tr>
+<tr>
+<td>Projection head</td>
+<td>&quot;Linear to LLM dim&quot;</td>
+<td>Final linear layer mapping Q-Former output to the LLM&#39;s embedding dimension</td>
+</tr>
+<tr>
+<td>Perceiver resampler</td>
+<td>&quot;Flamingo&#39;s version&quot;</td>
+<td>Similar learnable-query cross-attention, used by Flamingo at every layer rather than as a single bridge</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2301.12597" target="_blank" rel="noopener">Li et al. — BLIP-2 (arXiv:2301.12597)</a> — the core paper.</li>
+<li><a href="https://arxiv.org/abs/2201.12086" target="_blank" rel="noopener">Li et al. — BLIP (arXiv:2201.12086)</a> — the predecessor with the ITC/ITM/ITG trio.</li>
+<li><a href="https://arxiv.org/abs/2107.07651" target="_blank" rel="noopener">Li et al. — ALBEF (arXiv:2107.07651)</a> — &quot;align before fuse&quot; — the conceptual ancestor of stage 1 training.</li>
+<li><a href="https://arxiv.org/abs/2305.06500" target="_blank" rel="noopener">Dai et al. — InstructBLIP (arXiv:2305.06500)</a> — instruction-aware Q-Former.</li>
+<li><a href="https://arxiv.org/abs/2304.10592" target="_blank" rel="noopener">Zhu et al. — MiniGPT-4 (arXiv:2304.10592)</a> — projector-only approach.</li>
+<li><a href="https://arxiv.org/abs/2107.14795" target="_blank" rel="noopener">Jaegle et al. — Perceiver IO (arXiv:2107.14795)</a> — general architecture for learnable-query cross-attention.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="02-clip-contrastive-pretraining.html">
+  <span class="label">← Previous</span>
+  <b>CLIP and Contrastive Vision-Language Pretraining</b>
+</a>
+      <a class="pager__item pager__item--next" href="04-flamingo-gated-cross-attention.html">
+  <span class="label">Next →</span>
+  <b>Flamingo and Gated Cross-Attention for Few-Shot VLMs</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>7 minutes</b> of Multimodal AI behind you.</p>
+      <a class="btn btn--solid" href="04-flamingo-gated-cross-attention.html">Continue to Flamingo and Gated Cross-Attention for Few-Shot VLMs →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#learnable-queries">Learnable queries</a></li><li class="mini__item mini__item--d3"><a href="#architecture">Architecture</a></li><li class="mini__item mini__item--d3"><a href="#two-stage-training">Two-stage training</a></li><li class="mini__item mini__item--d3"><a href="#parameter-economics">Parameter economics</a></li><li class="mini__item mini__item--d3"><a href="#instructblip-and-the-instruction-aware-q-former">InstructBLIP and the instruction-aware Q-Former</a></li><li class="mini__item mini__item--d3"><a href="#minigpt-4-and-the-projector-only-approach">MiniGPT-4 and the projector-only approach</a></li><li class="mini__item mini__item--d3"><a href="#why-llava-went-simpler">Why LLaVA went simpler</a></li><li class="mini__item mini__item--d3"><a href="#gated-cross-attention-flamingo-the-ancestor">Gated cross-attention: Flamingo, the ancestor</a></li><li class="mini__item mini__item--d3"><a href="#the-2026-descendants">The 2026 descendants</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

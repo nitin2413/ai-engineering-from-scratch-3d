@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Async and Hogwild! Inference — LLMs from Scratch — AIFS</title>
+<meta name="description" content="LLMs from Scratch: Async and Hogwild! Inference. 10 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Async and Hogwild! Inference — LLMs from Scratch — AIFS">
+<meta property="og:description" content="LLMs from Scratch: Async and Hogwild! Inference. 10 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"continuous-batching":["../assets/figures/figures-llms-systems.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-llms-systems.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#6C4DFF" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#6C4DFF;--accent-ink:#FFFFFF"
+  data-lesson-id="llms-from-scratch/22-async-hogwild-inference" data-module="llms-from-scratch"
+  data-prev="21-jamba-hybrid-ssm-transformer.html" data-next="25-speculative-decoding.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#6C4DFF">
+        <span class="label">Phase 10</span>
+        <b>LLMs from Scratch</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="llms-from-scratch/01-tokenizers"><a href="01-tokenizers.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Tokenizers: BPE, WordPiece, SentencePiece</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/02-building-a-tokenizer"><a href="02-building-a-tokenizer.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Building a Tokenizer from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/03-data-pipelines"><a href="03-data-pipelines.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Data Pipelines for Pre-Training</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/04-pre-training-mini-gpt"><a href="04-pre-training-mini-gpt.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Pre-Training a Mini GPT (124M Parameters)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/05-scaling-distributed"><a href="05-scaling-distributed.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Scaling: Distributed Training, FSDP, DeepSpeed</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/06-instruction-tuning-sft"><a href="06-instruction-tuning-sft.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Instruction Tuning (SFT)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/07-rlhf"><a href="07-rlhf.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">RLHF: Reward Model + PPO</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/08-dpo"><a href="08-dpo.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">DPO: Direct Preference Optimization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/09-constitutional-ai-self-improvement"><a href="09-constitutional-ai-self-improvement.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Constitutional AI and Self-Improvement</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/10-evaluation"><a href="10-evaluation.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Evaluation: Benchmarks, Evals, LM Harness</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/11-quantization"><a href="11-quantization.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Quantization: Making Models Fit</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/12-inference-optimization"><a href="12-inference-optimization.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Inference Optimization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/13-building-complete-llm-pipeline"><a href="13-building-complete-llm-pipeline.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Building a Complete LLM Pipeline</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/14-open-models-architecture-walkthroughs"><a href="14-open-models-architecture-walkthroughs.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Open Models: Architecture Walkthroughs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/15-speculative-decoding-eagle3"><a href="15-speculative-decoding-eagle3.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Speculative Decoding and EAGLE-3</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/16-differential-attention-v2"><a href="16-differential-attention-v2.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Differential Attention (V2)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/17-native-sparse-attention"><a href="17-native-sparse-attention.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Native Sparse Attention (DeepSeek NSA)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/18-multi-token-prediction"><a href="18-multi-token-prediction.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Multi-Token Prediction (MTP)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/19-dualpipe-parallelism"><a href="19-dualpipe-parallelism.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">DualPipe Parallelism</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/20-deepseek-v3-walkthrough"><a href="20-deepseek-v3-walkthrough.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">DeepSeek-V3 Architecture Walkthrough</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/21-jamba-hybrid-ssm-transformer"><a href="21-jamba-hybrid-ssm-transformer.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Jamba — Hybrid SSM-Transformer</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/22-async-hogwild-inference"><a href="22-async-hogwild-inference.html" class="is-current">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Async and Hogwild! Inference</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/25-speculative-decoding"><a href="25-speculative-decoding.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Speculative Decoding and EAGLE</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/34-gradient-checkpointing"><a href="34-gradient-checkpointing.html" class="">
+  <span class="snav__n">34</span>
+  <span class="snav__t">Gradient Checkpointing and Activation Recomputation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">LLMs from Scratch</a></p>
+      <h1 class="page__title">Async and Hogwild! Inference</h1>
+      <p class="page__lede">Speculative decoding (Phase 10 · 15) parallelizes tokens within one sequence. Multi-agent frameworks parallelize across whole sequences but force explicit coordination (voting, sub-task splitting). Hogwild! Inference (Rodionov et al., arXiv:2504.06261) does something else: run N instances of the same LLM in parallel against a SHARED key-value cache. Each worker sees every other worker's generated tokens instantly. Modern reasoning models — QwQ, DeepSeek-R1 — can self-coordinate through that shared cache without any fine-tuning. The approach is experimental but it opens an entirely new axis of inference parallelism that sits orthogonal to spec decode. This lesson implements a two-worker Hogwild! simulator in stdlib Python and explains why the shared-cache collaboration emerges from the existing model's reasoning abilities.</p>
+      <div class="page__meta">
+        <span class="chip">10 min read</span>
+        <span class="chip">2,096 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (stdlib)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 10 · 12 (inference optimization), Phase 10 · 15 (speculative decoding)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~60 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Describe the three common parallel-LLM topologies (voting, sub-task, Hogwild!) and name which problems each one targets.</li>
+<li>State the core Hogwild! setup: multiple workers, one shared KV cache, emergent coordination via self-prompting.</li>
+<li>Compute the wall-time speedup of Hogwild! as a function of worker count <code class="inline-code">N</code>, task-level parallelism <code class="inline-code">p</code>, and coordination overhead <code class="inline-code">c</code>.</li>
+<li>Implement a two-worker Hogwild! simulator on a toy problem and observe the emergent task division.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Modern LLMs solve hard problems by producing long chains of reasoning — 5000 tokens of step-by-step logic is common, tens of thousands of tokens happens on deep math problems. At 35 tokens/sec decode on a 70B model, 50k tokens is 24 minutes. Interactive the model is not.</p>
+<p>Speculative decoding (Phase 10 · 15) gets you a 3-5x speedup by parallelizing within one sequence. Past that the sequential dependency of autoregressive decoding is the hard ceiling. Each new token depends on every prior token.</p>
+<p>The obvious question: can we parallelize across sequences? Run multiple copies of the same model on the same problem, let them cooperate, have them divide the work?</p>
+<p>Prior work: voting ensembles (run N models, pick the majority answer), tree-of-thought (branch reasoning paths and recombine), and multi-agent frameworks (assign each agent a sub-task, use a coordinator). These all help in specific task domains. They all also introduce explicit coordination machinery — voting rules, branch-and-prune logic, agent-to-agent messaging protocols.</p>
+<p>Hogwild! Inference takes a different approach. N workers share a single KV cache. Each worker sees every other worker&#39;s generated tokens immediately, as if they were its own context. The workers — without any training or fine-tuning — figure out how to divide the work. Modern reasoning models (QwQ, DeepSeek-R1, Claude-family reasoning mode) can read the shared cache and say things like &quot;I see worker 2 already handled the base case, so I&#39;ll work on the inductive step.&quot;</p>
+<p>The speedup is workload-dependent and experimental as of April 2026. But the idea is worth knowing because it opens a new axis of inference parallelism.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="the-setup" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-setup" aria-label="Link to this section">#</a>The setup</h3>
+<p>Initialize N worker processes, all running the same LLM. Instead of per-worker KV caches, maintain ONE shared cache. When worker <code class="inline-code">i</code> generates token <code class="inline-code">t_j</code>, the token is written into the shared cache at the next position. When worker <code class="inline-code">k</code> takes its next step, it reads the current state of the cache (which includes everything all N workers have generated so far).</p>
+<p>At step time, workers race to write tokens. There is no per-worker position index — the cache is a single growing sequence. Order is determined by write arrival time.</p>
+<h3 id="why-coordination-emerges" class="prose-h prose-h3"><a class="prose-h__anchor" href="#why-coordination-emerges" aria-label="Link to this section">#</a>Why coordination emerges</h3>
+<p>The workers share a prompt. Typically something like &quot;You are one of N instances working together on this problem. Each instance reads the shared memory and can see what other instances have written. Avoid redundant work.&quot; The prompt plus the shared cache is enough. Reasoning models read the cache, notice which parts of the problem have already been attempted, and (often but not always) pivot to unexplored parts.</p>
+<p>The Hogwild! paper (Rodionov et al., 2025) reports observations like:</p>
+<ul>
+<li>Workers formulate plans and communicate them to other workers via the cache.</li>
+<li>Workers notice errors in other workers&#39; reasoning and call them out.</li>
+<li>Workers adapt when a plan fails and propose alternatives.</li>
+<li>When prompted to check for redundancy, workers detect it and pivot.</li>
+</ul>
+<p>None of this requires fine-tuning. The emergent behavior comes from the reasoning capabilities the model already has.</p>
+<h3 id="the-naming" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-naming" aria-label="Link to this section">#</a>The naming</h3>
+<p>The paper&#39;s name riffs on Hogwild! SGD (Recht et al., 2011), an asynchronous-update optimizer. The analogy: SGD&#39;s asynchronous workers all write to a shared parameter vector; Hogwild! Inference&#39;s workers all write to a shared KV cache. Both rely on empirical convergence rather than synchronization guarantees.</p>
+<h3 id="rope-makes-this-tractable" class="prose-h prose-h3"><a class="prose-h__anchor" href="#rope-makes-this-tractable" aria-label="Link to this section">#</a>RoPE makes this tractable</h3>
+<p>Rotary Position Embeddings (RoPE, Su et al. 2021) encode position information via rotation in the Q and K vectors. Because positions are rotations and not baked-in offsets, a token&#39;s position can shift without recomputing the KV cache entry. When worker <code class="inline-code">i</code> writes into the shared cache at position <code class="inline-code">p</code>, other workers reading that position can use the cached entry directly — no re-rotation needed.</p>
+<p>In a learned-position or absolute-position model, Hogwild! would need cache invalidation on every concurrent write. RoPE lets the cache stay stable.</p>
+<h3 id="wall-time-math" class="prose-h prose-h3"><a class="prose-h__anchor" href="#wall-time-math" aria-label="Link to this section">#</a>Wall-time math</h3>
+<p>Let <code class="inline-code">T_serial</code> be the time for one worker to solve the problem alone. Let <code class="inline-code">p</code> be the task-level parallelizable fraction. Let <code class="inline-code">c</code> be the per-step coordination overhead (reading the extended cache, deciding what to write).</p>
+<p>Single-worker time: <code class="inline-code">T_serial</code>.
+N-worker Hogwild! time, if coordination is free: <code class="inline-code">T_serial * ((1 - p) + p / N)</code>. Classic Amdahl.
+With coordination overhead: <code class="inline-code">T_serial * ((1 - p) + p / N) + c * steps_per_worker</code>.</p>
+<p>For a worker to be productive, <code class="inline-code">c</code> must be small relative to the per-step decode time. On reasoning models producing 5k+ tokens, the workers can afford hundreds of tokens of coordination overhead and still come out ahead. On short chat tasks, coordination dominates and Hogwild! is worse than serial.</p>
+<h3 id="concrete-example" class="prose-h prose-h3"><a class="prose-h__anchor" href="#concrete-example" aria-label="Link to this section">#</a>Concrete example</h3>
+<p>Reasoning problem: 10k tokens of chain-of-thought. Suppose the problem has <code class="inline-code">p = 0.7</code> parallelizable content (different proof strategies, different case analyses) and <code class="inline-code">c = 200</code> tokens of coordination overhead per worker. With <code class="inline-code">N = 4</code> workers:</p>
+<ul>
+<li>Serial time: 10000 decode steps.</li>
+<li>Hogwild! time: 10000 * (0.3 + 0.7 / 4) + 200 * 4 = 10000 * 0.475 + 800 = 5550 decode steps.</li>
+<li>Speedup: 10000 / 5550 = 1.8x.</li>
+</ul>
+<p>That is modest. But on longer reasoning problems (50k tokens), the coordination overhead amortizes and the speedup pushes 2.5-3x. Hogwild! is the inference equivalent of thread-level parallelism in a language that lets you write multi-threaded code naturally.</p>
+<h3 id="when-to-reach-for-hogwild" class="prose-h prose-h3"><a class="prose-h__anchor" href="#when-to-reach-for-hogwild" aria-label="Link to this section">#</a>When to reach for Hogwild!</h3>
+<ul>
+<li>Long reasoning problems (thousands of tokens) where the task can be parallelized across independent sub-goals.</li>
+<li>Reasoning models that have been trained to think step by step. Non-reasoning models do not self-coordinate well.</li>
+<li>Single-node deployments with enough VRAM to hold the shared cache plus N worker processes. The cache is shared, but each worker has its own activation memory.</li>
+</ul>
+<h3 id="when-not-to" class="prose-h prose-h3"><a class="prose-h__anchor" href="#when-not-to" aria-label="Link to this section">#</a>When not to</h3>
+<ul>
+<li>Short interactive chat. Coordination overhead dominates.</li>
+<li>Tasks that don&#39;t parallelize (single linear proof, single compilation). N=1 is the max.</li>
+<li>Non-reasoning models. No coordination emerges.</li>
+<li>Multi-node deployments. The shared cache needs very fast cross-worker synchronization. Intra-node is fine; cross-node is a latency disaster.</li>
+</ul>
+<h3 id="the-experimental-status" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-experimental-status" aria-label="Link to this section">#</a>The experimental status</h3>
+<p>As of April 2026, Hogwild! is a research method with an open-source PyTorch implementation. Production adoption has not happened. Three blockers:</p>
+<ol>
+<li>Shared KV cache management across concurrent processes is non-trivial engineering.</li>
+<li>Emergent coordination is task-dependent; benchmarks are still being built.</li>
+<li>The speedups are modest compared to what speculative decoding already delivers, and the two can be combined but the combined engineering is another layer.</li>
+</ol>
+<p>Worth knowing. Worth experimenting with. Not yet worth betting a product on.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="continuous-batching"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">continuous-batching</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> continuous batching</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<p><code class="inline-code">code/main.py</code> implements a toy Hogwild! simulator:</p>
+<ul>
+<li>Two worker processes, each a deterministic &quot;LLM&quot; that produces one of several token categories (work-token, observe-token, coordinate-token) with known probabilities.</li>
+<li>A shared cache (just a list of tokens) that both workers read and write.</li>
+<li>A simple coordination logic: when a worker sees that the other has already produced enough work tokens in a category, it picks a different category.</li>
+</ul>
+<p>The simulator runs for a fixed step budget and reports:</p>
+<ul>
+<li>Total work-tokens produced.</li>
+<li>Total wall time (number of worker steps).</li>
+<li>Effective speedup over a single worker.</li>
+<li>A trace of which worker wrote which token.</li>
+</ul>
+<h3 id="step-1-the-shared-cache" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-the-shared-cache" aria-label="Link to this section">#</a>Step 1: the shared cache</h3>
+<p>A list that both workers append to. Simple locking (Python <code class="inline-code">threading.Lock</code>) in a real implementation; we simulate with a counter.</p>
+<h3 id="step-2-the-worker-loop" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-the-worker-loop" aria-label="Link to this section">#</a>Step 2: the worker loop</h3>
+<p>Each worker, on each step:</p>
+<ul>
+<li>Reads the current shared cache.</li>
+<li>Decides what category of token to write based on what is already there.</li>
+<li>Writes one token.</li>
+</ul>
+<h3 id="step-3-the-coordination-heuristic" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-the-coordination-heuristic" aria-label="Link to this section">#</a>Step 3: the coordination heuristic</h3>
+<p>If category X already has K tokens in the cache and worker&#39;s intended category is X, worker switches to category Y. This is a toy stand-in for the reasoning-model behavior of &quot;notice this is already covered, do something else instead.&quot;</p>
+<h3 id="step-4-measured-speedup" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-measured-speedup" aria-label="Link to this section">#</a>Step 4: measured speedup</h3>
+<p>Run the simulator with N=1 worker and with N=2 workers, same total step budget. Count work-tokens produced. N=2 should produce roughly 1.5-1.8x more work-tokens because of the coordination-driven task division.</p>
+<h3 id="step-5-stress-the-coordination" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-stress-the-coordination" aria-label="Link to this section">#</a>Step 5: stress the coordination</h3>
+<p>Reduce the coordination heuristic&#39;s sensitivity. Run again. Observe that without good coordination, N=2 redundantly produces the same tokens and the speedup drops below 1. This matches the paper&#39;s observation: the trick only works if the workers have the reasoning capacity to self-coordinate.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>Hogwild! integration in production as of April 2026 is research-grade. The reference implementation from Yandex/HSE/IST is PyTorch-based and targets single-node multi-process setups on DeepSeek-R1 and QwQ models.</p>
+<p>Pragmatic adoption path:</p>
+<ol>
+<li>Profile your reasoning-task workload. Measure the fraction of tokens that are exploratory (multiple strategies, case analyses, search) vs linear.</li>
+<li>If exploration dominates, run a two-worker Hogwild! experiment. Measure wall-time improvement.</li>
+<li>If the improvement is under 1.3x, you are in the coordination-dominated regime. Revert to single-worker.</li>
+<li>If the improvement is over 1.5x, push to N=4 and measure again. Diminishing returns typically hit around N=4-8.</li>
+</ol>
+<p>Combine with speculative decoding: each Hogwild! worker can independently use spec decode. The two speedups multiply (roughly), bringing a 3x spec decode and 1.8x Hogwild! to an effective 5.4x over naive single-worker decoding.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces <code class="inline-code">outputs/skill-parallel-inference-router.md</code>. Given a reasoning workload profile (token budget, task parallelism profile, model family, deployment target), it routes between voting, tree-of-thought, multi-agent, Hogwild!, and speculative decoding strategies.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p>Run <code class="inline-code">code/main.py</code> with the default settings. Confirm the N=2 Hogwild! configuration produces more work-tokens than the N=1 baseline in the same wall time.</p>
+</li>
+<li><p>Reduce the coordination heuristic&#39;s strength (set <code class="inline-code">coordination_weight=0.1</code>). Re-run. Show that speedup collapses. Explain why: the workers duplicate effort when they cannot coordinate.</p>
+</li>
+<li><p>Compute the expected Hogwild! speedup for a 50k-token reasoning task with <code class="inline-code">p=0.8, c=500</code> and N=4 workers. Do the same for a 1k-token chat task with <code class="inline-code">p=0.3, c=200</code> and N=4. Why is one a win and the other a loss?</p>
+</li>
+<li><p>Read the Hogwild! paper&#39;s Section 4 (preliminary evaluation). Identify the two failure modes the authors report. Describe how a better coordination prompt might mitigate each.</p>
+</li>
+<li><p>Combine Hogwild! with speculative decoding in the toy: each worker uses a 2-token spec-decode internally. Report the multiplicative speedup. What bookkeeping problem arises when two workers both want to extend the same shared-cache prefix?</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Hogwild!</td>
+<td>&quot;Parallel workers, shared cache&quot;</td>
+<td>N instances of the same LLM running concurrently with one shared KV cache; emergent coordination via self-prompting</td>
+</tr>
+<tr>
+<td>Shared KV cache</td>
+<td>&quot;The coordination medium&quot;</td>
+<td>A single growing KV buffer that all workers read and write; enables instant token visibility across workers</td>
+</tr>
+<tr>
+<td>Emergent coordination</td>
+<td>&quot;No training needed&quot;</td>
+<td>Reasoning-capable LLMs can read the shared cache and divide work without any fine-tuning or explicit protocol</td>
+</tr>
+<tr>
+<td>Coordination overhead (c)</td>
+<td>&quot;Tokens spent orienting&quot;</td>
+<td>The per-worker cost of reading the extended cache and deciding what to do; must stay small vs total decode time</td>
+</tr>
+<tr>
+<td>Parallelizable fraction (p)</td>
+<td>&quot;What can run in parallel&quot;</td>
+<td>Task-level parallelism: the fraction of the total work that is not intrinsically sequential</td>
+</tr>
+<tr>
+<td>RoPE enables Hogwild!</td>
+<td>&quot;Rotary positions are shift-invariant&quot;</td>
+<td>Because positions are rotations, writing into a shared cache does not require recomputing prior tokens</td>
+</tr>
+<tr>
+<td>Voting ensemble</td>
+<td>&quot;Run N, pick the majority&quot;</td>
+<td>The simplest parallel inference topology; useful for classification, less for long-form reasoning</td>
+</tr>
+<tr>
+<td>Tree of thought</td>
+<td>&quot;Branch and prune&quot;</td>
+<td>Reasoning strategy that explores multiple branches and prunes; explicit coordination logic</td>
+</tr>
+<tr>
+<td>Multi-agent framework</td>
+<td>&quot;Assign sub-tasks&quot;</td>
+<td>Each agent gets a role; a coordinator orchestrates; heavy protocol overhead</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2504.06261" target="_blank" rel="noopener">Rodionov et al. — Hogwild! Inference: Parallel LLM Generation via Concurrent Attention (arXiv:2504.06261)</a> — the Hogwild! paper, preliminary evaluation on QwQ and DeepSeek-R1</li>
+<li><a href="https://arxiv.org/abs/1106.5730" target="_blank" rel="noopener">Recht, Re, Wright, Niu — Hogwild!: A Lock-Free Approach to Parallelizing Stochastic Gradient Descent (arXiv:1106.5730, NeurIPS 2011)</a> — the original Hogwild!, the naming origin</li>
+<li><a href="https://arxiv.org/abs/2104.09864" target="_blank" rel="noopener">Su et al. — RoFormer: Enhanced Transformer with Rotary Position Embedding (arXiv:2104.09864)</a> — RoPE, the property that makes shared-cache inference tractable</li>
+<li><a href="https://arxiv.org/abs/2305.10601" target="_blank" rel="noopener">Yao et al. — Tree of Thoughts: Deliberate Problem Solving with Large Language Models (arXiv:2305.10601)</a> — the tree-of-thought reasoning strategy Hogwild! sits orthogonal to</li>
+<li><a href="https://arxiv.org/abs/2211.17192" target="_blank" rel="noopener">Leviathan et al. — Fast Inference from Transformers via Speculative Decoding (arXiv:2211.17192)</a> — speculative decoding, the within-sequence parallelism Hogwild! composes with</li>
+<li><a href="https://github.com/eqimp/hogwild_llm" target="_blank" rel="noopener">Hogwild! reference PyTorch implementation</a> — the single source of truth for the paper&#39;s experiments</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="21-jamba-hybrid-ssm-transformer.html">
+  <span class="label">← Previous</span>
+  <b>Jamba — Hybrid SSM-Transformer</b>
+</a>
+      <a class="pager__item pager__item--next" href="25-speculative-decoding.html">
+  <span class="label">Next →</span>
+  <b>Speculative Decoding and EAGLE</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>10 minutes</b> of LLMs from Scratch behind you.</p>
+      <a class="btn btn--solid" href="25-speculative-decoding.html">Continue to Speculative Decoding and EAGLE →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#the-setup">The setup</a></li><li class="mini__item mini__item--d3"><a href="#why-coordination-emerges">Why coordination emerges</a></li><li class="mini__item mini__item--d3"><a href="#the-naming">The naming</a></li><li class="mini__item mini__item--d3"><a href="#rope-makes-this-tractable">RoPE makes this tractable</a></li><li class="mini__item mini__item--d3"><a href="#wall-time-math">Wall-time math</a></li><li class="mini__item mini__item--d3"><a href="#concrete-example">Concrete example</a></li><li class="mini__item mini__item--d3"><a href="#when-to-reach-for-hogwild">When to reach for Hogwild!</a></li><li class="mini__item mini__item--d3"><a href="#when-not-to">When not to</a></li><li class="mini__item mini__item--d3"><a href="#the-experimental-status">The experimental status</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-the-shared-cache">Step 1: the shared cache</a></li><li class="mini__item mini__item--d3"><a href="#step-2-the-worker-loop">Step 2: the worker loop</a></li><li class="mini__item mini__item--d3"><a href="#step-3-the-coordination-heuristic">Step 3: the coordination heuristic</a></li><li class="mini__item mini__item--d3"><a href="#step-4-measured-speedup">Step 4: measured speedup</a></li><li class="mini__item mini__item--d3"><a href="#step-5-stress-the-coordination">Step 5: stress the coordination</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

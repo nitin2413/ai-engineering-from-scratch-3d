@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A/B Testing LLM Features — GrowthBook, Statsig, and the Vibes Problem — Infrastructure &amp; Production — AIFS</title>
+<meta name="description" content="Infrastructure &amp; Production: A/B Testing LLM Features — GrowthBook, Statsig, and the Vibes Problem. 4 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="A/B Testing LLM Features — GrowthBook, Statsig, and the Vibes Problem — Infrastructure &amp; Production — AIFS">
+<meta property="og:description" content="Infrastructure &amp; Production: A/B Testing LLM Features — GrowthBook, Statsig, and the Vibes Problem. 4 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"mx-sequential-test":["../assets/figures/figures-misc2.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-misc2.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#C79BFF" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#C79BFF;--accent-ink:#111111"
+  data-lesson-id="infrastructure-and-production/21-ab-testing-llm-features" data-module="infrastructure-and-production"
+  data-prev="20-shadow-canary-progressive.html" data-next="22-load-testing-llm-apis.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#C79BFF">
+        <span class="label">Phase 17</span>
+        <b>Infrastructure &amp; Production</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="infrastructure-and-production/01-managed-llm-platforms"><a href="01-managed-llm-platforms.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Managed LLM Platforms — Bedrock, Vertex AI, Azure OpenAI</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/02-inference-platform-economics"><a href="02-inference-platform-economics.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Inference Platform Economics — Fireworks, Together, Baseten, Modal, Replicate, Anyscale</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/03-gpu-autoscaling-kubernetes"><a href="03-gpu-autoscaling-kubernetes.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">GPU Autoscaling on Kubernetes — Karpenter, KAI Scheduler, Gang Scheduling</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/04-vllm-serving-internals"><a href="04-vllm-serving-internals.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Serving Engine Internals — PagedAttention, Continuous Batching, Chunked Prefill</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/05-eagle3-speculative-decoding"><a href="05-eagle3-speculative-decoding.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">EAGLE-3 Speculative Decoding in Production</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/06-sglang-radixattention"><a href="06-sglang-radixattention.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Prefix-Cache Serving — RadixAttention and KV Reuse</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/07-tensorrt-llm-blackwell"><a href="07-tensorrt-llm-blackwell.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Hardware-Specialized Inference Compilation — FP8 and NVFP4 on Blackwell</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/08-inference-metrics-goodput"><a href="08-inference-metrics-goodput.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Inference Metrics — TTFT, TPOT, ITL, Goodput, P99</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/09-production-quantization"><a href="09-production-quantization.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Production Quantization — AWQ, GPTQ, GGUF K-quants, FP8, MXFP4/NVFP4</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/10-cold-start-mitigation"><a href="10-cold-start-mitigation.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Cold Start Mitigation for Serverless LLMs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/11-multi-region-kv-locality"><a href="11-multi-region-kv-locality.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Multi-Region LLM Serving and KV Cache Locality</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/12-edge-inference"><a href="12-edge-inference.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Edge Inference — Apple Neural Engine, Qualcomm Hexagon, WebGPU/WebLLM, Jetson</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/13-llm-observability"><a href="13-llm-observability.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">LLM Observability Stack Selection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/14-prompt-semantic-caching"><a href="14-prompt-semantic-caching.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Prompt Caching and Semantic Caching Economics</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/15-batch-apis"><a href="15-batch-apis.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Batch APIs — the 50% Discount as Industry Standard</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/16-model-routing"><a href="16-model-routing.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Model Routing as a Cost-Reduction Primitive</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/17-disaggregated-prefill-decode"><a href="17-disaggregated-prefill-decode.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Disaggregated Prefill/Decode — NVIDIA Dynamo and llm-d</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/18-vllm-production-stack-lmcache"><a href="18-vllm-production-stack-lmcache.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Production Serving Stack — KV Offloading and Cache-Aware Routing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/19-ai-gateways"><a href="19-ai-gateways.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">AI Gateways — LiteLLM, Portkey, Kong AI Gateway, Bifrost</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/20-shadow-canary-progressive"><a href="20-shadow-canary-progressive.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Shadow Traffic, Canary Rollout, and Progressive Deployment for LLMs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/21-ab-testing-llm-features"><a href="21-ab-testing-llm-features.html" class="is-current">
+  <span class="snav__n">21</span>
+  <span class="snav__t">A/B Testing LLM Features — GrowthBook, Statsig, and the Vibes Problem</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/22-load-testing-llm-apis"><a href="22-load-testing-llm-apis.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Load Testing LLM APIs — Why k6 and Locust Lie</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/23-sre-for-ai"><a href="23-sre-for-ai.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">SRE for AI — Multi-Agent Incident Response, Runbooks, Predictive Detection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/24-chaos-engineering-llm"><a href="24-chaos-engineering-llm.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Chaos Engineering for LLM Production</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/25-security-secrets-audit"><a href="25-security-secrets-audit.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Security — Secrets, API Key Rotation, Audit Logs, Guardrails</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/26-compliance-frameworks"><a href="26-compliance-frameworks.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Compliance — SOC 2, HIPAA, GDPR, PCI-DSS, EU AI Act, ISO 42001</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/27-finops-llms"><a href="27-finops-llms.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">FinOps for LLMs — Unit Economics and Multi-Tenant Attribution</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/28-self-hosted-serving-selection"><a href="28-self-hosted-serving-selection.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">Self-Hosted Serving Selection — Matching Engine to Hardware and Scale</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Infrastructure &amp; Production</a></p>
+      <h1 class="page__title">A/B Testing LLM Features — GrowthBook, Statsig, and the Vibes Problem</h1>
+      <p class="page__lede">Traditional A/B testing was not built for non-deterministic LLMs. The critical distinction: evals answer &quot;can the model do the job?&quot; A/B tests answer &quot;do users care?&quot; Both are required; shipping on vibe checks is over. What to test in 2026: prompt engineering (wording), model selection (GPT-4 vs GPT-3.5 vs OSS; accuracy vs cost vs latency), generation parameters (temperature, top-p). Real cases: a chatbot reward-model variant delivered +70% conversation length and +30% retention; Nextdoor AI subject-line experiments delivered +1% CTR after reward-function refinement; Khan Academy Khanmigo iterated on a latency-vs-math-accuracy axis. Platform split: <b>Statsig</b> (acquired by OpenAI for $1.1B in September 2025) — sequential testing, CUPED, all-in-one. <b>GrowthBook</b> — open-source, warehouse-native, Bayesian + Frequentist + Sequential engines, CUPED, SRM checks, Benjamini-Hochberg + Bonferroni corrections. You pick based on warehouse-SQL preference and whether &quot;acquired by OpenAI&quot; matters to your organization.</p>
+      <div class="page__meta">
+        <span class="chip">4 min read</span>
+        <span class="chip">850 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Learn</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (stdlib, toy sequential test simulator)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 17 · 13 (Observability), Phase 17 · 20 (Progressive Deployment)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~60 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Distinguish evals (&quot;can the model do the job&quot;) from A/B tests (&quot;do users care&quot;).</li>
+<li>Enumerate three testable axes (prompt, model, parameters) and pick the metric for each.</li>
+<li>Explain CUPED, sequential testing, and Benjamini-Hochberg multiple-comparison corrections.</li>
+<li>Pick Statsig or GrowthBook based on warehouse-SQL posture and corporate acquisition stance.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>You hand-tuned a system prompt. It feels better. You ship it. Conversion changes by noise. You blame the metric. Or you shipped a new model and conversion didn&#39;t move — did the model degrade or was the change too small to detect? You don&#39;t know, because you shipped without an A/B.</p>
+<p>Evals answer whether the model can do a task on a labeled set. They do not answer whether users prefer the output. Only a controlled online experiment answers that, and only if the experiment has enough power, controls for non-determinism, and corrects for multiple comparisons.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="evals-vs-a-b-tests" class="prose-h prose-h3"><a class="prose-h__anchor" href="#evals-vs-a-b-tests" aria-label="Link to this section">#</a>Evals vs A/B tests</h3>
+<p><strong>Evals</strong> — offline, labeled set, judge (rubric or LLM-as-judge or human). Answer: &quot;Is the output correct / helpful / safe on this fixed distribution?&quot;</p>
+<p><strong>A/B test</strong> — online, live users, randomized. Answer: &quot;Does the new variant move the user-level metric that matters?&quot;</p>
+<p>Both required. Evals catch regressions before exposure; A/B confirms product impact after.</p>
+<h3 id="what-to-test" class="prose-h prose-h3"><a class="prose-h__anchor" href="#what-to-test" aria-label="Link to this section">#</a>What to test</h3>
+<ol>
+<li><strong>Prompt engineering</strong> — wording, system-prompt structure, examples. Metric: task success, user retention, cost/request.</li>
+<li><strong>Model selection</strong> — GPT-4 vs GPT-3.5-Turbo vs Llama-OSS. Metric: accuracy (task) + cost/request + latency P99. Multi-objective.</li>
+<li><strong>Generation parameters</strong> — temperature, top-p, max_tokens. Metric: task-specific (output diversity vs determinism).</li>
+</ol>
+<h3 id="cuped-variance-reduction" class="prose-h prose-h3"><a class="prose-h__anchor" href="#cuped-variance-reduction" aria-label="Link to this section">#</a>CUPED — variance reduction</h3>
+<p>Controlled-experiments Using Pre-Experiment Data. Regress out pre-period variance before comparing post-period. Typical variance reduction: 30-70%. Effective sample size goes up for free.</p>
+<p>Implementation: both Statsig and GrowthBook implement.</p>
+<h3 id="sequential-testing" class="prose-h prose-h3"><a class="prose-h__anchor" href="#sequential-testing" aria-label="Link to this section">#</a>Sequential testing</h3>
+<p>Classical A/B assumes fixed sample size. Sequential tests (&quot;peek-and-decide&quot;) control false-positive rate under repeated looks. Always-valid sequential procedures (mSPRT, Howard&#39;s confidence sequences) let you stop early on clear winners.</p>
+<h3 id="multiple-comparison-corrections" class="prose-h prose-h3"><a class="prose-h__anchor" href="#multiple-comparison-corrections" aria-label="Link to this section">#</a>Multiple-comparison corrections</h3>
+<p>Running 20 A/B tests at 95% confidence produces one false positive by chance. Bonferroni correction tightens α per-test; Benjamini-Hochberg controls false-discovery rate. GrowthBook implements both.</p>
+<h3 id="srm-sample-ratio-mismatch" class="prose-h prose-h3"><a class="prose-h__anchor" href="#srm-sample-ratio-mismatch" aria-label="Link to this section">#</a>SRM — sample ratio mismatch</h3>
+<p>Assignment hash randomizes users to variants. If 50/50 split delivers 47/53, something is broken — SRM check flags it. Both platforms implement.</p>
+<h3 id="statsig-vs-growthbook" class="prose-h prose-h3"><a class="prose-h__anchor" href="#statsig-vs-growthbook" aria-label="Link to this section">#</a>Statsig vs GrowthBook</h3>
+<p><strong>Statsig</strong>:</p>
+<ul>
+<li>Acquired by OpenAI for $1.1B (September 2025). Hosted, SaaS.</li>
+<li>Sequential testing, CUPED, held-out populations.</li>
+<li>All-in-one: feature flags + experimentation + observability.</li>
+<li>Best fit: team already wants a bundled product, doesn&#39;t care about OpenAI ownership.</li>
+</ul>
+<p><strong>GrowthBook</strong>:</p>
+<ul>
+<li>Open-source (MIT); warehouse-native (reads from Snowflake/BigQuery/Redshift directly).</li>
+<li>Multiple engines: Bayesian, Frequentist, Sequential.</li>
+<li>CUPED, SRM, Bonferroni, BH corrections.</li>
+<li>Self-host or managed cloud.</li>
+<li>Best fit: warehouse-SQL shop, data team controls the metric layer, wants OSS.</li>
+</ul>
+<h3 id="non-determinism-complicates-power" class="prose-h prose-h3"><a class="prose-h__anchor" href="#non-determinism-complicates-power" aria-label="Link to this section">#</a>Non-determinism complicates power</h3>
+<p>Same prompt produces varying outputs. Traditional power calculations assume IID observations. With LLM non-determinism, effective sample size is lower than nominal. Multiply required sample size by ~1.3-1.5x as a safety margin.</p>
+<h3 id="real-case-outcomes" class="prose-h prose-h3"><a class="prose-h__anchor" href="#real-case-outcomes" aria-label="Link to this section">#</a>Real case outcomes</h3>
+<ul>
+<li>Chatbot reward model variant: +70% conversation length, +30% retention.</li>
+<li>Nextdoor subject lines: +1% CTR after reward-function refinement.</li>
+<li>Khan Academy Khanmigo: iterative latency-vs-math-accuracy trade.</li>
+</ul>
+<h3 id="the-anti-pattern-shipping-on-vibes" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-anti-pattern-shipping-on-vibes" aria-label="Link to this section">#</a>The anti-pattern: shipping on vibes</h3>
+<p>Every senior engineer can name a feature that was shipped because &quot;it feels better&quot; with no A/B. Most of them regressed product metrics the team didn&#39;t notice for months. A/B is the forcing function.</p>
+<h3 id="numbers-you-should-remember" class="prose-h prose-h3"><a class="prose-h__anchor" href="#numbers-you-should-remember" aria-label="Link to this section">#</a>Numbers you should remember</h3>
+<ul>
+<li>Statsig acquired by OpenAI: $1.1B, September 2025.</li>
+<li>GrowthBook: open-source MIT; Bayesian + Frequentist + Sequential.</li>
+<li>CUPED variance reduction: 30-70%.</li>
+<li>LLM non-determinism → +30-50% sample-size buffer.</li>
+</ul>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="mx-sequential-test"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">mx-sequential-test</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> mx sequential test</figcaption>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p><code class="inline-code">code/main.py</code> simulates a sequential A/B test with fixed and sequential boundaries. Shows how sequential lets you stop early.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces <code class="inline-code">outputs/skill-ab-plan.md</code>. Given feature change, workload, baseline, picks platform, gates, sample size.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li>Run <code class="inline-code">code/main.py</code>. For an expected 5% lift with baseline 3% conversion, what sample size to 80% power?</li>
+<li>Pick Statsig or GrowthBook for a healthcare-regulated on-prem customer.</li>
+<li>Design an A/B that tests GPT-4 vs GPT-3.5 on cost-per-resolved-ticket. What&#39;s the primary metric, guardrail metric, secondary?</li>
+<li>Your canary passes but A/B shows -1.2% conversion. Do you ship? Write the escalation criteria.</li>
+<li>Apply CUPED to a pre-period with 60% of the variance of post. Compute the effective-sample-size boost.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Eval</td>
+<td>&quot;offline test&quot;</td>
+<td>Labeled-set evaluation of model capability</td>
+</tr>
+<tr>
+<td>A/B test</td>
+<td>&quot;experiment&quot;</td>
+<td>Live randomized comparison on users</td>
+</tr>
+<tr>
+<td>CUPED</td>
+<td>&quot;variance reduction&quot;</td>
+<td>Pre-period regression to reduce variance</td>
+</tr>
+<tr>
+<td>Sequential test</td>
+<td>&quot;peek-ok test&quot;</td>
+<td>Always-valid procedure allowing early stop</td>
+</tr>
+<tr>
+<td>Multiple comparison</td>
+<td>&quot;the family error&quot;</td>
+<td>Running many tests inflates false positives</td>
+</tr>
+<tr>
+<td>Bonferroni</td>
+<td>&quot;tight correction&quot;</td>
+<td>Divide α by number of tests</td>
+</tr>
+<tr>
+<td>Benjamini-Hochberg</td>
+<td>&quot;BH FDR&quot;</td>
+<td>False-discovery-rate control, less conservative</td>
+</tr>
+<tr>
+<td>SRM</td>
+<td>&quot;bad split&quot;</td>
+<td>Sample ratio mismatch; assignment bug</td>
+</tr>
+<tr>
+<td>Statsig</td>
+<td>&quot;OpenAI owned&quot;</td>
+<td>Commercial all-in-one, acquired 2025</td>
+</tr>
+<tr>
+<td>GrowthBook</td>
+<td>&quot;the OSS one&quot;</td>
+<td>MIT warehouse-native platform</td>
+</tr>
+<tr>
+<td>mSPRT</td>
+<td>&quot;sequential probability ratio test&quot;</td>
+<td>Classical sequential procedure</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://blog.growthbook.io/how-to-a-b-test-ai-a-practical-guide/" target="_blank" rel="noopener">GrowthBook — How to A/B Test AI</a></li>
+<li><a href="https://www.statsig.com/blog/llm-optimization-online-experimentation" target="_blank" rel="noopener">Statsig — Beyond Prompts: Data-Driven LLM Optimization</a></li>
+<li><a href="https://www.statsig.com/perspectives/ab-testing-feature-flags-comparison-tools" target="_blank" rel="noopener">Statsig vs GrowthBook comparison</a></li>
+<li><a href="https://www.exp-platform.com/Documents/2013-02-CUPED-ImprovingSensitivityOfControlledExperiments.pdf" target="_blank" rel="noopener">Deng et al. — CUPED</a></li>
+<li><a href="https://arxiv.org/abs/1810.08240" target="_blank" rel="noopener">Howard — Confidence Sequences</a></li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="20-shadow-canary-progressive.html">
+  <span class="label">← Previous</span>
+  <b>Shadow Traffic, Canary Rollout, and Progressive Deployment for LLMs</b>
+</a>
+      <a class="pager__item pager__item--next" href="22-load-testing-llm-apis.html">
+  <span class="label">Next →</span>
+  <b>Load Testing LLM APIs — Why k6 and Locust Lie</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>4 minutes</b> of Infrastructure &amp; Production behind you.</p>
+      <a class="btn btn--solid" href="22-load-testing-llm-apis.html">Continue to Load Testing LLM APIs — Why k6 and Locust Lie →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#evals-vs-a-b-tests">Evals vs A/B tests</a></li><li class="mini__item mini__item--d3"><a href="#what-to-test">What to test</a></li><li class="mini__item mini__item--d3"><a href="#cuped-variance-reduction">CUPED — variance reduction</a></li><li class="mini__item mini__item--d3"><a href="#sequential-testing">Sequential testing</a></li><li class="mini__item mini__item--d3"><a href="#multiple-comparison-corrections">Multiple-comparison corrections</a></li><li class="mini__item mini__item--d3"><a href="#srm-sample-ratio-mismatch">SRM — sample ratio mismatch</a></li><li class="mini__item mini__item--d3"><a href="#statsig-vs-growthbook">Statsig vs GrowthBook</a></li><li class="mini__item mini__item--d3"><a href="#non-determinism-complicates-power">Non-determinism complicates power</a></li><li class="mini__item mini__item--d3"><a href="#real-case-outcomes">Real case outcomes</a></li><li class="mini__item mini__item--d3"><a href="#the-anti-pattern-shipping-on-vibes">The anti-pattern: shipping on vibes</a></li><li class="mini__item mini__item--d3"><a href="#numbers-you-should-remember">Numbers you should remember</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RL for Games — AlphaZero, MuZero, and the LLM-Reasoning Era — Reinforcement Learning — AIFS</title>
+<meta name="description" content="Reinforcement Learning: RL for Games — AlphaZero, MuZero, and the LLM-Reasoning Era. 8 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="RL for Games — AlphaZero, MuZero, and the LLM-Reasoning Era — Reinforcement Learning — AIFS">
+<meta property="og:description" content="Reinforcement Learning: RL for Games — AlphaZero, MuZero, and the LLM-Reasoning Era. 8 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"f3-selfplay-ladder":["../assets/figures/figures-foundations3.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-foundations3.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#FFB800" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#FFB800;--accent-ink:#111111"
+  data-lesson-id="reinforcement-learning/12-rl-for-games" data-module="reinforcement-learning"
+  data-prev="11-sim-to-real-transfer.html" data-next="">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#FFB800">
+        <span class="label">Phase 09</span>
+        <b>Reinforcement Learning</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="reinforcement-learning/01-mdps-states-actions-rewards"><a href="01-mdps-states-actions-rewards.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">MDPs, States, Actions &amp; Rewards</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/02-dynamic-programming"><a href="02-dynamic-programming.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Dynamic Programming — Policy Iteration &amp; Value Iteration</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/03-monte-carlo-methods"><a href="03-monte-carlo-methods.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Monte Carlo Methods — Learning from Complete Episodes</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/04-q-learning-sarsa"><a href="04-q-learning-sarsa.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Temporal Difference — Q-Learning &amp; SARSA</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/05-dqn"><a href="05-dqn.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Deep Q-Networks (DQN)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/06-policy-gradients-reinforce"><a href="06-policy-gradients-reinforce.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Policy Gradient — REINFORCE from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/07-actor-critic-a2c-a3c"><a href="07-actor-critic-a2c-a3c.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Actor-Critic — A2C and A3C</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/08-ppo"><a href="08-ppo.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Proximal Policy Optimization (PPO)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/09-reward-modeling-rlhf"><a href="09-reward-modeling-rlhf.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Reward Modeling &amp; RLHF</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/10-multi-agent-rl"><a href="10-multi-agent-rl.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Multi-Agent RL</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/11-sim-to-real-transfer"><a href="11-sim-to-real-transfer.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Sim-to-Real Transfer</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/12-rl-for-games"><a href="12-rl-for-games.html" class="is-current">
+  <span class="snav__n">12</span>
+  <span class="snav__t">RL for Games — AlphaZero, MuZero, and the LLM-Reasoning Era</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Reinforcement Learning</a></p>
+      <h1 class="page__title">RL for Games — AlphaZero, MuZero, and the LLM-Reasoning Era</h1>
+      <p class="page__lede">1992: TD-Gammon beat human champions at backgammon with pure TD. 2016: AlphaGo beat Lee Sedol. 2017: AlphaZero dominated chess, shogi, and Go from scratch. 2024: DeepSeek-R1 proved the same recipe, with GRPO replacing PPO, works on reasoning. Games are the benchmark that drives every breakthrough in this phase.</p>
+      <div class="page__meta">
+        <span class="chip">8 min read</span>
+        <span class="chip">1,842 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 9 · 05 (DQN), Phase 9 · 08 (PPO), Phase 9 · 09 (RLHF), Phase 9 · 10 (MARL)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~120 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Games have everything RL wants. Clean reward (win/loss). Infinite episodes (self-play resets). Perfect simulation (the game <em>is</em> the simulator). Discrete or small continuous action spaces. Multi-agent structure that forces adversarial robustness.</p>
+<p>And games are how every major RL breakthrough was tested. TD-Gammon (backgammon, 1992). Atari-DQN (2013). AlphaGo (2016). AlphaZero (2017). OpenAI Five (Dota 2, 2019). AlphaStar (StarCraft II, 2019). MuZero (learned model, 2019). AlphaTensor (matrix multiplication, 2022). AlphaDev (sorting algorithms, 2023). DeepSeek-R1 (math reasoning, 2025) — the latest demonstration that game-RL techniques work on text.</p>
+<p>This capstone surveys the three landmark architectures — AlphaZero, MuZero, and GRPO — through a single unifying lens: <strong>self-play + search + policy improvement</strong>. Each generalizes the previous; GRPO in particular is AlphaZero&#39;s recipe applied to LLM reasoning, with tokens as actions and mathematical verification as the win signal.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<p><img src="assets/12-rl-for-games/rl-games.svg" alt="AlphaZero ↔ MuZero ↔ GRPO: same loop, different environments" loading="lazy"></p>
+<p><strong>The unifying loop.</strong></p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>while True:
+    trajectory = self_play(current_policy, search)     # play game against self
+    policy_target = search.improved_policy(trajectory) # search improves raw policy
+    policy_net.update(policy_target, value_target)     # supervised on search output</code></pre>
+</figure>
+<p><strong>AlphaZero (2017).</strong> Silver et al. Given a game (chess, shogi, Go) with known rules:</p>
+<ul>
+<li>Policy-value network: one tower <code class="inline-code">f_θ(s) → (p, v)</code>. <code class="inline-code">p</code> is a prior over legal moves. <code class="inline-code">v</code> is the expected game outcome.</li>
+<li>Monte Carlo Tree Search (MCTS): at each move, expand a tree of possible continuations. Use <code class="inline-code">(p, v)</code> as the prior + bootstrap. Select nodes by UCB (PUCT): <code class="inline-code">a* = argmax Q(s, a) + c · p(a|s) · √N(s) / (1 + N(s, a))</code>.</li>
+<li>Self-play: play games agent-vs-agent. At move <code class="inline-code">t</code>, the MCTS visit distribution <code class="inline-code">π_t</code> becomes the policy training target.</li>
+<li>Loss: <code class="inline-code">L = (v - z)² - π · log p + c · ||θ||²</code>. <code class="inline-code">z</code> is the game outcome (+1 / 0 / -1).</li>
+</ul>
+<p>Zero human knowledge. Zero handcrafted heuristics. A single recipe that mastered chess, shogi, and Go after a few tens of millions of self-play games each.</p>
+<p><strong>MuZero (2019).</strong> Schrittwieser et al. Removes the requirement that the rules are known.</p>
+<ul>
+<li>Instead of a fixed environment, learn a <em>latent dynamics model</em> <code class="inline-code">(h, g, f)</code>:<ul>
+<li><code class="inline-code">h(s)</code>: encode observation to latent state.</li>
+<li><code class="inline-code">g(s_latent, a)</code>: predict next latent state + reward.</li>
+<li><code class="inline-code">f(s_latent)</code>: predict policy prior + value.</li>
+</ul>
+</li>
+<li>MCTS runs in the <em>learned latent space</em>. Same search, same training loop.</li>
+<li>Works on Go, chess, shogi <em>and</em> Atari — one algorithm, no rule knowledge.</li>
+</ul>
+<p><strong>Stochastic MuZero (2022).</strong> Adds stochastic dynamics and chance nodes; extends to backgammon-class games.</p>
+<p><strong>Muesli, Gumbel MuZero (2022-2024).</strong> Improvements on sample efficiency and deterministic search.</p>
+<p><strong>GRPO (2024-2025).</strong> DeepSeek-R1 recipe. Same AlphaZero-shaped loop, applied to language-model reasoning:</p>
+<ul>
+<li><p>&quot;Game&quot;: answer a math / coding / reasoning problem. &quot;Win&quot; = verifier (test case passes, numerical answer matches) returns 1.</p>
+</li>
+<li><p>Policy: the LLM. Actions: tokens. State: prompt + response-so-far.</p>
+</li>
+<li><p>No critic (PPO-style V_φ). Instead, for each prompt, sample <code class="inline-code">G</code> completions from the policy. Compute reward for each. Use the <strong>group-relative advantage</strong> <code class="inline-code">A_i = (r_i - mean_r) / std_r</code> as the signal for REINFORCE-style update.</p>
+</li>
+<li><p>KL penalty to reference policy to prevent drift (like RLHF).</p>
+</li>
+<li><p>Full loss:</p>
+<p><code class="inline-code">L_GRPO(θ) = -E_{q, {o_i}} [ (1/G) Σ_i A_i · log π_θ(o_i | q) ] + β · KL(π_θ || π_ref)</code></p>
+</li>
+</ul>
+<p>No reward model, no critic, no MCTS. Group-relative baseline replaces all three. Matches or exceeds PPO-RLHF quality on reasoning benchmarks at a fraction of the compute.</p>
+<p><strong>The R1 recipe in full.</strong> DeepSeek-R1 (DeepSeek 2025) is two models in one paper:</p>
+<ul>
+<li><strong>R1-Zero.</strong> Start from the DeepSeek-V3 base model. No SFT. Apply GRPO directly with two reward components: <em>accuracy reward</em> (rule-based — did the final answer parse to the correct number / did the code pass unit tests) and <em>format reward</em> (did the completion wrap its chain-of-thought in <code class="inline-code">&lt;think&gt;…&lt;/think&gt;</code> tags). Over thousands of steps, average response length grows from ~100 to ~10,000 tokens and math benchmark scores climb to near-o1-preview levels. The model learns to reason from scratch. The downside: its chains of thought are often unreadable, mix languages, and lack stylistic polish.</li>
+<li><strong>R1.</strong> Fix R1-Zero&#39;s readability problems with a four-stage pipeline:<ol>
+<li><strong>Cold-start SFT.</strong> Collect a few thousand long-CoT demonstrations with clean formatting. Supervised-finetune the base model on them. This gives a readable starting point.</li>
+<li><strong>Reasoning-oriented GRPO.</strong> Apply GRPO with the accuracy+format rewards plus a <em>language-consistency</em> reward to prevent code-switching.</li>
+<li><strong>Rejection sampling + SFT round 2.</strong> Sample ~600K reasoning trajectories from the RL checkpoint, keep only those with correct final answers and readable CoT, and combine with ~200K non-reasoning SFT examples (writing, QA, self-cognition). Fine-tune the base again.</li>
+<li><strong>Full-spectrum GRPO.</strong> One more RL round covering both reasoning (rule-based rewards) and general alignment (helpfulness/harmlessness preference-based rewards).</li>
+</ol>
+</li>
+</ul>
+<p>The result matches o1 on AIME and MATH-500 at open weights, and is small enough to distill. The same paper also releases six distilled dense models (Qwen-1.5B through Llama-70B) by SFT&#39;ing on R1&#39;s reasoning traces — no RL at the student. Distillation of a strong RL teacher consistently beats RL from scratch at the student&#39;s scale.</p>
+<p><strong>Why GRPO instead of PPO for reasoning.</strong> Three reasons in the DeepSeekMath paper (Feb 2024): (1) no value network to train, halving memory; (2) the group baseline naturally handles the sparse end-of-trajectory reward that reasoning tasks produce; (3) per-prompt normalization makes advantages comparable across problems of wildly different difficulty, which PPO&#39;s single critic cannot.</p>
+<p><strong>Search-free vs search-based.</strong> Games have branched:</p>
+<ul>
+<li><em>Perfect-information games with long horizons</em> (Go, chess): still search-based. AlphaZero / MuZero dominate.</li>
+<li><em>LLM reasoning</em>: no MCTS yet in production; GRPO on full rollouts, best-of-N for inference compute. Process reward models (PRMs) hint at step-level search being added back.</li>
+</ul>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="f3-selfplay-ladder"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">f3-selfplay-ladder</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> f3 selfplay ladder</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<p>The code in <code class="inline-code">code/main.py</code> implements <strong>GRPO in miniature</strong> — a bandit with multiple groups of samples. The algorithm is the same as on an LLM; only the policy and environment are simpler. It teaches the <em>loss</em> and the <em>group-relative advantage</em>, which is the 2025 innovation.</p>
+<h3 id="step-1-a-tiny-verifier-environment" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-a-tiny-verifier-environment" aria-label="Link to this section">#</a>Step 1: a tiny verifier environment</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python">QUESTIONS <span class="token operator">=</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">{</span><span class="token string">"prompt"</span><span class="token punctuation">:</span> <span class="token string">"q1"</span><span class="token punctuation">,</span> <span class="token string">"correct"</span><span class="token punctuation">:</span> <span class="token number">3</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span><span class="token string">"prompt"</span><span class="token punctuation">:</span> <span class="token string">"q2"</span><span class="token punctuation">,</span> <span class="token string">"correct"</span><span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+<span class="token punctuation">]</span>
+
+<span class="token keyword">def</span> <span class="token function">verify</span><span class="token punctuation">(</span>prompt_idx<span class="token punctuation">,</span> answer_token<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token number">1.0</span> <span class="token keyword">if</span> answer_token <span class="token operator">==</span> QUESTIONS<span class="token punctuation">[</span>prompt_idx<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">"correct"</span><span class="token punctuation">]</span> <span class="token keyword">else</span> <span class="token number">0.0</span></code></pre>
+</figure>
+<p>In real GRPO the verifier runs unit tests or checks math equality.</p>
+<h3 id="step-2-policy-softmax-over-k-answer-tokens-per-prompt" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-policy-softmax-over-k-answer-tokens-per-prompt" aria-label="Link to this section">#</a>Step 2: policy: softmax over K answer tokens per prompt</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">policy_probs</span><span class="token punctuation">(</span>theta<span class="token punctuation">,</span> p_idx<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> softmax<span class="token punctuation">(</span>theta<span class="token punctuation">[</span>p_idx<span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Equivalent to the final-layer output of an LLM conditioned on a prompt.</p>
+<h3 id="step-3-group-sampling-and-group-relative-advantage" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-group-sampling-and-group-relative-advantage" aria-label="Link to this section">#</a>Step 3: group sampling and group-relative advantage</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">grpo_step</span><span class="token punctuation">(</span>theta<span class="token punctuation">,</span> p_idx<span class="token punctuation">,</span> G<span class="token operator">=</span><span class="token number">8</span><span class="token punctuation">,</span> beta<span class="token operator">=</span><span class="token number">0.01</span><span class="token punctuation">,</span> lr<span class="token operator">=</span><span class="token number">0.1</span><span class="token punctuation">,</span> rng<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    probs <span class="token operator">=</span> policy_probs<span class="token punctuation">(</span>theta<span class="token punctuation">,</span> p_idx<span class="token punctuation">)</span>
+    samples <span class="token operator">=</span> <span class="token punctuation">[</span>sample<span class="token punctuation">(</span>probs<span class="token punctuation">,</span> rng<span class="token punctuation">)</span> <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>G<span class="token punctuation">)</span><span class="token punctuation">]</span>
+    rewards <span class="token operator">=</span> <span class="token punctuation">[</span>verify<span class="token punctuation">(</span>p_idx<span class="token punctuation">,</span> s<span class="token punctuation">)</span> <span class="token keyword">for</span> s <span class="token keyword">in</span> samples<span class="token punctuation">]</span>
+    mean_r <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>rewards<span class="token punctuation">)</span> <span class="token operator">/</span> G
+    std_r <span class="token operator">=</span> stddev<span class="token punctuation">(</span>rewards<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1e-8</span>
+    advs <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">(</span>r <span class="token operator">-</span> mean_r<span class="token punctuation">)</span> <span class="token operator">/</span> std_r <span class="token keyword">for</span> r <span class="token keyword">in</span> rewards<span class="token punctuation">]</span>
+
+    <span class="token keyword">for</span> a<span class="token punctuation">,</span> A <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>samples<span class="token punctuation">,</span> advs<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        grad <span class="token operator">=</span> onehot<span class="token punctuation">(</span>a<span class="token punctuation">)</span> <span class="token operator">-</span> probs
+        <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>probs<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            theta<span class="token punctuation">[</span>p_idx<span class="token punctuation">]</span><span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+=</span> lr <span class="token operator">*</span> A <span class="token operator">*</span> grad<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+    <span class="token comment"># KL penalty: pull theta toward reference</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>probs<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        theta<span class="token punctuation">[</span>p_idx<span class="token punctuation">]</span><span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">-=</span> beta <span class="token operator">*</span> <span class="token punctuation">(</span>theta<span class="token punctuation">[</span>p_idx<span class="token punctuation">]</span><span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">-</span> reference<span class="token punctuation">[</span>p_idx<span class="token punctuation">]</span><span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>The group-relative advantage is the 2024 DeepSeek trick. No critic needed. The &quot;baseline&quot; is the group mean, and normalization uses group std.</p>
+<h3 id="step-4-compare-to-reinforce-baseline-value-free" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-compare-to-reinforce-baseline-value-free" aria-label="Link to this section">#</a>Step 4: compare to REINFORCE baseline (value-free)</h3>
+<p>Same setup, same compute, plain REINFORCE. GRPO converges faster and more stably.</p>
+<h3 id="step-5-observe-entropy-and-kl" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-observe-entropy-and-kl" aria-label="Link to this section">#</a>Step 5: observe entropy and KL</h3>
+<p>Same diagnostics as RLHF: mean KL to reference, policy entropy, reward-over-time. Once these stabilize, training is done.</p>
+<h2 id="pitfalls" class="prose-h prose-h2"><a class="prose-h__anchor" href="#pitfalls" aria-label="Link to this section">#</a>Pitfalls</h2>
+<ul>
+<li><strong>Reward hacking via verifier gaming.</strong> GRPO inherits RLHF&#39;s risk: if the verifier is wrong or exploitable, the LLM will find the exploit. Robust verifiers (multiple test cases, formal proofs) matter.</li>
+<li><strong>Group size too small.</strong> Variance of the group baseline goes like <code class="inline-code">1/√G</code>. Below <code class="inline-code">G = 4</code>, the advantage signal is noisy; standard choice is <code class="inline-code">G = 8</code> to <code class="inline-code">64</code>.</li>
+<li><strong>Length bias.</strong> LLM completions of different lengths have different log-probabilities. Normalize by token count, or use sequence-level log-prob, or truncate to max length.</li>
+<li><strong>Pure self-play cycles.</strong> AlphaZero-style training can get stuck in dominance loops on general-sum games. Mitigated by diverse opponent pools (league play, Lesson 10).</li>
+<li><strong>Search-policy mismatch.</strong> AlphaZero trains the policy to mimic search output. If the policy net is too small to represent the search&#39;s distribution, training stalls.</li>
+<li><strong>Compute floor.</strong> MuZero / AlphaZero need massive compute. A single ablation is often hundreds of GPU-hours. Miniature demos exist (e.g., AlphaZero on Connect Four) for learning.</li>
+<li><strong>Verifier coverage.</strong> Unit tests that pass for a buggy solution reinforce the bug. Design verifiers that catch edge cases.</li>
+</ul>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>The 2026 game-RL landscape, by domain:</p>
+<table>
+<thead>
+<tr>
+<th>Domain</th>
+<th>Dominant method</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Two-player zero-sum board games (Go, chess, shogi)</td>
+<td>AlphaZero / MuZero / KataGo</td>
+</tr>
+<tr>
+<td>Imperfect info card games (poker)</td>
+<td>CFR + deep learning (DeepStack, Libratus, Pluribus)</td>
+</tr>
+<tr>
+<td>Atari / pixel games</td>
+<td>Muesli / MuZero / IMPALA-PPO</td>
+</tr>
+<tr>
+<td>Large multiplayer strategy (Dota, StarCraft)</td>
+<td>PPO + self-play + league (OpenAI Five, AlphaStar)</td>
+</tr>
+<tr>
+<td>LLM math/code reasoning</td>
+<td>GRPO (DeepSeek-R1, Qwen-RL, open replications)</td>
+</tr>
+<tr>
+<td>LLM alignment</td>
+<td>DPO / RLHF-PPO (not GRPO; verifier is preference not verifiable)</td>
+</tr>
+<tr>
+<td>Robotics</td>
+<td>PPO + DR (not game-RL, but uses same policy-gradient tools)</td>
+</tr>
+<tr>
+<td>Combinatorial problems</td>
+<td>AlphaZero variants (AlphaTensor, AlphaDev)</td>
+</tr>
+</tbody></table>
+<p>The <em>recipe</em> — self-play, search-augmented improvement, policy distillation — spans text, pixels, and physical control. GRPO is the youngest instance; more are coming.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>Save as <code class="inline-code">outputs/skill-game-rl-designer.md</code>:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">markdown</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-markdown"><span class="token front-matter-block"><span class="token punctuation">---</span>
+<span class="token front-matter yaml language-yaml"><span class="token key atrule">name</span><span class="token punctuation">:</span> game<span class="token punctuation">-</span>rl<span class="token punctuation">-</span>designer
+<span class="token key atrule">description</span><span class="token punctuation">:</span> Design a game<span class="token punctuation">-</span>RL or reasoning<span class="token punctuation">-</span>RL training pipeline (AlphaZero / MuZero / GRPO) for a given domain.
+<span class="token key atrule">version</span><span class="token punctuation">:</span> 1.0.0
+<span class="token key atrule">phase</span><span class="token punctuation">:</span> <span class="token number">9</span>
+<span class="token key atrule">lesson</span><span class="token punctuation">:</span> <span class="token number">12</span>
+<span class="token key atrule">tags</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>rl<span class="token punctuation">,</span> alphazero<span class="token punctuation">,</span> muzero<span class="token punctuation">,</span> grpo<span class="token punctuation">,</span> self<span class="token punctuation">-</span>play<span class="token punctuation">]</span></span>
+<span class="token punctuation">---</span></span>
+
+Given a target (perfect-info game / imperfect-info / Atari / LLM reasoning / combinatorial), output:
+
+<span class="token list punctuation">1.</span> Environment fit. Known rules? Markov? Stochastic? Multi-agent? Informs AlphaZero vs MuZero vs GRPO.
+<span class="token list punctuation">2.</span> Search strategy. MCTS (PUCT with learned prior), Gumbel-sampled, best-of-N, or none.
+<span class="token list punctuation">3.</span> Self-play plan. Symmetric self-play / league / offline data / verifier-generated.
+<span class="token list punctuation">4.</span> Target signal. Game outcome / verifier reward / preference / learned model. Include robustness plan.
+<span class="token list punctuation">5.</span> Diagnostics. Win rate vs baseline, ELO curve, verifier pass rate, KL to reference.
+
+Refuse AlphaZero on imperfect-info games (route to CFR). Refuse GRPO without a trusted verifier. Refuse any game-RL pipeline without a fixed baseline opponent set (self-play ELO is uncalibrated otherwise).</code></pre>
+</figure>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><strong>Easy.</strong> Implement the GRPO bandit in <code class="inline-code">code/main.py</code>. Train on 2 prompts × 4 answer tokens each. Converge in &lt; 1,000 updates with <code class="inline-code">G=8</code>.</li>
+<li><strong>Medium.</strong> Plug in PPO (clipped) and vanilla REINFORCE. Compare sample efficiency and reward variance to GRPO on the same bandit.</li>
+<li><strong>Hard.</strong> Extend to a length-2 &quot;reasoning chain&quot;: the agent emits two tokens and the verifier rewards the pair. Measure how GRPO handles the credit assignment across two-step sequences. (Hint: compute group advantage per <em>full sequence</em>, propagate to both token positions.)</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>MCTS</td>
+<td>&quot;Tree search with learned net&quot;</td>
+<td>Monte Carlo Tree Search; UCB1/PUCT selection with learned <code class="inline-code">(p, v)</code> priors.</td>
+</tr>
+<tr>
+<td>AlphaZero</td>
+<td>&quot;Self-play + MCTS&quot;</td>
+<td>Policy-value net trained to match MCTS visits and game outcome.</td>
+</tr>
+<tr>
+<td>MuZero</td>
+<td>&quot;Learned-model AlphaZero&quot;</td>
+<td>Same loop but in latent space via learned dynamics.</td>
+</tr>
+<tr>
+<td>GRPO</td>
+<td>&quot;Critic-free PPO&quot;</td>
+<td>Group Relative Policy Optimization; REINFORCE with group-mean baseline + KL.</td>
+</tr>
+<tr>
+<td>PUCT</td>
+<td>&quot;AlphaZero&#39;s UCB&quot;</td>
+<td><code class="inline-code">Q + c · p · √N / (1 + N_a)</code> — balances value estimate with prior.</td>
+</tr>
+<tr>
+<td>Self-play</td>
+<td>&quot;Agent vs past self&quot;</td>
+<td>Standard for zero-sum; symmetric training signal.</td>
+</tr>
+<tr>
+<td>League play</td>
+<td>&quot;Population-based self-play&quot;</td>
+<td>Past + current + exploiters sampled as opponents.</td>
+</tr>
+<tr>
+<td>Verifier reward</td>
+<td>&quot;Verifiable RL&quot;</td>
+<td>Reward comes from a deterministic checker (tests pass, answer matches).</td>
+</tr>
+<tr>
+<td>Process reward</td>
+<td>&quot;PRM&quot;</td>
+<td>Scores each reasoning step, not just the final answer.</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://www.nature.com/articles/nature24270" target="_blank" rel="noopener">Silver et al. (2017). Mastering the game of Go without human knowledge (AlphaGo Zero)</a>.</li>
+<li><a href="https://www.science.org/doi/10.1126/science.aar6404" target="_blank" rel="noopener">Silver et al. (2018). A general reinforcement learning algorithm that masters chess, shogi, and Go through self-play (AlphaZero)</a>.</li>
+<li><a href="https://www.nature.com/articles/s41586-020-03051-4" target="_blank" rel="noopener">Schrittwieser et al. (2020). Mastering Atari, Go, chess and shogi by planning with a learned model (MuZero)</a>.</li>
+<li><a href="https://www.nature.com/articles/s41586-019-1724-z" target="_blank" rel="noopener">Vinyals et al. (2019). Grandmaster level in StarCraft II (AlphaStar)</a>.</li>
+<li><a href="https://arxiv.org/abs/2402.03300" target="_blank" rel="noopener">DeepSeek-AI (2024). DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models (GRPO)</a> — the paper that introduced GRPO and the group-relative baseline.</li>
+<li><a href="https://arxiv.org/abs/2501.12948" target="_blank" rel="noopener">DeepSeek-AI (2025). DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning</a> — the full four-stage R1 recipe plus the R1-Zero ablation.</li>
+<li><a href="https://www.science.org/doi/10.1126/science.aay2400" target="_blank" rel="noopener">Brown et al. (2019). Superhuman AI for multiplayer poker (Pluribus)</a> — CFR + deep-learning at scale.</li>
+<li><a href="https://dl.acm.org/doi/10.1145/203330.203343" target="_blank" rel="noopener">Tesauro (1995). Temporal Difference Learning and TD-Gammon</a> — the paper that started it all.</li>
+<li><a href="https://huggingface.co/docs/trl/main/en/grpo_trainer" target="_blank" rel="noopener">Hugging Face TRL — GRPOTrainer</a> — the production reference for applying GRPO with custom reward functions.</li>
+<li><a href="https://github.com/QwenLM/Qwen2.5-Math" target="_blank" rel="noopener">Qwen Team (2024). Qwen2.5-Math — GRPO replication</a> — open replication of the R1 recipe at multiple scales.</li>
+<li><a href="http://incompleteideas.net/book/RLbook2020.pdf" target="_blank" rel="noopener">Sutton &amp; Barto (2018). Ch. 17 — Frontiers of Reinforcement Learning</a> — the textbook framing for self-play, search, and &quot;designed reward&quot; that R1 instantiates at LLM scale.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="11-sim-to-real-transfer.html">
+  <span class="label">← Previous</span>
+  <b>Sim-to-Real Transfer</b>
+</a>
+      <span class="pager__item pager__item--next is-empty">
+  <span class="label">Next →</span>
+  <b>End of this module</b>
+</span>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>8 minutes</b> of Reinforcement Learning behind you.</p>
+      <a class="btn btn--solid" href="../index.html#modules">Pick the next module →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-a-tiny-verifier-environment">Step 1: a tiny verifier environment</a></li><li class="mini__item mini__item--d3"><a href="#step-2-policy-softmax-over-k-answer-tokens-per-prompt">Step 2: policy: softmax over K answer tokens per prompt</a></li><li class="mini__item mini__item--d3"><a href="#step-3-group-sampling-and-group-relative-advantage">Step 3: group sampling and group-relative advantage</a></li><li class="mini__item mini__item--d3"><a href="#step-4-compare-to-reinforce-baseline-value-free">Step 4: compare to REINFORCE baseline (value-free)</a></li><li class="mini__item mini__item--d3"><a href="#step-5-observe-entropy-and-kl">Step 5: observe entropy and KL</a></li><li class="mini__item mini__item--d2"><a href="#pitfalls">Pitfalls</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

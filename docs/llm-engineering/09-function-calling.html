@@ -1,0 +1,953 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Function Calling &amp; Tool Use — LLM Engineering — AIFS</title>
+<meta name="description" content="LLM Engineering: Function Calling &amp; Tool Use. 10 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Function Calling &amp; Tool Use — LLM Engineering — AIFS">
+<meta property="og:description" content="LLM Engineering: Function Calling &amp; Tool Use. 10 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"mx-tool-call-loop":["../assets/figures/figures-misc2.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-misc2.js"];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#00E0C6" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#00E0C6;--accent-ink:#111111"
+  data-lesson-id="llm-engineering/09-function-calling" data-module="llm-engineering"
+  data-prev="08-fine-tuning-lora.html" data-next="10-evaluation.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#00E0C6">
+        <span class="label">Phase 11</span>
+        <b>LLM Engineering</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="llm-engineering/01-prompt-engineering"><a href="01-prompt-engineering.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Prompt Engineering: Techniques &amp; Patterns</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/02-few-shot-cot"><a href="02-few-shot-cot.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Few-Shot, Chain-of-Thought, Tree-of-Thought</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/03-structured-outputs"><a href="03-structured-outputs.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Structured Outputs: JSON, Schema Validation, Constrained Decoding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/04-embeddings"><a href="04-embeddings.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Embeddings &amp; Vector Representations</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/05-context-engineering"><a href="05-context-engineering.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Context Engineering: Windows, Budgets, Memory, and Retrieval</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/06-rag"><a href="06-rag.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">RAG (Retrieval-Augmented Generation)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/07-advanced-rag"><a href="07-advanced-rag.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Advanced RAG (Chunking, Reranking, Hybrid Search)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/08-fine-tuning-lora"><a href="08-fine-tuning-lora.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Fine-Tuning with LoRA &amp; QLoRA</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/09-function-calling"><a href="09-function-calling.html" class="is-current">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Function Calling &amp; Tool Use</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/10-evaluation"><a href="10-evaluation.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Evaluation &amp; Testing LLM Applications</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/11-caching-cost"><a href="11-caching-cost.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Caching, Rate Limiting &amp; Cost Optimization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/12-guardrails"><a href="12-guardrails.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Guardrails, Safety &amp; Content Filtering</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/13-production-app"><a href="13-production-app.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Building a Production LLM Application</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/14-model-context-protocol"><a href="14-model-context-protocol.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Model Context Protocol (MCP)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/15-prompt-caching"><a href="15-prompt-caching.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Prompt Caching and Context Caching</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/16-langgraph-state-machines"><a href="16-langgraph-state-machines.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Agent State Machines — Graphs, Nodes, Checkpoints</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/17-agent-framework-tradeoffs"><a href="17-agent-framework-tradeoffs.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Agent Framework Tradeoffs — Graph, Role, and Actor Orchestration</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">LLM Engineering</a></p>
+      <h1 class="page__title">Function Calling &amp; Tool Use</h1>
+      <p class="page__lede">LLMs cannot do anything. They generate text. That is the entire capability. They cannot check the weather, query a database, send an email, run code, or read a file. Every &quot;AI agent&quot; you have ever seen is an LLM generating JSON that says which function to call -- and then your code actually calling it. The model is the brain. Tools are the hands. Function calling is the nervous system connecting them.</p>
+      <div class="page__meta">
+        <span class="chip">10 min read</span>
+        <span class="chip">2,244 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 11 Lesson 03 (Structured Outputs)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div><div class="facts__pair"><dt class="label">Related</dt><dd>Phase 11 · 14 (Model Context Protocol) — when a tool is shared across hosts, graduate from inline function-calling to an MCP server. This lesson covers the inline case; MCP covers the protocol case.</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Implement a function calling loop: define tool schemas, parse the model&#39;s tool-call JSON, execute functions, and return results</li>
+<li>Design tool schemas with clear descriptions and typed parameters that the model can reliably invoke</li>
+<li>Build a multi-turn agent loop that chains multiple function calls to answer complex queries</li>
+<li>Handle function calling edge cases: parallel tool calls, error propagation, and preventing infinite tool loops</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>You build a chatbot. A user asks: &quot;What&#39;s the weather in Tokyo right now?&quot;</p>
+<p>The model responds: &quot;I don&#39;t have access to real-time weather data, but based on the season, Tokyo is likely around 15 degrees Celsius...&quot;</p>
+<p>That is a hallucination dressed in a disclaimer. The model does not know the weather. It never will. Weather changes every hour. The model&#39;s training data is months old.</p>
+<p>The correct answer requires calling the OpenWeatherMap API, getting the current temperature, and returning the real number. The model cannot call APIs. Your code can. The missing piece: a structured protocol that lets the model say &quot;I need to call the weather API with these arguments&quot; and lets your code execute it and feed the result back.</p>
+<p>This is function calling. The model outputs structured JSON describing which function to invoke with what arguments. Your application executes the function. The result goes back into the conversation. The model uses the result to produce its final answer.</p>
+<p>Without function calling, LLMs are encyclopedias. With it, they become agents.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="the-function-calling-loop" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-function-calling-loop" aria-label="Link to this section">#</a>The Function Calling Loop</h3>
+<p>Every tool-use interaction follows the same 5-step loop.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">sequenceDiagram
+    participant U as User
+    participant A as Application
+    participant M as Model
+    participant T as Tool
+
+    U-&gt;&gt;A: &quot;What's the weather in Tokyo?&quot;
+    A-&gt;&gt;M: messages + tool definitions
+    M-&gt;&gt;A: tool_call: get_weather(city=&quot;Tokyo&quot;)
+    A-&gt;&gt;T: Execute get_weather(&quot;Tokyo&quot;)
+    T-&gt;&gt;A: {&quot;temp&quot;: 18, &quot;condition&quot;: &quot;cloudy&quot;}
+    A-&gt;&gt;M: tool_result + conversation
+    M-&gt;&gt;A: &quot;It's 18C and cloudy in Tokyo.&quot;
+    A-&gt;&gt;U: Final response</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>Step 1: the user sends a message. Step 2: the model receives the message along with tool definitions (JSON Schema describing available functions). Step 3: instead of responding with text, the model outputs a tool call -- a structured JSON object with the function name and arguments. Step 4: your code executes the function and captures the result. Step 5: the result goes back to the model, which now has real data to produce its final answer.</p>
+<p>The model never executes anything. It only decides what to call and with what arguments. Your code is the executor.</p>
+<h3 id="tool-definitions-the-json-schema-contract" class="prose-h prose-h3"><a class="prose-h__anchor" href="#tool-definitions-the-json-schema-contract" aria-label="Link to this section">#</a>Tool Definitions: The JSON Schema Contract</h3>
+<p>Each tool is defined by a JSON Schema that tells the model what the function does, what arguments it takes, and what types those arguments must be.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"function"</span><span class="token punctuation">,</span>
+  <span class="token property">"function"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"get_weather"</span><span class="token punctuation">,</span>
+    <span class="token property">"description"</span><span class="token operator">:</span> <span class="token string">"Get current weather for a city. Returns temperature in Celsius and conditions."</span><span class="token punctuation">,</span>
+    <span class="token property">"parameters"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"object"</span><span class="token punctuation">,</span>
+      <span class="token property">"properties"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token property">"city"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+          <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+          <span class="token property">"description"</span><span class="token operator">:</span> <span class="token string">"City name, e.g. 'Tokyo' or 'San Francisco'"</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token property">"units"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+          <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+          <span class="token property">"enum"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"celsius"</span><span class="token punctuation">,</span> <span class="token string">"fahrenheit"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+          <span class="token property">"description"</span><span class="token operator">:</span> <span class="token string">"Temperature units"</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token property">"required"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"city"</span><span class="token punctuation">]</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<p>The <code class="inline-code">description</code> fields are critical. The model reads them to decide when and how to use the tool. A vague description like &quot;gets weather&quot; produces worse tool selection than &quot;Get current weather for a city. Returns temperature in Celsius and conditions.&quot; The description is a prompt for tool selection.</p>
+<h3 id="provider-comparison" class="prose-h prose-h3"><a class="prose-h__anchor" href="#provider-comparison" aria-label="Link to this section">#</a>Provider Comparison</h3>
+<p>Every major provider supports function calling, but the API surface differs.</p>
+<table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>API Parameter</th>
+<th>Tool Call Format</th>
+<th>Parallel Calls</th>
+<th>Forced Calling</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>OpenAI (GPT-5, o4)</td>
+<td><code class="inline-code">tools</code></td>
+<td><code class="inline-code">tool_calls[].function</code></td>
+<td>Yes (multiple per turn)</td>
+<td><code class="inline-code">tool_choice=&quot;required&quot;</code></td>
+</tr>
+<tr>
+<td>Anthropic (Claude 4.6/4.7)</td>
+<td><code class="inline-code">tools</code></td>
+<td><code class="inline-code">content[].type=&quot;tool_use&quot;</code></td>
+<td>Yes (multiple blocks)</td>
+<td><code class="inline-code">tool_choice={&quot;type&quot;:&quot;any&quot;}</code></td>
+</tr>
+<tr>
+<td>Google (Gemini 3)</td>
+<td><code class="inline-code">function_declarations</code></td>
+<td><code class="inline-code">functionCall</code></td>
+<td>Yes</td>
+<td><code class="inline-code">function_calling_config</code></td>
+</tr>
+<tr>
+<td>Open-weight (Llama 4, Qwen3, DeepSeek-V3)</td>
+<td>Native <code class="inline-code">tools</code> on Llama 4; Hermes or ChatML on others</td>
+<td>Mixed</td>
+<td>Model-dependent</td>
+<td>Prompt-based or <code class="inline-code">tool_choice</code> if supported</td>
+</tr>
+</tbody></table>
+<p>By 2026 the three closed providers have converged on near-identical JSON-Schema-based formats. Llama 4 ships with a native <code class="inline-code">tools</code> field that matches OpenAI&#39;s shape. Open-weight fine-tunes still vary — the Hermes format (NousResearch) is the most common for third-party fine-tunes. For shared tools across hosts, prefer MCP (Phase 11 · 14) over inline function-calling — the server is the same for all of them.</p>
+<h3 id="tool-choice-auto-required-specific" class="prose-h prose-h3"><a class="prose-h__anchor" href="#tool-choice-auto-required-specific" aria-label="Link to this section">#</a>Tool Choice: Auto, Required, Specific</h3>
+<p>You control when the model uses tools.</p>
+<p><strong>Auto</strong> (default): the model decides whether to call a tool or respond directly. &quot;What&#39;s 2+2?&quot; -- responds directly. &quot;What&#39;s the weather?&quot; -- calls the tool.</p>
+<p><strong>Required</strong>: the model must call at least one tool. Use this when you know the user&#39;s intent requires a tool. Prevents the model from guessing instead of looking up real data.</p>
+<p><strong>Specific function</strong>: force the model to call a particular function. <code class="inline-code">tool_choice={&quot;type&quot;:&quot;function&quot;, &quot;function&quot;: {&quot;name&quot;: &quot;get_weather&quot;}}</code> guarantees the weather tool is called, regardless of the query. Use this for routing -- when upstream logic already determined which tool is needed.</p>
+<h3 id="parallel-function-calling" class="prose-h prose-h3"><a class="prose-h__anchor" href="#parallel-function-calling" aria-label="Link to this section">#</a>Parallel Function Calling</h3>
+<p>GPT-4o and Claude can call multiple functions in a single turn. A user asks: &quot;What&#39;s the weather in Tokyo and New York?&quot; The model outputs two tool calls simultaneously:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">[</span>
+  <span class="token punctuation">{</span><span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"get_weather"</span><span class="token punctuation">,</span> <span class="token property">"arguments"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token property">"city"</span><span class="token operator">:</span> <span class="token string">"Tokyo"</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token punctuation">{</span><span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"get_weather"</span><span class="token punctuation">,</span> <span class="token property">"arguments"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token property">"city"</span><span class="token operator">:</span> <span class="token string">"New York"</span><span class="token punctuation">}</span><span class="token punctuation">}</span>
+<span class="token punctuation">]</span></code></pre>
+</figure>
+<p>Your code executes both (ideally concurrently), returns both results, and the model synthesizes a single response. This cuts round trips from 2 to 1. For agents with 5-10 tool calls per query, parallel calling reduces latency by 60-80%.</p>
+<h3 id="structured-outputs-vs-function-calling" class="prose-h prose-h3"><a class="prose-h__anchor" href="#structured-outputs-vs-function-calling" aria-label="Link to this section">#</a>Structured Outputs vs Function Calling</h3>
+<p>Lesson 03 covered structured outputs. Function calling uses the same JSON Schema machinery, but for a different purpose.</p>
+<p><strong>Structured outputs</strong>: force the model to produce data in a specific shape. The output is the final product. Example: extract product info from text as <code class="inline-code">{name, price, in_stock}</code>.</p>
+<p><strong>Function calling</strong>: the model declares an intent to execute an action. The output is an intermediate step. Example: <code class="inline-code">get_weather(city=&quot;Tokyo&quot;)</code> -- the model is requesting an action, not producing the final answer.</p>
+<p>Use structured outputs when you want data extraction. Use function calling when you want the model to interact with external systems.</p>
+<h3 id="security-the-non-negotiable-rules" class="prose-h prose-h3"><a class="prose-h__anchor" href="#security-the-non-negotiable-rules" aria-label="Link to this section">#</a>Security: The Non-Negotiable Rules</h3>
+<p>Function calling is the most dangerous capability you can give an LLM. The model chooses what to execute. If your tool set includes database queries, the model constructs the queries. If it includes shell commands, the model writes them.</p>
+<p><strong>Rule 1: Never pass model-generated SQL directly to a database.</strong> The model can and will generate DROP TABLE, UNION injections, or queries that return every row. Always parameterize. Always validate. Always use an allowlist of operations.</p>
+<p><strong>Rule 2: Allowlist functions.</strong> The model can only call functions you explicitly define. Never build a generic &quot;execute any function by name&quot; tool. If you have 50 internal functions, expose only the 5 the user needs.</p>
+<p><strong>Rule 3: Validate arguments.</strong> The model might pass a city name of <code class="inline-code">&quot;; DROP TABLE users; --&quot;</code>. Validate every argument against expected types, ranges, and formats before execution.</p>
+<p><strong>Rule 4: Sanitize tool results.</strong> If a tool returns sensitive data (API keys, PII, internal errors), filter it before sending it back to the model. The model will include tool results in its response verbatim.</p>
+<p><strong>Rule 5: Rate limit tool calls.</strong> A model in a loop can call tools hundreds of times. Set a maximum (10-20 calls per conversation is reasonable). Break infinite loops.</p>
+<h3 id="error-handling" class="prose-h prose-h3"><a class="prose-h__anchor" href="#error-handling" aria-label="Link to this section">#</a>Error Handling</h3>
+<p>Tools fail. APIs time out. Databases go down. Files do not exist. The model needs to know when a tool fails and why.</p>
+<p>Return errors as structured tool results, not exceptions:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"error"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"City 'Toky' not found. Did you mean 'Tokyo'?"</span><span class="token punctuation">,</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token string">"CITY_NOT_FOUND"</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<p>The model reads this, adjusts its arguments, and retries. Models are good at self-correcting from structured error messages. They are bad at recovering from empty responses or generic &quot;something went wrong&quot; errors.</p>
+<h3 id="mcp-model-context-protocol" class="prose-h prose-h3"><a class="prose-h__anchor" href="#mcp-model-context-protocol" aria-label="Link to this section">#</a>MCP: Model Context Protocol</h3>
+<p>MCP is Anthropic&#39;s open standard for tool interoperability. Instead of every application defining its own tools, MCP provides a universal protocol: tools are served by MCP servers, consumed by MCP clients (like Claude Code, Cursor, or your application).</p>
+<p>One MCP server can expose tools to any compatible client. A Postgres MCP server gives any MCP-compatible agent database access. A GitHub MCP server gives any agent repository access. The tools are defined once, used everywhere.</p>
+<p>MCP is to function calling what HTTP is to networking. It standardizes the transport layer so tools become portable.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="mx-tool-call-loop"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">mx-tool-call-loop</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> mx tool call loop</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-define-the-tool-registry" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-define-the-tool-registry" aria-label="Link to this section">#</a>Step 1: Define the Tool Registry</h3>
+<p>Build a registry that stores tool definitions and their implementations. Each tool has a JSON Schema definition (what the model sees) and a Python function (what your code executes).</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> json
+<span class="token keyword">import</span> math
+<span class="token keyword">import</span> time
+<span class="token keyword">import</span> hashlib
+
+
+TOOL_REGISTRY <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+
+
+<span class="token keyword">def</span> <span class="token function">register_tool</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span> description<span class="token punctuation">,</span> parameters<span class="token punctuation">,</span> function<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    TOOL_REGISTRY<span class="token punctuation">[</span>name<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
+        <span class="token string">"definition"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+            <span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"function"</span><span class="token punctuation">,</span>
+            <span class="token string">"function"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+                <span class="token string">"name"</span><span class="token punctuation">:</span> name<span class="token punctuation">,</span>
+                <span class="token string">"description"</span><span class="token punctuation">:</span> description<span class="token punctuation">,</span>
+                <span class="token string">"parameters"</span><span class="token punctuation">:</span> parameters<span class="token punctuation">,</span>
+            <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token string">"function"</span><span class="token punctuation">:</span> function<span class="token punctuation">,</span>
+    <span class="token punctuation">}</span></code></pre>
+</figure>
+<h3 id="step-2-implement-5-tools" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-implement-5-tools" aria-label="Link to this section">#</a>Step 2: Implement 5 Tools</h3>
+<p>Build a calculator, weather lookup, web search simulator, file reader, and code runner.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">calculator</span><span class="token punctuation">(</span>expression<span class="token punctuation">,</span> precision<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    allowed <span class="token operator">=</span> <span class="token builtin">set</span><span class="token punctuation">(</span><span class="token string">"0123456789+-*/.() "</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> <span class="token keyword">not</span> <span class="token builtin">all</span><span class="token punctuation">(</span>c <span class="token keyword">in</span> allowed <span class="token keyword">for</span> c <span class="token keyword">in</span> expression<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token string">"error"</span><span class="token punctuation">:</span> <span class="token boolean">True</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string-interpolation"><span class="token string">f"Invalid characters in expression: </span><span class="token interpolation"><span class="token punctuation">{</span>expression<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">}</span>
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        result <span class="token operator">=</span> <span class="token builtin">eval</span><span class="token punctuation">(</span>expression<span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token string">"__builtins__"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token string">"math"</span><span class="token punctuation">:</span> math<span class="token punctuation">}</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token builtin">round</span><span class="token punctuation">(</span><span class="token builtin">float</span><span class="token punctuation">(</span>result<span class="token punctuation">)</span><span class="token punctuation">,</span> precision<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">"expression"</span><span class="token punctuation">:</span> expression<span class="token punctuation">}</span>
+    <span class="token keyword">except</span> Exception <span class="token keyword">as</span> e<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token string">"error"</span><span class="token punctuation">:</span> <span class="token boolean">True</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span><span class="token punctuation">}</span>
+
+
+WEATHER_DB <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">"tokyo"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"temp_c"</span><span class="token punctuation">:</span> <span class="token number">18</span><span class="token punctuation">,</span> <span class="token string">"condition"</span><span class="token punctuation">:</span> <span class="token string">"cloudy"</span><span class="token punctuation">,</span> <span class="token string">"humidity"</span><span class="token punctuation">:</span> <span class="token number">72</span><span class="token punctuation">,</span> <span class="token string">"wind_kph"</span><span class="token punctuation">:</span> <span class="token number">14</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token string">"new york"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"temp_c"</span><span class="token punctuation">:</span> <span class="token number">22</span><span class="token punctuation">,</span> <span class="token string">"condition"</span><span class="token punctuation">:</span> <span class="token string">"sunny"</span><span class="token punctuation">,</span> <span class="token string">"humidity"</span><span class="token punctuation">:</span> <span class="token number">45</span><span class="token punctuation">,</span> <span class="token string">"wind_kph"</span><span class="token punctuation">:</span> <span class="token number">8</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token string">"london"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"temp_c"</span><span class="token punctuation">:</span> <span class="token number">12</span><span class="token punctuation">,</span> <span class="token string">"condition"</span><span class="token punctuation">:</span> <span class="token string">"rainy"</span><span class="token punctuation">,</span> <span class="token string">"humidity"</span><span class="token punctuation">:</span> <span class="token number">88</span><span class="token punctuation">,</span> <span class="token string">"wind_kph"</span><span class="token punctuation">:</span> <span class="token number">22</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token string">"san francisco"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"temp_c"</span><span class="token punctuation">:</span> <span class="token number">16</span><span class="token punctuation">,</span> <span class="token string">"condition"</span><span class="token punctuation">:</span> <span class="token string">"foggy"</span><span class="token punctuation">,</span> <span class="token string">"humidity"</span><span class="token punctuation">:</span> <span class="token number">80</span><span class="token punctuation">,</span> <span class="token string">"wind_kph"</span><span class="token punctuation">:</span> <span class="token number">18</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token string">"sydney"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"temp_c"</span><span class="token punctuation">:</span> <span class="token number">25</span><span class="token punctuation">,</span> <span class="token string">"condition"</span><span class="token punctuation">:</span> <span class="token string">"sunny"</span><span class="token punctuation">,</span> <span class="token string">"humidity"</span><span class="token punctuation">:</span> <span class="token number">55</span><span class="token punctuation">,</span> <span class="token string">"wind_kph"</span><span class="token punctuation">:</span> <span class="token number">10</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span>
+
+
+<span class="token keyword">def</span> <span class="token function">get_weather</span><span class="token punctuation">(</span>city<span class="token punctuation">,</span> units<span class="token operator">=</span><span class="token string">"celsius"</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    key <span class="token operator">=</span> city<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>strip<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> key <span class="token keyword">not</span> <span class="token keyword">in</span> WEATHER_DB<span class="token punctuation">:</span>
+        suggestions <span class="token operator">=</span> <span class="token punctuation">[</span>c <span class="token keyword">for</span> c <span class="token keyword">in</span> WEATHER_DB <span class="token keyword">if</span> c<span class="token punctuation">.</span>startswith<span class="token punctuation">(</span>key<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+        <span class="token keyword">return</span> <span class="token punctuation">{</span>
+            <span class="token string">"error"</span><span class="token punctuation">:</span> <span class="token boolean">True</span><span class="token punctuation">,</span>
+            <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string-interpolation"><span class="token string">f"City '</span><span class="token interpolation"><span class="token punctuation">{</span>city<span class="token punctuation">}</span></span><span class="token string">' not found."</span></span><span class="token punctuation">,</span>
+            <span class="token string">"suggestions"</span><span class="token punctuation">:</span> suggestions<span class="token punctuation">,</span>
+            <span class="token string">"code"</span><span class="token punctuation">:</span> <span class="token string">"CITY_NOT_FOUND"</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span>
+    data <span class="token operator">=</span> WEATHER_DB<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> units <span class="token operator">==</span> <span class="token string">"fahrenheit"</span><span class="token punctuation">:</span>
+        data<span class="token punctuation">[</span><span class="token string">"temp_f"</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token builtin">round</span><span class="token punctuation">(</span>data<span class="token punctuation">[</span><span class="token string">"temp_c"</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token number">9</span> <span class="token operator">/</span> <span class="token number">5</span> <span class="token operator">+</span> <span class="token number">32</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span>
+        <span class="token keyword">del</span> data<span class="token punctuation">[</span><span class="token string">"temp_c"</span><span class="token punctuation">]</span>
+    data<span class="token punctuation">[</span><span class="token string">"city"</span><span class="token punctuation">]</span> <span class="token operator">=</span> city
+    <span class="token keyword">return</span> data
+
+
+SEARCH_DB <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">"python function calling"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+        <span class="token punctuation">{</span><span class="token string">"title"</span><span class="token punctuation">:</span> <span class="token string">"OpenAI Function Calling Guide"</span><span class="token punctuation">,</span> <span class="token string">"url"</span><span class="token punctuation">:</span> <span class="token string">"https://platform.openai.com/docs/guides/function-calling"</span><span class="token punctuation">,</span> <span class="token string">"snippet"</span><span class="token punctuation">:</span> <span class="token string">"Learn how to connect LLMs to external tools."</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span><span class="token string">"title"</span><span class="token punctuation">:</span> <span class="token string">"Anthropic Tool Use"</span><span class="token punctuation">,</span> <span class="token string">"url"</span><span class="token punctuation">:</span> <span class="token string">"https://docs.anthropic.com/en/docs/tool-use"</span><span class="token punctuation">,</span> <span class="token string">"snippet"</span><span class="token punctuation">:</span> <span class="token string">"Claude can interact with external tools and APIs."</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token string">"MCP protocol"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+        <span class="token punctuation">{</span><span class="token string">"title"</span><span class="token punctuation">:</span> <span class="token string">"Model Context Protocol"</span><span class="token punctuation">,</span> <span class="token string">"url"</span><span class="token punctuation">:</span> <span class="token string">"https://modelcontextprotocol.io"</span><span class="token punctuation">,</span> <span class="token string">"snippet"</span><span class="token punctuation">:</span> <span class="token string">"An open standard for connecting AI models to data sources."</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token string">"weather API"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+        <span class="token punctuation">{</span><span class="token string">"title"</span><span class="token punctuation">:</span> <span class="token string">"OpenWeatherMap API"</span><span class="token punctuation">,</span> <span class="token string">"url"</span><span class="token punctuation">:</span> <span class="token string">"https://openweathermap.org/api"</span><span class="token punctuation">,</span> <span class="token string">"snippet"</span><span class="token punctuation">:</span> <span class="token string">"Free weather API with current, forecast, and historical data."</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span>
+
+
+<span class="token keyword">def</span> <span class="token function">web_search</span><span class="token punctuation">(</span>query<span class="token punctuation">,</span> max_results<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    key <span class="token operator">=</span> query<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>strip<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> db_key<span class="token punctuation">,</span> results <span class="token keyword">in</span> SEARCH_DB<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> db_key <span class="token keyword">in</span> key <span class="token keyword">or</span> key <span class="token keyword">in</span> db_key<span class="token punctuation">:</span>
+            <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token string">"query"</span><span class="token punctuation">:</span> query<span class="token punctuation">,</span> <span class="token string">"results"</span><span class="token punctuation">:</span> results<span class="token punctuation">[</span><span class="token punctuation">:</span>max_results<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token string">"total"</span><span class="token punctuation">:</span> <span class="token builtin">len</span><span class="token punctuation">(</span>results<span class="token punctuation">)</span><span class="token punctuation">}</span>
+    <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token string">"query"</span><span class="token punctuation">:</span> query<span class="token punctuation">,</span> <span class="token string">"results"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token string">"total"</span><span class="token punctuation">:</span> <span class="token number">0</span><span class="token punctuation">}</span>
+
+
+FILE_SYSTEM <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">"data/config.json"</span><span class="token punctuation">:</span> <span class="token string">'{"model": "gpt-4o", "temperature": 0.7, "max_tokens": 4096}'</span><span class="token punctuation">,</span>
+    <span class="token string">"data/users.csv"</span><span class="token punctuation">:</span> <span class="token string">"name,email,role\nAlice,alice@example.com,admin\nBob,bob@example.com,user"</span><span class="token punctuation">,</span>
+    <span class="token string">"README.md"</span><span class="token punctuation">:</span> <span class="token string">"# My Project\nA tool-use agent built from scratch."</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span>
+
+
+<span class="token keyword">def</span> <span class="token function">read_file</span><span class="token punctuation">(</span>path<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> <span class="token string">".."</span> <span class="token keyword">in</span> path <span class="token keyword">or</span> path<span class="token punctuation">.</span>startswith<span class="token punctuation">(</span><span class="token string">"/"</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token string">"error"</span><span class="token punctuation">:</span> <span class="token boolean">True</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"Path traversal not allowed."</span><span class="token punctuation">,</span> <span class="token string">"code"</span><span class="token punctuation">:</span> <span class="token string">"FORBIDDEN"</span><span class="token punctuation">}</span>
+    <span class="token keyword">if</span> path <span class="token keyword">not</span> <span class="token keyword">in</span> FILE_SYSTEM<span class="token punctuation">:</span>
+        available <span class="token operator">=</span> <span class="token builtin">list</span><span class="token punctuation">(</span>FILE_SYSTEM<span class="token punctuation">.</span>keys<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token string">"error"</span><span class="token punctuation">:</span> <span class="token boolean">True</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string-interpolation"><span class="token string">f"File '</span><span class="token interpolation"><span class="token punctuation">{</span>path<span class="token punctuation">}</span></span><span class="token string">' not found."</span></span><span class="token punctuation">,</span> <span class="token string">"available_files"</span><span class="token punctuation">:</span> available<span class="token punctuation">,</span> <span class="token string">"code"</span><span class="token punctuation">:</span> <span class="token string">"NOT_FOUND"</span><span class="token punctuation">}</span>
+    content <span class="token operator">=</span> FILE_SYSTEM<span class="token punctuation">[</span>path<span class="token punctuation">]</span>
+    <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token string">"path"</span><span class="token punctuation">:</span> path<span class="token punctuation">,</span> <span class="token string">"content"</span><span class="token punctuation">:</span> content<span class="token punctuation">,</span> <span class="token string">"size_bytes"</span><span class="token punctuation">:</span> <span class="token builtin">len</span><span class="token punctuation">(</span>content<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">"lines"</span><span class="token punctuation">:</span> content<span class="token punctuation">.</span>count<span class="token punctuation">(</span><span class="token string">"\n"</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">}</span>
+
+
+<span class="token keyword">def</span> <span class="token function">run_code</span><span class="token punctuation">(</span>code<span class="token punctuation">,</span> language<span class="token operator">=</span><span class="token string">"python"</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> language <span class="token operator">!=</span> <span class="token string">"python"</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token string">"error"</span><span class="token punctuation">:</span> <span class="token boolean">True</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string-interpolation"><span class="token string">f"Language '</span><span class="token interpolation"><span class="token punctuation">{</span>language<span class="token punctuation">}</span></span><span class="token string">' not supported. Only 'python' is available."</span></span><span class="token punctuation">}</span>
+    forbidden <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">"import os"</span><span class="token punctuation">,</span> <span class="token string">"import sys"</span><span class="token punctuation">,</span> <span class="token string">"import subprocess"</span><span class="token punctuation">,</span> <span class="token string">"exec("</span><span class="token punctuation">,</span> <span class="token string">"eval("</span><span class="token punctuation">,</span> <span class="token string">"__import__"</span><span class="token punctuation">,</span> <span class="token string">"open("</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> pattern <span class="token keyword">in</span> forbidden<span class="token punctuation">:</span>
+        <span class="token keyword">if</span> pattern <span class="token keyword">in</span> code<span class="token punctuation">:</span>
+            <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token string">"error"</span><span class="token punctuation">:</span> <span class="token boolean">True</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string-interpolation"><span class="token string">f"Forbidden operation: </span><span class="token interpolation"><span class="token punctuation">{</span>pattern<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">,</span> <span class="token string">"code"</span><span class="token punctuation">:</span> <span class="token string">"SECURITY_VIOLATION"</span><span class="token punctuation">}</span>
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        local_vars <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+        <span class="token keyword">exec</span><span class="token punctuation">(</span>code<span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token string">"__builtins__"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"print"</span><span class="token punctuation">:</span> <span class="token keyword">print</span><span class="token punctuation">,</span> <span class="token string">"range"</span><span class="token punctuation">:</span> <span class="token builtin">range</span><span class="token punctuation">,</span> <span class="token string">"len"</span><span class="token punctuation">:</span> <span class="token builtin">len</span><span class="token punctuation">,</span> <span class="token string">"str"</span><span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">,</span> <span class="token string">"int"</span><span class="token punctuation">:</span> <span class="token builtin">int</span><span class="token punctuation">,</span> <span class="token string">"float"</span><span class="token punctuation">:</span> <span class="token builtin">float</span><span class="token punctuation">,</span> <span class="token string">"list"</span><span class="token punctuation">:</span> <span class="token builtin">list</span><span class="token punctuation">,</span> <span class="token string">"dict"</span><span class="token punctuation">:</span> <span class="token builtin">dict</span><span class="token punctuation">,</span> <span class="token string">"sum"</span><span class="token punctuation">:</span> <span class="token builtin">sum</span><span class="token punctuation">,</span> <span class="token string">"min"</span><span class="token punctuation">:</span> <span class="token builtin">min</span><span class="token punctuation">,</span> <span class="token string">"max"</span><span class="token punctuation">:</span> <span class="token builtin">max</span><span class="token punctuation">,</span> <span class="token string">"abs"</span><span class="token punctuation">:</span> <span class="token builtin">abs</span><span class="token punctuation">,</span> <span class="token string">"round"</span><span class="token punctuation">:</span> <span class="token builtin">round</span><span class="token punctuation">,</span> <span class="token string">"sorted"</span><span class="token punctuation">:</span> <span class="token builtin">sorted</span><span class="token punctuation">,</span> <span class="token string">"enumerate"</span><span class="token punctuation">:</span> <span class="token builtin">enumerate</span><span class="token punctuation">,</span> <span class="token string">"zip"</span><span class="token punctuation">:</span> <span class="token builtin">zip</span><span class="token punctuation">,</span> <span class="token string">"map"</span><span class="token punctuation">:</span> <span class="token builtin">map</span><span class="token punctuation">,</span> <span class="token string">"filter"</span><span class="token punctuation">:</span> <span class="token builtin">filter</span><span class="token punctuation">,</span> <span class="token string">"math"</span><span class="token punctuation">:</span> math<span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">,</span> local_vars<span class="token punctuation">)</span>
+        result <span class="token operator">=</span> local_vars<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"result"</span><span class="token punctuation">,</span> <span class="token boolean">None</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token string">"success"</span><span class="token punctuation">:</span> <span class="token boolean">True</span><span class="token punctuation">,</span> <span class="token string">"result"</span><span class="token punctuation">:</span> result<span class="token punctuation">,</span> <span class="token string">"variables"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>k<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">(</span>v<span class="token punctuation">)</span> <span class="token keyword">for</span> k<span class="token punctuation">,</span> v <span class="token keyword">in</span> local_vars<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">if</span> <span class="token keyword">not</span> k<span class="token punctuation">.</span>startswith<span class="token punctuation">(</span><span class="token string">"_"</span><span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">}</span>
+    <span class="token keyword">except</span> Exception <span class="token keyword">as</span> e<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token string">"error"</span><span class="token punctuation">:</span> <span class="token boolean">True</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">type</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span><span class="token punctuation">.</span>__name__<span class="token punctuation">}</span></span><span class="token string">: </span><span class="token interpolation"><span class="token punctuation">{</span>e<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">}</span></code></pre>
+</figure>
+<h3 id="step-3-register-all-tools" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-register-all-tools" aria-label="Link to this section">#</a>Step 3: Register All Tools</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">register_all_tools</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    register_tool<span class="token punctuation">(</span>
+        <span class="token string">"calculator"</span><span class="token punctuation">,</span> <span class="token string">"Evaluate a mathematical expression. Supports +, -, *, /, parentheses, and decimals. Returns the numeric result."</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span><span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"object"</span><span class="token punctuation">,</span> <span class="token string">"properties"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"expression"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span> <span class="token string">"description"</span><span class="token punctuation">:</span> <span class="token string">"Math expression, e.g. '(10 + 5) * 3'"</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token string">"precision"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"integer"</span><span class="token punctuation">,</span> <span class="token string">"description"</span><span class="token punctuation">:</span> <span class="token string">"Decimal places in result"</span><span class="token punctuation">,</span> <span class="token string">"default"</span><span class="token punctuation">:</span> <span class="token number">2</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token string">"required"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">"expression"</span><span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+        calculator<span class="token punctuation">,</span>
+    <span class="token punctuation">)</span>
+    register_tool<span class="token punctuation">(</span>
+        <span class="token string">"get_weather"</span><span class="token punctuation">,</span> <span class="token string">"Get current weather for a city. Returns temperature, condition, humidity, and wind speed."</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span><span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"object"</span><span class="token punctuation">,</span> <span class="token string">"properties"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"city"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span> <span class="token string">"description"</span><span class="token punctuation">:</span> <span class="token string">"City name, e.g. 'Tokyo' or 'San Francisco'"</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token string">"units"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span> <span class="token string">"enum"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">"celsius"</span><span class="token punctuation">,</span> <span class="token string">"fahrenheit"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token string">"description"</span><span class="token punctuation">:</span> <span class="token string">"Temperature units, defaults to celsius"</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token string">"required"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">"city"</span><span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+        get_weather<span class="token punctuation">,</span>
+    <span class="token punctuation">)</span>
+    register_tool<span class="token punctuation">(</span>
+        <span class="token string">"web_search"</span><span class="token punctuation">,</span> <span class="token string">"Search the web for information. Returns a list of results with title, URL, and snippet."</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span><span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"object"</span><span class="token punctuation">,</span> <span class="token string">"properties"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"query"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span> <span class="token string">"description"</span><span class="token punctuation">:</span> <span class="token string">"Search query"</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token string">"max_results"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"integer"</span><span class="token punctuation">,</span> <span class="token string">"description"</span><span class="token punctuation">:</span> <span class="token string">"Maximum results to return"</span><span class="token punctuation">,</span> <span class="token string">"default"</span><span class="token punctuation">:</span> <span class="token number">3</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token string">"required"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">"query"</span><span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+        web_search<span class="token punctuation">,</span>
+    <span class="token punctuation">)</span>
+    register_tool<span class="token punctuation">(</span>
+        <span class="token string">"read_file"</span><span class="token punctuation">,</span> <span class="token string">"Read the contents of a file. Returns the file content, size, and line count."</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span><span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"object"</span><span class="token punctuation">,</span> <span class="token string">"properties"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"path"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span> <span class="token string">"description"</span><span class="token punctuation">:</span> <span class="token string">"Relative file path, e.g. 'data/config.json'"</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token string">"required"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">"path"</span><span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+        read_file<span class="token punctuation">,</span>
+    <span class="token punctuation">)</span>
+    register_tool<span class="token punctuation">(</span>
+        <span class="token string">"run_code"</span><span class="token punctuation">,</span> <span class="token string">"Execute Python code in a sandboxed environment. Set a 'result' variable to return output."</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span><span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"object"</span><span class="token punctuation">,</span> <span class="token string">"properties"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"code"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span> <span class="token string">"description"</span><span class="token punctuation">:</span> <span class="token string">"Python code to execute"</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token string">"language"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span> <span class="token string">"enum"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">"python"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token string">"description"</span><span class="token punctuation">:</span> <span class="token string">"Programming language"</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token string">"required"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">"code"</span><span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+        run_code<span class="token punctuation">,</span>
+    <span class="token punctuation">)</span></code></pre>
+</figure>
+<h3 id="step-4-build-the-function-calling-loop" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-build-the-function-calling-loop" aria-label="Link to this section">#</a>Step 4: Build the Function Calling Loop</h3>
+<p>This is the core engine. It simulates the model deciding which tool to call, executes the tool, and feeds results back.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">simulate_model_decision</span><span class="token punctuation">(</span>user_message<span class="token punctuation">,</span> tools<span class="token punctuation">,</span> conversation_history<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    msg <span class="token operator">=</span> user_message<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">if</span> <span class="token builtin">any</span><span class="token punctuation">(</span>word <span class="token keyword">in</span> msg <span class="token keyword">for</span> word <span class="token keyword">in</span> <span class="token punctuation">[</span><span class="token string">"weather"</span><span class="token punctuation">,</span> <span class="token string">"temperature"</span><span class="token punctuation">,</span> <span class="token string">"forecast"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        cities <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">for</span> city <span class="token keyword">in</span> WEATHER_DB<span class="token punctuation">:</span>
+            <span class="token keyword">if</span> city <span class="token keyword">in</span> msg<span class="token punctuation">:</span>
+                cities<span class="token punctuation">.</span>append<span class="token punctuation">(</span>city<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> <span class="token keyword">not</span> cities<span class="token punctuation">:</span>
+            <span class="token keyword">for</span> word <span class="token keyword">in</span> msg<span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                <span class="token keyword">if</span> word<span class="token punctuation">.</span>capitalize<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">in</span> <span class="token punctuation">[</span>c<span class="token punctuation">.</span>title<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">for</span> c <span class="token keyword">in</span> WEATHER_DB<span class="token punctuation">]</span><span class="token punctuation">:</span>
+                    cities<span class="token punctuation">.</span>append<span class="token punctuation">(</span>word<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> <span class="token keyword">not</span> cities<span class="token punctuation">:</span>
+            cities <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">"tokyo"</span><span class="token punctuation">]</span>
+        calls <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">for</span> city <span class="token keyword">in</span> cities<span class="token punctuation">:</span>
+            calls<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"get_weather"</span><span class="token punctuation">,</span> <span class="token string">"arguments"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"city"</span><span class="token punctuation">:</span> city<span class="token punctuation">.</span>title<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> calls
+
+    <span class="token keyword">if</span> <span class="token builtin">any</span><span class="token punctuation">(</span>word <span class="token keyword">in</span> msg <span class="token keyword">for</span> word <span class="token keyword">in</span> <span class="token punctuation">[</span><span class="token string">"calculate"</span><span class="token punctuation">,</span> <span class="token string">"compute"</span><span class="token punctuation">,</span> <span class="token string">"math"</span><span class="token punctuation">,</span> <span class="token string">"what is"</span><span class="token punctuation">,</span> <span class="token string">"how much"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">for</span> token <span class="token keyword">in</span> msg<span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> <span class="token builtin">any</span><span class="token punctuation">(</span>c <span class="token keyword">in</span> token <span class="token keyword">for</span> c <span class="token keyword">in</span> <span class="token string">"+-*/"</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"calculator"</span><span class="token punctuation">,</span> <span class="token string">"arguments"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"expression"</span><span class="token punctuation">:</span> token<span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">]</span>
+        <span class="token keyword">if</span> <span class="token string">"+"</span> <span class="token keyword">in</span> msg <span class="token keyword">or</span> <span class="token string">"-"</span> <span class="token keyword">in</span> msg <span class="token keyword">or</span> <span class="token string">"*"</span> <span class="token keyword">in</span> msg <span class="token keyword">or</span> <span class="token string">"/"</span> <span class="token keyword">in</span> msg<span class="token punctuation">:</span>
+            expr <span class="token operator">=</span> <span class="token string">""</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>c <span class="token keyword">for</span> c <span class="token keyword">in</span> msg <span class="token keyword">if</span> c <span class="token keyword">in</span> <span class="token string">"0123456789+-*/.() "</span><span class="token punctuation">)</span>
+            <span class="token keyword">if</span> expr<span class="token punctuation">.</span>strip<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"calculator"</span><span class="token punctuation">,</span> <span class="token string">"arguments"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"expression"</span><span class="token punctuation">:</span> expr<span class="token punctuation">.</span>strip<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">]</span>
+        <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"calculator"</span><span class="token punctuation">,</span> <span class="token string">"arguments"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"expression"</span><span class="token punctuation">:</span> <span class="token string">"0"</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">if</span> <span class="token builtin">any</span><span class="token punctuation">(</span>word <span class="token keyword">in</span> msg <span class="token keyword">for</span> word <span class="token keyword">in</span> <span class="token punctuation">[</span><span class="token string">"search"</span><span class="token punctuation">,</span> <span class="token string">"find"</span><span class="token punctuation">,</span> <span class="token string">"look up"</span><span class="token punctuation">,</span> <span class="token string">"google"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        query <span class="token operator">=</span> msg<span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">"search for"</span><span class="token punctuation">,</span> <span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">"look up"</span><span class="token punctuation">,</span> <span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">"find"</span><span class="token punctuation">,</span> <span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">.</span>strip<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"web_search"</span><span class="token punctuation">,</span> <span class="token string">"arguments"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"query"</span><span class="token punctuation">:</span> query<span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">if</span> <span class="token builtin">any</span><span class="token punctuation">(</span>word <span class="token keyword">in</span> msg <span class="token keyword">for</span> word <span class="token keyword">in</span> <span class="token punctuation">[</span><span class="token string">"read"</span><span class="token punctuation">,</span> <span class="token string">"file"</span><span class="token punctuation">,</span> <span class="token string">"open"</span><span class="token punctuation">,</span> <span class="token string">"cat"</span><span class="token punctuation">,</span> <span class="token string">"show"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">for</span> path <span class="token keyword">in</span> FILE_SYSTEM<span class="token punctuation">:</span>
+            <span class="token keyword">if</span> path<span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token string">"/"</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token string">"."</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token keyword">in</span> msg<span class="token punctuation">:</span>
+                <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"read_file"</span><span class="token punctuation">,</span> <span class="token string">"arguments"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"path"</span><span class="token punctuation">:</span> path<span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">]</span>
+        <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"read_file"</span><span class="token punctuation">,</span> <span class="token string">"arguments"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"path"</span><span class="token punctuation">:</span> <span class="token string">"README.md"</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">if</span> <span class="token builtin">any</span><span class="token punctuation">(</span>word <span class="token keyword">in</span> msg <span class="token keyword">for</span> word <span class="token keyword">in</span> <span class="token punctuation">[</span><span class="token string">"run"</span><span class="token punctuation">,</span> <span class="token string">"execute"</span><span class="token punctuation">,</span> <span class="token string">"code"</span><span class="token punctuation">,</span> <span class="token string">"python"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"run_code"</span><span class="token punctuation">,</span> <span class="token string">"arguments"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"code"</span><span class="token punctuation">:</span> <span class="token string">"result = 'Hello from the sandbox!'"</span><span class="token punctuation">,</span> <span class="token string">"language"</span><span class="token punctuation">:</span> <span class="token string">"python"</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+
+
+<span class="token keyword">def</span> <span class="token function">execute_tool_call</span><span class="token punctuation">(</span>tool_call<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    name <span class="token operator">=</span> tool_call<span class="token punctuation">[</span><span class="token string">"name"</span><span class="token punctuation">]</span>
+    args <span class="token operator">=</span> tool_call<span class="token punctuation">[</span><span class="token string">"arguments"</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">if</span> name <span class="token keyword">not</span> <span class="token keyword">in</span> TOOL_REGISTRY<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token string">"error"</span><span class="token punctuation">:</span> <span class="token boolean">True</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string-interpolation"><span class="token string">f"Unknown tool: </span><span class="token interpolation"><span class="token punctuation">{</span>name<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">,</span> <span class="token string">"code"</span><span class="token punctuation">:</span> <span class="token string">"UNKNOWN_TOOL"</span><span class="token punctuation">}</span>
+
+    tool <span class="token operator">=</span> TOOL_REGISTRY<span class="token punctuation">[</span>name<span class="token punctuation">]</span>
+    func <span class="token operator">=</span> tool<span class="token punctuation">[</span><span class="token string">"function"</span><span class="token punctuation">]</span>
+    start <span class="token operator">=</span> time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        result <span class="token operator">=</span> func<span class="token punctuation">(</span><span class="token operator">**</span>args<span class="token punctuation">)</span>
+    <span class="token keyword">except</span> TypeError <span class="token keyword">as</span> e<span class="token punctuation">:</span>
+        result <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"error"</span><span class="token punctuation">:</span> <span class="token boolean">True</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string-interpolation"><span class="token string">f"Invalid arguments: </span><span class="token interpolation"><span class="token punctuation">{</span>e<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">}</span>
+
+    elapsed_ms <span class="token operator">=</span> <span class="token builtin">round</span><span class="token punctuation">(</span><span class="token punctuation">(</span>time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span> start<span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">1000</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token string">"tool"</span><span class="token punctuation">:</span> name<span class="token punctuation">,</span> <span class="token string">"result"</span><span class="token punctuation">:</span> result<span class="token punctuation">,</span> <span class="token string">"execution_time_ms"</span><span class="token punctuation">:</span> elapsed_ms<span class="token punctuation">}</span>
+
+
+<span class="token keyword">def</span> <span class="token function">run_function_calling_loop</span><span class="token punctuation">(</span>user_message<span class="token punctuation">,</span> max_iterations<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    conversation <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">"role"</span><span class="token punctuation">:</span> <span class="token string">"user"</span><span class="token punctuation">,</span> <span class="token string">"content"</span><span class="token punctuation">:</span> user_message<span class="token punctuation">}</span><span class="token punctuation">]</span>
+    tool_definitions <span class="token operator">=</span> <span class="token punctuation">[</span>t<span class="token punctuation">[</span><span class="token string">"definition"</span><span class="token punctuation">]</span> <span class="token keyword">for</span> t <span class="token keyword">in</span> TOOL_REGISTRY<span class="token punctuation">.</span>values<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+    all_tool_results <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">for</span> iteration <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>max_iterations<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        tool_calls <span class="token operator">=</span> simulate_model_decision<span class="token punctuation">(</span>user_message<span class="token punctuation">,</span> tool_definitions<span class="token punctuation">,</span> conversation<span class="token punctuation">)</span>
+
+        <span class="token keyword">if</span> <span class="token keyword">not</span> tool_calls<span class="token punctuation">:</span>
+            <span class="token keyword">break</span>
+
+        results <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">for</span> call <span class="token keyword">in</span> tool_calls<span class="token punctuation">:</span>
+            result <span class="token operator">=</span> execute_tool_call<span class="token punctuation">(</span>call<span class="token punctuation">)</span>
+            results<span class="token punctuation">.</span>append<span class="token punctuation">(</span>result<span class="token punctuation">)</span>
+
+        conversation<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"role"</span><span class="token punctuation">:</span> <span class="token string">"assistant"</span><span class="token punctuation">,</span> <span class="token string">"content"</span><span class="token punctuation">:</span> <span class="token boolean">None</span><span class="token punctuation">,</span> <span class="token string">"tool_calls"</span><span class="token punctuation">:</span> tool_calls<span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+        <span class="token keyword">for</span> result <span class="token keyword">in</span> results<span class="token punctuation">:</span>
+            conversation<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"role"</span><span class="token punctuation">:</span> <span class="token string">"tool"</span><span class="token punctuation">,</span> <span class="token string">"content"</span><span class="token punctuation">:</span> json<span class="token punctuation">.</span>dumps<span class="token punctuation">(</span>result<span class="token punctuation">[</span><span class="token string">"result"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">"tool_name"</span><span class="token punctuation">:</span> result<span class="token punctuation">[</span><span class="token string">"tool"</span><span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+        all_tool_results<span class="token punctuation">.</span>extend<span class="token punctuation">(</span>results<span class="token punctuation">)</span>
+        <span class="token keyword">break</span>
+
+    <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token string">"conversation"</span><span class="token punctuation">:</span> conversation<span class="token punctuation">,</span> <span class="token string">"tool_results"</span><span class="token punctuation">:</span> all_tool_results<span class="token punctuation">,</span> <span class="token string">"iterations"</span><span class="token punctuation">:</span> iteration <span class="token operator">+</span> <span class="token number">1</span> <span class="token keyword">if</span> tool_calls <span class="token keyword">else</span> <span class="token number">0</span><span class="token punctuation">}</span></code></pre>
+</figure>
+<h3 id="step-5-argument-validation" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-argument-validation" aria-label="Link to this section">#</a>Step 5: Argument Validation</h3>
+<p>Build a validator that checks tool call arguments against the JSON Schema before execution.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">validate_tool_arguments</span><span class="token punctuation">(</span>tool_name<span class="token punctuation">,</span> arguments<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> tool_name <span class="token keyword">not</span> <span class="token keyword">in</span> TOOL_REGISTRY<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token string-interpolation"><span class="token string">f"Unknown tool: </span><span class="token interpolation"><span class="token punctuation">{</span>tool_name<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">]</span>
+
+    schema <span class="token operator">=</span> TOOL_REGISTRY<span class="token punctuation">[</span>tool_name<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">"definition"</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">"function"</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">"parameters"</span><span class="token punctuation">]</span>
+    errors <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">if</span> <span class="token keyword">not</span> <span class="token builtin">isinstance</span><span class="token punctuation">(</span>arguments<span class="token punctuation">,</span> <span class="token builtin">dict</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token string-interpolation"><span class="token string">f"Arguments must be an object, got </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">type</span><span class="token punctuation">(</span>arguments<span class="token punctuation">)</span><span class="token punctuation">.</span>__name__<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">]</span>
+
+    <span class="token keyword">for</span> required_field <span class="token keyword">in</span> schema<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"required"</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> required_field <span class="token keyword">not</span> <span class="token keyword">in</span> arguments<span class="token punctuation">:</span>
+            errors<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Missing required argument: </span><span class="token interpolation"><span class="token punctuation">{</span>required_field<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    properties <span class="token operator">=</span> schema<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"properties"</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> arg_name<span class="token punctuation">,</span> arg_value <span class="token keyword">in</span> arguments<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> arg_name <span class="token keyword">not</span> <span class="token keyword">in</span> properties<span class="token punctuation">:</span>
+            errors<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Unknown argument: </span><span class="token interpolation"><span class="token punctuation">{</span>arg_name<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+            <span class="token keyword">continue</span>
+
+        prop_schema <span class="token operator">=</span> properties<span class="token punctuation">[</span>arg_name<span class="token punctuation">]</span>
+        expected_type <span class="token operator">=</span> prop_schema<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"type"</span><span class="token punctuation">)</span>
+
+        type_checks <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"string"</span><span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">,</span> <span class="token string">"integer"</span><span class="token punctuation">:</span> <span class="token builtin">int</span><span class="token punctuation">,</span> <span class="token string">"number"</span><span class="token punctuation">:</span> <span class="token punctuation">(</span><span class="token builtin">int</span><span class="token punctuation">,</span> <span class="token builtin">float</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">"boolean"</span><span class="token punctuation">:</span> <span class="token builtin">bool</span><span class="token punctuation">,</span> <span class="token string">"array"</span><span class="token punctuation">:</span> <span class="token builtin">list</span><span class="token punctuation">,</span> <span class="token string">"object"</span><span class="token punctuation">:</span> <span class="token builtin">dict</span><span class="token punctuation">}</span>
+        <span class="token keyword">if</span> expected_type <span class="token keyword">in</span> type_checks<span class="token punctuation">:</span>
+            <span class="token keyword">if</span> <span class="token keyword">not</span> <span class="token builtin">isinstance</span><span class="token punctuation">(</span>arg_value<span class="token punctuation">,</span> type_checks<span class="token punctuation">[</span>expected_type<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                errors<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Argument '</span><span class="token interpolation"><span class="token punctuation">{</span>arg_name<span class="token punctuation">}</span></span><span class="token string">': expected </span><span class="token interpolation"><span class="token punctuation">{</span>expected_type<span class="token punctuation">}</span></span><span class="token string">, got </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">type</span><span class="token punctuation">(</span>arg_value<span class="token punctuation">)</span><span class="token punctuation">.</span>__name__<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+        <span class="token keyword">if</span> <span class="token string">"enum"</span> <span class="token keyword">in</span> prop_schema <span class="token keyword">and</span> arg_value <span class="token keyword">not</span> <span class="token keyword">in</span> prop_schema<span class="token punctuation">[</span><span class="token string">"enum"</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
+            errors<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Argument '</span><span class="token interpolation"><span class="token punctuation">{</span>arg_name<span class="token punctuation">}</span></span><span class="token string">': '</span><span class="token interpolation"><span class="token punctuation">{</span>arg_value<span class="token punctuation">}</span></span><span class="token string">' not in </span><span class="token interpolation"><span class="token punctuation">{</span>prop_schema<span class="token punctuation">[</span><span class="token string">'enum'</span><span class="token punctuation">]</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> errors</code></pre>
+</figure>
+<h3 id="step-6-run-the-demo" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-6-run-the-demo" aria-label="Link to this section">#</a>Step 6: Run the Demo</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">run_demo</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    register_all_tools<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">60</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"  Function Calling &amp; Tool Use Demo"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">60</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n--- Registered Tools ---"</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> name<span class="token punctuation">,</span> tool <span class="token keyword">in</span> TOOL_REGISTRY<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        desc <span class="token operator">=</span> tool<span class="token punctuation">[</span><span class="token string">"definition"</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">"function"</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">"description"</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">60</span><span class="token punctuation">]</span>
+        params <span class="token operator">=</span> <span class="token builtin">list</span><span class="token punctuation">(</span>tool<span class="token punctuation">[</span><span class="token string">"definition"</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">"function"</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">"parameters"</span><span class="token punctuation">]</span><span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"properties"</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span>keys<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  </span><span class="token interpolation"><span class="token punctuation">{</span>name<span class="token punctuation">}</span></span><span class="token string">: </span><span class="token interpolation"><span class="token punctuation">{</span>desc<span class="token punctuation">}</span></span><span class="token string">..."</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"    params: </span><span class="token interpolation"><span class="token punctuation">{</span>params<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"\n--- Argument Validation ---"</span></span><span class="token punctuation">)</span>
+    validation_tests <span class="token operator">=</span> <span class="token punctuation">[</span>
+        <span class="token punctuation">(</span><span class="token string">"get_weather"</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token string">"city"</span><span class="token punctuation">:</span> <span class="token string">"Tokyo"</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token string">"Valid call"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">(</span><span class="token string">"get_weather"</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token string">"Missing required arg"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">(</span><span class="token string">"get_weather"</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token string">"city"</span><span class="token punctuation">:</span> <span class="token string">"Tokyo"</span><span class="token punctuation">,</span> <span class="token string">"units"</span><span class="token punctuation">:</span> <span class="token string">"kelvin"</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token string">"Invalid enum value"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">(</span><span class="token string">"calculator"</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token string">"expression"</span><span class="token punctuation">:</span> <span class="token number">123</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token string">"Wrong type (int for string)"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">(</span><span class="token string">"unknown_tool"</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token string">"x"</span><span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token string">"Unknown tool"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span>
+    <span class="token keyword">for</span> tool_name<span class="token punctuation">,</span> args<span class="token punctuation">,</span> label <span class="token keyword">in</span> validation_tests<span class="token punctuation">:</span>
+        errors <span class="token operator">=</span> validate_tool_arguments<span class="token punctuation">(</span>tool_name<span class="token punctuation">,</span> args<span class="token punctuation">)</span>
+        status <span class="token operator">=</span> <span class="token string">"VALID"</span> <span class="token keyword">if</span> <span class="token keyword">not</span> errors <span class="token keyword">else</span> <span class="token string-interpolation"><span class="token string">f"ERRORS: </span><span class="token interpolation"><span class="token punctuation">{</span>errors<span class="token punctuation">}</span></span><span class="token string">"</span></span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  </span><span class="token interpolation"><span class="token punctuation">{</span>label<span class="token punctuation">}</span></span><span class="token string">: </span><span class="token interpolation"><span class="token punctuation">{</span>status<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"\n--- Tool Execution ---"</span></span><span class="token punctuation">)</span>
+    direct_tests <span class="token operator">=</span> <span class="token punctuation">[</span>
+        <span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"calculator"</span><span class="token punctuation">,</span> <span class="token string">"arguments"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"expression"</span><span class="token punctuation">:</span> <span class="token string">"(10 + 5) * 3 / 2"</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"get_weather"</span><span class="token punctuation">,</span> <span class="token string">"arguments"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"city"</span><span class="token punctuation">:</span> <span class="token string">"Tokyo"</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"get_weather"</span><span class="token punctuation">,</span> <span class="token string">"arguments"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"city"</span><span class="token punctuation">:</span> <span class="token string">"Mars"</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"web_search"</span><span class="token punctuation">,</span> <span class="token string">"arguments"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"query"</span><span class="token punctuation">:</span> <span class="token string">"python function calling"</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"read_file"</span><span class="token punctuation">,</span> <span class="token string">"arguments"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"path"</span><span class="token punctuation">:</span> <span class="token string">"data/config.json"</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"read_file"</span><span class="token punctuation">,</span> <span class="token string">"arguments"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"path"</span><span class="token punctuation">:</span> <span class="token string">"../etc/passwd"</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"run_code"</span><span class="token punctuation">,</span> <span class="token string">"arguments"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"code"</span><span class="token punctuation">:</span> <span class="token string">"result = sum(range(1, 101))"</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"run_code"</span><span class="token punctuation">,</span> <span class="token string">"arguments"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"code"</span><span class="token punctuation">:</span> <span class="token string">"import os; os.system('rm -rf /')"</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span>
+    <span class="token keyword">for</span> call <span class="token keyword">in</span> direct_tests<span class="token punctuation">:</span>
+        result <span class="token operator">=</span> execute_tool_call<span class="token punctuation">(</span>call<span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"\n  </span><span class="token interpolation"><span class="token punctuation">{</span>call<span class="token punctuation">[</span><span class="token string">'name'</span><span class="token punctuation">]</span><span class="token punctuation">}</span></span><span class="token string">(</span><span class="token interpolation"><span class="token punctuation">{</span>json<span class="token punctuation">.</span>dumps<span class="token punctuation">(</span>call<span class="token punctuation">[</span><span class="token string">'arguments'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">)"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"    -> </span><span class="token interpolation"><span class="token punctuation">{</span>json<span class="token punctuation">.</span>dumps<span class="token punctuation">(</span>result<span class="token punctuation">[</span><span class="token string">'result'</span><span class="token punctuation">]</span><span class="token punctuation">,</span> indent<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token format-spec">100]</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"    time: </span><span class="token interpolation"><span class="token punctuation">{</span>result<span class="token punctuation">[</span><span class="token string">'execution_time_ms'</span><span class="token punctuation">]</span><span class="token punctuation">}</span></span><span class="token string">ms"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"\n--- Full Function Calling Loop ---"</span></span><span class="token punctuation">)</span>
+    test_queries <span class="token operator">=</span> <span class="token punctuation">[</span>
+        <span class="token string">"What's the weather in Tokyo?"</span><span class="token punctuation">,</span>
+        <span class="token string">"Calculate (100 + 250) * 0.15"</span><span class="token punctuation">,</span>
+        <span class="token string">"Search for MCP protocol"</span><span class="token punctuation">,</span>
+        <span class="token string">"Read the config file"</span><span class="token punctuation">,</span>
+        <span class="token string">"Run some Python code"</span><span class="token punctuation">,</span>
+        <span class="token string">"Tell me a joke"</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span>
+    <span class="token keyword">for</span> query <span class="token keyword">in</span> test_queries<span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"\n  User: </span><span class="token interpolation"><span class="token punctuation">{</span>query<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+        result <span class="token operator">=</span> run_function_calling_loop<span class="token punctuation">(</span>query<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> result<span class="token punctuation">[</span><span class="token string">"tool_results"</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
+            <span class="token keyword">for</span> tr <span class="token keyword">in</span> result<span class="token punctuation">[</span><span class="token string">"tool_results"</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
+                <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"    Tool: </span><span class="token interpolation"><span class="token punctuation">{</span>tr<span class="token punctuation">[</span><span class="token string">'tool'</span><span class="token punctuation">]</span><span class="token punctuation">}</span></span><span class="token string"> (</span><span class="token interpolation"><span class="token punctuation">{</span>tr<span class="token punctuation">[</span><span class="token string">'execution_time_ms'</span><span class="token punctuation">]</span><span class="token punctuation">}</span></span><span class="token string">ms)"</span></span><span class="token punctuation">)</span>
+                <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"    Result: </span><span class="token interpolation"><span class="token punctuation">{</span>json<span class="token punctuation">.</span>dumps<span class="token punctuation">(</span>tr<span class="token punctuation">[</span><span class="token string">'result'</span><span class="token punctuation">]</span><span class="token punctuation">,</span> indent<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token format-spec">90]</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"    [No tool called -- direct response]"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"    Iterations: </span><span class="token interpolation"><span class="token punctuation">{</span>result<span class="token punctuation">[</span><span class="token string">'iterations'</span><span class="token punctuation">]</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"\n--- Parallel Tool Calls ---"</span></span><span class="token punctuation">)</span>
+    multi_city_query <span class="token operator">=</span> <span class="token string">"What's the weather in tokyo and london?"</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  User: </span><span class="token interpolation"><span class="token punctuation">{</span>multi_city_query<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    result <span class="token operator">=</span> run_function_calling_loop<span class="token punctuation">(</span>multi_city_query<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Tool calls made: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">len</span><span class="token punctuation">(</span>result<span class="token punctuation">[</span><span class="token string">'tool_results'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> tr <span class="token keyword">in</span> result<span class="token punctuation">[</span><span class="token string">"tool_results"</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
+        city <span class="token operator">=</span> tr<span class="token punctuation">[</span><span class="token string">"result"</span><span class="token punctuation">]</span><span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"city"</span><span class="token punctuation">,</span> <span class="token string">"unknown"</span><span class="token punctuation">)</span>
+        temp <span class="token operator">=</span> tr<span class="token punctuation">[</span><span class="token string">"result"</span><span class="token punctuation">]</span><span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"temp_c"</span><span class="token punctuation">,</span> <span class="token string">"N/A"</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"    </span><span class="token interpolation"><span class="token punctuation">{</span>city<span class="token punctuation">}</span></span><span class="token string">: </span><span class="token interpolation"><span class="token punctuation">{</span>temp<span class="token punctuation">}</span></span><span class="token string">C, </span><span class="token interpolation"><span class="token punctuation">{</span>tr<span class="token punctuation">[</span><span class="token string">'result'</span><span class="token punctuation">]</span><span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'condition'</span><span class="token punctuation">,</span> <span class="token string">'N/A'</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"\n--- Security Checks ---"</span></span><span class="token punctuation">)</span>
+    security_tests <span class="token operator">=</span> <span class="token punctuation">[</span>
+        <span class="token punctuation">(</span><span class="token string">"read_file"</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token string">"path"</span><span class="token punctuation">:</span> <span class="token string">"../../etc/passwd"</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">(</span><span class="token string">"run_code"</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token string">"code"</span><span class="token punctuation">:</span> <span class="token string">"import subprocess; subprocess.run(['ls'])"</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">(</span><span class="token string">"calculator"</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token string">"expression"</span><span class="token punctuation">:</span> <span class="token string">"__import__('os').system('ls')"</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span>
+    <span class="token keyword">for</span> tool_name<span class="token punctuation">,</span> args <span class="token keyword">in</span> security_tests<span class="token punctuation">:</span>
+        result <span class="token operator">=</span> execute_tool_call<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> tool_name<span class="token punctuation">,</span> <span class="token string">"arguments"</span><span class="token punctuation">:</span> args<span class="token punctuation">}</span><span class="token punctuation">)</span>
+        blocked <span class="token operator">=</span> result<span class="token punctuation">[</span><span class="token string">"result"</span><span class="token punctuation">]</span><span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"error"</span><span class="token punctuation">,</span> <span class="token boolean">False</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  </span><span class="token interpolation"><span class="token punctuation">{</span>tool_name<span class="token punctuation">}</span></span><span class="token string">(</span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">list</span><span class="token punctuation">(</span>args<span class="token punctuation">.</span>values<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token format-spec">40]</span><span class="token punctuation">}</span></span><span class="token string">): </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'BLOCKED'</span> <span class="token keyword">if</span> blocked <span class="token keyword">else</span> <span class="token string">'ALLOWED'</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<h3 id="openai-function-calling" class="prose-h prose-h3"><a class="prose-h__anchor" href="#openai-function-calling" aria-label="Link to this section">#</a>OpenAI Function Calling</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token comment"># from openai import OpenAI</span>
+<span class="token comment">#</span>
+<span class="token comment"># client = OpenAI()</span>
+<span class="token comment">#</span>
+<span class="token comment"># tools = [{</span>
+<span class="token comment">#     "type": "function",</span>
+<span class="token comment">#     "function": {</span>
+<span class="token comment">#         "name": "get_weather",</span>
+<span class="token comment">#         "description": "Get current weather for a city",</span>
+<span class="token comment">#         "parameters": {</span>
+<span class="token comment">#             "type": "object",</span>
+<span class="token comment">#             "properties": {</span>
+<span class="token comment">#                 "city": {"type": "string"},</span>
+<span class="token comment">#                 "units": {"type": "string", "enum": ["celsius", "fahrenheit"]}</span>
+<span class="token comment">#             },</span>
+<span class="token comment">#             "required": ["city"]</span>
+<span class="token comment">#         }</span>
+<span class="token comment">#     }</span>
+<span class="token comment"># }]</span>
+<span class="token comment">#</span>
+<span class="token comment"># response = client.chat.completions.create(</span>
+<span class="token comment">#     model="gpt-4o",</span>
+<span class="token comment">#     messages=[{"role": "user", "content": "Weather in Tokyo?"}],</span>
+<span class="token comment">#     tools=tools,</span>
+<span class="token comment">#     tool_choice="auto",</span>
+<span class="token comment"># )</span>
+<span class="token comment">#</span>
+<span class="token comment"># tool_call = response.choices[0].message.tool_calls[0]</span>
+<span class="token comment"># args = json.loads(tool_call.function.arguments)</span>
+<span class="token comment"># result = get_weather(**args)</span>
+<span class="token comment">#</span>
+<span class="token comment"># final = client.chat.completions.create(</span>
+<span class="token comment">#     model="gpt-4o",</span>
+<span class="token comment">#     messages=[</span>
+<span class="token comment">#         {"role": "user", "content": "Weather in Tokyo?"},</span>
+<span class="token comment">#         response.choices[0].message,</span>
+<span class="token comment">#         {"role": "tool", "tool_call_id": tool_call.id, "content": json.dumps(result)},</span>
+<span class="token comment">#     ],</span>
+<span class="token comment"># )</span>
+<span class="token comment"># print(final.choices[0].message.content)</span></code></pre>
+</figure>
+<p>OpenAI returns tool calls as <code class="inline-code">response.choices[0].message.tool_calls</code>. Each call has an <code class="inline-code">id</code> you must include when returning the result. The model uses this ID to match results to calls. GPT-4o can return multiple tool calls in a single response -- iterate and execute all of them.</p>
+<h3 id="anthropic-tool-use" class="prose-h prose-h3"><a class="prose-h__anchor" href="#anthropic-tool-use" aria-label="Link to this section">#</a>Anthropic Tool Use</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token comment"># import anthropic</span>
+<span class="token comment">#</span>
+<span class="token comment"># client = anthropic.Anthropic()</span>
+<span class="token comment">#</span>
+<span class="token comment"># response = client.messages.create(</span>
+<span class="token comment">#     model="claude-sonnet-5",</span>
+<span class="token comment">#     max_tokens=1024,</span>
+<span class="token comment">#     tools=[{</span>
+<span class="token comment">#         "name": "get_weather",</span>
+<span class="token comment">#         "description": "Get current weather for a city",</span>
+<span class="token comment">#         "input_schema": {</span>
+<span class="token comment">#             "type": "object",</span>
+<span class="token comment">#             "properties": {</span>
+<span class="token comment">#                 "city": {"type": "string"},</span>
+<span class="token comment">#                 "units": {"type": "string", "enum": ["celsius", "fahrenheit"]}</span>
+<span class="token comment">#             },</span>
+<span class="token comment">#             "required": ["city"]</span>
+<span class="token comment">#         }</span>
+<span class="token comment">#     }],</span>
+<span class="token comment">#     messages=[{"role": "user", "content": "Weather in Tokyo?"}],</span>
+<span class="token comment"># )</span>
+<span class="token comment">#</span>
+<span class="token comment"># tool_block = next(b for b in response.content if b.type == "tool_use")</span>
+<span class="token comment"># result = get_weather(**tool_block.input)</span>
+<span class="token comment">#</span>
+<span class="token comment"># final = client.messages.create(</span>
+<span class="token comment">#     model="claude-sonnet-5",</span>
+<span class="token comment">#     max_tokens=1024,</span>
+<span class="token comment">#     tools=[...],</span>
+<span class="token comment">#     messages=[</span>
+<span class="token comment">#         {"role": "user", "content": "Weather in Tokyo?"},</span>
+<span class="token comment">#         {"role": "assistant", "content": response.content},</span>
+<span class="token comment">#         {"role": "user", "content": [{"type": "tool_result", "tool_use_id": tool_block.id, "content": json.dumps(result)}]},</span>
+<span class="token comment">#     ],</span>
+<span class="token comment"># )</span></code></pre>
+</figure>
+<p>Anthropic returns tool calls as content blocks with <code class="inline-code">type: &quot;tool_use&quot;</code>. The tool result goes in a user message with <code class="inline-code">type: &quot;tool_result&quot;</code>. Note the key difference: Anthropic uses <code class="inline-code">input_schema</code> for tool parameter definitions, while OpenAI uses <code class="inline-code">parameters</code>.</p>
+<h3 id="mcp-integration" class="prose-h prose-h3"><a class="prose-h__anchor" href="#mcp-integration" aria-label="Link to this section">#</a>MCP Integration</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token comment"># MCP servers expose tools over a standardized protocol.</span>
+<span class="token comment"># Any MCP-compatible client can discover and call these tools.</span>
+<span class="token comment">#</span>
+<span class="token comment"># Example: connecting to a Postgres MCP server</span>
+<span class="token comment">#</span>
+<span class="token comment"># from mcp import ClientSession, StdioServerParameters</span>
+<span class="token comment"># from mcp.client.stdio import stdio_client</span>
+<span class="token comment">#</span>
+<span class="token comment"># server_params = StdioServerParameters(</span>
+<span class="token comment">#     command="npx",</span>
+<span class="token comment">#     args=["-y", "@modelcontextprotocol/server-postgres", "postgresql://localhost/mydb"],</span>
+<span class="token comment"># )</span>
+<span class="token comment">#</span>
+<span class="token comment"># async with stdio_client(server_params) as (read, write):</span>
+<span class="token comment">#     async with ClientSession(read, write) as session:</span>
+<span class="token comment">#         await session.initialize()</span>
+<span class="token comment">#         tools = await session.list_tools()</span>
+<span class="token comment">#         result = await session.call_tool("query", {"sql": "SELECT count(*) FROM users"})</span></code></pre>
+</figure>
+<p>MCP decouples tool implementation from tool consumption. The Postgres server knows SQL. The GitHub server knows the API. Your agent just discovers and calls tools -- it does not need provider-specific code for each integration.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces <code class="inline-code">outputs/prompt-tool-designer.md</code> -- a reusable prompt template for designing tool definitions. Give it a description of what you want a tool to do, and it produces the complete JSON Schema definition with descriptions, types, and constraints.</p>
+<p>It also produces <code class="inline-code">outputs/skill-function-calling-patterns.md</code> -- a decision framework for implementing function calling in production, covering tool design, error handling, security, and provider-specific patterns.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p><strong>Add a 6th tool: database query.</strong> Implement a simulated SQL tool with an in-memory table. The tool accepts a table name and filter conditions (not raw SQL). Validate that the table name is in an allowlist and that filter operators are restricted to <code class="inline-code">=</code>, <code class="inline-code">&gt;</code>, <code class="inline-code">&lt;</code>, <code class="inline-code">&gt;=</code>, <code class="inline-code">&lt;=</code>. Return matching rows as JSON.</p>
+</li>
+<li><p><strong>Implement retry with error feedback.</strong> When a tool call fails (e.g., city not found), feed the error message back to the model decision function and let it correct its arguments. Track how many retries each call takes. Set a maximum of 3 retries per tool call.</p>
+</li>
+<li><p><strong>Build a multi-step agent.</strong> Some queries require chaining tool calls: &quot;Read the config file and tell me what model is configured, then search the web for that model&#39;s pricing.&quot; Implement a loop that runs until the model decides no more tools are needed, passing accumulated results into each decision step. Limit to 10 iterations to prevent infinite loops.</p>
+</li>
+<li><p><strong>Measure tool selection accuracy.</strong> Create 30 test queries with expected tool names. Run your decision function on all 30 and measure what percentage of the time it selects the correct tool. Identify which queries cause the most confusion between tools.</p>
+</li>
+<li><p><strong>Implement tool call caching.</strong> If the same tool is called with identical arguments within 60 seconds, return the cached result instead of re-executing. Use a dictionary keyed by <code class="inline-code">(tool_name, frozenset(args.items()))</code>. Measure cache hit rates across a conversation with 20 queries.</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Function calling</td>
+<td>&quot;Tool use&quot;</td>
+<td>The model outputs structured JSON describing a function to invoke with specific arguments -- your code executes it, not the model</td>
+</tr>
+<tr>
+<td>Tool definition</td>
+<td>&quot;Function schema&quot;</td>
+<td>A JSON Schema object describing a tool&#39;s name, purpose, parameters, and types -- the model reads this to decide when and how to use the tool</td>
+</tr>
+<tr>
+<td>Tool choice</td>
+<td>&quot;Calling mode&quot;</td>
+<td>Controls whether the model must call a tool (required), may call a tool (auto), or must call a specific tool (named)</td>
+</tr>
+<tr>
+<td>Parallel calling</td>
+<td>&quot;Multi-tool&quot;</td>
+<td>The model outputs multiple tool calls in a single turn, reducing round trips -- GPT-4o and Claude both support this</td>
+</tr>
+<tr>
+<td>Tool result</td>
+<td>&quot;Function output&quot;</td>
+<td>The return value from executing a tool, sent back to the model as a message so it can use real data in its response</td>
+</tr>
+<tr>
+<td>Argument validation</td>
+<td>&quot;Input checking&quot;</td>
+<td>Verifying that model-generated arguments match the expected types, ranges, and constraints before executing the tool</td>
+</tr>
+<tr>
+<td>MCP</td>
+<td>&quot;Tool protocol&quot;</td>
+<td>Model Context Protocol -- Anthropic&#39;s open standard for exposing tools via servers that any compatible client can discover and call</td>
+</tr>
+<tr>
+<td>Agent loop</td>
+<td>&quot;ReAct loop&quot;</td>
+<td>The iterative cycle of model-decides-tool, code-executes-tool, result-feeds-back until the model has enough information to respond</td>
+</tr>
+<tr>
+<td>Tool poisoning</td>
+<td>&quot;Prompt injection via tools&quot;</td>
+<td>An attack where tool results contain instructions that manipulate the model&#39;s behavior -- sanitize all tool outputs</td>
+</tr>
+<tr>
+<td>Rate limiting</td>
+<td>&quot;Call budget&quot;</td>
+<td>Setting a maximum number of tool calls per conversation to prevent infinite loops and runaway API costs</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://platform.openai.com/docs/guides/function-calling" target="_blank" rel="noopener">OpenAI Function Calling Guide</a> -- the definitive reference for tool use with GPT-4o, including parallel calls, forced calling, and structured arguments</li>
+<li><a href="https://docs.anthropic.com/en/docs/tool-use" target="_blank" rel="noopener">Anthropic Tool Use Guide</a> -- Claude&#39;s tool use implementation with input_schema, multi-tool responses, and tool_choice configuration</li>
+<li><a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">Model Context Protocol Specification</a> -- the open standard for tool interoperability across AI applications, with server/client architecture</li>
+<li><a href="https://arxiv.org/abs/2302.04761" target="_blank" rel="noopener">Schick et al., 2023 -- &quot;Toolformer: Language Models Can Teach Themselves to Use Tools&quot;</a> -- the foundational paper on training LLMs to decide when and how to call external tools</li>
+<li><a href="https://arxiv.org/abs/2305.15334" target="_blank" rel="noopener">Patil et al., 2023 -- &quot;Gorilla: Large Language Model Connected with Massive APIs&quot;</a> -- fine-tuning LLMs for accurate API calls across 1,645 APIs with hallucination reduction</li>
+<li><a href="https://gorilla.cs.berkeley.edu/leaderboard.html" target="_blank" rel="noopener">Berkeley Function Calling Leaderboard</a> -- real-time benchmark comparing function calling accuracy across GPT-4o, Claude, Gemini, and open models</li>
+<li><a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener">Yao et al., &quot;ReAct: Synergizing Reasoning and Acting in Language Models&quot; (ICLR 2023)</a> -- the Thought-Action-Observation loop that is the outer agent loop around every tool call; where this lesson ends, Phase 14 picks up.</li>
+<li><a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Anthropic — Building effective agents (Dec 2024)</a> -- five composable patterns (prompt chaining, routing, parallelization, orchestrator-workers, evaluator-optimizer) built from the single tool-use primitive.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="08-fine-tuning-lora.html">
+  <span class="label">← Previous</span>
+  <b>Fine-Tuning with LoRA &amp; QLoRA</b>
+</a>
+      <a class="pager__item pager__item--next" href="10-evaluation.html">
+  <span class="label">Next →</span>
+  <b>Evaluation &amp; Testing LLM Applications</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>10 minutes</b> of LLM Engineering behind you.</p>
+      <a class="btn btn--solid" href="10-evaluation.html">Continue to Evaluation &amp; Testing LLM Applications →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#the-function-calling-loop">The Function Calling Loop</a></li><li class="mini__item mini__item--d3"><a href="#tool-definitions-the-json-schema-contract">Tool Definitions: The JSON Schema Contract</a></li><li class="mini__item mini__item--d3"><a href="#provider-comparison">Provider Comparison</a></li><li class="mini__item mini__item--d3"><a href="#tool-choice-auto-required-specific">Tool Choice: Auto, Required, Specific</a></li><li class="mini__item mini__item--d3"><a href="#parallel-function-calling">Parallel Function Calling</a></li><li class="mini__item mini__item--d3"><a href="#structured-outputs-vs-function-calling">Structured Outputs vs Function Calling</a></li><li class="mini__item mini__item--d3"><a href="#security-the-non-negotiable-rules">Security: The Non-Negotiable Rules</a></li><li class="mini__item mini__item--d3"><a href="#error-handling">Error Handling</a></li><li class="mini__item mini__item--d3"><a href="#mcp-model-context-protocol">MCP: Model Context Protocol</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-define-the-tool-registry">Step 1: Define the Tool Registry</a></li><li class="mini__item mini__item--d3"><a href="#step-2-implement-5-tools">Step 2: Implement 5 Tools</a></li><li class="mini__item mini__item--d3"><a href="#step-3-register-all-tools">Step 3: Register All Tools</a></li><li class="mini__item mini__item--d3"><a href="#step-4-build-the-function-calling-loop">Step 4: Build the Function Calling Loop</a></li><li class="mini__item mini__item--d3"><a href="#step-5-argument-validation">Step 5: Argument Validation</a></li><li class="mini__item mini__item--d3"><a href="#step-6-run-the-demo">Step 6: Run the Demo</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d3"><a href="#openai-function-calling">OpenAI Function Calling</a></li><li class="mini__item mini__item--d3"><a href="#anthropic-tool-use">Anthropic Tool Use</a></li><li class="mini__item mini__item--d3"><a href="#mcp-integration">MCP Integration</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

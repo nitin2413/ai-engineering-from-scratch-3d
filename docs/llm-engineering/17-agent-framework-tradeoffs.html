@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Framework Tradeoffs — Graph, Role, and Actor Orchestration — LLM Engineering — AIFS</title>
+<meta name="description" content="LLM Engineering: Agent Framework Tradeoffs — Graph, Role, and Actor Orchestration. 7 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Agent Framework Tradeoffs — Graph, Role, and Actor Orchestration — LLM Engineering — AIFS">
+<meta property="og:description" content="LLM Engineering: Agent Framework Tradeoffs — Graph, Role, and Actor Orchestration. 7 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"l5-framework-fit":["../assets/figures/figures-llmstack5.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-llmstack5.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#00E0C6" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#00E0C6;--accent-ink:#111111"
+  data-lesson-id="llm-engineering/17-agent-framework-tradeoffs" data-module="llm-engineering"
+  data-prev="16-langgraph-state-machines.html" data-next="">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#00E0C6">
+        <span class="label">Phase 11</span>
+        <b>LLM Engineering</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="llm-engineering/01-prompt-engineering"><a href="01-prompt-engineering.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Prompt Engineering: Techniques &amp; Patterns</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/02-few-shot-cot"><a href="02-few-shot-cot.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Few-Shot, Chain-of-Thought, Tree-of-Thought</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/03-structured-outputs"><a href="03-structured-outputs.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Structured Outputs: JSON, Schema Validation, Constrained Decoding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/04-embeddings"><a href="04-embeddings.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Embeddings &amp; Vector Representations</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/05-context-engineering"><a href="05-context-engineering.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Context Engineering: Windows, Budgets, Memory, and Retrieval</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/06-rag"><a href="06-rag.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">RAG (Retrieval-Augmented Generation)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/07-advanced-rag"><a href="07-advanced-rag.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Advanced RAG (Chunking, Reranking, Hybrid Search)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/08-fine-tuning-lora"><a href="08-fine-tuning-lora.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Fine-Tuning with LoRA &amp; QLoRA</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/09-function-calling"><a href="09-function-calling.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Function Calling &amp; Tool Use</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/10-evaluation"><a href="10-evaluation.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Evaluation &amp; Testing LLM Applications</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/11-caching-cost"><a href="11-caching-cost.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Caching, Rate Limiting &amp; Cost Optimization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/12-guardrails"><a href="12-guardrails.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Guardrails, Safety &amp; Content Filtering</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/13-production-app"><a href="13-production-app.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Building a Production LLM Application</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/14-model-context-protocol"><a href="14-model-context-protocol.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Model Context Protocol (MCP)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/15-prompt-caching"><a href="15-prompt-caching.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Prompt Caching and Context Caching</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/16-langgraph-state-machines"><a href="16-langgraph-state-machines.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Agent State Machines — Graphs, Nodes, Checkpoints</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/17-agent-framework-tradeoffs"><a href="17-agent-framework-tradeoffs.html" class="is-current">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Agent Framework Tradeoffs — Graph, Role, and Actor Orchestration</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">LLM Engineering</a></p>
+      <h1 class="page__title">Agent Framework Tradeoffs — Graph, Role, and Actor Orchestration</h1>
+      <p class="page__lede">Every framework sells the same demo (research agent builds a report) and hides the same bug (state schema fights with the orchestration layer). Pick the framework whose abstractions match the shape of your problem; everything else is glue you write twice.</p>
+      <div class="page__meta">
+        <span class="chip">7 min read</span>
+        <span class="chip">1,570 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Learn</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 11 · 09 (Function Calling), Phase 11 · 16 (LangGraph)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~45 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>You have a task that needs more than one LLM call. Maybe it is a research workflow (plan, search, summarize, cite). Maybe it is a code-review pipeline (parse diff, critique, patch, validate). Maybe it is a multi-turn assistant that books flights, writes emails, and files expense reports. You pick a framework.</p>
+<p>Three days later, you discover the framework&#39;s abstractions leak. CrewAI gives you roles but fights you when the &quot;researcher&quot; needs to hand a structured plan to the &quot;writer.&quot; AutoGen gives you chat between agents but has no first-class state so your checkpoint is a pickle of a conversation log. LangGraph gives you a state graph but forces you to name every transition before you know what the agent will do. Agno gives you a single-agent abstraction that screams when you try to fan out to three concurrent workers.</p>
+<p>The fix is not &quot;pick the best framework.&quot; It is to match the framework&#39;s core abstraction to the shape of your problem. This lesson draws that map.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<p><img src="assets/17-agent-framework-tradeoffs/framework-matrix.svg" alt="Agent framework matrix: core abstraction vs problem shape" loading="lazy"></p>
+<p>Four frameworks dominate the 2026 landscape. Their core abstractions are not the same.</p>
+<table>
+<thead>
+<tr>
+<th>Framework</th>
+<th>Core abstraction</th>
+<th>Best fit</th>
+<th>Worst fit</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>LangGraph</strong></td>
+<td><code class="inline-code">StateGraph</code> — typed state, nodes, conditional edges, checkpointer.</td>
+<td>Workflows with explicit state and human-in-the-loop interrupts; production agents needing time-travel debugging.</td>
+<td>Loose, role-driven brainstorming where the topology is unknown.</td>
+</tr>
+<tr>
+<td><strong>CrewAI</strong></td>
+<td><code class="inline-code">Crew</code> — roles (goal, backstory), tasks, process (sequential or hierarchical).</td>
+<td>Role-playing or persona-driven workflows with a short linear/hierarchical plan.</td>
+<td>Anything stateful beyond the crew&#39;s turn history; complex branching.</td>
+</tr>
+<tr>
+<td><strong>AutoGen</strong></td>
+<td><code class="inline-code">ConversableAgent</code> pair — two or more agents that speak in turns until an exit condition.</td>
+<td>Multi-agent <em>dialogue</em> (teacher-student, proposer-critic, actor-reviewer) where the thinking emerges from the chat.</td>
+<td>Deterministic workflows with a known DAG; anything needing durable state across restarts.</td>
+</tr>
+<tr>
+<td><strong>Agno</strong></td>
+<td><code class="inline-code">Agent</code> — a single LLM + tools + memory, composable into teams.</td>
+<td>Fast-to-build single agents and lightweight teams; strong multi-modality and built-in storage drivers.</td>
+<td>Deep, explicitly-branched graphs with custom reducers.</td>
+</tr>
+</tbody></table>
+<h3 id="what-abstraction-actually-means" class="prose-h prose-h3"><a class="prose-h__anchor" href="#what-abstraction-actually-means" aria-label="Link to this section">#</a>What &quot;abstraction&quot; actually means</h3>
+<p>A framework&#39;s core abstraction is the thing you draw on the whiteboard when you pitch the architecture.</p>
+<ul>
+<li><strong>LangGraph</strong> → you draw a graph. Nodes are steps, edges are transitions, and the state object at every point is typed. The mental model is a state machine.</li>
+<li><strong>CrewAI</strong> → you draw an org chart. Each role has a job description and a manager routes tasks. The mental model is a small team of specialists.</li>
+<li><strong>AutoGen</strong> → you draw a Slack DM. Two agents message each other; a third joins if you need a moderator. The mental model is chat.</li>
+<li><strong>Agno</strong> → you draw a single box with tools hanging off it. Put boxes next to each other for a team. The mental model is &quot;agent with batteries included.&quot;</li>
+</ul>
+<h3 id="the-state-question" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-state-question" aria-label="Link to this section">#</a>The state question</h3>
+<p>State is where most framework choices break down in production.</p>
+<ul>
+<li><strong>LangGraph.</strong> Typed state (<code class="inline-code">TypedDict</code> or Pydantic model), per-field reducers, first-class checkpointer (SQLite/Postgres/Redis). Resume, interrupt, and time-travel are free. <em>(See Phase 11 · 16.)</em></li>
+<li><strong>CrewAI.</strong> State flows as strings between tasks via the <code class="inline-code">context</code> field, or structured through <code class="inline-code">output_pydantic</code>. No durable per-crew store out of the box; you bolt on your own if the crew must survive a restart.</li>
+<li><strong>AutoGen.</strong> State is the chat history and any user-defined <code class="inline-code">context</code>. Conversation transcripts persist; arbitrary workflow state does not unless you write adapters.</li>
+<li><strong>Agno.</strong> Built-in storage drivers (SQLite, Postgres, Mongo, Redis, DynamoDB) attached to an <code class="inline-code">Agent</code> via <code class="inline-code">storage=</code> — conversation sessions and user memories persist automatically. Not a full graph checkpointer; a session store.</li>
+</ul>
+<h3 id="the-branching-question" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-branching-question" aria-label="Link to this section">#</a>The branching question</h3>
+<p>Every non-trivial agent branches. Who decides the branch matters.</p>
+<ul>
+<li><strong>LangGraph</strong> — you decide, via conditional edges. Routing is a Python function with named branches. Branches are first-class in the compiled graph; the checkpointer records which branch was taken.</li>
+<li><strong>CrewAI</strong> — the manager decides in hierarchical mode; in sequential mode you decide at build time. Routing is implicit in the task list; there is no first-class &quot;if&quot; outside the manager&#39;s prompt.</li>
+<li><strong>AutoGen</strong> — the agents decide via chat. Branching is emergent from who speaks next. <code class="inline-code">GroupChatManager</code> selects the next speaker; you can hand-write a <code class="inline-code">speaker_selection_method</code> but the default is LLM-driven.</li>
+<li><strong>Agno</strong> — the agent decides by which tool to call next. Teams have a coordinator/router/collaborator mode; branching beyond that is the developer&#39;s responsibility.</li>
+</ul>
+<h3 id="the-observability-question" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-observability-question" aria-label="Link to this section">#</a>The observability question</h3>
+<ul>
+<li><strong>LangGraph</strong> — OpenTelemetry via LangSmith or any OTel exporter. Every node transition is a trace span; checkpoints double as replayable traces. LangSmith is the first-party option; Langfuse/Phoenix also have adapters.</li>
+<li><strong>CrewAI</strong> — first-class OpenTelemetry since late-2025; integrations with Langfuse, Phoenix, Opik, AgentOps.</li>
+<li><strong>AutoGen</strong> — OpenTelemetry integration via <code class="inline-code">autogen-core</code>; AgentOps and Opik have connectors. Tracing granularity is per-agent-message, not per-node.</li>
+<li><strong>Agno</strong> — built-in <code class="inline-code">monitoring=True</code> flag plus OpenTelemetry exporters; tight integration with Langfuse for session traces.</li>
+</ul>
+<h3 id="cost-and-latency" class="prose-h prose-h3"><a class="prose-h__anchor" href="#cost-and-latency" aria-label="Link to this section">#</a>Cost and latency</h3>
+<p>All four frameworks add per-call overhead (framework logic, validation, serialization). Rough order of increasing overhead: Agno ≈ LangGraph &lt; CrewAI ≈ AutoGen. The difference is dominated by how much extra LLM routing the framework does. CrewAI&#39;s hierarchical manager spends tokens deciding who goes next; AutoGen&#39;s <code class="inline-code">GroupChatManager</code> likewise. LangGraph only spends tokens where you write <code class="inline-code">llm.invoke</code>. Agno&#39;s single-agent path is thin.</p>
+<p>When cost per run matters, prefer explicit routing (LangGraph edges, AutoGen <code class="inline-code">speaker_selection_method</code>) over LLM-selected routing.</p>
+<h3 id="interoperability" class="prose-h prose-h3"><a class="prose-h__anchor" href="#interoperability" aria-label="Link to this section">#</a>Interoperability</h3>
+<ul>
+<li><strong>LangGraph</strong> ↔ <strong>LangChain</strong> tools, retrievers, LLMs. First-class MCP adapter (tools imported as MCP servers).</li>
+<li><strong>CrewAI</strong> ↔ tools inherit from <code class="inline-code">BaseTool</code>; LangChain tools, LlamaIndex tools, and MCP tools all adapt in. Crew-to-crew delegation via <code class="inline-code">allow_delegation=True</code>.</li>
+<li><strong>AutoGen</strong> → <code class="inline-code">FunctionTool</code> wraps any Python callable; MCP adapter available. Tight coupling to AG2 ecosystem for agent-to-agent patterns.</li>
+<li><strong>Agno</strong> → <code class="inline-code">@tool</code> decorator or BaseTool subclass; MCP adapter; tools can be shared across agents and teams.</li>
+</ul>
+<h2 id="the-skill" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-skill" aria-label="Link to this section">#</a>The Skill</h2>
+<blockquote class="quote"><p>You can explain, in one sentence, why a given framework is right for a given agent problem.</p>
+</blockquote>
+<p>Pre-build checklist:</p>
+<ol>
+<li><strong>Draw the shape.</strong> Is this a graph (typed state, named transitions)? A role play (specialists hand off work)? A chat (agents talk until done)? A single agent with tools?</li>
+<li><strong>Decide who branches.</strong> Developer-decided branching → LangGraph. Manager-agent-decided → CrewAI hierarchical. Chat-emergent → AutoGen. Tool-call-decided → Agno.</li>
+<li><strong>Check the state budget.</strong> Do you need resume-from-checkpoint? Time-travel? Human interrupts mid-run? If yes, LangGraph is the default; Agno sessions cover conversation-scoped state.</li>
+<li><strong>Check the cost budget.</strong> LLM-selected routing costs extra tokens per turn. If the agent runs thousands of times a day, prefer explicit routing.</li>
+<li><strong>Budget the framework overhead.</strong> Every framework is another dependency. If the task is two LLM calls and a tool, write 30 lines of plain Python; no framework is cheaper than no framework.</li>
+</ol>
+<p>Refuse to reach for a framework before you can draw the graph, the org chart, the chat, or the agent box. Refuse to pick one that forces you to fight its state model for the thing you actually need.</p>
+<h2 id="the-decision-matrix" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-decision-matrix" aria-label="Link to this section">#</a>The Decision Matrix</h2>
+<table>
+<thead>
+<tr>
+<th>Problem shape</th>
+<th>Preferred framework</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Workflow DAG with typed state, human approvals, long-running</td>
+<td>LangGraph</td>
+<td>First-class state, checkpointer, interrupts, time-travel.</td>
+</tr>
+<tr>
+<td>Research / writing pipeline with distinct roles</td>
+<td>CrewAI (sequential) or LangGraph subgraphs</td>
+<td>Role-per-task is cheap to express in CrewAI; scale up with LangGraph when branching gets complex.</td>
+</tr>
+<tr>
+<td>Proposer-critic or teacher-student dialogue</td>
+<td>AutoGen</td>
+<td>Two-agent chat is its native shape.</td>
+</tr>
+<tr>
+<td>Single agent with tools, sessions, memory</td>
+<td>Agno</td>
+<td>Thinnest setup, built-in storage and memory.</td>
+</tr>
+<tr>
+<td>Thousands of parallel fanouts with reducers</td>
+<td>LangGraph + <code class="inline-code">Send</code></td>
+<td>The only one with a first-class parallel-dispatch API.</td>
+</tr>
+<tr>
+<td>Quick prototype, no framework commitment</td>
+<td>Plain Python + provider SDK</td>
+<td>No framework is the fastest framework.</td>
+</tr>
+</tbody></table>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="l5-framework-fit"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">l5-framework-fit</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> l5 framework fit</figcaption>
+</figure>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><strong>Easy.</strong> Take the same task — &quot;research Anthropic&#39;s headquarters, write a 200-word brief, cite sources&quot; — and implement it in LangGraph (four nodes: plan, search, write, cite) and in CrewAI (three roles: researcher, writer, editor). Report token cost per run and lines of code.</li>
+<li><strong>Medium.</strong> Build the same task in AutoGen (researcher ↔ writer chat, editor joins via <code class="inline-code">GroupChat</code>) and Agno (a single agent with <code class="inline-code">search_tools</code> and <code class="inline-code">write_tools</code>, plus a session store). Rank the four implementations on (a) cost per run, (b) ability to resume after a crash, (c) ability to inject a human approval before the write step.</li>
+<li><strong>Hard.</strong> Build a decision-tree script <code class="inline-code">pick_framework.py</code> that takes a short problem description (JSON: <code class="inline-code">{has_typed_state, has_roles, has_dialogue, has_parallel_fanout, needs_resume}</code>) and returns a recommendation with one-sentence justification. Verify it on six cases you design yourself.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Orchestration</td>
+<td>&quot;How the agents coordinate&quot;</td>
+<td>The layer that decides which node/role/agent runs next.</td>
+</tr>
+<tr>
+<td>Durable state</td>
+<td>&quot;Resume after a restart&quot;</td>
+<td>State that survives process death, attached to a checkpoint or session store.</td>
+</tr>
+<tr>
+<td>LLM-selected routing</td>
+<td>&quot;Let the model decide&quot;</td>
+<td>A planner LLM picks the next step each turn; flexible but pays tokens on every decision.</td>
+</tr>
+<tr>
+<td>Explicit routing</td>
+<td>&quot;Developer decides&quot;</td>
+<td>A Python function or static edge picks the next step; cheap and auditable.</td>
+</tr>
+<tr>
+<td>Crew</td>
+<td>&quot;A CrewAI team&quot;</td>
+<td>Roles + tasks + process (sequential or hierarchical) bound into a single runnable.</td>
+</tr>
+<tr>
+<td>GroupChat</td>
+<td>&quot;AutoGen&#39;s multi-agent chat&quot;</td>
+<td>A managed conversation between N agents with a speaker selector.</td>
+</tr>
+<tr>
+<td>Team (Agno)</td>
+<td>&quot;Multi-agent Agno&quot;</td>
+<td>Route / coordinate / collaborate mode over a set of agents.</td>
+</tr>
+<tr>
+<td>StateGraph</td>
+<td>&quot;LangGraph&#39;s graph&quot;</td>
+<td>Typed-state, node, conditional-edge, checkpointer abstraction.</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://langchain-ai.github.io/langgraph/" target="_blank" rel="noopener">LangGraph documentation</a> — StateGraph, checkpointers, interrupts, time-travel.</li>
+<li><a href="https://docs.crewai.com/" target="_blank" rel="noopener">CrewAI documentation</a> — Crews, Flows, Agents, Tasks, Processes.</li>
+<li><a href="https://microsoft.github.io/autogen/" target="_blank" rel="noopener">AutoGen documentation</a> — ConversableAgent, GroupChat, teams, tools.</li>
+<li><a href="https://docs.agno.com/" target="_blank" rel="noopener">Agno documentation</a> — Agent, Team, Workflow, storage, memory.</li>
+<li><a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Anthropic — Building effective agents (Dec 2024)</a> — pattern library (prompt chaining, routing, parallelization, orchestrator-workers, evaluator-optimizer) framework-agnostic.</li>
+<li><a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener">Yao et al., &quot;ReAct: Synergizing Reasoning and Acting&quot; (ICLR 2023)</a> — the loop every framework dresses up.</li>
+<li><a href="https://arxiv.org/abs/2308.08155" target="_blank" rel="noopener">Wu et al., &quot;AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation&quot; (2023)</a> — AutoGen&#39;s design paper.</li>
+<li><a href="https://arxiv.org/abs/2304.03442" target="_blank" rel="noopener">Park et al., &quot;Generative Agents: Interactive Simulacra of Human Behavior&quot; (UIST 2023)</a> — role-play foundation that CrewAI-style persona stacks build on.</li>
+<li>Phase 11 · 16 (LangGraph) — the framework this lesson benchmarks against.</li>
+<li>Phase 11 · 19 (Reflexion) — a pattern that maps cleanly to LangGraph but awkwardly to CrewAI.</li>
+<li>Phase 11 · 22 (Production observability) — how to instrument whichever framework you pick.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="16-langgraph-state-machines.html">
+  <span class="label">← Previous</span>
+  <b>Agent State Machines — Graphs, Nodes, Checkpoints</b>
+</a>
+      <span class="pager__item pager__item--next is-empty">
+  <span class="label">Next →</span>
+  <b>End of this module</b>
+</span>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>7 minutes</b> of LLM Engineering behind you.</p>
+      <a class="btn btn--solid" href="../index.html#modules">Pick the next module →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#what-abstraction-actually-means">What &quot;abstraction&quot; actually means</a></li><li class="mini__item mini__item--d3"><a href="#the-state-question">The state question</a></li><li class="mini__item mini__item--d3"><a href="#the-branching-question">The branching question</a></li><li class="mini__item mini__item--d3"><a href="#the-observability-question">The observability question</a></li><li class="mini__item mini__item--d3"><a href="#cost-and-latency">Cost and latency</a></li><li class="mini__item mini__item--d3"><a href="#interoperability">Interoperability</a></li><li class="mini__item mini__item--d2"><a href="#the-skill">The Skill</a></li><li class="mini__item mini__item--d2"><a href="#the-decision-matrix">The Decision Matrix</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

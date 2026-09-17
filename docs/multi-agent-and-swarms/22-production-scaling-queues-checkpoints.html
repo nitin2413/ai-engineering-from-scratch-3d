@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Production Scaling — Queues, Checkpoints, Durability — Multi-Agent &amp; Swarms — AIFS</title>
+<meta name="description" content="Multi-Agent &amp; Swarms: Production Scaling — Queues, Checkpoints, Durability. 6 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Production Scaling — Queues, Checkpoints, Durability — Multi-Agent &amp; Swarms — AIFS">
+<meta property="og:description" content="Multi-Agent &amp; Swarms: Production Scaling — Queues, Checkpoints, Durability. 6 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"sw-checkpoint-replay":["../assets/figures/figures-swarms3.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-swarms3.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#7CFFB2" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#7CFFB2;--accent-ink:#111111"
+  data-lesson-id="multi-agent-and-swarms/22-production-scaling-queues-checkpoints" data-module="multi-agent-and-swarms"
+  data-prev="21-agent-economies.html" data-next="23-failure-modes-mast-groupthink.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#7CFFB2">
+        <span class="label">Phase 16</span>
+        <b>Multi-Agent &amp; Swarms</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="multi-agent-and-swarms/01-why-multi-agent"><a href="01-why-multi-agent.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Why Multi-Agent?</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/02-fipa-acl-heritage"><a href="02-fipa-acl-heritage.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Heritage of FIPA-ACL and Speech Acts</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/03-communication-protocols"><a href="03-communication-protocols.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Communication Protocols</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/04-primitive-model"><a href="04-primitive-model.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">The Multi-Agent Primitive Model</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/05-supervisor-orchestrator-pattern"><a href="05-supervisor-orchestrator-pattern.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Supervisor / Orchestrator-Worker Pattern</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/06-hierarchical-architecture"><a href="06-hierarchical-architecture.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Hierarchical Architecture and Its Failure Mode</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/07-society-of-mind-debate"><a href="07-society-of-mind-debate.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Society of Mind and Multi-Agent Debate</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/08-role-specialization"><a href="08-role-specialization.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Role Specialization — Planner, Critic, Executor, Verifier</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/09-parallel-swarm-networks"><a href="09-parallel-swarm-networks.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Parallel / Swarm / Networked Architectures</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/10-group-chat-speaker-selection"><a href="10-group-chat-speaker-selection.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Group Chat and Speaker Selection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/11-handoffs-and-routines"><a href="11-handoffs-and-routines.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Handoffs and Routines — Stateless Orchestration</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/12-a2a-protocol"><a href="12-a2a-protocol.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">A2A — The Agent-to-Agent Protocol</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/13-shared-memory-blackboard"><a href="13-shared-memory-blackboard.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Shared Memory and Blackboard Patterns</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/14-consensus-and-bft"><a href="14-consensus-and-bft.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Consensus and Byzantine Fault Tolerance for Agents</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/15-voting-debate-topology"><a href="15-voting-debate-topology.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Voting, Self-Consistency, and Debate Topology</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/16-negotiation-bargaining"><a href="16-negotiation-bargaining.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Negotiation and Bargaining</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/17-generative-agents-simulation"><a href="17-generative-agents-simulation.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Generative Agents and Emergent Simulation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/18-theory-of-mind-coordination"><a href="18-theory-of-mind-coordination.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Theory of Mind and Emergent Coordination</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/19-swarm-optimization-pso-aco"><a href="19-swarm-optimization-pso-aco.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">Swarm Optimization for LLMs (PSO, ACO)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/20-marl-maddpg-qmix-mappo"><a href="20-marl-maddpg-qmix-mappo.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">MARL — MADDPG, QMIX, MAPPO</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/21-agent-economies"><a href="21-agent-economies.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Agent Economies, Token Incentives, Reputation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/22-production-scaling-queues-checkpoints"><a href="22-production-scaling-queues-checkpoints.html" class="is-current">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Production Scaling — Queues, Checkpoints, Durability</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/23-failure-modes-mast-groupthink"><a href="23-failure-modes-mast-groupthink.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Failure Modes — MAST, Groupthink, Monoculture, Cascading Errors</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/24-evaluation-coordination-benchmarks"><a href="24-evaluation-coordination-benchmarks.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Evaluation and Coordination Benchmarks</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/25-case-studies-2026-sota"><a href="25-case-studies-2026-sota.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Case Studies and the 2026 State of the Art</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Multi-Agent &amp; Swarms</a></p>
+      <h1 class="page__title">Production Scaling — Queues, Checkpoints, Durability</h1>
+      <p class="page__lede">Scaling multi-agent systems to thousands of concurrent runs requires <b>durable execution</b> — work queues plus checkpoints, so any worker can resume any run after any crash, provided lease handling, idempotent side effects, and deterministic replay are in place. LangGraph's runtime is the reference example: it writes a checkpoint after each super-step keyed by <code class="inline-code">thread_id</code> (Postgres by default); worker crashes release a lease and another worker resumes. Agents can sleep indefinitely waiting for human input. <b>MegaAgent</b> (arXiv:2408.09955) ran a per-agent producer-consumer queue with three states (Idle / Processing / Response) and two-layer coordination (intra-group chat + inter-group admin chat). <b>Fiber/async</b> beats thread-per-job for LLM streaming: threads sit idle 99% of the time waiting for tokens, fibers cooperatively yield on I/O. Counterpoint: Ashpreet Bedi's &quot;Scaling Agentic Software&quot; argues for <b>FastAPI + Postgres + nothing else</b> until load proves otherwise — simple architectures go further than expected. This lesson builds a durable checkpoint log, a per-agent work queue with state transitions, an async-vs-thread demo, and lands the pragmatic &quot;start simple&quot; rule.</p>
+      <div class="page__meta">
+        <span class="chip">6 min read</span>
+        <span class="chip">1,278 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Learn + Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (stdlib, <code class="inline-code">asyncio</code>, <code class="inline-code">sqlite3</code>)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 16 · 09 (Parallel Swarm Networks), Phase 16 · 13 (Shared Memory)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#problem" aria-label="Link to this section">#</a>Problem</h2>
+<p>A prototype multi-agent system works on one laptop with three agents in an in-memory event loop. You move to production:</p>
+<ul>
+<li>Agents sometimes run for hours (long research, human-in-the-loop waits).</li>
+<li>Worker processes crash. Restarting loses state.</li>
+<li>Peak load is 10x average; you need horizontal scaling.</li>
+<li>Users pay per agent-run; you need exactly-once semantics for charging.</li>
+</ul>
+<p>The in-memory event loop does none of these. You need a durable execution layer underneath. The 2026 canonical options are:</p>
+<ol>
+<li>A workflow engine with checkpoints (Temporal, LangGraph runtime).</li>
+<li>A message queue with a state store (Postgres + SQS/RabbitMQ).</li>
+<li>Actor-model frameworks (MegaAgent&#39;s producer-consumer per agent).</li>
+<li>Hand-rolled FastAPI + Postgres (Bedi&#39;s argument).</li>
+</ol>
+<p>This lesson builds a miniature of each.</p>
+<h2 id="concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#concept" aria-label="Link to this section">#</a>Concept</h2>
+<h3 id="durable-execution-the-pattern" class="prose-h prose-h3"><a class="prose-h__anchor" href="#durable-execution-the-pattern" aria-label="Link to this section">#</a>Durable execution, the pattern</h3>
+<p>A durable-execution engine persists the full program state after each &quot;step&quot; (super-step, in LangGraph&#39;s language). On crash:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>worker crashes mid-step
+  -&gt; lease timeout
+  -&gt; another worker picks up the thread_id
+  -&gt; resumes from last checkpoint
+  -&gt; no duplicate side effects</code></pre>
+</figure>
+<p>Requirements for this to work:</p>
+<ul>
+<li><strong>Serializable state.</strong> All agent state has to be persistable. Function closures with live database connections do not survive.</li>
+<li><strong>Deterministic resume.</strong> Given the same state and same inputs, the agent produces the same actions (or defers to an external deterministic oracle for LLM calls).</li>
+<li><strong>Idempotent side effects.</strong> External calls (tool calls, payments) must be idempotent or use a deduplication key.</li>
+</ul>
+<p>LangGraph writes a checkpoint after each super-step; Temporal writes after each activity; Restate uses event-sourced journals. All three implement the same pattern.</p>
+<h3 id="a-checkpoint-per-step-runtime" class="prose-h prose-h3"><a class="prose-h__anchor" href="#a-checkpoint-per-step-runtime" aria-label="Link to this section">#</a>A checkpoint-per-step runtime</h3>
+<p>LangGraph&#39;s runtime is the worked example: each agent has a <code class="inline-code">thread_id</code>; state is a typed dict; each super-step writes a row to the checkpoints table. On resume, the runtime replays from the last checkpoint, not from scratch. Agents can <code class="inline-code">interrupt()</code> waiting for human input; the runtime persists and releases the worker. When input arrives, any worker can resume.</p>
+<p>This is the reference production design in April 2026.</p>
+<h3 id="megaagent-s-per-agent-queue" class="prose-h prose-h3"><a class="prose-h__anchor" href="#megaagent-s-per-agent-queue" aria-label="Link to this section">#</a>MegaAgent&#39;s per-agent queue</h3>
+<p>arXiv:2408.09955 describes a scale experiment: thousands of concurrent agents in one cluster. Architecture:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>agent i:
+  state ∈ {Idle, Processing, Response}
+  in_queue   &lt;- messages addressed to agent i
+  out_queue  -&gt; replies + side effects
+
+coordinators:
+  intra-group chat  (agents in the same group)
+  inter-group admin chat  (high-level routing)</code></pre>
+</figure>
+<p>The two-layer coordination lets intra-group conversation happen densely while inter-group stays sparse — the pattern used for keeping cost linear in thousands of agents.</p>
+<h3 id="async-vs-thread-per-job" class="prose-h prose-h3"><a class="prose-h__anchor" href="#async-vs-thread-per-job" aria-label="Link to this section">#</a>Async vs thread-per-job</h3>
+<p>LLM calls are I/O-bound. A thread waiting for the next token is idle 99% of the time. Threads cost ~1MB RAM each; at 10,000 concurrent calls, that is 10GB just for stacks.</p>
+<p>Fibers (Python <code class="inline-code">asyncio</code>, Go goroutines, Rust <code class="inline-code">tokio</code>) cooperatively yield on I/O. The same 10,000 calls fit comfortably in process. At LLM-agent scale, async is not an optimization — it is the architecture.</p>
+<p>Exception: CPU-bound post-processing (embedding, tokenizer tricks) still wants threads or processes. Separate your I/O layer from your CPU layer.</p>
+<h3 id="bedi-s-counterpoint" class="prose-h prose-h3"><a class="prose-h__anchor" href="#bedi-s-counterpoint" aria-label="Link to this section">#</a>Bedi&#39;s counterpoint</h3>
+<p>&quot;Scaling Agentic Software&quot; (Ashpreet Bedi, 2026) argues that most teams over-engineer before they have measured load. The pragmatic default:</p>
+<ul>
+<li>FastAPI + Postgres.</li>
+<li>Each agent run is a row; state updated in-place with optimistic concurrency.</li>
+<li>Background jobs via <code class="inline-code">pg_notify</code> or a simple Celery worker.</li>
+<li>Retry policy in application code.</li>
+</ul>
+<p>For loads under ~100 concurrent agent-runs on manageable tasks, this is often all you need. Upgrade when you measure it failing.</p>
+<p>The rule: adopt durable-execution frameworks when you hit a concrete problem that simple architectures cannot solve. Premature adoption burns time on ceremonies that do not pay off.</p>
+<h3 id="exactly-once-semantics" class="prose-h prose-h3"><a class="prose-h__anchor" href="#exactly-once-semantics" aria-label="Link to this section">#</a>Exactly-once semantics</h3>
+<p>For paid agent runs, you need &quot;exactly-once effective&quot; (at-least-once delivery + idempotent consumer). The engineering moves:</p>
+<ul>
+<li><strong>Dedup key per run.</strong> Include it in every side-effect call.</li>
+<li><strong>Outbox pattern.</strong> Side effects write to a table first, then a separate process executes them. Both steps idempotent.</li>
+<li><strong>Compensating transactions.</strong> When a side effect succeeds but its tracking write fails, schedule a compensate.</li>
+</ul>
+<p>These are database-engineering patterns, not LLM-specific. The LLM tax is only that LLM calls are slow; everything else is standard distributed systems.</p>
+<h3 id="rainbow-deployment" class="prose-h prose-h3"><a class="prose-h__anchor" href="#rainbow-deployment" aria-label="Link to this section">#</a>Rainbow deployment</h3>
+<p>Anthropic&#39;s multi-agent research system uses &quot;rainbow deployments&quot;: multiple versions of the agent runtime run concurrently so long-running agents do not have to be killed on every code deploy. Canary new versions on a slice of traffic; retire old versions when their agents finish.</p>
+<p>This is standard for long-running stateful systems; the 2026 adaptation is that agents can live for hours, so deployment cycles must accommodate.</p>
+<h3 id="the-canonical-production-checklist" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-canonical-production-checklist" aria-label="Link to this section">#</a>The canonical production checklist</h3>
+<ul>
+<li>Durable state (checkpoints, snapshots, or outbox + replayable log).</li>
+<li>Idempotent side effects.</li>
+<li>Async I/O layer for LLM calls.</li>
+<li>At-least-once delivery with dedup.</li>
+<li>Rainbow/canary deployment for stateful workloads.</li>
+<li>Observability: per-agent traces, super-step audit, retry counter.</li>
+</ul>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="sw-checkpoint-replay"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">sw-checkpoint-replay</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> sw checkpoint replay</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<p><code class="inline-code">code/main.py</code> implements:</p>
+<ul>
+<li><code class="inline-code">CheckpointStore</code> — SQLite-backed checkpoint log with thread-id keys. Each super-step appends a row.</li>
+<li><code class="inline-code">run_with_checkpoint(agent, thread_id)</code> — simulates a crash mid-run; a second worker resumes from last checkpoint.</li>
+<li><code class="inline-code">AgentQueue</code> — per-agent Idle / Processing / Response state machine with a small work queue.</li>
+<li><code class="inline-code">demo_async_vs_threads()</code> — runs 500 concurrent simulated &quot;LLM calls&quot; via asyncio and via threads; reports wall-clock and peak memory (approximated).</li>
+</ul>
+<p>Run:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>python3 code/main.py</code></pre>
+</figure>
+<p>Expected output: checkpoint resume succeeds after simulated crash; async version handles 500 concurrent calls in &lt; 1s; thread version takes several seconds and uses orders of magnitude more memory per concurrent unit.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p><code class="inline-code">outputs/skill-scaling-advisor.md</code> advises on durable-execution choice: FastAPI + Postgres, LangGraph runtime, Temporal, or custom. Calibrated by load, state-retention needs, and deploy frequency.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>Canonical production hardening:</p>
+<ul>
+<li><strong>Start simple (Bedi&#39;s rule).</strong> FastAPI + Postgres until you measure it failing.</li>
+<li><strong>Instrument everything before optimizing.</strong> Per-run latency histogram, per-step time, retry count, failure categorization.</li>
+<li><strong>Outbox pattern for side effects.</strong> Especially payments and external API calls.</li>
+<li><strong>Rainbow deploys.</strong> Never kill in-flight agent runs during deploys.</li>
+<li><strong>Adopt durable-execution engines (Temporal / LangGraph / Restate) when</strong> you hit specific problems: hour-long human-in-the-loop waits, cross-region coordination, complex retry/compensation policies.</li>
+<li><strong>Async for the I/O layer.</strong> Threads only for CPU-bound post-processing.</li>
+</ul>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li>Run <code class="inline-code">code/main.py</code>. Confirm checkpoint resume works; measure async vs thread concurrency difference.</li>
+<li>Implement an <strong>outbox</strong> table: every tool call writes to outbox first, then a separate goroutine/task executes. Verify idempotency by running the tool call twice.</li>
+<li>Simulate a <strong>rainbow deploy</strong>: two concurrent runtime versions; route half of new thread_ids to each; confirm that in-flight threads on the old version are not interrupted.</li>
+<li>Read LangGraph&#39;s runtime doc (linked below). Identify which features of the runtime would take the longest to replicate in a hand-rolled FastAPI + Postgres version. Is that a reason to adopt, or can you defer?</li>
+<li>Read MegaAgent (arXiv:2408.09955) Section 3. The two-layer coordination (intra-group + inter-group admin chat) is explicit. Sketch how you would map this to a message queue with two queue families.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Durable execution</td>
+<td>&quot;Persist the program state&quot;</td>
+<td>Engine writes state after each super-step; crash recovery is deterministic.</td>
+</tr>
+<tr>
+<td>Super-step</td>
+<td>&quot;Transactional boundary&quot;</td>
+<td>Unit of work between checkpoints. LangGraph term.</td>
+</tr>
+<tr>
+<td>thread_id</td>
+<td>&quot;Agent run identifier&quot;</td>
+<td>Key that binds checkpoints and resume logic.</td>
+</tr>
+<tr>
+<td>Idempotency</td>
+<td>&quot;Safe to retry&quot;</td>
+<td>Repeating a side effect produces the same result as one attempt.</td>
+</tr>
+<tr>
+<td>Outbox pattern</td>
+<td>&quot;Decouple side effects&quot;</td>
+<td>Write intent to a table; a separate executor performs and marks done.</td>
+</tr>
+<tr>
+<td>At-least-once delivery</td>
+<td>&quot;Possible duplicates&quot;</td>
+<td>Message queue semantics; dedup key makes consumer effective-once.</td>
+</tr>
+<tr>
+<td>Rainbow deploy</td>
+<td>&quot;Overlapping versions&quot;</td>
+<td>Multiple runtime versions concurrent during long-running workloads.</td>
+</tr>
+<tr>
+<td>Async fiber</td>
+<td>&quot;Cooperative yielding&quot;</td>
+<td>User-mode concurrency; cheap compared to threads for I/O-bound loads.</td>
+</tr>
+<tr>
+<td>Checkpoint</td>
+<td>&quot;State snapshot&quot;</td>
+<td>Serialized state at a super-step boundary; key for resume.</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://www.langchain.com/conceptual-guides/runtime-behind-production-deep-agents" target="_blank" rel="noopener">LangChain — The runtime behind production deep agents</a> — LangGraph runtime design</li>
+<li><a href="https://arxiv.org/abs/2408.09955" target="_blank" rel="noopener">MegaAgent</a> — per-agent producer-consumer queue; two-layer coordination at thousands of concurrent agents</li>
+<li><a href="https://arxiv.org/abs/2511.21686" target="_blank" rel="noopener">Matrix</a> — decentralized framework with message queues as the coordination substrate</li>
+<li><a href="https://docs.temporal.io/" target="_blank" rel="noopener">Temporal docs</a> — the reference workflow engine for durable execution</li>
+<li><a href="https://www.anthropic.com/engineering/multi-agent-research-system" target="_blank" rel="noopener">Anthropic — Multi-agent research system</a> — production lessons including rainbow deployment</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="21-agent-economies.html">
+  <span class="label">← Previous</span>
+  <b>Agent Economies, Token Incentives, Reputation</b>
+</a>
+      <a class="pager__item pager__item--next" href="23-failure-modes-mast-groupthink.html">
+  <span class="label">Next →</span>
+  <b>Failure Modes — MAST, Groupthink, Monoculture, Cascading Errors</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>6 minutes</b> of Multi-Agent &amp; Swarms behind you.</p>
+      <a class="btn btn--solid" href="23-failure-modes-mast-groupthink.html">Continue to Failure Modes — MAST, Groupthink, Monoculture, Cascading Errors →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#problem">Problem</a></li><li class="mini__item mini__item--d2"><a href="#concept">Concept</a></li><li class="mini__item mini__item--d3"><a href="#durable-execution-the-pattern">Durable execution, the pattern</a></li><li class="mini__item mini__item--d3"><a href="#a-checkpoint-per-step-runtime">A checkpoint-per-step runtime</a></li><li class="mini__item mini__item--d3"><a href="#megaagent-s-per-agent-queue">MegaAgent's per-agent queue</a></li><li class="mini__item mini__item--d3"><a href="#async-vs-thread-per-job">Async vs thread-per-job</a></li><li class="mini__item mini__item--d3"><a href="#bedi-s-counterpoint">Bedi's counterpoint</a></li><li class="mini__item mini__item--d3"><a href="#exactly-once-semantics">Exactly-once semantics</a></li><li class="mini__item mini__item--d3"><a href="#rainbow-deployment">Rainbow deployment</a></li><li class="mini__item mini__item--d3"><a href="#the-canonical-production-checklist">The canonical production checklist</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

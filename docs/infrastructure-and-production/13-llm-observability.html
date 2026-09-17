@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLM Observability Stack Selection — Infrastructure &amp; Production — AIFS</title>
+<meta name="description" content="Infrastructure &amp; Production: LLM Observability Stack Selection. 5 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="LLM Observability Stack Selection — Infrastructure &amp; Production — AIFS">
+<meta property="og:description" content="Infrastructure &amp; Production: LLM Observability Stack Selection. 5 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"i4-otel-glue":["../assets/figures/figures-infra4.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-infra4.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#C79BFF" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#C79BFF;--accent-ink:#111111"
+  data-lesson-id="infrastructure-and-production/13-llm-observability" data-module="infrastructure-and-production"
+  data-prev="12-edge-inference.html" data-next="14-prompt-semantic-caching.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#C79BFF">
+        <span class="label">Phase 17</span>
+        <b>Infrastructure &amp; Production</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="infrastructure-and-production/01-managed-llm-platforms"><a href="01-managed-llm-platforms.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Managed LLM Platforms — Bedrock, Vertex AI, Azure OpenAI</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/02-inference-platform-economics"><a href="02-inference-platform-economics.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Inference Platform Economics — Fireworks, Together, Baseten, Modal, Replicate, Anyscale</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/03-gpu-autoscaling-kubernetes"><a href="03-gpu-autoscaling-kubernetes.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">GPU Autoscaling on Kubernetes — Karpenter, KAI Scheduler, Gang Scheduling</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/04-vllm-serving-internals"><a href="04-vllm-serving-internals.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Serving Engine Internals — PagedAttention, Continuous Batching, Chunked Prefill</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/05-eagle3-speculative-decoding"><a href="05-eagle3-speculative-decoding.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">EAGLE-3 Speculative Decoding in Production</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/06-sglang-radixattention"><a href="06-sglang-radixattention.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Prefix-Cache Serving — RadixAttention and KV Reuse</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/07-tensorrt-llm-blackwell"><a href="07-tensorrt-llm-blackwell.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Hardware-Specialized Inference Compilation — FP8 and NVFP4 on Blackwell</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/08-inference-metrics-goodput"><a href="08-inference-metrics-goodput.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Inference Metrics — TTFT, TPOT, ITL, Goodput, P99</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/09-production-quantization"><a href="09-production-quantization.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Production Quantization — AWQ, GPTQ, GGUF K-quants, FP8, MXFP4/NVFP4</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/10-cold-start-mitigation"><a href="10-cold-start-mitigation.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Cold Start Mitigation for Serverless LLMs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/11-multi-region-kv-locality"><a href="11-multi-region-kv-locality.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Multi-Region LLM Serving and KV Cache Locality</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/12-edge-inference"><a href="12-edge-inference.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Edge Inference — Apple Neural Engine, Qualcomm Hexagon, WebGPU/WebLLM, Jetson</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/13-llm-observability"><a href="13-llm-observability.html" class="is-current">
+  <span class="snav__n">13</span>
+  <span class="snav__t">LLM Observability Stack Selection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/14-prompt-semantic-caching"><a href="14-prompt-semantic-caching.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Prompt Caching and Semantic Caching Economics</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/15-batch-apis"><a href="15-batch-apis.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Batch APIs — the 50% Discount as Industry Standard</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/16-model-routing"><a href="16-model-routing.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Model Routing as a Cost-Reduction Primitive</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/17-disaggregated-prefill-decode"><a href="17-disaggregated-prefill-decode.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Disaggregated Prefill/Decode — NVIDIA Dynamo and llm-d</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/18-vllm-production-stack-lmcache"><a href="18-vllm-production-stack-lmcache.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Production Serving Stack — KV Offloading and Cache-Aware Routing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/19-ai-gateways"><a href="19-ai-gateways.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">AI Gateways — LiteLLM, Portkey, Kong AI Gateway, Bifrost</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/20-shadow-canary-progressive"><a href="20-shadow-canary-progressive.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Shadow Traffic, Canary Rollout, and Progressive Deployment for LLMs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/21-ab-testing-llm-features"><a href="21-ab-testing-llm-features.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">A/B Testing LLM Features — GrowthBook, Statsig, and the Vibes Problem</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/22-load-testing-llm-apis"><a href="22-load-testing-llm-apis.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Load Testing LLM APIs — Why k6 and Locust Lie</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/23-sre-for-ai"><a href="23-sre-for-ai.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">SRE for AI — Multi-Agent Incident Response, Runbooks, Predictive Detection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/24-chaos-engineering-llm"><a href="24-chaos-engineering-llm.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Chaos Engineering for LLM Production</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/25-security-secrets-audit"><a href="25-security-secrets-audit.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Security — Secrets, API Key Rotation, Audit Logs, Guardrails</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/26-compliance-frameworks"><a href="26-compliance-frameworks.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Compliance — SOC 2, HIPAA, GDPR, PCI-DSS, EU AI Act, ISO 42001</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/27-finops-llms"><a href="27-finops-llms.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">FinOps for LLMs — Unit Economics and Multi-Tenant Attribution</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/28-self-hosted-serving-selection"><a href="28-self-hosted-serving-selection.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">Self-Hosted Serving Selection — Matching Engine to Hardware and Scale</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Infrastructure &amp; Production</a></p>
+      <h1 class="page__title">LLM Observability Stack Selection</h1>
+      <p class="page__lede">The 2026 observability market splits into two categories. Development platforms (LangSmith, Langfuse, Comet Opik) bundle monitoring with evals, prompt management, session replays. Gateway/instrumentation tools (Helicone, SigNoz, OpenLLMetry, Phoenix) focus on telemetry. Langfuse is MIT-licensed core with strong OSS balance (50K events/month free cloud). Phoenix is OpenTelemetry-native under Elastic License 2.0 — excellent for drift/RAG visualization, not a persistent production backend. Arize AX uses zero-copy Iceberg/Parquet integration claiming 100x cheaper than monolithic observability. LangSmith leads for LangChain/LangGraph, $39/user/mo, self-host in Enterprise only. Helicone is proxy-based with 15-30 min setup, 100K req/mo free, but less depth on agent traces. Common production pattern: Gateway (Helicone/Portkey) + eval platform (Phoenix/TruLens) glued by OpenTelemetry.</p>
+      <div class="page__meta">
+        <span class="chip">5 min read</span>
+        <span class="chip">1,008 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Learn</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (stdlib, toy trace-sampling simulator)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 17 · 08 (Inference Metrics), Phase 14 (Agent Engineering)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~60 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Distinguish development platforms (bundled: evals + prompts + sessions) from gateway/telemetry tools (traces + metrics only).</li>
+<li>Map six major tools (Langfuse, LangSmith, Phoenix, Arize AX, Helicone, Opik) to their licensing, pricing, and sweet-spot use cases.</li>
+<li>Explain the OpenTelemetry-glue pattern that lets you combine a gateway tool with a separate eval platform.</li>
+<li>Name the 2026 cost differentiator (Arize AX&#39;s zero-copy approach vs monolithic ingest) and state the rough 100x multiplier.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>You shipped an LLM feature. It works. You have no visibility into prompt failures, tool loops, latency regressions, cost spikes, or prompt-cache hit rate. You Google &quot;LLM observability&quot; and get eight tools all claiming they solve the same problem at three different price points.</p>
+<p>They don&#39;t solve the same problem. LangSmith answers &quot;why did this LangGraph run fail?&quot; Phoenix answers &quot;is my RAG pipeline drifting?&quot; Helicone answers &quot;which app is burning tokens?&quot; Langfuse answers &quot;can I self-host the whole thing?&quot; Different tools, different audiences.</p>
+<p>Picking involves four axes: stack (LangChain? raw SDK? multi-vendor?), license tolerance (MIT only? Elastic OK? commercial fine?), budget (free tier? $100/mo? $1000/mo?), and self-host (must? nice-to-have? never?).</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="two-categories" class="prose-h prose-h3"><a class="prose-h__anchor" href="#two-categories" aria-label="Link to this section">#</a>Two categories</h3>
+<p><strong>Development platforms</strong> bundle observability with evals, prompt management, dataset versioning, session replay. You run experiments, see which prompt worked, dataset-regression a new prompt against old winners. LangSmith, Langfuse, Comet Opik.</p>
+<p><strong>Gateway/telemetry tools</strong> instrument inference calls — prompt, response, tokens, latency, model, cost. Helicone, SigNoz, OpenLLMetry, Phoenix. Minimalist. Can be combined with a separate eval tool via OpenTelemetry.</p>
+<h3 id="langfuse-oss-balance" class="prose-h prose-h3"><a class="prose-h__anchor" href="#langfuse-oss-balance" aria-label="Link to this section">#</a>Langfuse — OSS balance</h3>
+<ul>
+<li>Core Apache / MIT licensed; self-host via Docker.</li>
+<li>Cloud free tier: 50K events/month. Paid: $29/mo for team.</li>
+<li>Evals, prompt management, traces, datasets. Reasonable coverage of all four dev-platform features.</li>
+<li>Sweet spot: you want LangSmith-class features but must self-host or stay on OSS license.</li>
+</ul>
+<h3 id="phoenix-arize-telemetry-first-opentelemetry-native" class="prose-h prose-h3"><a class="prose-h__anchor" href="#phoenix-arize-telemetry-first-opentelemetry-native" aria-label="Link to this section">#</a>Phoenix (Arize) — telemetry-first, OpenTelemetry-native</h3>
+<ul>
+<li>Elastic License 2.0; self-host trivial.</li>
+<li>Excellent at RAG and drift visualization. Embedding-space scatter plots shipped as first-class.</li>
+<li>Not designed as persistent production backend — primarily development-time observability.</li>
+<li>Sweet spot: RAG pipeline development, drift debugging, pairs with a separate gateway for production.</li>
+</ul>
+<h3 id="arize-ax-the-scale-play" class="prose-h prose-h3"><a class="prose-h__anchor" href="#arize-ax-the-scale-play" aria-label="Link to this section">#</a>Arize AX — the scale play</h3>
+<ul>
+<li>Commercial. Zero-copy data lake integration via Iceberg/Parquet.</li>
+<li>Claims ~100x cheaper than monolithic observability (Datadog-class) at scale. The math: you store traces in your own Parquet on S3; Arize reads directly.</li>
+<li>Sweet spot: &gt;10M traces/day, existing data lake, want LLM-specific dashboards without Datadog pricing.</li>
+</ul>
+<h3 id="langsmith-langchain-langgraph-first" class="prose-h prose-h3"><a class="prose-h__anchor" href="#langsmith-langchain-langgraph-first" aria-label="Link to this section">#</a>LangSmith — LangChain/LangGraph first</h3>
+<ul>
+<li>Commercial, $39/user/month. Self-host only on Enterprise.</li>
+<li>Best-in-class for LangChain and LangGraph stacks. If you are not on either, it is less compelling.</li>
+<li>Sweet spot: team committed to LangChain, willing to pay.</li>
+</ul>
+<h3 id="helicone-proxy-based-minimum-viable" class="prose-h prose-h3"><a class="prose-h__anchor" href="#helicone-proxy-based-minimum-viable" aria-label="Link to this section">#</a>Helicone — proxy-based minimum viable</h3>
+<ul>
+<li>15-30 minute setup by swapping your <code class="inline-code">OPENAI_API_BASE</code> to Helicone proxy.</li>
+<li>MIT licensed; 100K req/mo free, paid $20/mo+.</li>
+<li>Includes failover, caching, rate limits — acts as a gateway too.</li>
+<li>Less depth on agent / multi-step traces.</li>
+<li>Sweet spot: quick start, single-stack app, need gateway + observability in one.</li>
+</ul>
+<h3 id="opik-comet-oss-dev-platform" class="prose-h prose-h3"><a class="prose-h__anchor" href="#opik-comet-oss-dev-platform" aria-label="Link to this section">#</a>Opik (Comet) — OSS dev platform</h3>
+<ul>
+<li>Apache 2.0, fully OSS.</li>
+<li>Similar feature set to Langfuse with Comet heritage.</li>
+<li>Sweet spot: ML teams already on Comet, want LLM observability in the same pane.</li>
+</ul>
+<h3 id="signoz-opentelemetry-first-full-apm" class="prose-h prose-h3"><a class="prose-h__anchor" href="#signoz-opentelemetry-first-full-apm" aria-label="Link to this section">#</a>SigNoz — OpenTelemetry-first full APM</h3>
+<ul>
+<li>Apache 2.0. Handles general APM plus LLM via OpenTelemetry.</li>
+<li>Sweet spot: unified observability across services and LLM calls.</li>
+</ul>
+<h3 id="the-glue-opentelemetry-genai-semantic-conventions" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-glue-opentelemetry-genai-semantic-conventions" aria-label="Link to this section">#</a>The glue: OpenTelemetry + GenAI semantic conventions</h3>
+<p>OpenTelemetry published GenAI semantic conventions in late 2025 (<code class="inline-code">gen_ai.system</code>, <code class="inline-code">gen_ai.request.model</code>, <code class="inline-code">gen_ai.usage.input_tokens</code>). Tools that consume OTel can interoperate. The production pattern emerging:</p>
+<ol>
+<li>Emit OTel with GenAI conventions from every LLM call.</li>
+<li>Route to gateway (Helicone / Portkey) for day-to-day.</li>
+<li>Dual-ship to eval platform (Phoenix / Langfuse) for regressions.</li>
+<li>Archive in data lake (Iceberg) for long-term analysis via Arize AX or DuckDB.</li>
+</ol>
+<h3 id="the-trap-instrumenting-at-the-wrong-layer" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-trap-instrumenting-at-the-wrong-layer" aria-label="Link to this section">#</a>The trap: instrumenting at the wrong layer</h3>
+<p>Instrumenting inside your agent framework (e.g., adding LangSmith traces) couples you to that framework. Instrumenting at the HTTP/OpenAI-SDK layer (via OpenLLMetry or your gateway) is portable.</p>
+<h3 id="sampling-you-can-t-keep-everything" class="prose-h prose-h3"><a class="prose-h__anchor" href="#sampling-you-can-t-keep-everything" aria-label="Link to this section">#</a>Sampling — you can&#39;t keep everything</h3>
+<p>At &gt;1M requests/day, full-trace retention costs more than the LLM calls. Sample by rules: 100% errors, 100% high-cost, 5% success. Keep aggregates always; keep raw for the long tail.</p>
+<h3 id="numbers-you-should-remember" class="prose-h prose-h3"><a class="prose-h__anchor" href="#numbers-you-should-remember" aria-label="Link to this section">#</a>Numbers you should remember</h3>
+<ul>
+<li>Langfuse free cloud: 50K events/month.</li>
+<li>LangSmith: $39/user/month.</li>
+<li>Helicone free: 100K req/month.</li>
+<li>Arize AX claim: ~100x cheaper than monolithic at scale.</li>
+<li>OpenTelemetry GenAI conventions: 2025 shipping, 2026 widely adopted.</li>
+</ul>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="i4-otel-glue"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">i4-otel-glue</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> i4 otel glue</figcaption>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p><code class="inline-code">code/main.py</code> simulates a 1M-trace day across retention strategies (100% ingest, sampling, sampling + errors). Reports storage cost and what&#39;s lost under each.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces <code class="inline-code">outputs/skill-observability-stack.md</code>. Given stack, scale, budget, license posture, picks the tool(s).</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li>Your team on LangChain wants OSS self-hosted observability. Pick Langfuse or Opik and justify.</li>
+<li>At 5M traces/day with Datadog quotes $150K/month, compute break-even for Arize AX.</li>
+<li>Design an OpenTelemetry GenAI attribute set your org&#39;s guideline should mandate on every LLM call.</li>
+<li>Argue whether Phoenix alone is sufficient for production. When does it not suffice?</li>
+<li>Helicone is 20ms proxy overhead. At P99 TTFT 300 ms, is that acceptable? What if SLA is 100 ms?</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>OpenLLMetry</td>
+<td>&quot;OTel for LLMs&quot;</td>
+<td>Open-source OpenTelemetry instrumentation for LLMs</td>
+</tr>
+<tr>
+<td>GenAI conventions</td>
+<td>&quot;OTel attributes&quot;</td>
+<td>Standard OTel attribute names for LLM calls</td>
+</tr>
+<tr>
+<td>LangSmith</td>
+<td>&quot;LangChain observability&quot;</td>
+<td>Commercial platform bundled with LangChain ecosystem</td>
+</tr>
+<tr>
+<td>Langfuse</td>
+<td>&quot;OSS LangSmith&quot;</td>
+<td>MIT OSS with similar feature set</td>
+</tr>
+<tr>
+<td>Phoenix</td>
+<td>&quot;Arize dev tool&quot;</td>
+<td>OpenTelemetry-native dev/eval platform</td>
+</tr>
+<tr>
+<td>Arize AX</td>
+<td>&quot;scale observability&quot;</td>
+<td>Commercial zero-copy Iceberg/Parquet observability</td>
+</tr>
+<tr>
+<td>Helicone</td>
+<td>&quot;proxy observability&quot;</td>
+<td>HTTP proxy collecting LLM telemetry + gateway features</td>
+</tr>
+<tr>
+<td>Opik</td>
+<td>&quot;Comet LLM&quot;</td>
+<td>Apache 2.0 OSS dev platform from Comet</td>
+</tr>
+<tr>
+<td>Session replay</td>
+<td>&quot;trace rerun&quot;</td>
+<td>Replay a full agent session with tool calls</td>
+</tr>
+<tr>
+<td>Eval</td>
+<td>&quot;offline test&quot;</td>
+<td>Running candidate model/prompt over labeled dataset</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://signoz.io/comparisons/llm-observability-tools/" target="_blank" rel="noopener">SigNoz — Top LLM Observability Tools 2026</a></li>
+<li><a href="https://langfuse.com/faq/all/best-phoenix-arize-alternatives" target="_blank" rel="noopener">Langfuse — Arize AX Alternative analysis</a></li>
+<li><a href="https://blog.premai.io/llm-observability-setting-up-langfuse-langsmith-helicone-phoenix/" target="_blank" rel="noopener">PremAI — Setting Up Langfuse, LangSmith, Helicone, Phoenix</a></li>
+<li><a href="https://opentelemetry.io/docs/specs/semconv/gen-ai/" target="_blank" rel="noopener">OpenTelemetry GenAI Semantic Conventions</a></li>
+<li><a href="https://docs.arize.com/phoenix" target="_blank" rel="noopener">Arize Phoenix docs</a></li>
+<li><a href="https://docs.helicone.ai/" target="_blank" rel="noopener">Helicone docs</a></li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="12-edge-inference.html">
+  <span class="label">← Previous</span>
+  <b>Edge Inference — Apple Neural Engine, Qualcomm Hexagon, WebGPU/WebLLM, Jetson</b>
+</a>
+      <a class="pager__item pager__item--next" href="14-prompt-semantic-caching.html">
+  <span class="label">Next →</span>
+  <b>Prompt Caching and Semantic Caching Economics</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>5 minutes</b> of Infrastructure &amp; Production behind you.</p>
+      <a class="btn btn--solid" href="14-prompt-semantic-caching.html">Continue to Prompt Caching and Semantic Caching Economics →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#two-categories">Two categories</a></li><li class="mini__item mini__item--d3"><a href="#langfuse-oss-balance">Langfuse — OSS balance</a></li><li class="mini__item mini__item--d3"><a href="#phoenix-arize-telemetry-first-opentelemetry-native">Phoenix (Arize) — telemetry-first, OpenTelemetry-native</a></li><li class="mini__item mini__item--d3"><a href="#arize-ax-the-scale-play">Arize AX — the scale play</a></li><li class="mini__item mini__item--d3"><a href="#langsmith-langchain-langgraph-first">LangSmith — LangChain/LangGraph first</a></li><li class="mini__item mini__item--d3"><a href="#helicone-proxy-based-minimum-viable">Helicone — proxy-based minimum viable</a></li><li class="mini__item mini__item--d3"><a href="#opik-comet-oss-dev-platform">Opik (Comet) — OSS dev platform</a></li><li class="mini__item mini__item--d3"><a href="#signoz-opentelemetry-first-full-apm">SigNoz — OpenTelemetry-first full APM</a></li><li class="mini__item mini__item--d3"><a href="#the-glue-opentelemetry-genai-semantic-conventions">The glue: OpenTelemetry + GenAI semantic conventions</a></li><li class="mini__item mini__item--d3"><a href="#the-trap-instrumenting-at-the-wrong-layer">The trap: instrumenting at the wrong layer</a></li><li class="mini__item mini__item--d3"><a href="#sampling-you-can-t-keep-everything">Sampling — you can't keep everything</a></li><li class="mini__item mini__item--d3"><a href="#numbers-you-should-remember">Numbers you should remember</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

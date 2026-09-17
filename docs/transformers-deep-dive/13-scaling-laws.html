@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scaling Laws — Transformers Deep Dive — AIFS</title>
+<meta name="description" content="Transformers Deep Dive: Scaling Laws. 5 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Scaling Laws — Transformers Deep Dive — AIFS">
+<meta property="og:description" content="Transformers Deep Dive: Scaling Laws. 5 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={};window.AIFS_FIGURE_PROVIDER_ORDER=[];</script>
+</head>
+<body class="is-reader" style="--accent:#9B5CFF" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#9B5CFF;--accent-ink:#FFFFFF"
+  data-lesson-id="transformers-deep-dive/13-scaling-laws" data-module="transformers-deep-dive"
+  data-prev="12-kv-cache-flash-attention.html" data-next="14-build-a-transformer-capstone.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#9B5CFF">
+        <span class="label">Phase 07</span>
+        <b>Transformers Deep Dive</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="transformers-deep-dive/01-why-transformers"><a href="01-why-transformers.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Why Transformers — The Problems with RNNs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/02-self-attention-from-scratch"><a href="02-self-attention-from-scratch.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Self-Attention from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/03-multi-head-attention"><a href="03-multi-head-attention.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Multi-Head Attention</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/04-positional-encoding"><a href="04-positional-encoding.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Positional Encoding — Sinusoidal, RoPE, ALiBi</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/05-full-transformer"><a href="05-full-transformer.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">The Full Transformer — Encoder + Decoder</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/06-bert-masked-language-modeling"><a href="06-bert-masked-language-modeling.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">BERT — Masked Language Modeling</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/07-gpt-causal-language-modeling"><a href="07-gpt-causal-language-modeling.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">GPT — Causal Language Modeling</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/08-t5-bart-encoder-decoder"><a href="08-t5-bart-encoder-decoder.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">T5, BART — Encoder-Decoder Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/09-vision-transformers"><a href="09-vision-transformers.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Vision Transformers (ViT)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/10-audio-transformers-whisper"><a href="10-audio-transformers-whisper.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Audio Transformers — Whisper Architecture</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/11-mixture-of-experts"><a href="11-mixture-of-experts.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Mixture of Experts (MoE)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/12-kv-cache-flash-attention"><a href="12-kv-cache-flash-attention.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">KV Cache, Flash Attention &amp; Inference Optimization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/13-scaling-laws"><a href="13-scaling-laws.html" class="is-current">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Scaling Laws</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/14-build-a-transformer-capstone"><a href="14-build-a-transformer-capstone.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Build a Transformer from Scratch — The Capstone</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/15-attention-variants"><a href="15-attention-variants.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Attention Variants — Sliding Window, Sparse, Differential</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/16-speculative-decoding"><a href="16-speculative-decoding.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Speculative Decoding — Draft, Verify, Repeat</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Transformers Deep Dive</a></p>
+      <h1 class="page__title">Scaling Laws</h1>
+      <p class="page__lede">The 2020 Kaplan paper said: bigger model, lower loss. The 2022 Hoffmann paper said: you were under-training. Compute goes into two buckets — parameters and tokens — and the split is not obvious.</p>
+      <div class="page__meta">
+        <span class="chip">5 min read</span>
+        <span class="chip">1,175 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Learn</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 7 · 05 (Full Transformer), Phase 7 · 07 (GPT)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~45 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>When you have C FLOPs of training compute and want the best model, you face two knobs:</p>
+<ol>
+<li><strong>How many parameters (N)?</strong> Bigger model, higher capacity.</li>
+<li><strong>How many training tokens (D)?</strong> More data, better use of capacity.</li>
+</ol>
+<p>FLOPs scale approximately as <code class="inline-code">6 × N × D</code>. You can push N up and D down, or D up and N down. Which is better?</p>
+<p>Before 2022, the answer was &quot;push N hard.&quot; GPT-3 (2020) was 175B parameters trained on ~300B tokens. A ratio of about 1.7 tokens per parameter. The Kaplan scaling laws backed this up.</p>
+<p>Hoffmann et al. (2022), training a small family of models called Chinchilla, found something different: optimal ratio is closer to <strong>20 tokens per parameter</strong>. GPT-3 was 10× undertrained. Chinchilla (70B params, 1.4T tokens) beat GPT-3 (175B, 300B tokens) on every benchmark at 2.5× less inference cost.</p>
+<p>2026 is Chinchilla&#39;s world — with one important twist. Llama 3 8B was trained on 15 trillion tokens, a ratio of 1,875 tokens per parameter. Ninety-four times past Chinchilla-optimal. Inference cost matters more than training cost for models that will be used at scale, so over-training (past Chinchilla) for a smaller deployable footprint is the 2026 default.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<p><img src="assets/13-scaling-laws/scaling-laws.svg" alt="Chinchilla curves: loss vs compute at various N/D ratios" loading="lazy"></p>
+<h3 id="the-hoffmann-law" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-hoffmann-law" aria-label="Link to this section">#</a>The Hoffmann law</h3>
+<p>From the Chinchilla paper, loss follows:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>L(N, D) = A / N^α + B / D^β + E</code></pre>
+</figure>
+<ul>
+<li><code class="inline-code">N</code> = parameters (non-embedding).</li>
+<li><code class="inline-code">D</code> = training tokens.</li>
+<li><code class="inline-code">α ≈ 0.34</code>, <code class="inline-code">β ≈ 0.28</code> (roughly symmetric).</li>
+<li><code class="inline-code">E ≈ 1.69</code>, the irreducible loss ceiling.</li>
+<li><code class="inline-code">A ≈ 406</code>, <code class="inline-code">B ≈ 411</code>.</li>
+</ul>
+<p>Two terms trade against each other as you scale. Take the derivative w.r.t. <code class="inline-code">N</code> at fixed compute (C = 6ND) and solve:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>N_opt ≈ 0.6 × (C/6)^0.5
+D_opt ≈ 0.6 × (C/6)^0.5
+D_opt / N_opt ≈ 20</code></pre>
+</figure>
+<p>Compute-optimal: 20 tokens per parameter.</p>
+<h3 id="why-over-training-anyway" class="prose-h prose-h3"><a class="prose-h__anchor" href="#why-over-training-anyway" aria-label="Link to this section">#</a>Why over-training anyway</h3>
+<p>Chinchilla-optimal minimizes training loss per training FLOP. But you pay training cost once; inference cost forever.</p>
+<p>For a chatbot that serves a trillion tokens per month, inference dominates total cost. Llama&#39;s approach: train smaller, longer. 8B at 15T tokens is deeply inference-optimized:</p>
+<ul>
+<li>Fits on consumer GPUs.</li>
+<li>Latency is a fraction of 70B Chinchilla-optimal.</li>
+<li>Quality is close enough for most tasks.</li>
+</ul>
+<p>DeepMind&#39;s 2024 paper (&quot;Over-training is the new optimal&quot;) formalized this. For inference-dominated workloads, the right ratio is closer to 100–500 tokens per parameter depending on serving volume.</p>
+<h3 id="emergence-vs-smoothness" class="prose-h prose-h3"><a class="prose-h__anchor" href="#emergence-vs-smoothness" aria-label="Link to this section">#</a>Emergence vs smoothness</h3>
+<p>Claim: certain abilities (arithmetic, multi-step reasoning, chain-of-thought following) &quot;emerge&quot; suddenly at some scale.</p>
+<p>Schaeffer et al. (2023) argued this is a measurement artifact: emergent metrics use discontinuous scoring (exact match, accuracy at threshold) that hide smooth improvement in the underlying logits. Continuous metrics (cross-entropy) show smooth curves.</p>
+<p>In 2026 the consensus is: predictions via continuous loss are reliable. Benchmark jumps are often scorer artifacts. Plan budgets against continuous metrics.</p>
+<h3 id="the-2026-picture" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-2026-picture" aria-label="Link to this section">#</a>The 2026 picture</h3>
+<p>Scaling laws still work, but:</p>
+<table>
+<thead>
+<tr>
+<th>Factor</th>
+<th>Changed how</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Data quality</td>
+<td>Curating &quot;good&quot; tokens (Phi-style) shifts curves by &gt;2× effective compute</td>
+</tr>
+<tr>
+<td>MoE</td>
+<td>Total params decouple from active FLOPs; scaling laws per-active-FLOP</td>
+</tr>
+<tr>
+<td>Post-training</td>
+<td>Some capabilities (instruction following, code) shift with SFT+RLHF more than pretraining</td>
+</tr>
+<tr>
+<td>Multimodality</td>
+<td>Image + text tokens scale together; separate curves per modality</td>
+</tr>
+<tr>
+<td>Synthetic data</td>
+<td>Models generate training data; effective compute can compound</td>
+</tr>
+</tbody></table>
+<p>The Muon optimizer (Kimi Moonlight, 2024) showed a ~2× effective-compute gain over AdamW at matched data. Some 2026 training runs use Muon by default. Changes the absolute constant in the scaling law, not its shape.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="scaling-laws"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">scaling-laws</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> scaling laws</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<p>See <code class="inline-code">code/main.py</code>. We implement the Chinchilla loss equation and solve for compute-optimal <code class="inline-code">(N, D)</code> at each of several compute budgets.</p>
+<h3 id="step-1-chinchilla-loss" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-chinchilla-loss" aria-label="Link to this section">#</a>Step 1: Chinchilla loss</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">chinchilla_loss</span><span class="token punctuation">(</span>N<span class="token punctuation">,</span> D<span class="token punctuation">,</span> A<span class="token operator">=</span><span class="token number">406.4</span><span class="token punctuation">,</span> B<span class="token operator">=</span><span class="token number">410.7</span><span class="token punctuation">,</span> alpha<span class="token operator">=</span><span class="token number">0.34</span><span class="token punctuation">,</span> beta<span class="token operator">=</span><span class="token number">0.28</span><span class="token punctuation">,</span> E<span class="token operator">=</span><span class="token number">1.69</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> A <span class="token operator">/</span> N <span class="token operator">**</span> alpha <span class="token operator">+</span> B <span class="token operator">/</span> D <span class="token operator">**</span> beta <span class="token operator">+</span> E</code></pre>
+</figure>
+<p>Plot <code class="inline-code">L</code> as a contour over <code class="inline-code">(N, D)</code> at fixed <code class="inline-code">C = 6ND</code>. Find the minimum.</p>
+<h3 id="step-2-compute-optimal-frontier" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-compute-optimal-frontier" aria-label="Link to this section">#</a>Step 2: compute-optimal frontier</h3>
+<p>For compute budgets from <code class="inline-code">1e17</code> to <code class="inline-code">1e25</code> FLOPs, find <code class="inline-code">(N, D)</code> that minimize loss subject to <code class="inline-code">6ND = C</code>. Verify the ratio <code class="inline-code">D/N ≈ 20</code>.</p>
+<h3 id="step-3-over-training-cost" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-over-training-cost" aria-label="Link to this section">#</a>Step 3: over-training cost</h3>
+<p>Compute the extra loss you pay to train a 10× smaller model (1/10 of optimal N, 10× the optimal D). Reports the inference FLOP savings (proportional to N) in exchange.</p>
+<h3 id="step-4-compare-to-real-models" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-compare-to-real-models" aria-label="Link to this section">#</a>Step 4: compare to real models</h3>
+<p>Drop in known <code class="inline-code">(N, D)</code> pairs for GPT-3, Chinchilla, Llama 3 8B, DeepSeek-V3 (active params), and compare predicted vs reported loss.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>You&#39;re unlikely to train a frontier model yourself. But scaling laws tell you:</p>
+<ol>
+<li><strong>Whether your fine-tune has enough data.</strong> If your task-specific data is below 20 tokens per param of the base model, expect saturation at some loss floor.</li>
+<li><strong>Whether to pick a bigger base model.</strong> If you&#39;re spending all your budget on inference, prefer a smaller, longer-trained model.</li>
+<li><strong>Where the returns diminish.</strong> Beyond 1000× Chinchilla-optimal, log-loss changes become noise.</li>
+</ol>
+<p><strong>The research trajectory in 2026:</strong></p>
+<ul>
+<li><strong>Data-constrained regime.</strong> The web has a finite number of high-quality tokens (~5–10 trillion English after filtering). Frontier pretraining is approaching this ceiling. Synthetic data, multilingual, multimodal, and RLHF-scaled fine-tuning are the next levers.</li>
+<li><strong>Compute-multiplier tricks.</strong> Muon optimizer, MoE, better data curation — each shifts the absolute constants, not the asymptote.</li>
+<li><strong>Scaling laws for RL.</strong> Open question. Early evidence suggests power-law in RL samples but with very different exponents than pretraining.</li>
+</ul>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>See <code class="inline-code">outputs/skill-training-budget-estimator.md</code>. The skill picks <code class="inline-code">(N, D, hours, GPU)</code> for a new training run given compute budget, deployment constraints, and target loss.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><strong>Easy.</strong> Run <code class="inline-code">code/main.py</code>. Print Chinchilla-optimal <code class="inline-code">(N, D)</code> for compute budgets <code class="inline-code">1e20</code>, <code class="inline-code">1e22</code>, <code class="inline-code">1e24</code>. Compare to the real model table.</li>
+<li><strong>Medium.</strong> Implement the Hoffmann loss-as-function-of-compute curve. Plot loss vs <code class="inline-code">log10(C)</code> for the compute-optimal frontier. Identify when the law predicts we&#39;d need <code class="inline-code">&gt;10^28</code> FLOPs for the next 0.1 reduction in cross-entropy.</li>
+<li><strong>Hard.</strong> Fit your own scaling law on 5 tiny models (100K to 10M params) trained on the same dataset. Estimate <code class="inline-code">α</code> and <code class="inline-code">E</code>. How well do your exponents match published ones?</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Parameters (N)</td>
+<td>&quot;Model size&quot;</td>
+<td>Non-embedding weight count; determines capacity.</td>
+</tr>
+<tr>
+<td>Tokens (D)</td>
+<td>&quot;Training data&quot;</td>
+<td>Number of training tokens seen; determines how well the parameters get used.</td>
+</tr>
+<tr>
+<td>Compute (C)</td>
+<td>&quot;FLOPs spent&quot;</td>
+<td>Approximately <code class="inline-code">6 × N × D</code> for a standard transformer.</td>
+</tr>
+<tr>
+<td>Chinchilla-optimal</td>
+<td>&quot;D/N ≈ 20&quot;</td>
+<td>Ratio that minimizes loss per FLOP of pretraining.</td>
+</tr>
+<tr>
+<td>Over-training</td>
+<td>&quot;Past Chinchilla&quot;</td>
+<td>Spend extra training FLOPs to save inference FLOPs; D/N &gt;&gt; 20.</td>
+</tr>
+<tr>
+<td>Irreducible loss</td>
+<td>&quot;The floor&quot;</td>
+<td>The <code class="inline-code">E</code> term in the scaling law; the entropy of the data itself.</td>
+</tr>
+<tr>
+<td>Emergent capability</td>
+<td>&quot;Sudden jumps at scale&quot;</td>
+<td>Often a scorer artifact; continuous loss is smooth.</td>
+</tr>
+<tr>
+<td>Effective compute</td>
+<td>&quot;Training-efficiency multiplier&quot;</td>
+<td>Better data / optimizer / architecture multiplies how far a FLOP goes.</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2001.08361" target="_blank" rel="noopener">Kaplan et al. (2020). Scaling Laws for Neural Language Models</a> — the first scaling law paper; undertrained.</li>
+<li><a href="https://arxiv.org/abs/2203.15556" target="_blank" rel="noopener">Hoffmann et al. (2022). Training Compute-Optimal Large Language Models</a> — Chinchilla.</li>
+<li><a href="https://arxiv.org/abs/2304.15004" target="_blank" rel="noopener">Schaeffer et al. (2023). Are Emergent Abilities of Large Language Models a Mirage?</a> — emergence as measurement artifact.</li>
+<li><a href="https://arxiv.org/abs/2401.00448" target="_blank" rel="noopener">Sardana, Frankle (2024). Beyond Chinchilla-Optimal: Accounting for Inference in Language Model Scaling Laws</a> — why Llama&#39;s over-training is right for its workload.</li>
+<li><a href="https://kellerjordan.github.io/posts/muon/" target="_blank" rel="noopener">Jordan et al. (2024). Muon: An optimizer for hidden layers in neural networks</a> — 2× compute multiplier.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="12-kv-cache-flash-attention.html">
+  <span class="label">← Previous</span>
+  <b>KV Cache, Flash Attention &amp; Inference Optimization</b>
+</a>
+      <a class="pager__item pager__item--next" href="14-build-a-transformer-capstone.html">
+  <span class="label">Next →</span>
+  <b>Build a Transformer from Scratch — The Capstone</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>5 minutes</b> of Transformers Deep Dive behind you.</p>
+      <a class="btn btn--solid" href="14-build-a-transformer-capstone.html">Continue to Build a Transformer from Scratch — The Capstone →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#the-hoffmann-law">The Hoffmann law</a></li><li class="mini__item mini__item--d3"><a href="#why-over-training-anyway">Why over-training anyway</a></li><li class="mini__item mini__item--d3"><a href="#emergence-vs-smoothness">Emergence vs smoothness</a></li><li class="mini__item mini__item--d3"><a href="#the-2026-picture">The 2026 picture</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-chinchilla-loss">Step 1: Chinchilla loss</a></li><li class="mini__item mini__item--d3"><a href="#step-2-compute-optimal-frontier">Step 2: compute-optimal frontier</a></li><li class="mini__item mini__item--d3"><a href="#step-3-over-training-cost">Step 3: over-training cost</a></li><li class="mini__item mini__item--d3"><a href="#step-4-compare-to-real-models">Step 4: compare to real models</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

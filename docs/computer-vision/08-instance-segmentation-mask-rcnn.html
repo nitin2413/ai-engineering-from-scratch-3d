@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Instance Segmentation — Mask R-CNN — Computer Vision — AIFS</title>
+<meta name="description" content="Computer Vision: Instance Segmentation — Mask R-CNN. 6 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Instance Segmentation — Mask R-CNN — Computer Vision — AIFS">
+<meta property="og:description" content="Computer Vision: Instance Segmentation — Mask R-CNN. 6 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"cv3-roialign-sampling":["../assets/figures/figures-cv3.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-cv3.js"];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#FF6B1A" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#FF6B1A;--accent-ink:#111111"
+  data-lesson-id="computer-vision/08-instance-segmentation-mask-rcnn" data-module="computer-vision"
+  data-prev="07-semantic-segmentation-unet.html" data-next="09-image-generation-gans.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#FF6B1A">
+        <span class="label">Phase 04</span>
+        <b>Computer Vision</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="computer-vision/01-image-fundamentals"><a href="01-image-fundamentals.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Image Fundamentals — Pixels, Channels, Color Spaces</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/02-convolutions-from-scratch"><a href="02-convolutions-from-scratch.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Convolutions from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/03-cnns-lenet-to-resnet"><a href="03-cnns-lenet-to-resnet.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">CNNs — LeNet to ResNet</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/04-image-classification"><a href="04-image-classification.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Image Classification</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/05-transfer-learning"><a href="05-transfer-learning.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Transfer Learning &amp; Fine-Tuning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/06-object-detection-yolo"><a href="06-object-detection-yolo.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Object Detection — YOLO from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/07-semantic-segmentation-unet"><a href="07-semantic-segmentation-unet.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Semantic Segmentation — U-Net</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/08-instance-segmentation-mask-rcnn"><a href="08-instance-segmentation-mask-rcnn.html" class="is-current">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Instance Segmentation — Mask R-CNN</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/09-image-generation-gans"><a href="09-image-generation-gans.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Image Generation — GANs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/10-image-generation-diffusion"><a href="10-image-generation-diffusion.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Image Generation — Diffusion Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/11-stable-diffusion"><a href="11-stable-diffusion.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Stable Diffusion — Architecture &amp; Fine-Tuning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/12-video-understanding"><a href="12-video-understanding.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Video Understanding — Temporal Modeling</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/13-3d-vision-nerf"><a href="13-3d-vision-nerf.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">3D Vision — Point Clouds &amp; NeRFs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/14-vision-transformers"><a href="14-vision-transformers.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Vision Transformers (ViT)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/15-real-time-edge"><a href="15-real-time-edge.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Real-Time Vision — Edge Deployment</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/16-vision-pipeline-capstone"><a href="16-vision-pipeline-capstone.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Build a Complete Vision Pipeline — Capstone</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/17-self-supervised-vision"><a href="17-self-supervised-vision.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Self-Supervised Vision — SimCLR, DINO, MAE</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/18-open-vocab-clip"><a href="18-open-vocab-clip.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Open-Vocabulary Vision — CLIP</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/19-ocr-document-understanding"><a href="19-ocr-document-understanding.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">OCR &amp; Document Understanding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/20-image-retrieval-metric"><a href="20-image-retrieval-metric.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Image Retrieval &amp; Metric Learning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/21-keypoint-pose"><a href="21-keypoint-pose.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Keypoint Detection &amp; Pose Estimation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/22-3d-gaussian-splatting"><a href="22-3d-gaussian-splatting.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">3D Gaussian Splatting from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/23-diffusion-transformers-rectified-flow"><a href="23-diffusion-transformers-rectified-flow.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Diffusion Transformers &amp; Rectified Flow</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/24-sam3-open-vocab-segmentation"><a href="24-sam3-open-vocab-segmentation.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">SAM 3 &amp; Open-Vocabulary Segmentation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/25-vision-language-models"><a href="25-vision-language-models.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Vision-Language Models — The ViT-MLP-LLM Pattern</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/26-monocular-depth"><a href="26-monocular-depth.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Monocular Depth &amp; Geometry Estimation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/27-multi-object-tracking"><a href="27-multi-object-tracking.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">Multi-Object Tracking &amp; Video Memory</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/28-world-models-video-diffusion"><a href="28-world-models-video-diffusion.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">World Models &amp; Video Diffusion</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Computer Vision</a></p>
+      <h1 class="page__title">Instance Segmentation — Mask R-CNN</h1>
+      <p class="page__lede">Add a tiny mask branch to a Faster R-CNN detector and you have instance segmentation. The hard part is RoIAlign, and it is harder than it looks.</p>
+      <div class="page__meta">
+        <span class="chip">6 min read</span>
+        <span class="chip">1,361 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build + Learn</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 4 Lesson 06 (YOLO), Phase 4 Lesson 07 (U-Net)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Trace the Mask R-CNN architecture end-to-end: backbone, FPN, RPN, RoIAlign, box head, mask head</li>
+<li>Implement RoIAlign from scratch and explain why RoIPool is no longer used</li>
+<li>Use the torchvision <code class="inline-code">maskrcnn_resnet50_fpn_v2</code> pretrained model for production-quality instance masks and read its output format correctly</li>
+<li>Fine-tune Mask R-CNN on a small custom dataset by replacing the box and mask heads and keeping the backbone frozen</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Semantic segmentation gives you one mask per class. Instance segmentation gives you one mask per object, even when two objects share a class. Counting individuals, tracking across frames, and measuring things (the bounding box of each brick in a wall, each cell in a microscope image) all demand instance segmentation.</p>
+<p>Mask R-CNN (He et al., 2017) solved this by reframing instance segmentation as detection-plus-a-mask. The design was so clean that for the next five years almost every instance segmentation paper was a Mask R-CNN variant, and the torchvision implementation is still the production default for small to medium datasets.</p>
+<p>The hard engineering problem is sampling: how do you crop a fixed-size feature region out of a proposal box whose corners do not align with pixel boundaries? Getting that wrong costs tenths of a mAP point everywhere. RoIAlign is the answer.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="the-architecture" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-architecture" aria-label="Link to this section">#</a>The architecture</h3>
+<figure class="mermaid-figure">
+  <pre class="mermaid">flowchart LR
+    IMG[&quot;Input&quot;] --&gt; BB[&quot;ResNet&lt;br/&gt;backbone&quot;]
+    BB --&gt; FPN[&quot;Feature&lt;br/&gt;Pyramid Network&quot;]
+    FPN --&gt; RPN[&quot;Region&lt;br/&gt;Proposal&lt;br/&gt;Network&quot;]
+    FPN --&gt; RA[&quot;RoIAlign&quot;]
+    RPN --&gt;|&quot;top-K proposals&quot;| RA
+    RA --&gt; BH[&quot;Box head&lt;br/&gt;(class + refine)&quot;]
+    RA --&gt; MH[&quot;Mask head&lt;br/&gt;(14x14 conv)&quot;]
+    BH --&gt; NMS[&quot;NMS&quot;]
+    MH --&gt; NMS
+    NMS --&gt; OUT[&quot;boxes +&lt;br/&gt;classes + masks&quot;]
+
+    style BB fill:#dbeafe,stroke:#2563eb
+    style FPN fill:#fef3c7,stroke:#d97706
+    style RPN fill:#fecaca,stroke:#dc2626
+    style OUT fill:#dcfce7,stroke:#16a34a</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>Five pieces to understand:</p>
+<ol>
+<li><strong>Backbone</strong> — ResNet-50 or ResNet-101 trained on ImageNet. Produces a hierarchy of feature maps at strides 4, 8, 16, 32.</li>
+<li><strong>FPN (Feature Pyramid Network)</strong> — top-down + lateral connections that give every level C channels of semantic-rich features. Detection queries the FPN level matching the object size.</li>
+<li><strong>RPN (Region Proposal Network)</strong> — a small conv head that, at every anchor position, predicts &quot;is there an object here?&quot; and &quot;how do I refine the box?&quot;. Produces ~1000 proposals per image.</li>
+<li><strong>RoIAlign</strong> — samples a fixed-size (e.g. 7x7) feature patch from any box on any FPN level. Bilinear sampling, no quantisation.</li>
+<li><strong>Heads</strong> — two-layer box head that refines the box and picks a class, plus a small conv head that outputs a <code class="inline-code">28x28</code> binary mask for each proposal.</li>
+</ol>
+<h3 id="why-roialign-not-roipool" class="prose-h prose-h3"><a class="prose-h__anchor" href="#why-roialign-not-roipool" aria-label="Link to this section">#</a>Why RoIAlign, not RoIPool</h3>
+<p>The original Fast R-CNN used RoIPool, which splits a proposal box into a grid, takes the maximum feature in each cell, and rounds all coordinates to integers. That rounding misaligns the feature map from the input pixel coordinates by up to a full feature-map pixel — small on a 224x224 image, catastrophic when the feature map is stride 32.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>RoIPool:
+  box (34.7, 51.3, 98.2, 142.9)
+  round -&gt; (34, 51, 98, 142)
+  split grid -&gt; round each cell boundary
+  misalignment accumulates at every step
+
+RoIAlign:
+  box (34.7, 51.3, 98.2, 142.9)
+  sample at exact float coordinates using bilinear interpolation
+  no rounding anywhere</code></pre>
+</figure>
+<p>RoIAlign lifts mask AP by 3-4 points on COCO for free. Every detector that cares about localisation now uses it — YOLOv7 seg, RT-DETR, Mask2Former alike.</p>
+<h3 id="the-rpn-in-one-paragraph" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-rpn-in-one-paragraph" aria-label="Link to this section">#</a>The RPN in one paragraph</h3>
+<p>At every position of a feature map, place K anchor boxes of different sizes and shapes. Predict an objectness score for each anchor and a regression offset to turn the anchor into a better-fitting box. Keep the top ~1,000 boxes by score, apply NMS at IoU 0.7, and hand the survivors to the heads. The RPN is trained with its own mini-loss — the same structure as the YOLO loss from Lesson 6, just with two classes (object / no object).</p>
+<h3 id="the-mask-head" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-mask-head" aria-label="Link to this section">#</a>The mask head</h3>
+<p>For each proposal (after RoIAlign) the mask head is a tiny FCN: four 3x3 convs, a 2x deconv, a final 1x1 conv that produces <code class="inline-code">num_classes</code> output channels at <code class="inline-code">28x28</code> resolution. Only the channel corresponding to the predicted class is kept; the others are ignored. This decouples mask prediction from classification.</p>
+<p>Upsample the 28x28 mask to the proposal&#39;s original pixel size to produce the final binary mask.</p>
+<h3 id="losses" class="prose-h prose-h3"><a class="prose-h__anchor" href="#losses" aria-label="Link to this section">#</a>Losses</h3>
+<p>Mask R-CNN has four losses added together:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>L = L_rpn_cls + L_rpn_box + L_box_cls + L_box_reg + L_mask</code></pre>
+</figure>
+<ul>
+<li><code class="inline-code">L_rpn_cls</code>, <code class="inline-code">L_rpn_box</code> — objectness + box regression for the RPN proposals.</li>
+<li><code class="inline-code">L_box_cls</code> — cross-entropy over (C+1) classes (including background) on the head&#39;s classifier.</li>
+<li><code class="inline-code">L_box_reg</code> — smooth L1 on the head&#39;s box refinement.</li>
+<li><code class="inline-code">L_mask</code> — per-pixel binary cross-entropy on the 28x28 mask output.</li>
+</ul>
+<p>Each loss has its own default weight; the torchvision implementation exposes them as constructor arguments.</p>
+<h3 id="output-format" class="prose-h prose-h3"><a class="prose-h__anchor" href="#output-format" aria-label="Link to this section">#</a>Output format</h3>
+<p><code class="inline-code">torchvision.models.detection.maskrcnn_resnet50_fpn_v2</code> returns a list of dicts, one per image:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>{
+    &quot;boxes&quot;:  (N, 4) in (x1, y1, x2, y2) pixel coordinates,
+    &quot;labels&quot;: (N,) class IDs, 0 = background so indices are 1-based,
+    &quot;scores&quot;: (N,) confidence scores,
+    &quot;masks&quot;:  (N, 1, H, W) float masks in [0, 1] — threshold at 0.5 for binary,
+}</code></pre>
+</figure>
+<p>The mask is full image resolution already. The 28x28 head output has been upsampled internally.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="cv3-roialign-sampling"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">cv3-roialign-sampling</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> cv3 roialign sampling</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-roialign-from-scratch" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-roialign-from-scratch" aria-label="Link to this section">#</a>Step 1: RoIAlign from scratch</h3>
+<p>This is the one component of Mask R-CNN that is simpler to understand as code than as prose.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> torch
+<span class="token keyword">import</span> torch<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>functional <span class="token keyword">as</span> F
+
+<span class="token keyword">def</span> <span class="token function">roi_align_single</span><span class="token punctuation">(</span>feature<span class="token punctuation">,</span> box<span class="token punctuation">,</span> output_size<span class="token operator">=</span><span class="token number">7</span><span class="token punctuation">,</span> spatial_scale<span class="token operator">=</span><span class="token number">1</span> <span class="token operator">/</span> <span class="token number">16.0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""
+    feature: (C, H, W) single-image feature map
+    box: (x1, y1, x2, y2) in original image pixel coordinates
+    output_size: side of the output grid (7 for box head, 14 for mask head)
+    spatial_scale: reciprocal of the feature map stride
+    """</span>
+    C<span class="token punctuation">,</span> H<span class="token punctuation">,</span> W <span class="token operator">=</span> feature<span class="token punctuation">.</span>shape
+    x1<span class="token punctuation">,</span> y1<span class="token punctuation">,</span> x2<span class="token punctuation">,</span> y2 <span class="token operator">=</span> <span class="token punctuation">[</span>c <span class="token operator">*</span> spatial_scale <span class="token operator">-</span> <span class="token number">0.5</span> <span class="token keyword">for</span> c <span class="token keyword">in</span> box<span class="token punctuation">]</span>
+    bin_w <span class="token operator">=</span> <span class="token punctuation">(</span>x2 <span class="token operator">-</span> x1<span class="token punctuation">)</span> <span class="token operator">/</span> output_size
+    bin_h <span class="token operator">=</span> <span class="token punctuation">(</span>y2 <span class="token operator">-</span> y1<span class="token punctuation">)</span> <span class="token operator">/</span> output_size
+
+    grid_y <span class="token operator">=</span> torch<span class="token punctuation">.</span>linspace<span class="token punctuation">(</span>y1 <span class="token operator">+</span> bin_h <span class="token operator">/</span> <span class="token number">2</span><span class="token punctuation">,</span> y2 <span class="token operator">-</span> bin_h <span class="token operator">/</span> <span class="token number">2</span><span class="token punctuation">,</span> output_size<span class="token punctuation">)</span>
+    grid_x <span class="token operator">=</span> torch<span class="token punctuation">.</span>linspace<span class="token punctuation">(</span>x1 <span class="token operator">+</span> bin_w <span class="token operator">/</span> <span class="token number">2</span><span class="token punctuation">,</span> x2 <span class="token operator">-</span> bin_w <span class="token operator">/</span> <span class="token number">2</span><span class="token punctuation">,</span> output_size<span class="token punctuation">)</span>
+    yy<span class="token punctuation">,</span> xx <span class="token operator">=</span> torch<span class="token punctuation">.</span>meshgrid<span class="token punctuation">(</span>grid_y<span class="token punctuation">,</span> grid_x<span class="token punctuation">,</span> indexing<span class="token operator">=</span><span class="token string">"ij"</span><span class="token punctuation">)</span>
+
+    gx <span class="token operator">=</span> <span class="token number">2</span> <span class="token operator">*</span> <span class="token punctuation">(</span>xx <span class="token operator">+</span> <span class="token number">0.5</span><span class="token punctuation">)</span> <span class="token operator">/</span> W <span class="token operator">-</span> <span class="token number">1</span>
+    gy <span class="token operator">=</span> <span class="token number">2</span> <span class="token operator">*</span> <span class="token punctuation">(</span>yy <span class="token operator">+</span> <span class="token number">0.5</span><span class="token punctuation">)</span> <span class="token operator">/</span> H <span class="token operator">-</span> <span class="token number">1</span>
+    grid <span class="token operator">=</span> torch<span class="token punctuation">.</span>stack<span class="token punctuation">(</span><span class="token punctuation">[</span>gx<span class="token punctuation">,</span> gy<span class="token punctuation">]</span><span class="token punctuation">,</span> dim<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">.</span>unsqueeze<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+    sampled <span class="token operator">=</span> F<span class="token punctuation">.</span>grid_sample<span class="token punctuation">(</span>feature<span class="token punctuation">.</span>unsqueeze<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span> grid<span class="token punctuation">,</span> mode<span class="token operator">=</span><span class="token string">"bilinear"</span><span class="token punctuation">,</span>
+                            align_corners<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> sampled<span class="token punctuation">.</span>squeeze<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Every number is at a bilinearly-sampled position. No rounding, no quantisation, no dropped gradients.</p>
+<h3 id="step-2-compare-to-torchvision-s-roialign" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-compare-to-torchvision-s-roialign" aria-label="Link to this section">#</a>Step 2: Compare to torchvision&#39;s RoIAlign</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> torchvision<span class="token punctuation">.</span>ops <span class="token keyword">import</span> roi_align
+
+feature <span class="token operator">=</span> torch<span class="token punctuation">.</span>randn<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">16</span><span class="token punctuation">,</span> <span class="token number">50</span><span class="token punctuation">,</span> <span class="token number">50</span><span class="token punctuation">)</span>
+boxes <span class="token operator">=</span> torch<span class="token punctuation">.</span>tensor<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">20</span><span class="token punctuation">,</span> <span class="token number">100</span><span class="token punctuation">,</span> <span class="token number">90</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">,</span> dtype<span class="token operator">=</span>torch<span class="token punctuation">.</span>float32<span class="token punctuation">)</span>  <span class="token comment"># (batch_idx, x1, y1, x2, y2)</span>
+
+ours <span class="token operator">=</span> roi_align_single<span class="token punctuation">(</span>feature<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> boxes<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">.</span>tolist<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> output_size<span class="token operator">=</span><span class="token number">7</span><span class="token punctuation">,</span> spatial_scale<span class="token operator">=</span><span class="token number">1</span><span class="token operator">/</span><span class="token number">4</span><span class="token punctuation">)</span>
+theirs <span class="token operator">=</span> roi_align<span class="token punctuation">(</span>feature<span class="token punctuation">,</span> boxes<span class="token punctuation">,</span> output_size<span class="token operator">=</span><span class="token punctuation">(</span><span class="token number">7</span><span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">,</span> spatial_scale<span class="token operator">=</span><span class="token number">1</span><span class="token operator">/</span><span class="token number">4</span><span class="token punctuation">,</span> sampling_ratio<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span> aligned<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"shape ours:   </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">tuple</span><span class="token punctuation">(</span>ours<span class="token punctuation">.</span>shape<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"shape theirs: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">tuple</span><span class="token punctuation">(</span>theirs<span class="token punctuation">.</span>shape<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"max|diff|:    </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token punctuation">(</span>ours <span class="token operator">-</span> theirs<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token builtin">abs</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token builtin">max</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.3e</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>With <code class="inline-code">sampling_ratio=1</code> and <code class="inline-code">aligned=True</code>, the two match to within <code class="inline-code">1e-5</code>.</p>
+<h3 id="step-3-load-a-pretrained-mask-r-cnn" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-load-a-pretrained-mask-r-cnn" aria-label="Link to this section">#</a>Step 3: Load a pretrained Mask R-CNN</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> torch
+<span class="token keyword">from</span> torchvision<span class="token punctuation">.</span>models<span class="token punctuation">.</span>detection <span class="token keyword">import</span> maskrcnn_resnet50_fpn_v2<span class="token punctuation">,</span> MaskRCNN_ResNet50_FPN_V2_Weights
+
+model <span class="token operator">=</span> maskrcnn_resnet50_fpn_v2<span class="token punctuation">(</span>weights<span class="token operator">=</span>MaskRCNN_ResNet50_FPN_V2_Weights<span class="token punctuation">.</span>DEFAULT<span class="token punctuation">)</span>
+model<span class="token punctuation">.</span><span class="token builtin">eval</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"params: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">sum</span><span class="token punctuation">(</span>p<span class="token punctuation">.</span>numel<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">for</span> p <span class="token keyword">in</span> model<span class="token punctuation">.</span>parameters<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">,</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"classes (including background): </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">len</span><span class="token punctuation">(</span>model<span class="token punctuation">.</span>roi_heads<span class="token punctuation">.</span>box_predictor<span class="token punctuation">.</span>cls_score<span class="token punctuation">.</span>out_features <span class="token operator">*</span> <span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>46M parameters, 91 classes (COCO). The first class (id 0) is background; everything the model actually detects starts at id 1.</p>
+<h3 id="step-4-run-inference" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-run-inference" aria-label="Link to this section">#</a>Step 4: Run inference</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">with</span> torch<span class="token punctuation">.</span>no_grad<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    x <span class="token operator">=</span> torch<span class="token punctuation">.</span>randn<span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">400</span><span class="token punctuation">,</span> <span class="token number">600</span><span class="token punctuation">)</span>
+    predictions <span class="token operator">=</span> model<span class="token punctuation">(</span><span class="token punctuation">[</span>x<span class="token punctuation">]</span><span class="token punctuation">)</span>
+p <span class="token operator">=</span> predictions<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"boxes:  </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">tuple</span><span class="token punctuation">(</span>p<span class="token punctuation">[</span><span class="token string">'boxes'</span><span class="token punctuation">]</span><span class="token punctuation">.</span>shape<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"labels: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">tuple</span><span class="token punctuation">(</span>p<span class="token punctuation">[</span><span class="token string">'labels'</span><span class="token punctuation">]</span><span class="token punctuation">.</span>shape<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"scores: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">tuple</span><span class="token punctuation">(</span>p<span class="token punctuation">[</span><span class="token string">'scores'</span><span class="token punctuation">]</span><span class="token punctuation">.</span>shape<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"masks:  </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">tuple</span><span class="token punctuation">(</span>p<span class="token punctuation">[</span><span class="token string">'masks'</span><span class="token punctuation">]</span><span class="token punctuation">.</span>shape<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>The mask tensor is shape <code class="inline-code">(N, 1, H, W)</code>. Threshold at 0.5 to get a binary mask per object:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python">binary_masks <span class="token operator">=</span> <span class="token punctuation">(</span>p<span class="token punctuation">[</span><span class="token string">'masks'</span><span class="token punctuation">]</span> <span class="token operator">></span> <span class="token number">0.5</span><span class="token punctuation">)</span><span class="token punctuation">.</span>squeeze<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>  <span class="token comment"># (N, H, W) boolean</span></code></pre>
+</figure>
+<h3 id="step-5-swap-the-heads-for-a-custom-class-count" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-swap-the-heads-for-a-custom-class-count" aria-label="Link to this section">#</a>Step 5: Swap the heads for a custom class count</h3>
+<p>The common fine-tuning recipe: reuse the backbone, FPN, and RPN; replace the two classifier heads.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> torchvision<span class="token punctuation">.</span>models<span class="token punctuation">.</span>detection<span class="token punctuation">.</span>faster_rcnn <span class="token keyword">import</span> FastRCNNPredictor
+<span class="token keyword">from</span> torchvision<span class="token punctuation">.</span>models<span class="token punctuation">.</span>detection<span class="token punctuation">.</span>mask_rcnn <span class="token keyword">import</span> MaskRCNNPredictor
+
+<span class="token keyword">def</span> <span class="token function">build_custom_maskrcnn</span><span class="token punctuation">(</span>num_classes<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    model <span class="token operator">=</span> maskrcnn_resnet50_fpn_v2<span class="token punctuation">(</span>weights<span class="token operator">=</span>MaskRCNN_ResNet50_FPN_V2_Weights<span class="token punctuation">.</span>DEFAULT<span class="token punctuation">)</span>
+    in_features <span class="token operator">=</span> model<span class="token punctuation">.</span>roi_heads<span class="token punctuation">.</span>box_predictor<span class="token punctuation">.</span>cls_score<span class="token punctuation">.</span>in_features
+    model<span class="token punctuation">.</span>roi_heads<span class="token punctuation">.</span>box_predictor <span class="token operator">=</span> FastRCNNPredictor<span class="token punctuation">(</span>in_features<span class="token punctuation">,</span> num_classes<span class="token punctuation">)</span>
+    in_features_mask <span class="token operator">=</span> model<span class="token punctuation">.</span>roi_heads<span class="token punctuation">.</span>mask_predictor<span class="token punctuation">.</span>conv5_mask<span class="token punctuation">.</span>in_channels
+    hidden_layer <span class="token operator">=</span> <span class="token number">256</span>
+    model<span class="token punctuation">.</span>roi_heads<span class="token punctuation">.</span>mask_predictor <span class="token operator">=</span> MaskRCNNPredictor<span class="token punctuation">(</span>in_features_mask<span class="token punctuation">,</span> hidden_layer<span class="token punctuation">,</span> num_classes<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> model
+
+custom <span class="token operator">=</span> build_custom_maskrcnn<span class="token punctuation">(</span>num_classes<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"custom cls_score.out_features: </span><span class="token interpolation"><span class="token punctuation">{</span>custom<span class="token punctuation">.</span>roi_heads<span class="token punctuation">.</span>box_predictor<span class="token punctuation">.</span>cls_score<span class="token punctuation">.</span>out_features<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p><code class="inline-code">num_classes</code> must include the background class, so a dataset with 4 object classes uses <code class="inline-code">num_classes=5</code>.</p>
+<h3 id="step-6-freeze-what-does-not-need-training" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-6-freeze-what-does-not-need-training" aria-label="Link to this section">#</a>Step 6: Freeze what does not need training</h3>
+<p>On small datasets, freeze the backbone and the FPN. Only the RPN objectness + regression and the two heads learn.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">freeze_backbone_and_fpn</span><span class="token punctuation">(</span>model<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token comment"># torchvision Mask R-CNN packs the FPN inside `model.backbone` (as</span>
+    <span class="token comment"># `model.backbone.fpn`), so iterating `model.backbone.parameters()` covers</span>
+    <span class="token comment"># both the ResNet feature layers and the FPN lateral/output convs.</span>
+    <span class="token keyword">for</span> p <span class="token keyword">in</span> model<span class="token punctuation">.</span>backbone<span class="token punctuation">.</span>parameters<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        p<span class="token punctuation">.</span>requires_grad <span class="token operator">=</span> <span class="token boolean">False</span>
+    <span class="token keyword">return</span> model
+
+custom <span class="token operator">=</span> freeze_backbone_and_fpn<span class="token punctuation">(</span>custom<span class="token punctuation">)</span>
+trainable <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>p<span class="token punctuation">.</span>numel<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">for</span> p <span class="token keyword">in</span> custom<span class="token punctuation">.</span>parameters<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">if</span> p<span class="token punctuation">.</span>requires_grad<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"trainable after freeze: </span><span class="token interpolation"><span class="token punctuation">{</span>trainable<span class="token punctuation">:</span><span class="token format-spec">,</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>On 500-image datasets this is the difference between convergence and overfitting.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>The full training loop for Mask R-CNN in torchvision is 40 lines and does not change meaningfully between tasks — swap datasets and go.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">train_step</span><span class="token punctuation">(</span>model<span class="token punctuation">,</span> images<span class="token punctuation">,</span> targets<span class="token punctuation">,</span> optimizer<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    model<span class="token punctuation">.</span>train<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    loss_dict <span class="token operator">=</span> model<span class="token punctuation">(</span>images<span class="token punctuation">,</span> targets<span class="token punctuation">)</span>
+    losses <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>loss <span class="token keyword">for</span> loss <span class="token keyword">in</span> loss_dict<span class="token punctuation">.</span>values<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    optimizer<span class="token punctuation">.</span>zero_grad<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    losses<span class="token punctuation">.</span>backward<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    optimizer<span class="token punctuation">.</span>step<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token punctuation">{</span>k<span class="token punctuation">:</span> v<span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">for</span> k<span class="token punctuation">,</span> v <span class="token keyword">in</span> loss_dict<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span></code></pre>
+</figure>
+<p>The <code class="inline-code">targets</code> list must have per-image dicts with <code class="inline-code">boxes</code>, <code class="inline-code">labels</code>, and <code class="inline-code">masks</code> (as <code class="inline-code">(num_instances, H, W)</code> binary tensors). The model returns a dict of four losses during training and a list of predictions during eval, keyed on <code class="inline-code">model.training</code>.</p>
+<p>The <code class="inline-code">pycocotools</code> evaluator produces mAP@IoU=0.5:0.95 both for boxes and for masks; you need both numbers to know if the box head or the mask head is the bottleneck.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces:</p>
+<ul>
+<li><code class="inline-code">outputs/prompt-instance-vs-semantic-router.md</code> — a prompt that asks three questions and picks instance vs semantic vs panoptic plus the exact model to start with.</li>
+<li><code class="inline-code">outputs/skill-mask-rcnn-head-swapper.md</code> — a skill that generates the 10 lines of code for swapping heads on any torchvision detection model, given the new <code class="inline-code">num_classes</code>.</li>
+</ul>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><strong>(Easy)</strong> Verify your RoIAlign against <code class="inline-code">torchvision.ops.roi_align</code> on 100 random boxes. Report the max absolute difference. Also run RoIPool (pre-2017 behaviour) and show it diverges by ~1-2 feature-map pixels on boxes near the border.</li>
+<li><strong>(Medium)</strong> Fine-tune <code class="inline-code">maskrcnn_resnet50_fpn_v2</code> on a 50-image custom dataset (any two classes: balloons, fish, pothole, logos). Freeze the backbone, train for 20 epochs, report mask <a href="mailto:AP@0.5">AP@0.5</a>.</li>
+<li><strong>(Hard)</strong> Replace Mask R-CNN&#39;s mask head with one that predicts at 56x56 instead of 28x28. Measure mAP@IoU=0.75 before and after. Explain why the gain (or lack of one) matches the expected boundary-precision / memory trade-off.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Mask R-CNN</td>
+<td>&quot;Detection plus masks&quot;</td>
+<td>Faster R-CNN + a small FCN head that predicts a 28x28 mask per proposal per class</td>
+</tr>
+<tr>
+<td>FPN</td>
+<td>&quot;Feature pyramid&quot;</td>
+<td>Top-down + lateral connections that give every stride level C channels of semantic-rich features</td>
+</tr>
+<tr>
+<td>RPN</td>
+<td>&quot;Region proposer&quot;</td>
+<td>A small conv head that produces ~1000 object/no-object proposals per image</td>
+</tr>
+<tr>
+<td>RoIAlign</td>
+<td>&quot;No-rounding crop&quot;</td>
+<td>Bilinearly samples a fixed-size feature grid from any float-coordinate box</td>
+</tr>
+<tr>
+<td>RoIPool</td>
+<td>&quot;Pre-2017 crop&quot;</td>
+<td>Same purpose as RoIAlign but rounds box coordinates; obsolete</td>
+</tr>
+<tr>
+<td>Mask AP</td>
+<td>&quot;Instance mAP&quot;</td>
+<td>Average precision computed with mask IoU instead of box IoU; the COCO instance segmentation metric</td>
+</tr>
+<tr>
+<td>Binary mask head</td>
+<td>&quot;Per-class mask&quot;</td>
+<td>Predicts one binary mask per class for each proposal; only the predicted class&#39;s channel is kept</td>
+</tr>
+<tr>
+<td>Background class</td>
+<td>&quot;Class 0&quot;</td>
+<td>The catch-all &quot;no object&quot; class; indices for real classes start at 1</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/1703.06870" target="_blank" rel="noopener">Mask R-CNN (He et al., 2017)</a> — the paper; section 3 on RoIAlign is the critical read</li>
+<li><a href="https://arxiv.org/abs/1612.03144" target="_blank" rel="noopener">FPN: Feature Pyramid Networks (Lin et al., 2017)</a> — the FPN paper; every modern detector uses it</li>
+<li><a href="https://pytorch.org/tutorials/intermediate/torchvision_tutorial.html" target="_blank" rel="noopener">torchvision Mask R-CNN tutorial</a> — the reference for the fine-tuning loop</li>
+<li><a href="https://github.com/facebookresearch/detectron2/blob/main/MODEL_ZOO.md" target="_blank" rel="noopener">Detectron2 model zoo</a> — production implementations with trained weights for nearly every detection and segmentation variant</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="07-semantic-segmentation-unet.html">
+  <span class="label">← Previous</span>
+  <b>Semantic Segmentation — U-Net</b>
+</a>
+      <a class="pager__item pager__item--next" href="09-image-generation-gans.html">
+  <span class="label">Next →</span>
+  <b>Image Generation — GANs</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>6 minutes</b> of Computer Vision behind you.</p>
+      <a class="btn btn--solid" href="09-image-generation-gans.html">Continue to Image Generation — GANs →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#the-architecture">The architecture</a></li><li class="mini__item mini__item--d3"><a href="#why-roialign-not-roipool">Why RoIAlign, not RoIPool</a></li><li class="mini__item mini__item--d3"><a href="#the-rpn-in-one-paragraph">The RPN in one paragraph</a></li><li class="mini__item mini__item--d3"><a href="#the-mask-head">The mask head</a></li><li class="mini__item mini__item--d3"><a href="#losses">Losses</a></li><li class="mini__item mini__item--d3"><a href="#output-format">Output format</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-roialign-from-scratch">Step 1: RoIAlign from scratch</a></li><li class="mini__item mini__item--d3"><a href="#step-2-compare-to-torchvision-s-roialign">Step 2: Compare to torchvision's RoIAlign</a></li><li class="mini__item mini__item--d3"><a href="#step-3-load-a-pretrained-mask-r-cnn">Step 3: Load a pretrained Mask R-CNN</a></li><li class="mini__item mini__item--d3"><a href="#step-4-run-inference">Step 4: Run inference</a></li><li class="mini__item mini__item--d3"><a href="#step-5-swap-the-heads-for-a-custom-class-count">Step 5: Swap the heads for a custom class count</a></li><li class="mini__item mini__item--d3"><a href="#step-6-freeze-what-does-not-need-training">Step 6: Freeze what does not need training</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

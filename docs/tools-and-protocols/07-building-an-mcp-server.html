@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Building an MCP Server: Stateless Python and TypeScript — Tools &amp; Protocols — AIFS</title>
+<meta name="description" content="Tools &amp; Protocols: Building an MCP Server: Stateless Python and TypeScript. 4 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Building an MCP Server: Stateless Python and TypeScript — Tools &amp; Protocols — AIFS">
+<meta property="og:description" content="Tools &amp; Protocols: Building an MCP Server: Stateless Python and TypeScript. 4 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"t3-dispatch-loop":["../assets/figures/figures-mcp.js","../assets/figures/figures-tools3.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-mcp.js","../assets/figures/figures-tools3.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#C6FF00" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#C6FF00;--accent-ink:#111111"
+  data-lesson-id="tools-and-protocols/07-building-an-mcp-server" data-module="tools-and-protocols"
+  data-prev="06-mcp-fundamentals.html" data-next="08-building-an-mcp-client.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#C6FF00">
+        <span class="label">Phase 13</span>
+        <b>Tools &amp; Protocols</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="tools-and-protocols/01-the-tool-interface"><a href="01-the-tool-interface.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">The Tool Interface — Why Agents Need Structured I/O</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/02-function-calling-deep-dive"><a href="02-function-calling-deep-dive.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Function Calling Deep Dive — OpenAI, Anthropic, Gemini</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/03-parallel-and-streaming-tool-calls"><a href="03-parallel-and-streaming-tool-calls.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Parallel Tool Calls and Streaming with Tools</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/04-structured-output"><a href="04-structured-output.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Structured Output — JSON Schema, Pydantic, Zod, Constrained Decoding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/05-tool-schema-design"><a href="05-tool-schema-design.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Tool Schema Design — Naming, Descriptions, Parameter Constraints</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/06-mcp-fundamentals"><a href="06-mcp-fundamentals.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">MCP Fundamentals: Stateless Requests and JSON-RPC</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/07-building-an-mcp-server"><a href="07-building-an-mcp-server.html" class="is-current">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Building an MCP Server: Stateless Python and TypeScript</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/08-building-an-mcp-client"><a href="08-building-an-mcp-client.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Building an MCP Client: Discovery, Routing, and Dual-Era Fallback</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/09-mcp-transports"><a href="09-mcp-transports.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">MCP Transports: stdio and Stateless Streamable HTTP</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/10-mcp-resources-and-prompts"><a href="10-mcp-resources-and-prompts.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">MCP Resources and Prompts: Addressable Context for Stateless Servers</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/11-mcp-sampling"><a href="11-mcp-sampling.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">MCP Model Input: Sampling Migration and Stateless MRTR</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/12-mcp-roots-and-elicitation"><a href="12-mcp-roots-and-elicitation.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Explicit Scope and Stateless Elicitation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/13-mcp-async-tasks"><a href="13-mcp-async-tasks.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">MCP Tasks Extension: Durable Work on a Stateless Core</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/14-mcp-apps"><a href="14-mcp-apps.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">MCP Apps on the Stateless Protocol</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/15-mcp-security-tool-poisoning"><a href="15-mcp-security-tool-poisoning.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">MCP Security: Poisoned Metadata, Routing, and MRTR State</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/16-mcp-security-oauth-2-1"><a href="16-mcp-security-oauth-2-1.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">MCP Authorization: CIMD, Issuer Binding, PKCE, and Step-Up</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/17-mcp-gateways-and-registries"><a href="17-mcp-gateways-and-registries.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Stateless MCP Gateways and Registry Admission</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/18-mcp-auth-production"><a href="18-mcp-auth-production.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">MCP Auth in Production: Issuer-Bound Enrollment and Tokens</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/19-a2a-protocol"><a href="19-a2a-protocol.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">A2A — Agent-to-Agent Protocol</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/20-opentelemetry-genai"><a href="20-opentelemetry-genai.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">OpenTelemetry GenAI — Tracing Tool Calls End-to-End</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/21-llm-routing-layer"><a href="21-llm-routing-layer.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">LLM Routing Layer — LiteLLM, OpenRouter, Portkey</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/22-skills-and-agent-sdks"><a href="22-skills-and-agent-sdks.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Agent Skills: Portable Contract and Runtime Boundary</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/23-capstone-tool-ecosystem"><a href="23-capstone-tool-ecosystem.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Capstone: Stateless Tool Ecosystem</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/24-skill-discovery-and-progressive-disclosure"><a href="24-skill-discovery-and-progressive-disclosure.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Skill Discovery and Progressive Disclosure</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/25-skill-invocation-and-routing"><a href="25-skill-invocation-and-routing.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Skill Invocation and Routing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/26-skill-permissions-sandboxes-and-trust"><a href="26-skill-permissions-sandboxes-and-trust.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Skill Permissions, Sandboxes, and Trust</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/27-skill-evals-packaging-and-portability"><a href="27-skill-evals-packaging-and-portability.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">Skill Evals, Packaging, and Portability</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/28-mcp-tool-contracts-and-content"><a href="28-mcp-tool-contracts-and-content.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">MCP Tool Contracts and Content</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control"><a href="29-mcp-reliability-cancellation-and-flow-control.html" class="">
+  <span class="snav__n">29</span>
+  <span class="snav__t">MCP Reliability, Cancellation, and Flow Control</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/30-mcp-registry-supply-chain-and-drift"><a href="30-mcp-registry-supply-chain-and-drift.html" class="">
+  <span class="snav__n">30</span>
+  <span class="snav__t">MCP Registry Supply Chain: Admission, Drift, and Rollback</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/31-mcp-conformance-versioning-and-operations"><a href="31-mcp-conformance-versioning-and-operations.html" class="">
+  <span class="snav__n">31</span>
+  <span class="snav__t">MCP Conformance Engineering: Versioning, Evidence, and Operations</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Tools &amp; Protocols</a></p>
+      <h1 class="page__title">Building an MCP Server: Stateless Python and TypeScript</h1>
+      <p class="page__lede">A modern MCP server does not remember a handshake. It validates the metadata on every request, runs one handler, and returns one typed result.</p>
+      <div class="page__meta">
+        <span class="chip">4 min read</span>
+        <span class="chip">966 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python, TypeScript</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 13, Lesson 06</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~85 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Implement mandatory <code class="inline-code">server/discover</code> for MCP <code class="inline-code">2026-07-28</code>.</li>
+<li>Validate protocol version and client capabilities on every request.</li>
+<li>Expose tools, resources, and prompts with deterministic list ordering.</li>
+<li>Return <code class="inline-code">resultType</code>, server identity, and cache hints on the correct results.</li>
+<li>Serve the same stateless contract over newline-delimited stdio in Python and TypeScript.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>A server that stores client capabilities after the first message is easy to build and hard to operate. The same process may serve sequential clients. A remote request may land on a different worker. A stale capability declaration can leak behavior across authorization boundaries.</p>
+<p>MCP <code class="inline-code">2026-07-28</code> solves the protocol part of that problem by making every request self-describing. Your application can still keep durable notes, jobs, or explicit state handles. What it cannot keep is hidden protocol state that changes how a later request is decoded.</p>
+<p>This lesson builds a notes server twice. The Python and TypeScript versions use only their standard libraries for the protocol core. Both expose the same methods and enforce the same wire contract.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="the-modern-dispatch-loop" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-modern-dispatch-loop" aria-label="Link to this section">#</a>The modern dispatch loop</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>read one JSON-RPC line
+parse the envelope
+if it is a notification, do not respond
+validate params._meta for this request
+route by method
+wrap success with resultType and serverInfo
+write one JSON-RPC response line
+forget request-scoped metadata</code></pre>
+</figure>
+<p>Three stdio rules still matter:</p>
+<ul>
+<li>Write only JSON-RPC messages to stdout. Send diagnostics to stderr.</li>
+<li>Delimit messages with a newline and flush each response.</li>
+<li>Exit promptly when stdin reaches EOF.</li>
+</ul>
+<p>The process lifetime is a transport lifetime. It is not a modern MCP session.</p>
+<h3 id="request-validation" class="prose-h prose-h3"><a class="prose-h__anchor" href="#request-validation" aria-label="Link to this section">#</a>Request validation</h3>
+<p>Every request must have:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"params"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"_meta"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"io.modelcontextprotocol/protocolVersion"</span><span class="token operator">:</span> <span class="token string">"2026-07-28"</span><span class="token punctuation">,</span>
+      <span class="token property">"io.modelcontextprotocol/clientCapabilities"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token property">"io.modelcontextprotocol/clientInfo"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"notes-client"</span><span class="token punctuation">,</span>
+        <span class="token property">"version"</span><span class="token operator">:</span> <span class="token string">"1.0.0"</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<p>The first two fields are required. <code class="inline-code">clientInfo</code> is recommended. Validate a present identity shape, but do not treat it as authentication.</p>
+<p>If the version is unsupported, return code <code class="inline-code">-32022</code> with <code class="inline-code">requested</code> and <code class="inline-code">supported</code>. Missing request metadata is invalid params, code <code class="inline-code">-32602</code>. Never fill missing fields from a previous call.</p>
+<h3 id="mandatory-discovery" class="prose-h prose-h3"><a class="prose-h__anchor" href="#mandatory-discovery" aria-label="Link to this section">#</a>Mandatory discovery</h3>
+<p>Modern servers must implement <code class="inline-code">server/discover</code>. A complete discovery result includes supported modern versions, capabilities, optional instructions, cache hints, and server identity in result <code class="inline-code">_meta</code>:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"resultType"</span><span class="token operator">:</span> <span class="token string">"complete"</span><span class="token punctuation">,</span>
+  <span class="token property">"supportedVersions"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"2026-07-28"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"capabilities"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"tools"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token property">"listChanged"</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token property">"resources"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token property">"listChanged"</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span> <span class="token property">"subscribe"</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token property">"prompts"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token property">"listChanged"</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">}</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">"ttlMs"</span><span class="token operator">:</span> <span class="token number">3600000</span><span class="token punctuation">,</span>
+  <span class="token property">"cacheScope"</span><span class="token operator">:</span> <span class="token string">"public"</span><span class="token punctuation">,</span>
+  <span class="token property">"_meta"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"io.modelcontextprotocol/serverInfo"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"notes-server"</span><span class="token punctuation">,</span>
+      <span class="token property">"version"</span><span class="token operator">:</span> <span class="token string">"2.0.0"</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<p>Discovery does not unlock the server. A client may call <code class="inline-code">tools/list</code> without calling discovery because <code class="inline-code">tools/list</code> already carries the same request metadata.</p>
+<h3 id="tools" class="prose-h prose-h3"><a class="prose-h__anchor" href="#tools" aria-label="Link to this section">#</a>Tools</h3>
+<p><code class="inline-code">tools/list</code> returns a deterministic list of tool descriptors. Stable ordering improves response caching and keeps model context stable. The result also requires <code class="inline-code">ttlMs</code> and <code class="inline-code">cacheScope</code>.</p>
+<p><code class="inline-code">tools/call</code> returns content blocks and <code class="inline-code">isError</code>. Use a JSON-RPC error when the protocol envelope or method parameters are invalid. Use <code class="inline-code">isError: true</code> when a valid tool invocation runs but the tool itself fails.</p>
+<p>Tool annotations remain hints, not enforcement:</p>
+<ul>
+<li><code class="inline-code">readOnlyHint</code></li>
+<li><code class="inline-code">destructiveHint</code></li>
+<li><code class="inline-code">idempotentHint</code></li>
+<li><code class="inline-code">openWorldHint</code></li>
+</ul>
+<p>The host should use them for confirmation and presentation. The server must still enforce real authorization.</p>
+<h3 id="resources" class="prose-h prose-h3"><a class="prose-h__anchor" href="#resources" aria-label="Link to this section">#</a>Resources</h3>
+<p><code class="inline-code">resources/list</code> returns stable URI descriptors. <code class="inline-code">resources/read</code> returns typed contents. Both are cacheable in <code class="inline-code">2026-07-28</code>, so both include <code class="inline-code">ttlMs</code> and <code class="inline-code">cacheScope</code>.</p>
+<p>Use <code class="inline-code">cacheScope: &quot;private&quot;</code> for user-specific note data. A shared cache must not reuse a private response across authorization contexts.</p>
+<p>Modern change delivery does not use <code class="inline-code">resources/subscribe</code>. A client opens <code class="inline-code">subscriptions/listen</code> and requests <code class="inline-code">resourceSubscriptions</code> or list-change categories. Lesson 10 builds that flow.</p>
+<h3 id="prompts" class="prose-h prose-h3"><a class="prose-h__anchor" href="#prompts" aria-label="Link to this section">#</a>Prompts</h3>
+<p><code class="inline-code">prompts/list</code> is cacheable and deterministic. <code class="inline-code">prompts/get</code> renders a named prompt with arguments. The rendered prompt result is complete, but it is not one of the cacheable list or read results that requires cache hints.</p>
+<h3 id="every-successful-result-is-typed" class="prose-h prose-h3"><a class="prose-h__anchor" href="#every-successful-result-is-typed" aria-label="Link to this section">#</a>Every successful result is typed</h3>
+<p>The examples use one wrapper for every success:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">complete</span><span class="token punctuation">(</span>payload<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token punctuation">{</span>
+        <span class="token string">"resultType"</span><span class="token punctuation">:</span> <span class="token string">"complete"</span><span class="token punctuation">,</span>
+        <span class="token operator">**</span>payload<span class="token punctuation">,</span>
+        <span class="token string">"_meta"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>SERVER_INFO_KEY<span class="token punctuation">:</span> SERVER_INFO<span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span></code></pre>
+</figure>
+<p>List, read, and discovery handlers add <code class="inline-code">ttlMs</code> plus <code class="inline-code">cacheScope</code>. Centralizing this wrapper prevents one handler from silently omitting modern result fields.</p>
+<h3 id="no-server-initiated-requests" class="prose-h prose-h3"><a class="prose-h__anchor" href="#no-server-initiated-requests" aria-label="Link to this section">#</a>No server-initiated requests</h3>
+<p>A modern server may send notifications related to a client request, or notifications on a client-opened <code class="inline-code">subscriptions/listen</code> stream. It must not send its own JSON-RPC request.</p>
+<p>When a handler needs sampling, elicitation, or roots input, it returns an <code class="inline-code">input_required</code> result. The client fulfills the embedded input requests and retries the original method with a new request id. Lesson 11 covers that Multi Round-Trip Request pattern.</p>
+<h3 id="explicit-legacy-compatibility" class="prose-h prose-h3"><a class="prose-h__anchor" href="#explicit-legacy-compatibility" aria-label="Link to this section">#</a>Explicit legacy compatibility</h3>
+<p>A dual-era server may also implement the <code class="inline-code">2025-11-25</code> handshake on a clearly separate legacy branch. It chooses modern behavior when required modern <code class="inline-code">_meta</code> fields are present and legacy behavior when it receives <code class="inline-code">initialize</code>.</p>
+<p>Do not put a <code class="inline-code">2026-07-28</code> request through the legacy handshake path. Do not stamp modern <code class="inline-code">resultType</code> fields onto legacy initialization results. The code in this lesson is deliberately modern-only so its invariants stay visible.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="t3-dispatch-loop"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">t3-dispatch-loop</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> t3 dispatch loop</figcaption>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>Run the Python server&#39;s finite demo and tests:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">bash</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-bash"><span class="token builtin class-name">cd</span> code
+python3 main.py <span class="token parameter variable">--demo</span>
+python3 <span class="token parameter variable">-m</span> unittest discover tests <span class="token parameter variable">-v</span></code></pre>
+</figure>
+<p>Run the TypeScript port with a TypeScript runner:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">bash</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-bash">npx tsx main.ts <span class="token parameter variable">--demo</span></code></pre>
+</figure>
+<p>The demo sends <code class="inline-code">server/discover</code>, lists each primitive, invokes tools, and shows an unsupported-version error. Every modern request repeats metadata. Every success includes server identity.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson ships <code class="inline-code">outputs/skill-mcp-server-scaffolder.md</code>. It produces a modern server plan with a discovery contract, per-request validation, deterministic cacheable lists, and an optional isolated legacy adapter.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li>Remove capabilities from one request and prove the server does not reuse the previous request&#39;s declaration.</li>
+<li>Reverse the <code class="inline-code">TOOLS</code>, <code class="inline-code">PROMPTS</code>, and note insertion order. Confirm all list results remain stable.</li>
+<li>Add a destructive <code class="inline-code">notes_delete</code> tool and require an authorization check inside the executor. Keep <code class="inline-code">destructiveHint</code> as a UX hint only.</li>
+<li>Add <code class="inline-code">resources/templates/list</code> with <code class="inline-code">ttlMs</code>, <code class="inline-code">cacheScope</code>, and deterministic ordering.</li>
+<li>Build a separate legacy adapter for <code class="inline-code">2025-11-25</code>. Add tests proving a modern request never enters it.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Stateless server</td>
+<td>Handles each request from its own metadata without protocol-session memory</td>
+</tr>
+<tr>
+<td><code class="inline-code">server/discover</code></td>
+<td>Mandatory modern method that advertises versions and capabilities</td>
+</tr>
+<tr>
+<td>Complete result</td>
+<td>Successful modern result with <code class="inline-code">resultType: &quot;complete&quot;</code></td>
+</tr>
+<tr>
+<td>Cacheable result</td>
+<td>Discovery, list, or resource-read result with <code class="inline-code">ttlMs</code> and <code class="inline-code">cacheScope</code></td>
+</tr>
+<tr>
+<td>Deterministic list</td>
+<td>Same logical registry produces the same item order</td>
+</tr>
+<tr>
+<td>Server identity</td>
+<td>Recommended <code class="inline-code">io.modelcontextprotocol/serverInfo</code> in result <code class="inline-code">_meta</code></td>
+</tr>
+<tr>
+<td>Tool error</td>
+<td>Valid tool call that returns content with <code class="inline-code">isError: true</code></td>
+</tr>
+<tr>
+<td>Protocol error</td>
+<td>Invalid JSON-RPC or MCP request returned through <code class="inline-code">error</code></td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/" target="_blank" rel="noopener">MCP Specification 2026-07-28</a></li>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/server/discover" target="_blank" rel="noopener">MCP Server Discovery</a></li>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/server/tools" target="_blank" rel="noopener">MCP Tools</a></li>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/server/resources" target="_blank" rel="noopener">MCP Resources</a></li>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/server/prompts" target="_blank" rel="noopener">MCP Prompts</a></li>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/stdio" target="_blank" rel="noopener">MCP stdio Transport</a></li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="06-mcp-fundamentals.html">
+  <span class="label">← Previous</span>
+  <b>MCP Fundamentals: Stateless Requests and JSON-RPC</b>
+</a>
+      <a class="pager__item pager__item--next" href="08-building-an-mcp-client.html">
+  <span class="label">Next →</span>
+  <b>Building an MCP Client: Discovery, Routing, and Dual-Era Fallback</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>4 minutes</b> of Tools &amp; Protocols behind you.</p>
+      <a class="btn btn--solid" href="08-building-an-mcp-client.html">Continue to Building an MCP Client: Discovery, Routing, and Dual-Era Fallback →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#the-modern-dispatch-loop">The modern dispatch loop</a></li><li class="mini__item mini__item--d3"><a href="#request-validation">Request validation</a></li><li class="mini__item mini__item--d3"><a href="#mandatory-discovery">Mandatory discovery</a></li><li class="mini__item mini__item--d3"><a href="#tools">Tools</a></li><li class="mini__item mini__item--d3"><a href="#resources">Resources</a></li><li class="mini__item mini__item--d3"><a href="#prompts">Prompts</a></li><li class="mini__item mini__item--d3"><a href="#every-successful-result-is-typed">Every successful result is typed</a></li><li class="mini__item mini__item--d3"><a href="#no-server-initiated-requests">No server-initiated requests</a></li><li class="mini__item mini__item--d3"><a href="#explicit-legacy-compatibility">Explicit legacy compatibility</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

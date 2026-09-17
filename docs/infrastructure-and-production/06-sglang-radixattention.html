@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prefix-Cache Serving — RadixAttention and KV Reuse — Infrastructure &amp; Production — AIFS</title>
+<meta name="description" content="Infrastructure &amp; Production: Prefix-Cache Serving — RadixAttention and KV Reuse. 5 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Prefix-Cache Serving — RadixAttention and KV Reuse — Infrastructure &amp; Production — AIFS">
+<meta property="og:description" content="Infrastructure &amp; Production: Prefix-Cache Serving — RadixAttention and KV Reuse. 5 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"roofline":["../assets/figures/figures-infra.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-infra.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#C79BFF" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#C79BFF;--accent-ink:#111111"
+  data-lesson-id="infrastructure-and-production/06-sglang-radixattention" data-module="infrastructure-and-production"
+  data-prev="05-eagle3-speculative-decoding.html" data-next="07-tensorrt-llm-blackwell.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#C79BFF">
+        <span class="label">Phase 17</span>
+        <b>Infrastructure &amp; Production</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="infrastructure-and-production/01-managed-llm-platforms"><a href="01-managed-llm-platforms.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Managed LLM Platforms — Bedrock, Vertex AI, Azure OpenAI</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/02-inference-platform-economics"><a href="02-inference-platform-economics.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Inference Platform Economics — Fireworks, Together, Baseten, Modal, Replicate, Anyscale</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/03-gpu-autoscaling-kubernetes"><a href="03-gpu-autoscaling-kubernetes.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">GPU Autoscaling on Kubernetes — Karpenter, KAI Scheduler, Gang Scheduling</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/04-vllm-serving-internals"><a href="04-vllm-serving-internals.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Serving Engine Internals — PagedAttention, Continuous Batching, Chunked Prefill</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/05-eagle3-speculative-decoding"><a href="05-eagle3-speculative-decoding.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">EAGLE-3 Speculative Decoding in Production</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/06-sglang-radixattention"><a href="06-sglang-radixattention.html" class="is-current">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Prefix-Cache Serving — RadixAttention and KV Reuse</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/07-tensorrt-llm-blackwell"><a href="07-tensorrt-llm-blackwell.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Hardware-Specialized Inference Compilation — FP8 and NVFP4 on Blackwell</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/08-inference-metrics-goodput"><a href="08-inference-metrics-goodput.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Inference Metrics — TTFT, TPOT, ITL, Goodput, P99</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/09-production-quantization"><a href="09-production-quantization.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Production Quantization — AWQ, GPTQ, GGUF K-quants, FP8, MXFP4/NVFP4</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/10-cold-start-mitigation"><a href="10-cold-start-mitigation.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Cold Start Mitigation for Serverless LLMs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/11-multi-region-kv-locality"><a href="11-multi-region-kv-locality.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Multi-Region LLM Serving and KV Cache Locality</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/12-edge-inference"><a href="12-edge-inference.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Edge Inference — Apple Neural Engine, Qualcomm Hexagon, WebGPU/WebLLM, Jetson</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/13-llm-observability"><a href="13-llm-observability.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">LLM Observability Stack Selection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/14-prompt-semantic-caching"><a href="14-prompt-semantic-caching.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Prompt Caching and Semantic Caching Economics</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/15-batch-apis"><a href="15-batch-apis.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Batch APIs — the 50% Discount as Industry Standard</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/16-model-routing"><a href="16-model-routing.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Model Routing as a Cost-Reduction Primitive</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/17-disaggregated-prefill-decode"><a href="17-disaggregated-prefill-decode.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Disaggregated Prefill/Decode — NVIDIA Dynamo and llm-d</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/18-vllm-production-stack-lmcache"><a href="18-vllm-production-stack-lmcache.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Production Serving Stack — KV Offloading and Cache-Aware Routing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/19-ai-gateways"><a href="19-ai-gateways.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">AI Gateways — LiteLLM, Portkey, Kong AI Gateway, Bifrost</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/20-shadow-canary-progressive"><a href="20-shadow-canary-progressive.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Shadow Traffic, Canary Rollout, and Progressive Deployment for LLMs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/21-ab-testing-llm-features"><a href="21-ab-testing-llm-features.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">A/B Testing LLM Features — GrowthBook, Statsig, and the Vibes Problem</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/22-load-testing-llm-apis"><a href="22-load-testing-llm-apis.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Load Testing LLM APIs — Why k6 and Locust Lie</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/23-sre-for-ai"><a href="23-sre-for-ai.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">SRE for AI — Multi-Agent Incident Response, Runbooks, Predictive Detection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/24-chaos-engineering-llm"><a href="24-chaos-engineering-llm.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Chaos Engineering for LLM Production</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/25-security-secrets-audit"><a href="25-security-secrets-audit.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Security — Secrets, API Key Rotation, Audit Logs, Guardrails</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/26-compliance-frameworks"><a href="26-compliance-frameworks.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Compliance — SOC 2, HIPAA, GDPR, PCI-DSS, EU AI Act, ISO 42001</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/27-finops-llms"><a href="27-finops-llms.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">FinOps for LLMs — Unit Economics and Multi-Tenant Attribution</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/28-self-hosted-serving-selection"><a href="28-self-hosted-serving-selection.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">Self-Hosted Serving Selection — Matching Engine to Hardware and Scale</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Infrastructure &amp; Production</a></p>
+      <h1 class="page__title">Prefix-Cache Serving — RadixAttention and KV Reuse</h1>
+      <p class="page__lede">Treat the KV cache as a first-class, reusable resource stored in a radix tree, and scheduling changes with it: instead of FCFS (first-come, first-served) as vLLM schedules, a cache-aware scheduler prioritizes requests with longer shared prefixes — effectively a depth-first radix traversal so hot branches stay resident in HBM. SGLang is the engine that built serving around this idea. On Llama 3.1 8B with ShareGPT-like 1K prompts, SGLang hits ~16,200 tok/s to vLLM's ~12,500, a ~29% edge. On prefix-heavy RAG workloads the advantage reaches 6.4x. On voice-cloning-shaped workloads cache hit rate cleared 86%. Deployed on 400,000+ GPUs in 2026 across xAI, LinkedIn, Cursor, Oracle, GCP, Azure, AWS. The gotcha is that the 6.4x number evaporates when prefix ordering is inconsistent — ordering is the engineer's lever.</p>
+      <div class="page__meta">
+        <span class="chip">5 min read</span>
+        <span class="chip">1,204 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Learn</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (stdlib, toy radix-tree cache + cache-aware scheduler)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 17 · 04 (Serving Engine Internals), Phase 14 (Agentic RAG)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Diagram RadixAttention: how prefixes are stored in a radix tree and how KV blocks are shared across sequences rooted at the same branch.</li>
+<li>Explain cache-aware scheduling and why FCFS is wrong for prefix-heavy traffic.</li>
+<li>Compute expected speedup for a workload given prefix-cache hit rate and prompt length distribution.</li>
+<li>Name the prompt-ordering discipline that makes the 6.4x number real vs a lost upside.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Classic serving treats each request&#39;s prompt as opaque. Even when 5,000 RAG requests all start with the same 2,000-token system prompt plus same retrieval preamble, vLLM prefills that 2,000-token prefix 5,000 times. The GPU does the same work over and over.</p>
+<p>The observation: prompts in agentic and RAG workloads share long prefixes almost always. System prompt, tool schemas, few-shot examples, retrieval headers, conversation history — all repeat across requests. If you stored the KV cache for that prefix once and reused it, you would not prefill it again.</p>
+<p>RadixAttention does exactly this. Tokens are indexed in a radix tree; each node owns KV blocks for the token sequence on its path from root. A new request walks the tree: any node whose token matches re-uses that node&#39;s KV blocks. Prefill cost becomes proportional to the &quot;new&quot; suffix, not the full prompt.</p>
+<p>The challenge is scheduling. If two requests share a 2,000-token prefix and a third shares only 200 tokens of the same prefix, you want to serve the two long-shared requests together so the long prefix stays in HBM. FCFS does the opposite — it serves whoever arrived first, potentially evicting the hot branch before the next long-prefix request hits.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="the-radix-tree-as-a-kv-index" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-radix-tree-as-a-kv-index" aria-label="Link to this section">#</a>The radix tree as a KV index</h3>
+<p>A radix tree (compact trie) stores token sequences. Each node owns a token range and the KV blocks computed for that range. Children extend the sequence one or more tokens.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>root
+ |- &quot;You are a helpful assistant...&quot;  (2,000 tokens, 124 KV blocks)
+      |- &quot;Context: &lt;doc A&gt;...&quot;        (500 tokens, 31 blocks)
+           |- &quot;Question: Alice...&quot;    (80 tokens, 5 blocks)
+           |- &quot;Question: Bob...&quot;      (95 tokens, 6 blocks)
+      |- &quot;Context: &lt;doc B&gt;...&quot;        (520 tokens, 33 blocks)</code></pre>
+</figure>
+<p>A new request comes in with system prompt + &quot;Context: <doc A>&quot; + &quot;Question: Carol&quot;. The scheduler walks: system prefix matches (124 blocks reused), doc-A branch matches (31 blocks reused), then allocates fresh blocks only for &quot;Question: Carol&quot; (4 blocks). Prefill cost: 4 blocks of new tokens. Without the tree: 160 blocks. ~40x savings on prefill.</p>
+<h3 id="cache-aware-scheduling" class="prose-h prose-h3"><a class="prose-h__anchor" href="#cache-aware-scheduling" aria-label="Link to this section">#</a>Cache-aware scheduling</h3>
+<p>Radix-tree-backed reuse is pointless if the cache churns. Two key policies:</p>
+<ol>
+<li><strong>Depth-first dispatch</strong>. When picking the next request from the queue, prefer requests rooted at the same branch as the current running set. This keeps the hot branch pinned.</li>
+<li><strong>LRU at branch level, not block level</strong>. Evict whole branches (starting from shortest-used leaves) rather than individual blocks, so cache shape matches radix shape.</li>
+</ol>
+<p>FCFS violates both. A request sharing 2,000 tokens sits behind a request sharing 50, then the 2,000-token branch gets evicted to admit the 50-token one.</p>
+<h3 id="benchmark-numbers-you-should-memorize" class="prose-h prose-h3"><a class="prose-h__anchor" href="#benchmark-numbers-you-should-memorize" aria-label="Link to this section">#</a>Benchmark numbers you should memorize</h3>
+<ul>
+<li>Llama 3.1 8B, H100, ShareGPT 1K prompts: SGLang ~16,200 tok/s vs vLLM ~12,500 (~29% edge).</li>
+<li>Prefix-heavy RAG (same system + same doc, varying question): up to 6.4x on SGLang.</li>
+<li>Voice cloning workloads: 86.4% prefix-cache hit rate.</li>
+<li>Production hit rates across SGLang customers: 50-99% depending on prompt discipline.</li>
+<li>Deployed on 400,000+ GPUs in 2026.</li>
+</ul>
+<h3 id="the-ordering-gotcha" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-ordering-gotcha" aria-label="Link to this section">#</a>The ordering gotcha</h3>
+<p>The 6.4x number relies on consistent prompt-template ordering. If your client constructs prompts as <code class="inline-code">[system, tools, context, history, question]</code> in some requests and <code class="inline-code">[system, context, tools, history, question]</code> in others, the tree cannot find the shared prefix. What looks like a shared prefix to a human is two distinct sequences to the radix tree.</p>
+<p>Engineer&#39;s lever: your prompt template is a cache key. Fix the order. Put everything immutable (system, tools, schemas) first. Put retrieval context next. Put user question last. Do not interleave dynamic content into the prefix.</p>
+<p>Real case from the research: moving dynamic content out of the cacheable prefix took one deployment from 7% to 74% cache hit rate in one change.</p>
+<h3 id="where-radixattention-wins-and-loses" class="prose-h prose-h3"><a class="prose-h__anchor" href="#where-radixattention-wins-and-loses" aria-label="Link to this section">#</a>Where RadixAttention wins and loses</h3>
+<p>Wins:</p>
+<ul>
+<li>RAG (same retrieval preamble, varying question).</li>
+<li>Agents (same tool schemas, varying query).</li>
+<li>Chat with long system prompt.</li>
+<li>Voice / vision workloads with repeated preambles.</li>
+</ul>
+<p>Loses (returns to vLLM-level throughput):</p>
+<ul>
+<li>Single-shot generation with unique prompts (code completion, open-ended chat without system prompt).</li>
+<li>Dynamic prompts where every request interleaves unique content into the prefix.</li>
+</ul>
+<h3 id="why-this-is-a-scheduler-problem-not-just-a-kernel-problem" class="prose-h prose-h3"><a class="prose-h__anchor" href="#why-this-is-a-scheduler-problem-not-just-a-kernel-problem" aria-label="Link to this section">#</a>Why this is a scheduler problem, not just a kernel problem</h3>
+<p>You can implement KV reuse as a kernel trick. SGLang&#39;s insight is that reuse only pays if the scheduler keeps the hot branch resident. A naive &quot;reuse if available&quot; policy will churn the cache under mixed load. The radix-tree-indexed scheduler is what turns the kernel trick into a 29% production edge.</p>
+<h3 id="interplay-with-vllm" class="prose-h prose-h3"><a class="prose-h__anchor" href="#interplay-with-vllm" aria-label="Link to this section">#</a>Interplay with vLLM</h3>
+<p>The two systems are not strict competitors. In 2026 vLLM added prefix caching (<code class="inline-code">--enable-prefix-caching</code>) and a cache-aware router (vLLM Router in Rust). The gap closed but did not fully disappear — SGLang&#39;s whole stack is radix-first; vLLM grafted it on. For workloads dominated by prefix reuse, SGLang remains the default. For general-purpose serving without strong prefix patterns, vLLM remains equal or better.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="roofline"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">roofline</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> roofline</figcaption>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p><code class="inline-code">code/main.py</code> implements a toy radix-tree KV cache plus a scheduler with two policies: FCFS and cache-aware. Runs the same workload through both, reports prefix-cache hit rate and throughput delta. Then runs a &quot;scrambled ordering&quot; workload to show the 6.4x collapse.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces <code class="inline-code">outputs/skill-radix-scheduler-advisor.md</code>. Given a workload description (prompt-template shape, retrieval pattern, number of concurrent tenants), it produces a prompt-ordering prescription and a go/no-go for SGLang adoption.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li>Run <code class="inline-code">code/main.py</code>. Compare FCFS and cache-aware on the same workload. Where does the delta come from — prefill savings, decode savings, or queue delay?</li>
+<li>Modify the workload so prompts randomly permute <code class="inline-code">[system, tools, context]</code>. Re-run. What happens to hit rate? Why?</li>
+<li>Compute the HBM cost of keeping a 2,000-token system prompt resident as one radix branch on Llama 3.1 8B. Compare to the cost of a 16-sequence batch without prefix reuse.</li>
+<li>Read the SGLang RadixAttention paper. Explain in three sentences why tree-shaped LRU eviction beats block-shaped LRU under prefix-heavy load.</li>
+<li>A customer reports only 8% cache hit rate. Name three likely causes and the diagnostic you would run for each.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>RadixAttention</td>
+<td>&quot;the SGLang thing&quot;</td>
+<td>KV cache indexed as a radix tree so shared prefixes reuse blocks</td>
+</tr>
+<tr>
+<td>Radix tree</td>
+<td>&quot;compact trie&quot;</td>
+<td>Tree where each node owns a token range and its KV blocks</td>
+</tr>
+<tr>
+<td>Cache-aware scheduler</td>
+<td>&quot;hot-branch-first&quot;</td>
+<td>Scheduler that prefers requests sharing the resident branch</td>
+</tr>
+<tr>
+<td>Prefix-cache hit rate</td>
+<td>&quot;how much of your prompt was free&quot;</td>
+<td>Fraction of prompt tokens served from reused KV blocks</td>
+</tr>
+<tr>
+<td>FCFS</td>
+<td>&quot;first-come first-served&quot;</td>
+<td>Default scheduling that breaks prefix locality</td>
+</tr>
+<tr>
+<td>Branch-level LRU</td>
+<td>&quot;evict the leaf&quot;</td>
+<td>Eviction policy matched to radix shape</td>
+</tr>
+<tr>
+<td>Prompt template ordering</td>
+<td>&quot;the cache key&quot;</td>
+<td>The prompt&#39;s component order determines what the tree can share</td>
+</tr>
+<tr>
+<td>System prompt pinning</td>
+<td>&quot;resident prefix&quot;</td>
+<td>Keep the immutable system portion pinned to avoid eviction thrash</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://github.com/sgl-project/sglang" target="_blank" rel="noopener">SGLang GitHub</a> — source and docs.</li>
+<li><a href="https://sgl-project.github.io/" target="_blank" rel="noopener">SGLang documentation</a> — RadixAttention and scheduling details.</li>
+<li><a href="https://arxiv.org/abs/2312.07104" target="_blank" rel="noopener">SGLang paper — Efficiently Programming Large Language Models (arXiv:2312.07104)</a> — the design reference.</li>
+<li><a href="https://www.lmsys.org/blog/2024-01-17-sglang/" target="_blank" rel="noopener">LMSYS blog — SGLang with RadixAttention</a> — benchmark numbers and scheduler rationale.</li>
+<li><a href="https://docs.vllm.ai/en/latest/features/prefix_caching.html" target="_blank" rel="noopener">vLLM — Prefix Caching</a> — vLLM&#39;s own radix-like implementation, for comparison.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="05-eagle3-speculative-decoding.html">
+  <span class="label">← Previous</span>
+  <b>EAGLE-3 Speculative Decoding in Production</b>
+</a>
+      <a class="pager__item pager__item--next" href="07-tensorrt-llm-blackwell.html">
+  <span class="label">Next →</span>
+  <b>Hardware-Specialized Inference Compilation — FP8 and NVFP4 on Blackwell</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>5 minutes</b> of Infrastructure &amp; Production behind you.</p>
+      <a class="btn btn--solid" href="07-tensorrt-llm-blackwell.html">Continue to Hardware-Specialized Inference Compilation — FP8 and NVFP4 on Blackwell →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#the-radix-tree-as-a-kv-index">The radix tree as a KV index</a></li><li class="mini__item mini__item--d3"><a href="#cache-aware-scheduling">Cache-aware scheduling</a></li><li class="mini__item mini__item--d3"><a href="#benchmark-numbers-you-should-memorize">Benchmark numbers you should memorize</a></li><li class="mini__item mini__item--d3"><a href="#the-ordering-gotcha">The ordering gotcha</a></li><li class="mini__item mini__item--d3"><a href="#where-radixattention-wins-and-loses">Where RadixAttention wins and loses</a></li><li class="mini__item mini__item--d3"><a href="#why-this-is-a-scheduler-problem-not-just-a-kernel-problem">Why this is a scheduler problem, not just a kernel problem</a></li><li class="mini__item mini__item--d3"><a href="#interplay-with-vllm">Interplay with vLLM</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

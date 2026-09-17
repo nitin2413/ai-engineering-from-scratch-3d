@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DeepSeek-V3 Architecture Walkthrough — LLMs from Scratch — AIFS</title>
+<meta name="description" content="LLMs from Scratch: DeepSeek-V3 Architecture Walkthrough. 8 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="DeepSeek-V3 Architecture Walkthrough — LLMs from Scratch — AIFS">
+<meta property="og:description" content="LLMs from Scratch: DeepSeek-V3 Architecture Walkthrough. 8 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"moe-routing":["../assets/figures/figures-llms-systems.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-llms-systems.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#6C4DFF" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#6C4DFF;--accent-ink:#FFFFFF"
+  data-lesson-id="llms-from-scratch/20-deepseek-v3-walkthrough" data-module="llms-from-scratch"
+  data-prev="19-dualpipe-parallelism.html" data-next="21-jamba-hybrid-ssm-transformer.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#6C4DFF">
+        <span class="label">Phase 10</span>
+        <b>LLMs from Scratch</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="llms-from-scratch/01-tokenizers"><a href="01-tokenizers.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Tokenizers: BPE, WordPiece, SentencePiece</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/02-building-a-tokenizer"><a href="02-building-a-tokenizer.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Building a Tokenizer from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/03-data-pipelines"><a href="03-data-pipelines.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Data Pipelines for Pre-Training</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/04-pre-training-mini-gpt"><a href="04-pre-training-mini-gpt.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Pre-Training a Mini GPT (124M Parameters)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/05-scaling-distributed"><a href="05-scaling-distributed.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Scaling: Distributed Training, FSDP, DeepSpeed</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/06-instruction-tuning-sft"><a href="06-instruction-tuning-sft.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Instruction Tuning (SFT)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/07-rlhf"><a href="07-rlhf.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">RLHF: Reward Model + PPO</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/08-dpo"><a href="08-dpo.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">DPO: Direct Preference Optimization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/09-constitutional-ai-self-improvement"><a href="09-constitutional-ai-self-improvement.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Constitutional AI and Self-Improvement</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/10-evaluation"><a href="10-evaluation.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Evaluation: Benchmarks, Evals, LM Harness</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/11-quantization"><a href="11-quantization.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Quantization: Making Models Fit</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/12-inference-optimization"><a href="12-inference-optimization.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Inference Optimization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/13-building-complete-llm-pipeline"><a href="13-building-complete-llm-pipeline.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Building a Complete LLM Pipeline</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/14-open-models-architecture-walkthroughs"><a href="14-open-models-architecture-walkthroughs.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Open Models: Architecture Walkthroughs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/15-speculative-decoding-eagle3"><a href="15-speculative-decoding-eagle3.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Speculative Decoding and EAGLE-3</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/16-differential-attention-v2"><a href="16-differential-attention-v2.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Differential Attention (V2)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/17-native-sparse-attention"><a href="17-native-sparse-attention.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Native Sparse Attention (DeepSeek NSA)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/18-multi-token-prediction"><a href="18-multi-token-prediction.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Multi-Token Prediction (MTP)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/19-dualpipe-parallelism"><a href="19-dualpipe-parallelism.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">DualPipe Parallelism</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/20-deepseek-v3-walkthrough"><a href="20-deepseek-v3-walkthrough.html" class="is-current">
+  <span class="snav__n">20</span>
+  <span class="snav__t">DeepSeek-V3 Architecture Walkthrough</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/21-jamba-hybrid-ssm-transformer"><a href="21-jamba-hybrid-ssm-transformer.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Jamba — Hybrid SSM-Transformer</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/22-async-hogwild-inference"><a href="22-async-hogwild-inference.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Async and Hogwild! Inference</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/25-speculative-decoding"><a href="25-speculative-decoding.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Speculative Decoding and EAGLE</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/34-gradient-checkpointing"><a href="34-gradient-checkpointing.html" class="">
+  <span class="snav__n">34</span>
+  <span class="snav__t">Gradient Checkpointing and Activation Recomputation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">LLMs from Scratch</a></p>
+      <h1 class="page__title">DeepSeek-V3 Architecture Walkthrough</h1>
+      <p class="page__lede">Phase 10 · Lesson 14 named the six architectural knobs every open model turns. DeepSeek-V3 (December 2024, 671B parameters total, 37B active) turns all six and adds four more: Multi-Head Latent Attention, auxiliary-loss-free load balancing, Multi-Token Prediction, and DualPipe training. This lesson reads DeepSeek-V3's architecture top to bottom and derives every parameter count from the published config. By the end you can explain why the 671B/37B ratio is the right bet and why MLA + MoE together beat either alone at the frontier.</p>
+      <div class="page__meta">
+        <span class="chip">8 min read</span>
+        <span class="chip">1,753 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Learn</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (stdlib, parameter calculator)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 10 · 14 (open-model walkthroughs), Phase 10 · 17 (NSA), Phase 10 · 18 (MTP), Phase 10 · 19 (DualPipe)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Read the DeepSeek-V3 config top to bottom and explain each field in terms of the six GPT-2 knobs plus four DeepSeek-specific additions.</li>
+<li>Derive the total parameter count (671B), active parameter count (37B), and the components that contribute to each.</li>
+<li>Compute the KV cache footprint of MLA at 128k context and compare to what a same-active-param dense model with GQA would pay.</li>
+<li>State the four DeepSeek-specific innovations (MLA, MTP, auxiliary-loss-free routing, DualPipe) and name which part of the architecture/training stack each one targets.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>DeepSeek-V3 is the first frontier open model whose architecture is meaningfully different from the Llama family. Llama 3 405B is &quot;GPT-2 with six knobs turned.&quot; DeepSeek-V3 is GPT-2 with all six knobs plus four more. Reading the Llama 3 config is a warmup for reading the DeepSeek config, but the deep structure — the shape of the attention block, the routing logic, the training-time objective — is different enough that you need a separate walkthrough.</p>
+<p>The payoff of learning it: DeepSeek-V3&#39;s open-weights release shifted what &quot;frontier capability&quot; means in open models. The architecture is the blueprint many 2026 training runs are copying. Understanding it is table stakes for any role that touches frontier LLM training or inference.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="the-invariant-core-again" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-invariant-core-again" aria-label="Link to this section">#</a>The invariant core, again</h3>
+<p>DeepSeek-V3 is still autoregressive. It still stacks decoder blocks. Each block still has attention plus MLP plus two RMSNorms. It still uses SwiGLU in the MLP. It still uses RoPE. Pre-norm. Weight-tied embeddings. Same baseline as every Llama or Mistral.</p>
+<h3 id="the-twist-mla-instead-of-gqa" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-twist-mla-instead-of-gqa" aria-label="Link to this section">#</a>The twist: MLA instead of GQA</h3>
+<p>From Phase 10 · 14 you know GQA shrinks the KV cache by sharing K and V across groups of Q heads. Multi-Head Latent Attention (MLA) goes further: K and V are compressed into a shared low-rank latent representation (the <code class="inline-code">kv_lora_rank</code>), then decompressed per head on the fly. The KV cache stores only the latent — typically 512 floats per token per layer, not 8 x 128 = 1024 floats.</p>
+<p>At 128k context, DeepSeek-V3 with MLA (one shared latent <code class="inline-code">c^{KV}</code> per token per layer; K and V are both derived from this latent via up-projections that can be absorbed into the subsequent matmul):</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>kv_cache = num_layers * kv_lora_rank * max_seq_len * bytes_per_element
+         = 61 * 512 * 131072 * 2
+         = 7.6 GB</code></pre>
+</figure>
+<p>A hypothetical GQA baseline (Llama 3 70B shape, 8 KV heads, head dim 128) would pay:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>kv_cache = 2 * 61 * 8 * 128 * 131072 * 2
+         = 30.5 GB</code></pre>
+</figure>
+<p>MLA is 4x smaller than a Llama-3-70B-style GQA cache at 128k context.</p>
+<p>The tradeoff: MLA adds a decompression step per attention computation (per head). The extra compute is small compared to the bandwidth saved. Net win for long-context inference.</p>
+<h3 id="the-routing-auxiliary-loss-free-load-balancing" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-routing-auxiliary-loss-free-load-balancing" aria-label="Link to this section">#</a>The routing: auxiliary-loss-free load balancing</h3>
+<p>MoE routers decide which top-k experts process each token. A naive router concentrates too much work on a few experts, leaving others idle. Standard fix: add an auxiliary loss term that penalizes load imbalance. This works but slightly degrades main-task performance.</p>
+<p>DeepSeek-V3 introduces an auxiliary-loss-free scheme. Per-expert bias terms are added to the router logits, adjusted during training by a simple rule: if expert <code class="inline-code">e</code> is overloaded, decrease <code class="inline-code">bias_e</code>; if underloaded, increase it. No extra loss term. Training stays clean. Expert load stays balanced.</p>
+<p>Effect on the main loss: none measurable. Effect on the MoE architecture: cleaner, no auxiliary-loss hyperparameter to tune.</p>
+<h3 id="the-mtp-denser-training-free-draft" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-mtp-denser-training-free-draft" aria-label="Link to this section">#</a>The MTP: denser training + free draft</h3>
+<p>From Phase 10 · 18 you know DeepSeek-V3 adds D=1 MTP module that predicts the token two positions ahead. At inference, the trained module is repurposed as a speculative-decoding draft with 80%+ acceptance. At training, each hidden state is supervised on D+1 = 2 targets, providing a denser signal.</p>
+<p>Parameters: 14B on top of the 671B main. Overhead: 2.1%.</p>
+<h3 id="the-training-dualpipe" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-training-dualpipe" aria-label="Link to this section">#</a>The training: DualPipe</h3>
+<p>From Phase 10 · 19 you know DualPipe is a bidirectional pipeline that overlaps forward and backward chunks with cross-node all-to-all comms. At DeepSeek-V3&#39;s 2,048-H800 scale, it recovers roughly 245k GPU-hours that 1F1B would have lost to pipeline bubbles.</p>
+<h3 id="the-config-field-by-field" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-config-field-by-field" aria-label="Link to this section">#</a>The config, field by field</h3>
+<p>Here is the DeepSeek-V3 config (simplified):</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>hidden_size: 7168
+intermediate_size: 18432   (dense MLP hidden size, used on first few layers)
+moe_intermediate_size: 2048 (expert MLP hidden size)
+num_hidden_layers: 61
+first_k_dense_layers: 3    (first 3 layers use dense MLP)
+num_attention_heads: 128
+num_key_value_heads: 128   (formally equal to num_heads under MLA, but
+                           the real compression is in kv_lora_rank)
+kv_lora_rank: 512          (MLA latent dimension)
+num_experts: 256            (MoE expert count per block)
+num_experts_per_tok: 8      (top-8 routing)
+shared_experts: 1           (always-on shared expert per block)
+max_position_embeddings: 163840
+rope_theta: 10000.0
+vocab_size: 129280
+mtp_module: 1               (1 MTP module at depth 1)</code></pre>
+</figure>
+<p>Parse it:</p>
+<ul>
+<li><code class="inline-code">hidden_size=7168</code>: embedding dimension.</li>
+<li><code class="inline-code">num_hidden_layers=61</code>: total block depth.</li>
+<li><code class="inline-code">first_k_dense_layers=3</code>: the first 3 blocks use a dense MLP of size 18432. The remaining 58 use MoE.</li>
+<li><code class="inline-code">num_attention_heads=128</code>: 128 query heads.</li>
+<li><code class="inline-code">kv_lora_rank=512</code>: K and V are compressed to this latent dimension and decompressed per head.</li>
+<li><code class="inline-code">num_experts=256, num_experts_per_tok=8</code>: each MoE block has 256 experts, routes top-8.</li>
+<li><code class="inline-code">shared_experts=1</code>: on top of the 256 routed experts, 1 always-on expert contributes to every token. Think of it as a &quot;dense floor&quot; that ensures every token gets something reliable.</li>
+<li><code class="inline-code">moe_intermediate_size=2048</code>: each expert&#39;s MLP hidden size. Smaller than the dense MLP because there are 256 of them.</li>
+</ul>
+<h3 id="parameter-accounting" class="prose-h prose-h3"><a class="prose-h__anchor" href="#parameter-accounting" aria-label="Link to this section">#</a>Parameter accounting</h3>
+<p>The full calculation lives in <code class="inline-code">code/main.py</code>. The headline:</p>
+<ul>
+<li>Embedding: <code class="inline-code">vocab * hidden = 129280 * 7168 = ~0.93B</code>.</li>
+<li>First 3 dense blocks: attention with MLA (~144M per block) + dense MLP (~260M per block) + norms. About 1.2B total.</li>
+<li>58 MoE blocks: attention with MLA (~144M) + 256 experts each (30M apiece) + 1 shared expert (30M) + norm. Total ~7.95B per block, including all experts. 461B total for the 58 MoE blocks.</li>
+<li>MTP module: 14B.</li>
+</ul>
+<p>Grand total: ~476B for core architecture + 14B MTP + distinctly the published 671B number accounts for additional structural parameters (bias tensors, expert-specific components, shared expert scaling, etc.). The number we reproduce in the calculator is within 3-5% of published — the delta comes from fine-grained accounting DeepSeek&#39;s report documents in its Section 2 appendix.</p>
+<p>Active parameters per forward:</p>
+<ul>
+<li>Attention: 144M per layer * 61 = 8.8B (all layers fire).</li>
+<li>MLP active: first 3 layers dense (3 * 260M = 780M), 58 MoE layers each active with 8 routed + 1 shared + routing overhead. Per layer active MLP: ~260M. Total: 3 * 260M + 58 * 260M = ~15.9B.</li>
+<li>Embedding + norms: 1.2B.</li>
+<li>Total active: roughly 26B core + 14B MTP (trained but not always run at inference) ≈ 37B.</li>
+</ul>
+<h3 id="the-671b-37b-ratio" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-671b-37b-ratio" aria-label="Link to this section">#</a>The 671B / 37B ratio</h3>
+<p>18x sparsity ratio (active params are 5.5% of total). DeepSeek-V3 is the sparsest frontier MoE model that has shipped open weights. Mixtral 8x7B at ratio 13/47 (28%) is much denser. Llama 4 Maverick at ratio 17B/400B (4.25%) is comparable. The DeepSeek bet: at frontier scale, more experts with lower activation ratio produces better quality per active-FLOP.</p>
+<h3 id="where-deepseek-v3-sits" class="prose-h prose-h3"><a class="prose-h__anchor" href="#where-deepseek-v3-sits" aria-label="Link to this section">#</a>Where DeepSeek-V3 sits</h3>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Total</th>
+<th>Active</th>
+<th>Ratio</th>
+<th>Attention</th>
+<th>Novel ideas</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Llama 3 70B</td>
+<td>70B</td>
+<td>70B</td>
+<td>100%</td>
+<td>GQA 64/8</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Llama 4 Maverick</td>
+<td>400B</td>
+<td>17B</td>
+<td>4.25%</td>
+<td>GQA</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Mixtral 8x22B</td>
+<td>141B</td>
+<td>39B</td>
+<td>27%</td>
+<td>GQA</td>
+<td>—</td>
+</tr>
+<tr>
+<td>DeepSeek V3</td>
+<td>671B</td>
+<td>37B</td>
+<td>5.5%</td>
+<td>MLA 512</td>
+<td>MLA + MTP + aux-free + DualPipe</td>
+</tr>
+<tr>
+<td>Qwen 2.5 72B</td>
+<td>72B</td>
+<td>72B</td>
+<td>100%</td>
+<td>GQA 64/8</td>
+<td>YaRN extension</td>
+</tr>
+</tbody></table>
+<h3 id="the-follow-on-r1-v4" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-follow-on-r1-v4" aria-label="Link to this section">#</a>The follow-on: R1, V4</h3>
+<p>DeepSeek-R1 (2025) is a reasoning-training run on the V3 backbone. R1 uses the same architecture. What changed is the post-training recipe (large-scale RL on verifiable tasks), not the pretraining architecture.</p>
+<p>DeepSeek-V4 (if it ships) is expected to keep MLA + MoE + MTP and add DSA (DeepSeek Sparse Attention), the successor to NSA from Phase 10 · 17. The lineage is stable: architecture-level innovations accumulate; each version turns additional knobs.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="moe-routing"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">moe-routing</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> moe routing</figcaption>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p><code class="inline-code">code/main.py</code> is the parameter calculator specialized to DeepSeek-V3&#39;s shape. Run it, compare its output to the paper&#39;s numbers, and use it on hypothetical variants (256 experts vs 512, top-8 vs top-16, MLA rank 512 vs 1024).</p>
+<p>What to look at:</p>
+<ul>
+<li>Total parameter count vs published 671B.</li>
+<li>Active parameter count vs published 37B.</li>
+<li>KV cache at 128k context — the MLA vs GQA comparison.</li>
+<li>Per-layer breakdown to see where the parameter budget actually goes.</li>
+</ul>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces <code class="inline-code">outputs/skill-deepseek-v3-reader.md</code>. Given a DeepSeek-family model (V3, R1, or any future variant), it produces a component-by-component architecture reading that names each field of the config, derives parameter counts by component, and identifies which of the four DeepSeek-specific innovations the model uses.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p>Run <code class="inline-code">code/main.py</code>. Compare the calculator&#39;s total-parameter estimate to the published 671B and identify where the delta comes from. The paper&#39;s Section 2 has the full itemization.</p>
+</li>
+<li><p>Modify the config to use MLA rank 256 instead of 512. Compute the resulting KV cache size at 128k context. What percentage reduction does it buy, and at what cost to the per-head expressiveness?</p>
+</li>
+<li><p>Compare DeepSeek-V3&#39;s (256 experts, top-8) routing to a hypothetical (512 experts, top-8) variant. Total parameters grow; active parameters stay the same. What does the extra expert capacity buy in theory, and what does it cost at inference?</p>
+</li>
+<li><p>Read Section 2.1 of the DeepSeek-V3 technical report (arXiv:2412.19437) on MLA. Explain in three sentences why the K and V decompression matrices can be &quot;absorbed&quot; into the subsequent matmul for inference-time efficiency.</p>
+</li>
+<li><p>DeepSeek-V3 uses FP8 training for most operations. Compute the memory savings of FP8 vs BF16 for storing the 671B weights. How does this intersect with the 14.8T-token training budget?</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>MLA</td>
+<td>&quot;Multi-Head Latent Attention&quot;</td>
+<td>Compress K and V into a shared low-rank latent (kv_lora_rank, typically 512), decompress per head on-the-fly; KV cache stores only the latent</td>
+</tr>
+<tr>
+<td>kv_lora_rank</td>
+<td>&quot;MLA compression dim&quot;</td>
+<td>The size of the shared latent for K and V; DeepSeek-V3 uses 512</td>
+</tr>
+<tr>
+<td>First k dense layers</td>
+<td>&quot;Early layers stay dense&quot;</td>
+<td>The first few MoE-model layers skip the MoE router and run a dense MLP for stability</td>
+</tr>
+<tr>
+<td>num_experts_per_tok</td>
+<td>&quot;Top-k routing&quot;</td>
+<td>How many routed experts fire per token; DeepSeek-V3 uses 8</td>
+</tr>
+<tr>
+<td>Shared experts</td>
+<td>&quot;Always-on experts&quot;</td>
+<td>Experts that process every token regardless of routing; DeepSeek-V3 uses 1</td>
+</tr>
+<tr>
+<td>Auxiliary-loss-free routing</td>
+<td>&quot;Bias-adjusted load balance&quot;</td>
+<td>Per-expert bias terms adjusted during training to keep expert load balanced without adding a loss term</td>
+</tr>
+<tr>
+<td>MTP module</td>
+<td>&quot;Extra prediction head&quot;</td>
+<td>Transformer block predicting t+2 from h^(1) and E(t+1); denser training, free speculative-decoding draft</td>
+</tr>
+<tr>
+<td>DualPipe</td>
+<td>&quot;Bidirectional pipeline&quot;</td>
+<td>Training schedule that overlaps forward/backward compute with cross-node all-to-all</td>
+</tr>
+<tr>
+<td>Active parameter ratio</td>
+<td>&quot;Sparsity&quot;</td>
+<td>active_params / total_params; DeepSeek-V3 hits 5.5%</td>
+</tr>
+<tr>
+<td>FP8 training</td>
+<td>&quot;8-bit training&quot;</td>
+<td>Training storage and many compute ops in FP8; roughly halves memory vs BF16 at a small quality cost</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2412.19437" target="_blank" rel="noopener">DeepSeek-AI — DeepSeek-V3 Technical Report (arXiv:2412.19437)</a> — the full architecture, training, and results document</li>
+<li><a href="https://huggingface.co/deepseek-ai/DeepSeek-V3" target="_blank" rel="noopener">DeepSeek-V3 model card on Hugging Face</a> — config files and deployment notes</li>
+<li><a href="https://arxiv.org/abs/2405.04434" target="_blank" rel="noopener">DeepSeek-V2 paper (arXiv:2405.04434)</a> — the predecessor that introduced MLA</li>
+<li><a href="https://arxiv.org/abs/2501.12948" target="_blank" rel="noopener">DeepSeek-R1 paper (arXiv:2501.12948)</a> — the reasoning-training successor on V3&#39;s architecture</li>
+<li><a href="https://arxiv.org/abs/2502.11089" target="_blank" rel="noopener">Native Sparse Attention (arXiv:2502.11089)</a> — the future direction for DeepSeek-family attention</li>
+<li><a href="https://github.com/deepseek-ai/DualPipe" target="_blank" rel="noopener">DualPipe repository</a> — the training-schedule reference</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="19-dualpipe-parallelism.html">
+  <span class="label">← Previous</span>
+  <b>DualPipe Parallelism</b>
+</a>
+      <a class="pager__item pager__item--next" href="21-jamba-hybrid-ssm-transformer.html">
+  <span class="label">Next →</span>
+  <b>Jamba — Hybrid SSM-Transformer</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>8 minutes</b> of LLMs from Scratch behind you.</p>
+      <a class="btn btn--solid" href="21-jamba-hybrid-ssm-transformer.html">Continue to Jamba — Hybrid SSM-Transformer →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#the-invariant-core-again">The invariant core, again</a></li><li class="mini__item mini__item--d3"><a href="#the-twist-mla-instead-of-gqa">The twist: MLA instead of GQA</a></li><li class="mini__item mini__item--d3"><a href="#the-routing-auxiliary-loss-free-load-balancing">The routing: auxiliary-loss-free load balancing</a></li><li class="mini__item mini__item--d3"><a href="#the-mtp-denser-training-free-draft">The MTP: denser training + free draft</a></li><li class="mini__item mini__item--d3"><a href="#the-training-dualpipe">The training: DualPipe</a></li><li class="mini__item mini__item--d3"><a href="#the-config-field-by-field">The config, field by field</a></li><li class="mini__item mini__item--d3"><a href="#parameter-accounting">Parameter accounting</a></li><li class="mini__item mini__item--d3"><a href="#the-671b-37b-ratio">The 671B / 37B ratio</a></li><li class="mini__item mini__item--d3"><a href="#where-deepseek-v3-sits">Where DeepSeek-V3 sits</a></li><li class="mini__item mini__item--d3"><a href="#the-follow-on-r1-v4">The follow-on: R1, V4</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

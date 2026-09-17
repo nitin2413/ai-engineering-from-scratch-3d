@@ -1,0 +1,925 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Convex Optimization — Math Foundations — AIFS</title>
+<meta name="description" content="Math Foundations: Convex Optimization. 5 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Convex Optimization — Math Foundations — AIFS">
+<meta property="og:description" content="Math Foundations: Convex Optimization. 5 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"convex-vs-nonconvex":["../assets/figures/figures-math.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-math.js"];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#4D5BFF" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#4D5BFF;--accent-ink:#FFFFFF"
+  data-lesson-id="math-foundations/18-convex-optimization" data-module="math-foundations"
+  data-prev="17-linear-systems.html" data-next="19-complex-numbers.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#4D5BFF">
+        <span class="label">Phase 01</span>
+        <b>Math Foundations</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="math-foundations/01-linear-algebra-intuition"><a href="01-linear-algebra-intuition.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Linear Algebra Intuition</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/02-vectors-matrices-operations"><a href="02-vectors-matrices-operations.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Vectors, Matrices &amp; Operations</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/03-matrix-transformations"><a href="03-matrix-transformations.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Matrix Transformations</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/04-calculus-for-ml"><a href="04-calculus-for-ml.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Calculus for Machine Learning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/05-chain-rule-and-autodiff"><a href="05-chain-rule-and-autodiff.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Chain Rule &amp; Automatic Differentiation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/06-probability-and-distributions"><a href="06-probability-and-distributions.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Probability and Distributions</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/07-bayes-theorem"><a href="07-bayes-theorem.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Bayes' Theorem</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/08-optimization"><a href="08-optimization.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Optimization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/09-information-theory"><a href="09-information-theory.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Information Theory</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/10-dimensionality-reduction"><a href="10-dimensionality-reduction.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Dimensionality Reduction</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/11-singular-value-decomposition"><a href="11-singular-value-decomposition.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Singular Value Decomposition</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/12-tensor-operations"><a href="12-tensor-operations.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Tensor Operations</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/13-numerical-stability"><a href="13-numerical-stability.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Numerical Stability</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/14-norms-and-distances"><a href="14-norms-and-distances.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Norms and Distances</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/15-statistics-for-ml"><a href="15-statistics-for-ml.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Statistics for Machine Learning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/16-sampling-methods"><a href="16-sampling-methods.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Sampling Methods</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/17-linear-systems"><a href="17-linear-systems.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Linear Systems</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/18-convex-optimization"><a href="18-convex-optimization.html" class="is-current">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Convex Optimization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/19-complex-numbers"><a href="19-complex-numbers.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">Complex Numbers for AI</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/20-fourier-transform"><a href="20-fourier-transform.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">The Fourier Transform</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/21-graph-theory"><a href="21-graph-theory.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Graph Theory for Machine Learning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/22-stochastic-processes"><a href="22-stochastic-processes.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Stochastic Processes</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Math Foundations</a></p>
+      <h1 class="page__title">Convex Optimization</h1>
+      <p class="page__lede">Convex problems have one valley. Neural networks have millions. Knowing the difference matters.</p>
+      <div class="page__meta">
+        <span class="chip">5 min read</span>
+        <span class="chip">1,160 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Language</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 1, Lessons 04 (Calculus for ML), 08 (Optimization)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~90 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Test whether a function is convex using the definition, second derivative, and Hessian criteria</li>
+<li>Implement Newton&#39;s method and compare its quadratic convergence against gradient descent</li>
+<li>Solve constrained optimization problems using Lagrange multipliers and interpret KKT conditions</li>
+<li>Explain why neural network loss landscapes are non-convex yet SGD still finds good solutions</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Lesson 08 taught you gradient descent, momentum, and Adam. Those optimizers walk downhill on any surface. But they come with no guarantees. Gradient descent on a non-convex landscape might land in a bad local minimum, get stuck on a saddle point, or oscillate forever. You used it anyway because neural networks are non-convex and there is no alternative.</p>
+<p>But many problems in machine learning are convex. Linear regression, logistic regression, SVMs, LASSO, ridge regression. For these, something stronger exists: optimization with mathematical guarantees. A convex problem has exactly one valley. Any algorithm that walks downhill will reach the global minimum. No restarts needed. No learning rate schedules. No prayer.</p>
+<p>Understanding convexity does three things. First, it tells you when your problem is easy (convex) versus hard (non-convex). Second, it gives you faster tools like Newton&#39;s method for convex problems. Third, it explains concepts that appear throughout ML: regularization as a constraint, duality in SVMs, and why deep learning works despite violating every nice property convexity gives you.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="convex-sets" class="prose-h prose-h3"><a class="prose-h__anchor" href="#convex-sets" aria-label="Link to this section">#</a>Convex sets</h3>
+<p>A set S is convex if for any two points in S, the line segment between them also lies entirely in S.</p>
+<table>
+<thead>
+<tr>
+<th>Convex sets</th>
+<th>Not convex</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Rectangle</strong>: any two points inside can be connected by a line segment that stays inside</td>
+<td><strong>Star/crescent shape</strong>: a line between two interior points can pass outside the set</td>
+</tr>
+<tr>
+<td><strong>Triangle</strong>: same property holds for all interior points</td>
+<td><strong>Donut/annulus</strong>: the hole means some line segments leave the set</td>
+</tr>
+<tr>
+<td>The line segment between any two points stays within the set</td>
+<td>The line segment between some pairs of points exits the set</td>
+</tr>
+</tbody></table>
+<p>Formal test: for any points x, y in S and any t in [0, 1], the point tx + (1-t)y is also in S.</p>
+<p>Examples of convex sets:</p>
+<ul>
+<li>A line, a plane, all of R^n</li>
+<li>A ball (circle, sphere, hypersphere)</li>
+<li>A halfspace: {x : a^T x &lt;= b}</li>
+<li>The intersection of any number of convex sets</li>
+</ul>
+<p>Examples of non-convex sets:</p>
+<ul>
+<li>A donut (annulus)</li>
+<li>The union of two disjoint circles</li>
+<li>Any set with a &quot;dent&quot; or &quot;hole&quot;</li>
+</ul>
+<h3 id="convex-functions" class="prose-h prose-h3"><a class="prose-h__anchor" href="#convex-functions" aria-label="Link to this section">#</a>Convex functions</h3>
+<p>A function f is convex if its domain is a convex set and for any two points x, y in its domain and any t in [0, 1]:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>f(tx + (1-t)y) &lt;= t*f(x) + (1-t)*f(y)</code></pre>
+</figure>
+<p>Geometrically: the line segment between any two points on the graph lies above or on the graph.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Convex function</th>
+<th>Non-convex function</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Line segment test</strong></td>
+<td>The line between any two points on the graph lies <strong>above or on</strong> the curve</td>
+<td>The line between some points on the graph dips <strong>below</strong> the curve</td>
+</tr>
+<tr>
+<td><strong>Shape</strong></td>
+<td>Single bowl/valley curving upward</td>
+<td>Multiple peaks and valleys with mixed curvature</td>
+</tr>
+<tr>
+<td><strong>Local minima</strong></td>
+<td>Every local minimum is the global minimum</td>
+<td>Multiple local minima may exist at different heights</td>
+</tr>
+</tbody></table>
+<p>Common convex functions:</p>
+<ul>
+<li>f(x) = x^2 (parabola)</li>
+<li>f(x) = |x| (absolute value)</li>
+<li>f(x) = e^x (exponential)</li>
+<li>f(x) = max(0, x) (ReLU, though piecewise linear)</li>
+<li>f(x) = -log(x) for x &gt; 0 (negative log)</li>
+<li>Any linear function f(x) = a^T x + b (both convex and concave)</li>
+</ul>
+<h3 id="testing-for-convexity" class="prose-h prose-h3"><a class="prose-h__anchor" href="#testing-for-convexity" aria-label="Link to this section">#</a>Testing for convexity</h3>
+<p>Three practical tests, from easiest to most rigorous.</p>
+<p><strong>Test 1: Second derivative test (1D).</strong> If f&#39;&#39;(x) &gt;= 0 for all x, then f is convex.</p>
+<ul>
+<li>f(x) = x^2: f&#39;&#39;(x) = 2 &gt;= 0. Convex.</li>
+<li>f(x) = x^3: f&#39;&#39;(x) = 6x. Negative for x &lt; 0. Not convex.</li>
+<li>f(x) = e^x: f&#39;&#39;(x) = e^x &gt; 0. Convex.</li>
+</ul>
+<p><strong>Test 2: Hessian test (multivariate).</strong> If the Hessian matrix H(x) is positive semidefinite for all x, then f is convex. The Hessian is the matrix of second partial derivatives.</p>
+<p><strong>Test 3: Definition test.</strong> Check the inequality f(tx + (1-t)y) &lt;= t*f(x) + (1-t)*f(y) directly. Useful for functions where derivatives are hard to compute.</p>
+<h3 id="why-convexity-matters" class="prose-h prose-h3"><a class="prose-h__anchor" href="#why-convexity-matters" aria-label="Link to this section">#</a>Why convexity matters</h3>
+<p>The central theorem of convex optimization:</p>
+<p><strong>For a convex function, every local minimum is a global minimum.</strong></p>
+<p>This means gradient descent cannot get trapped. Any downhill path leads to the same answer. The algorithm is guaranteed to converge to the optimal solution.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph LR
+    subgraph &quot;Convex: ONE answer&quot;
+        direction TB
+        C1[&quot;Loss surface has a single valley&quot;] --&gt; C2[&quot;Gradient descent ALWAYS finds the global minimum&quot;]
+    end
+    subgraph &quot;Non-convex: MANY traps&quot;
+        direction TB
+        N1[&quot;Loss surface has multiple valleys and peaks&quot;] --&gt; N2[&quot;Gradient descent may get stuck in a local minimum&quot;]
+        N2 --&gt; N3[&quot;Global minimum might be missed&quot;]
+    end</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>Consequences:</p>
+<ul>
+<li>No need for random restarts</li>
+<li>No need for sophisticated learning rate schedules</li>
+<li>Convergence proofs are possible (rate depends on function properties)</li>
+<li>The solution is unique (up to flat regions)</li>
+</ul>
+<h3 id="convex-vs-non-convex-in-ml" class="prose-h prose-h3"><a class="prose-h__anchor" href="#convex-vs-non-convex-in-ml" aria-label="Link to this section">#</a>Convex vs non-convex in ML</h3>
+<table>
+<thead>
+<tr>
+<th>Problem</th>
+<th>Convex?</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Linear regression (MSE)</td>
+<td>Yes</td>
+<td>Loss is quadratic in weights</td>
+</tr>
+<tr>
+<td>Logistic regression</td>
+<td>Yes</td>
+<td>Log-loss is convex in weights</td>
+</tr>
+<tr>
+<td>SVM (hinge loss)</td>
+<td>Yes</td>
+<td>Maximum of linear functions</td>
+</tr>
+<tr>
+<td>LASSO (L1 regression)</td>
+<td>Yes</td>
+<td>Sum of convex functions is convex</td>
+</tr>
+<tr>
+<td>Ridge regression (L2)</td>
+<td>Yes</td>
+<td>Quadratic + quadratic = convex</td>
+</tr>
+<tr>
+<td>Neural network (any loss)</td>
+<td>No</td>
+<td>Nonlinear activations create non-convex landscape</td>
+</tr>
+<tr>
+<td>k-means clustering</td>
+<td>No</td>
+<td>Discrete assignment step</td>
+</tr>
+<tr>
+<td>Matrix factorization</td>
+<td>No</td>
+<td>Product of unknowns</td>
+</tr>
+</tbody></table>
+<p>Linear models with convex losses are convex. The moment you add hidden layers with nonlinear activations, convexity breaks.</p>
+<h3 id="the-hessian-matrix" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-hessian-matrix" aria-label="Link to this section">#</a>The Hessian matrix</h3>
+<p>The Hessian H of a function f: R^n -&gt; R is the n x n matrix of second partial derivatives.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>H[i][j] = d^2 f / (dx_i dx_j)</code></pre>
+</figure>
+<p>For f(x, y) = x^2 + 3xy + y^2:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>df/dx = 2x + 3y       d^2f/dx^2 = 2      d^2f/dxdy = 3
+df/dy = 3x + 2y       d^2f/dydx = 3      d^2f/dy^2 = 2
+
+H = [ 2  3 ]
+    [ 3  2 ]</code></pre>
+</figure>
+<p>The Hessian tells you about curvature:</p>
+<ul>
+<li>Eigenvalues all positive: the function curves upward in every direction (convex at that point)</li>
+<li>Eigenvalues all negative: curves downward in every direction (concave, a local max)</li>
+<li>Mixed signs: saddle point (curves up in some directions, down in others)</li>
+<li>Zero eigenvalue: flat in that direction (degenerate)</li>
+</ul>
+<p>For convexity, the Hessian must be positive semidefinite (all eigenvalues &gt;= 0) everywhere, not just at one point.</p>
+<h3 id="newton-s-method" class="prose-h prose-h3"><a class="prose-h__anchor" href="#newton-s-method" aria-label="Link to this section">#</a>Newton&#39;s method</h3>
+<p>Gradient descent uses first-order information (the gradient). Newton&#39;s method uses second-order information (the Hessian). It fits a quadratic approximation at the current point and jumps directly to the minimum of that quadratic.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>Update rule:
+  x_new = x - H^(-1) * gradient
+
+Compare to gradient descent:
+  x_new = x - lr * gradient</code></pre>
+</figure>
+<p>Newton&#39;s method replaces the scalar learning rate with the inverse Hessian. This automatically adjusts the step size and direction based on local curvature.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph TD
+    subgraph &quot;Gradient Descent&quot;
+        GD1[&quot;Start&quot;] --&gt; GD2[&quot;Step 1&quot;]
+        GD2 --&gt; GD3[&quot;Step 2&quot;]
+        GD3 --&gt; GD4[&quot;...&quot;]
+        GD4 --&gt; GD5[&quot;Step ~500: Converged&quot;]
+        GD_note[&quot;Follows gradient blindly — many small steps&quot;]
+    end
+    subgraph &quot;Newton's Method&quot;
+        NM1[&quot;Start&quot;] --&gt; NM2[&quot;Step 1&quot;]
+        NM2 --&gt; NM3[&quot;...&quot;]
+        NM3 --&gt; NM4[&quot;Step ~5: Converged&quot;]
+        NM_note[&quot;Uses curvature for optimal steps&quot;]
+    end</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>Advantages:</p>
+<ul>
+<li>Quadratic convergence near the minimum (error squares each step)</li>
+<li>No learning rate to tune</li>
+<li>Scale-invariant (works regardless of how you parameterize the problem)</li>
+</ul>
+<p>Disadvantages:</p>
+<ul>
+<li>Computing the Hessian costs O(n^2) memory and O(n^3) to invert</li>
+<li>For a neural network with 1 million weights, that is 10^12 entries and 10^18 operations</li>
+<li>Not practical for deep learning</li>
+</ul>
+<h3 id="constrained-optimization" class="prose-h prose-h3"><a class="prose-h__anchor" href="#constrained-optimization" aria-label="Link to this section">#</a>Constrained optimization</h3>
+<p>Unconstrained optimization: minimize f(x) over all x.
+Constrained optimization: minimize f(x) subject to constraints.</p>
+<p>Real problems have constraints. You want to minimize cost but your budget is limited. You want to minimize error but your model complexity is bounded.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph LR
+    subgraph &quot;Unconstrained&quot;
+        U1[&quot;Loss function&quot;] --&gt; U2[&quot;Free minimum: lowest point of the loss surface&quot;]
+    end
+    subgraph &quot;Constrained&quot;
+        C1[&quot;Loss function&quot;] --&gt; C2[&quot;Constrained minimum: lowest point within the feasible region&quot;]
+        C3[&quot;Constraint boundary limits the search space&quot;]
+    end</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<h3 id="lagrange-multipliers" class="prose-h prose-h3"><a class="prose-h__anchor" href="#lagrange-multipliers" aria-label="Link to this section">#</a>Lagrange multipliers</h3>
+<p>The method of Lagrange multipliers converts a constrained problem into an unconstrained one.</p>
+<p>Problem: minimize f(x) subject to g(x) = 0.</p>
+<p>Solution: introduce a new variable (the Lagrange multiplier lambda) and solve the unconstrained problem:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>L(x, lambda) = f(x) + lambda * g(x)</code></pre>
+</figure>
+<p>At the solution, the gradient of L is zero:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>dL/dx = df/dx + lambda * dg/dx = 0
+dL/dlambda = g(x) = 0</code></pre>
+</figure>
+<p>Geometric intuition: at the constrained minimum, the gradient of f must be parallel to the gradient of the constraint g. If they were not parallel, you could move along the constraint surface and reduce f further.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph LR
+    A[&quot;Contours of f(x,y): concentric ellipses&quot;] --- S[&quot;Solution point&quot;]
+    B[&quot;Constraint curve g(x,y) = 0&quot;] --- S
+    S --- C[&quot;At the solution, gradient of f is parallel to gradient of g&quot;]</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>Example: minimize f(x,y) = x^2 + y^2 subject to x + y = 1.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>L = x^2 + y^2 + lambda(x + y - 1)
+
+dL/dx = 2x + lambda = 0  =&gt;  x = -lambda/2
+dL/dy = 2y + lambda = 0  =&gt;  y = -lambda/2
+dL/dlambda = x + y - 1 = 0
+
+From first two: x = y
+Substituting: 2x = 1, so x = y = 0.5, lambda = -1</code></pre>
+</figure>
+<p>The closest point on the line x + y = 1 to the origin is (0.5, 0.5).</p>
+<h3 id="kkt-conditions" class="prose-h prose-h3"><a class="prose-h__anchor" href="#kkt-conditions" aria-label="Link to this section">#</a>KKT conditions</h3>
+<p>The Karush-Kuhn-Tucker conditions extend Lagrange multipliers to inequality constraints.</p>
+<p>Problem: minimize f(x) subject to g_i(x) &lt;= 0 for i = 1, ..., m.</p>
+<p>The KKT conditions (necessary for optimality):</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>1. Stationarity:    df/dx + sum(lambda_i * dg_i/dx) = 0
+2. Primal feasibility:  g_i(x) &lt;= 0  for all i
+3. Dual feasibility:    lambda_i &gt;= 0  for all i
+4. Complementary slackness:  lambda_i * g_i(x) = 0  for all i</code></pre>
+</figure>
+<p>Complementary slackness is the key insight: either the constraint is active (g_i = 0, the solution sits on the boundary) or the multiplier is zero (the constraint does not matter). A constraint that does not affect the solution has lambda = 0.</p>
+<p>KKT conditions are central to SVMs. The support vectors are the data points where the constraint is active (lambda &gt; 0). All other data points have lambda = 0 and do not affect the decision boundary.</p>
+<h3 id="regularization-as-constrained-optimization" class="prose-h prose-h3"><a class="prose-h__anchor" href="#regularization-as-constrained-optimization" aria-label="Link to this section">#</a>Regularization as constrained optimization</h3>
+<p>L1 and L2 regularization are not arbitrary tricks. They are constrained optimization problems in disguise.</p>
+<p><strong>L2 regularization (Ridge):</strong></p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>minimize  Loss(w)  subject to  ||w||^2 &lt;= t
+
+Equivalent unconstrained form:
+minimize  Loss(w) + lambda * ||w||^2</code></pre>
+</figure>
+<p>The constraint ||w||^2 &lt;= t defines a ball (circle in 2D, sphere in 3D). The solution is where the loss contours first touch this ball.</p>
+<p><strong>L1 regularization (LASSO):</strong></p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>minimize  Loss(w)  subject to  ||w||_1 &lt;= t
+
+Equivalent unconstrained form:
+minimize  Loss(w) + lambda * ||w||_1</code></pre>
+</figure>
+<p>The constraint ||w||_1 &lt;= t defines a diamond (rotated square in 2D).</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>L2 constraint (circle)</th>
+<th>L1 constraint (diamond)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Constraint shape</strong></td>
+<td>Circle (sphere in higher dims)</td>
+<td>Diamond (rotated square in 2D)</td>
+</tr>
+<tr>
+<td><strong>Where loss contour touches</strong></td>
+<td>Smooth boundary — any point on the circle</td>
+<td>Corner — aligned with an axis</td>
+</tr>
+<tr>
+<td><strong>Solution behavior</strong></td>
+<td>Weights are small but nonzero</td>
+<td>Some weights are exactly zero (sparse)</td>
+</tr>
+<tr>
+<td><strong>Result</strong></td>
+<td>Weight shrinkage</td>
+<td>Feature selection</td>
+</tr>
+</tbody></table>
+<p>This explains why L1 produces sparse models (feature selection) while L2 only shrinks weights. The diamond has corners aligned with axes. Loss contours are more likely to touch a corner, setting one or more weights exactly to zero.</p>
+<h3 id="duality" class="prose-h prose-h3"><a class="prose-h__anchor" href="#duality" aria-label="Link to this section">#</a>Duality</h3>
+<p>Every constrained optimization problem (the primal) has a companion problem (the dual). For convex problems, the primal and dual have the same optimal value. This is strong duality.</p>
+<p>The Lagrangian dual function:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>Primal: minimize f(x) subject to g(x) &lt;= 0
+Lagrangian: L(x, lambda) = f(x) + lambda * g(x)
+Dual function: d(lambda) = min_x L(x, lambda)
+Dual problem: maximize d(lambda) subject to lambda &gt;= 0</code></pre>
+</figure>
+<p>Why duality matters:</p>
+<ul>
+<li>The dual problem is sometimes easier to solve than the primal</li>
+<li>SVMs are solved in their dual form, where the problem depends on dot products between data points (enabling the kernel trick)</li>
+<li>The dual provides a lower bound on the primal optimum, useful for checking solution quality</li>
+</ul>
+<p>For SVMs specifically:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>Primal: find w, b that maximize the margin 2/||w|| subject to
+        y_i(w^T x_i + b) &gt;= 1 for all i
+
+Dual:   maximize sum(alpha_i) - 0.5 * sum_ij(alpha_i * alpha_j * y_i * y_j * x_i^T x_j)
+        subject to alpha_i &gt;= 0 and sum(alpha_i * y_i) = 0
+
+The dual only involves dot products x_i^T x_j.
+Replace x_i^T x_j with K(x_i, x_j) to get the kernel trick.</code></pre>
+</figure>
+<h3 id="why-deep-learning-works-despite-non-convexity" class="prose-h prose-h3"><a class="prose-h__anchor" href="#why-deep-learning-works-despite-non-convexity" aria-label="Link to this section">#</a>Why deep learning works despite non-convexity</h3>
+<p>Neural network loss functions are wildly non-convex. By every classical measure, optimizing them should fail. Yet stochastic gradient descent finds good solutions reliably. Several factors explain this.</p>
+<p><strong>Most local minima are good enough.</strong> In high-dimensional spaces, random critical points (where the gradient is zero) are overwhelmingly saddle points, not local minima. The few local minima that exist tend to have loss values close to the global minimum. Getting trapped in a terrible local minimum is extremely unlikely when the parameter space has millions of dimensions.</p>
+<p><strong>Saddle points, not local minima, are the real obstacle.</strong> In a function with n parameters, a saddle point has a mix of positive and negative curvature directions. For a random critical point in high dimensions, the probability of all n eigenvalues being positive (local minimum) is roughly 2^(-n). Almost all critical points are saddle points. SGD&#39;s noise helps escape them.</p>
+<p><strong>Overparameterization smooths the landscape.</strong> Networks with more parameters than training examples have smoother, more connected loss surfaces. Wider networks have fewer bad local minima. This is counterintuitive but empirically consistent.</p>
+<p><strong>Loss landscape structure:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Low-dimensional space</th>
+<th>High-dimensional space</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Landscape</strong></td>
+<td>Many isolated peaks and valleys</td>
+<td>Smoothly connected valleys</td>
+</tr>
+<tr>
+<td><strong>Minima</strong></td>
+<td>Many isolated local minima</td>
+<td>Few bad local minima; most are near-optimal</td>
+</tr>
+<tr>
+<td><strong>Navigation</strong></td>
+<td>Hard to find global minimum</td>
+<td>Many paths lead to good solutions</td>
+</tr>
+<tr>
+<td><strong>Critical points</strong></td>
+<td>Mix of local minima and saddle points</td>
+<td>Overwhelmingly saddle points, not local minima</td>
+</tr>
+</tbody></table>
+<p><strong>Stochastic noise acts as implicit regularization.</strong> Mini-batch SGD adds noise that prevents settling into sharp minima. Sharp minima overfit; flat minima generalize. The noise biases optimization toward flat regions of the loss landscape.</p>
+<h3 id="second-order-methods-in-practice" class="prose-h prose-h3"><a class="prose-h__anchor" href="#second-order-methods-in-practice" aria-label="Link to this section">#</a>Second-order methods in practice</h3>
+<p>Pure Newton&#39;s method is impractical for large models. Several approximations make second-order information usable.</p>
+<p><strong>L-BFGS (Limited-memory BFGS):</strong> Approximates the inverse Hessian using the last m gradient differences. Requires O(mn) memory instead of O(n^2). Works well for problems with up to ~10,000 parameters. Used in classical ML (logistic regression, CRFs) but not deep learning.</p>
+<p><strong>Natural gradient:</strong> Uses the Fisher information matrix (expected Hessian of the log-likelihood) instead of the standard Hessian. This accounts for the geometry of probability distributions. K-FAC (Kronecker-Factored Approximate Curvature) approximates the Fisher matrix as a Kronecker product, making it practical for neural networks.</p>
+<p><strong>Hessian-free optimization:</strong> Uses conjugate gradient to solve Hx = g without ever forming H. Only requires Hessian-vector products, which can be computed in O(n) time via automatic differentiation.</p>
+<p><strong>Diagonal approximations:</strong> Adam&#39;s second moment is a diagonal approximation of the Hessian&#39;s diagonal. AdaHessian extends this by using actual Hessian diagonal elements via Hutchinson&#39;s estimator.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Memory</th>
+<th>Per-step cost</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Gradient descent</td>
+<td>O(n)</td>
+<td>O(n)</td>
+<td>Baseline, large models</td>
+</tr>
+<tr>
+<td>Newton&#39;s method</td>
+<td>O(n^2)</td>
+<td>O(n^3)</td>
+<td>Small convex problems</td>
+</tr>
+<tr>
+<td>L-BFGS</td>
+<td>O(mn)</td>
+<td>O(mn)</td>
+<td>Medium convex problems</td>
+</tr>
+<tr>
+<td>Adam</td>
+<td>O(n)</td>
+<td>O(n)</td>
+<td>Deep learning default</td>
+</tr>
+<tr>
+<td>K-FAC</td>
+<td>O(n)</td>
+<td>O(n) per layer</td>
+<td>Research, large-batch training</td>
+</tr>
+</tbody></table>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="convex-vs-nonconvex"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">convex-vs-nonconvex</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> convex vs nonconvex</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-convexity-checker" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-convexity-checker" aria-label="Link to this section">#</a>Step 1: Convexity checker</h3>
+<p>Build a function that tests convexity empirically by sampling points and checking the definition.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> random
+<span class="token keyword">import</span> math
+
+<span class="token keyword">def</span> <span class="token function">check_convexity</span><span class="token punctuation">(</span>f<span class="token punctuation">,</span> dim<span class="token punctuation">,</span> bounds<span class="token operator">=</span><span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">,</span> samples<span class="token operator">=</span><span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    violations <span class="token operator">=</span> <span class="token number">0</span>
+    <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>samples<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        x <span class="token operator">=</span> <span class="token punctuation">[</span>random<span class="token punctuation">.</span>uniform<span class="token punctuation">(</span><span class="token operator">*</span>bounds<span class="token punctuation">)</span> <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>dim<span class="token punctuation">)</span><span class="token punctuation">]</span>
+        y <span class="token operator">=</span> <span class="token punctuation">[</span>random<span class="token punctuation">.</span>uniform<span class="token punctuation">(</span><span class="token operator">*</span>bounds<span class="token punctuation">)</span> <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>dim<span class="token punctuation">)</span><span class="token punctuation">]</span>
+        t <span class="token operator">=</span> random<span class="token punctuation">.</span>uniform<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span>
+        mid <span class="token operator">=</span> <span class="token punctuation">[</span>t <span class="token operator">*</span> xi <span class="token operator">+</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> t<span class="token punctuation">)</span> <span class="token operator">*</span> yi <span class="token keyword">for</span> xi<span class="token punctuation">,</span> yi <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> y<span class="token punctuation">)</span><span class="token punctuation">]</span>
+        lhs <span class="token operator">=</span> f<span class="token punctuation">(</span>mid<span class="token punctuation">)</span>
+        rhs <span class="token operator">=</span> t <span class="token operator">*</span> f<span class="token punctuation">(</span>x<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> t<span class="token punctuation">)</span> <span class="token operator">*</span> f<span class="token punctuation">(</span>y<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> lhs <span class="token operator">></span> rhs <span class="token operator">+</span> <span class="token number">1e-10</span><span class="token punctuation">:</span>
+            violations <span class="token operator">+=</span> <span class="token number">1</span>
+    <span class="token keyword">return</span> violations <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">,</span> violations</code></pre>
+</figure>
+<h3 id="step-2-newton-s-method-for-2d" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-newton-s-method-for-2d" aria-label="Link to this section">#</a>Step 2: Newton&#39;s method for 2D</h3>
+<p>Implement Newton&#39;s method using an explicit Hessian. Compare convergence speed against gradient descent.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">newtons_method</span><span class="token punctuation">(</span>f<span class="token punctuation">,</span> grad_f<span class="token punctuation">,</span> hessian_f<span class="token punctuation">,</span> x0<span class="token punctuation">,</span> steps<span class="token operator">=</span><span class="token number">50</span><span class="token punctuation">,</span> tol<span class="token operator">=</span><span class="token number">1e-12</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    x <span class="token operator">=</span> <span class="token builtin">list</span><span class="token punctuation">(</span>x0<span class="token punctuation">)</span>
+    history <span class="token operator">=</span> <span class="token punctuation">[</span>x<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>steps<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        g <span class="token operator">=</span> grad_f<span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+        H <span class="token operator">=</span> hessian_f<span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+        det <span class="token operator">=</span> H<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">*</span> H<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">-</span> H<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">*</span> H<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+        <span class="token keyword">if</span> <span class="token builtin">abs</span><span class="token punctuation">(</span>det<span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">1e-15</span><span class="token punctuation">:</span>
+            <span class="token keyword">break</span>
+        H_inv <span class="token operator">=</span> <span class="token punctuation">[</span>
+            <span class="token punctuation">[</span>H<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">/</span> det<span class="token punctuation">,</span> <span class="token operator">-</span>H<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">/</span> det<span class="token punctuation">]</span><span class="token punctuation">,</span>
+            <span class="token punctuation">[</span><span class="token operator">-</span>H<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">/</span> det<span class="token punctuation">,</span> H<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">/</span> det<span class="token punctuation">]</span><span class="token punctuation">,</span>
+        <span class="token punctuation">]</span>
+        dx <span class="token operator">=</span> <span class="token punctuation">[</span>
+            H_inv<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">*</span> g<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">+</span> H_inv<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">*</span> g<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+            H_inv<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">*</span> g<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">+</span> H_inv<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">*</span> g<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+        <span class="token punctuation">]</span>
+        x <span class="token operator">=</span> <span class="token punctuation">[</span>x<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">-</span> dx<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> x<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">-</span> dx<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">]</span>
+        history<span class="token punctuation">.</span>append<span class="token punctuation">(</span>x<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>gi <span class="token operator">**</span> <span class="token number">2</span> <span class="token keyword">for</span> gi <span class="token keyword">in</span> g<span class="token punctuation">)</span> <span class="token operator">&lt;</span> tol<span class="token punctuation">:</span>
+            <span class="token keyword">break</span>
+    <span class="token keyword">return</span> history</code></pre>
+</figure>
+<h3 id="step-3-lagrange-multiplier-solver" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-lagrange-multiplier-solver" aria-label="Link to this section">#</a>Step 3: Lagrange multiplier solver</h3>
+<p>Solve constrained optimization using gradient descent on the Lagrangian.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">lagrange_solve</span><span class="token punctuation">(</span>f_grad<span class="token punctuation">,</span> g_val<span class="token punctuation">,</span> g_grad<span class="token punctuation">,</span> x0<span class="token punctuation">,</span> lr<span class="token operator">=</span><span class="token number">0.01</span><span class="token punctuation">,</span>
+                   lr_lambda<span class="token operator">=</span><span class="token number">0.01</span><span class="token punctuation">,</span> steps<span class="token operator">=</span><span class="token number">5000</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    x <span class="token operator">=</span> <span class="token builtin">list</span><span class="token punctuation">(</span>x0<span class="token punctuation">)</span>
+    lam <span class="token operator">=</span> <span class="token number">0.0</span>
+    history <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>steps<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        fg <span class="token operator">=</span> f_grad<span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+        gv <span class="token operator">=</span> g_val<span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+        gg <span class="token operator">=</span> g_grad<span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+        x <span class="token operator">=</span> <span class="token punctuation">[</span>
+            xi <span class="token operator">-</span> lr <span class="token operator">*</span> <span class="token punctuation">(</span>fgi <span class="token operator">+</span> lam <span class="token operator">*</span> ggi<span class="token punctuation">)</span>
+            <span class="token keyword">for</span> xi<span class="token punctuation">,</span> fgi<span class="token punctuation">,</span> ggi <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> fg<span class="token punctuation">,</span> gg<span class="token punctuation">)</span>
+        <span class="token punctuation">]</span>
+        lam <span class="token operator">=</span> lam <span class="token operator">+</span> lr_lambda <span class="token operator">*</span> gv
+        history<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">(</span>x<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">,</span> lam<span class="token punctuation">,</span> gv<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> history</code></pre>
+</figure>
+<h3 id="step-4-compare-first-order-vs-second-order" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-compare-first-order-vs-second-order" aria-label="Link to this section">#</a>Step 4: Compare first-order vs second-order</h3>
+<p>Run gradient descent and Newton&#39;s method on the same quadratic function. Count the steps to convergence.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">quadratic</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token number">5</span> <span class="token operator">*</span> x<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">**</span> <span class="token number">2</span> <span class="token operator">+</span> x<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">**</span> <span class="token number">2</span>
+
+<span class="token keyword">def</span> <span class="token function">quadratic_grad</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token number">10</span> <span class="token operator">*</span> x<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">2</span> <span class="token operator">*</span> x<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">]</span>
+
+<span class="token keyword">def</span> <span class="token function">quadratic_hessian</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">]</span></code></pre>
+</figure>
+<p>Newton&#39;s method will converge in 1 step (it is exact for quadratics). Gradient descent will take hundreds of steps because the eigenvalues of the Hessian differ by a factor of 5, creating an elongated valley.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>Convexity analysis applies directly when choosing ML models and solvers.</p>
+<p>For convex problems (logistic regression, SVMs, LASSO):</p>
+<ul>
+<li>Use dedicated solvers (liblinear, CVXPY, scipy.optimize.minimize with method=&#39;L-BFGS-B&#39;)</li>
+<li>Expect a unique global solution</li>
+<li>Second-order methods are practical and fast</li>
+</ul>
+<p>For non-convex problems (neural networks):</p>
+<ul>
+<li>Use first-order methods (SGD, Adam)</li>
+<li>Accept that the solution depends on initialization and randomness</li>
+<li>Use overparameterization, noise, and learning rate schedules as implicit regularization</li>
+<li>Do not waste time searching for the global minimum. A good local minimum is sufficient.</li>
+</ul>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> scipy<span class="token punctuation">.</span>optimize <span class="token keyword">import</span> minimize
+
+result <span class="token operator">=</span> minimize<span class="token punctuation">(</span>
+    fun<span class="token operator">=</span><span class="token keyword">lambda</span> w<span class="token punctuation">:</span> <span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token punctuation">(</span>y <span class="token operator">-</span> X @ w<span class="token punctuation">)</span> <span class="token operator">**</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">0.1</span> <span class="token operator">*</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>w <span class="token operator">**</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    x0<span class="token operator">=</span>np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span>d<span class="token punctuation">)</span><span class="token punctuation">,</span>
+    method<span class="token operator">=</span><span class="token string">'L-BFGS-B'</span><span class="token punctuation">,</span>
+    jac<span class="token operator">=</span><span class="token keyword">lambda</span> w<span class="token punctuation">:</span> <span class="token operator">-</span><span class="token number">2</span> <span class="token operator">*</span> X<span class="token punctuation">.</span>T @ <span class="token punctuation">(</span>y <span class="token operator">-</span> X @ w<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">0.2</span> <span class="token operator">*</span> w<span class="token punctuation">,</span>
+<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>For SVMs, the dual formulation lets you use the kernel trick:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>svm <span class="token keyword">import</span> SVC
+
+svm <span class="token operator">=</span> SVC<span class="token punctuation">(</span>kernel<span class="token operator">=</span><span class="token string">'rbf'</span><span class="token punctuation">,</span> C<span class="token operator">=</span><span class="token number">1.0</span><span class="token punctuation">)</span>
+svm<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X_train<span class="token punctuation">,</span> y_train<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Support vectors: </span><span class="token interpolation"><span class="token punctuation">{</span>svm<span class="token punctuation">.</span>n_support_<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p><strong>Convexity gallery.</strong> Test these functions for convexity using the checker: f(x) = x^4, f(x) = sin(x), f(x,y) = x^2 + y^2, f(x,y) = x*y, f(x) = max(x, 0). Explain why each result makes sense.</p>
+</li>
+<li><p><strong>Newton vs gradient descent race.</strong> Run both methods on f(x,y) = 50*x^2 + y^2 from the starting point (10, 10). How many steps does each need to reach loss &lt; 1e-10? What happens to gradient descent when the condition number (ratio of largest to smallest Hessian eigenvalue) increases?</p>
+</li>
+<li><p><strong>Lagrange multiplier geometry.</strong> Minimize f(x,y) = (x-3)^2 + (y-3)^2 subject to x + 2y = 4. Verify the solution by checking that the gradient of f is parallel to the gradient of g at the solution.</p>
+</li>
+<li><p><strong>Regularization constraint.</strong> Implement L1-constrained optimization: minimize (x-3)^2 + (y-2)^2 subject to |x| + |y| &lt;= 1. Show that the solution has one coordinate equal to zero (sparsity from the diamond constraint).</p>
+</li>
+<li><p><strong>Hessian eigenvalue analysis.</strong> Compute the Hessian of the Rosenbrock function at (1,1) and at (-1,1). Compute eigenvalues at both points. What do the eigenvalues tell you about the curvature at the minimum versus far from it?</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What it means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Convex set</td>
+<td>A set where the line segment between any two points in the set stays inside the set</td>
+</tr>
+<tr>
+<td>Convex function</td>
+<td>A function where the line between any two points on its graph lies above or on the graph. Equivalently, Hessian is positive semidefinite everywhere</td>
+</tr>
+<tr>
+<td>Local minimum</td>
+<td>A point lower than all nearby points. For convex functions, every local minimum is the global minimum</td>
+</tr>
+<tr>
+<td>Global minimum</td>
+<td>The lowest point of a function over its entire domain</td>
+</tr>
+<tr>
+<td>Hessian matrix</td>
+<td>The matrix of all second partial derivatives. Encodes curvature information</td>
+</tr>
+<tr>
+<td>Positive semidefinite</td>
+<td>A matrix whose eigenvalues are all non-negative. The multidimensional analogue of &quot;second derivative &gt;= 0&quot;</td>
+</tr>
+<tr>
+<td>Condition number</td>
+<td>Ratio of largest to smallest eigenvalue of the Hessian. High condition number means elongated valleys and slow gradient descent</td>
+</tr>
+<tr>
+<td>Newton&#39;s method</td>
+<td>Second-order optimizer that uses the inverse Hessian to determine step direction and size. Quadratic convergence near the minimum</td>
+</tr>
+<tr>
+<td>Lagrange multiplier</td>
+<td>A variable introduced to convert a constrained optimization problem into an unconstrained one</td>
+</tr>
+<tr>
+<td>KKT conditions</td>
+<td>Necessary conditions for optimality with inequality constraints. Generalize Lagrange multipliers</td>
+</tr>
+<tr>
+<td>Complementary slackness</td>
+<td>At the solution, either a constraint is active or its multiplier is zero. Never both nonzero</td>
+</tr>
+<tr>
+<td>Duality</td>
+<td>Every constrained problem has a companion dual problem. For convex problems, both have the same optimal value</td>
+</tr>
+<tr>
+<td>Strong duality</td>
+<td>Primal and dual optimal values are equal. Holds for convex problems satisfying Slater&#39;s condition</td>
+</tr>
+<tr>
+<td>L-BFGS</td>
+<td>Approximate second-order method that stores the last m gradient differences instead of the full Hessian</td>
+</tr>
+<tr>
+<td>Saddle point</td>
+<td>A point where the gradient is zero but it is a minimum in some directions and a maximum in others</td>
+</tr>
+<tr>
+<td>Overparameterization</td>
+<td>Using more parameters than training examples. Smooths the loss landscape and reduces bad local minima</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://web.stanford.edu/~boyd/cvxbook/" target="_blank" rel="noopener">Boyd &amp; Vandenberghe: Convex Optimization</a> - the standard textbook, freely available online</li>
+<li><a href="https://arxiv.org/abs/1606.04838" target="_blank" rel="noopener">Bottou, Curtis, Nocedal: Optimization Methods for Large-Scale Machine Learning (2018)</a> - bridges convex optimization theory and deep learning practice</li>
+<li><a href="https://arxiv.org/abs/1412.0233" target="_blank" rel="noopener">Choromanska et al.: The Loss Surfaces of Multilayer Networks (2015)</a> - why non-convex neural network landscapes are not as bad as they seem</li>
+<li><a href="https://link.springer.com/book/10.1007/978-0-387-40065-5" target="_blank" rel="noopener">Nocedal &amp; Wright: Numerical Optimization</a> - comprehensive reference for Newton&#39;s method, L-BFGS, and constrained optimization</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="17-linear-systems.html">
+  <span class="label">← Previous</span>
+  <b>Linear Systems</b>
+</a>
+      <a class="pager__item pager__item--next" href="19-complex-numbers.html">
+  <span class="label">Next →</span>
+  <b>Complex Numbers for AI</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>5 minutes</b> of Math Foundations behind you.</p>
+      <a class="btn btn--solid" href="19-complex-numbers.html">Continue to Complex Numbers for AI →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#convex-sets">Convex sets</a></li><li class="mini__item mini__item--d3"><a href="#convex-functions">Convex functions</a></li><li class="mini__item mini__item--d3"><a href="#testing-for-convexity">Testing for convexity</a></li><li class="mini__item mini__item--d3"><a href="#why-convexity-matters">Why convexity matters</a></li><li class="mini__item mini__item--d3"><a href="#convex-vs-non-convex-in-ml">Convex vs non-convex in ML</a></li><li class="mini__item mini__item--d3"><a href="#the-hessian-matrix">The Hessian matrix</a></li><li class="mini__item mini__item--d3"><a href="#newton-s-method">Newton's method</a></li><li class="mini__item mini__item--d3"><a href="#constrained-optimization">Constrained optimization</a></li><li class="mini__item mini__item--d3"><a href="#lagrange-multipliers">Lagrange multipliers</a></li><li class="mini__item mini__item--d3"><a href="#kkt-conditions">KKT conditions</a></li><li class="mini__item mini__item--d3"><a href="#regularization-as-constrained-optimization">Regularization as constrained optimization</a></li><li class="mini__item mini__item--d3"><a href="#duality">Duality</a></li><li class="mini__item mini__item--d3"><a href="#why-deep-learning-works-despite-non-convexity">Why deep learning works despite non-convexity</a></li><li class="mini__item mini__item--d3"><a href="#second-order-methods-in-practice">Second-order methods in practice</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-convexity-checker">Step 1: Convexity checker</a></li><li class="mini__item mini__item--d3"><a href="#step-2-newton-s-method-for-2d">Step 2: Newton's method for 2D</a></li><li class="mini__item mini__item--d3"><a href="#step-3-lagrange-multiplier-solver">Step 3: Lagrange multiplier solver</a></li><li class="mini__item mini__item--d3"><a href="#step-4-compare-first-order-vs-second-order">Step 4: Compare first-order vs second-order</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

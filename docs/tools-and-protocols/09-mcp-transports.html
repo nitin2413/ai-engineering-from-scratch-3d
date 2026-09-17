@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MCP Transports: stdio and Stateless Streamable HTTP — Tools &amp; Protocols — AIFS</title>
+<meta name="description" content="Tools &amp; Protocols: MCP Transports: stdio and Stateless Streamable HTTP. 7 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="MCP Transports: stdio and Stateless Streamable HTTP — Tools &amp; Protocols — AIFS">
+<meta property="og:description" content="Tools &amp; Protocols: MCP Transports: stdio and Stateless Streamable HTTP. 7 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"tp-transport-handshake":["../assets/figures/figures-mcp.js","../assets/figures/figures-tools2.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-mcp.js","../assets/figures/figures-tools2.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#C6FF00" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#C6FF00;--accent-ink:#111111"
+  data-lesson-id="tools-and-protocols/09-mcp-transports" data-module="tools-and-protocols"
+  data-prev="08-building-an-mcp-client.html" data-next="10-mcp-resources-and-prompts.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#C6FF00">
+        <span class="label">Phase 13</span>
+        <b>Tools &amp; Protocols</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="tools-and-protocols/01-the-tool-interface"><a href="01-the-tool-interface.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">The Tool Interface — Why Agents Need Structured I/O</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/02-function-calling-deep-dive"><a href="02-function-calling-deep-dive.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Function Calling Deep Dive — OpenAI, Anthropic, Gemini</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/03-parallel-and-streaming-tool-calls"><a href="03-parallel-and-streaming-tool-calls.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Parallel Tool Calls and Streaming with Tools</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/04-structured-output"><a href="04-structured-output.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Structured Output — JSON Schema, Pydantic, Zod, Constrained Decoding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/05-tool-schema-design"><a href="05-tool-schema-design.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Tool Schema Design — Naming, Descriptions, Parameter Constraints</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/06-mcp-fundamentals"><a href="06-mcp-fundamentals.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">MCP Fundamentals: Stateless Requests and JSON-RPC</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/07-building-an-mcp-server"><a href="07-building-an-mcp-server.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Building an MCP Server: Stateless Python and TypeScript</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/08-building-an-mcp-client"><a href="08-building-an-mcp-client.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Building an MCP Client: Discovery, Routing, and Dual-Era Fallback</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/09-mcp-transports"><a href="09-mcp-transports.html" class="is-current">
+  <span class="snav__n">09</span>
+  <span class="snav__t">MCP Transports: stdio and Stateless Streamable HTTP</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/10-mcp-resources-and-prompts"><a href="10-mcp-resources-and-prompts.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">MCP Resources and Prompts: Addressable Context for Stateless Servers</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/11-mcp-sampling"><a href="11-mcp-sampling.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">MCP Model Input: Sampling Migration and Stateless MRTR</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/12-mcp-roots-and-elicitation"><a href="12-mcp-roots-and-elicitation.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Explicit Scope and Stateless Elicitation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/13-mcp-async-tasks"><a href="13-mcp-async-tasks.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">MCP Tasks Extension: Durable Work on a Stateless Core</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/14-mcp-apps"><a href="14-mcp-apps.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">MCP Apps on the Stateless Protocol</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/15-mcp-security-tool-poisoning"><a href="15-mcp-security-tool-poisoning.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">MCP Security: Poisoned Metadata, Routing, and MRTR State</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/16-mcp-security-oauth-2-1"><a href="16-mcp-security-oauth-2-1.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">MCP Authorization: CIMD, Issuer Binding, PKCE, and Step-Up</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/17-mcp-gateways-and-registries"><a href="17-mcp-gateways-and-registries.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Stateless MCP Gateways and Registry Admission</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/18-mcp-auth-production"><a href="18-mcp-auth-production.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">MCP Auth in Production: Issuer-Bound Enrollment and Tokens</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/19-a2a-protocol"><a href="19-a2a-protocol.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">A2A — Agent-to-Agent Protocol</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/20-opentelemetry-genai"><a href="20-opentelemetry-genai.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">OpenTelemetry GenAI — Tracing Tool Calls End-to-End</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/21-llm-routing-layer"><a href="21-llm-routing-layer.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">LLM Routing Layer — LiteLLM, OpenRouter, Portkey</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/22-skills-and-agent-sdks"><a href="22-skills-and-agent-sdks.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Agent Skills: Portable Contract and Runtime Boundary</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/23-capstone-tool-ecosystem"><a href="23-capstone-tool-ecosystem.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Capstone: Stateless Tool Ecosystem</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/24-skill-discovery-and-progressive-disclosure"><a href="24-skill-discovery-and-progressive-disclosure.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Skill Discovery and Progressive Disclosure</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/25-skill-invocation-and-routing"><a href="25-skill-invocation-and-routing.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Skill Invocation and Routing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/26-skill-permissions-sandboxes-and-trust"><a href="26-skill-permissions-sandboxes-and-trust.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Skill Permissions, Sandboxes, and Trust</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/27-skill-evals-packaging-and-portability"><a href="27-skill-evals-packaging-and-portability.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">Skill Evals, Packaging, and Portability</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/28-mcp-tool-contracts-and-content"><a href="28-mcp-tool-contracts-and-content.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">MCP Tool Contracts and Content</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control"><a href="29-mcp-reliability-cancellation-and-flow-control.html" class="">
+  <span class="snav__n">29</span>
+  <span class="snav__t">MCP Reliability, Cancellation, and Flow Control</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/30-mcp-registry-supply-chain-and-drift"><a href="30-mcp-registry-supply-chain-and-drift.html" class="">
+  <span class="snav__n">30</span>
+  <span class="snav__t">MCP Registry Supply Chain: Admission, Drift, and Rollback</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/31-mcp-conformance-versioning-and-operations"><a href="31-mcp-conformance-versioning-and-operations.html" class="">
+  <span class="snav__n">31</span>
+  <span class="snav__t">MCP Conformance Engineering: Versioning, Evidence, and Operations</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Tools &amp; Protocols</a></p>
+      <h1 class="page__title">MCP Transports: stdio and Stateless Streamable HTTP</h1>
+      <p class="page__lede">Transport carries MCP messages. It does not supply missing protocol state. In <code class="inline-code">2026-07-28</code>, local stdio and remote Streamable HTTP both carry self-describing requests.</p>
+      <div class="page__meta">
+        <span class="chip">7 min read</span>
+        <span class="chip">1,586 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Learn</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 13, Lessons 07 and 08</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~65 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Choose stdio for local child processes and Streamable HTTP for network services.</li>
+<li>Implement the modern single-endpoint, POST-only Streamable HTTP contract.</li>
+<li>Mirror and validate MCP version, method, and name headers against the JSON-RPC body.</li>
+<li>Deliver request-scoped SSE and long-lived <code class="inline-code">subscriptions/listen</code> streams correctly.</li>
+<li>Migrate session-based and legacy HTTP+SSE deployments without presenting legacy behavior as modern.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Earlier Streamable HTTP revisions combined protocol negotiation with connection and session behavior. A server could mint <code class="inline-code">Mcp-Session-Id</code>, expose a standalone GET stream, accept DELETE for session termination, and resume SSE with <code class="inline-code">Last-Event-ID</code>.</p>
+<p>MCP <code class="inline-code">2026-07-28</code> removes those mechanisms from the modern wire. Every request can land on any healthy worker because its protocol version and client capabilities travel in the request body. HTTP headers mirror selected fields for routing and policy, but the server validates those headers against the body before execution.</p>
+<p>The result is easier to scale and easier to reason about. It also means that a server teaching the 2025 transport as current is teaching the wrong failure and security model.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="stdio" class="prose-h prose-h3"><a class="prose-h__anchor" href="#stdio" aria-label="Link to this section">#</a>stdio</h3>
+<p>The stdio binding is for a client-launched subprocess:</p>
+<ul>
+<li>Client writes one UTF-8 JSON-RPC message per line to stdin.</li>
+<li>Server writes one UTF-8 JSON-RPC message per line to stdout.</li>
+<li>Server writes diagnostics to stderr.</li>
+<li>Server exits promptly on stdin EOF.</li>
+<li>Every modern request carries version and client capabilities in <code class="inline-code">params._meta</code>.</li>
+</ul>
+<p>The process may live for many calls, but it is not a modern protocol session. If it exits unexpectedly, in-flight requests are lost. Restart the process, rediscover, relist, reopen subscriptions, and retry safe operations with new request ids.</p>
+<h3 id="streamable-http-in-2026-07-28" class="prose-h prose-h3"><a class="prose-h__anchor" href="#streamable-http-in-2026-07-28" aria-label="Link to this section">#</a>Streamable HTTP in 2026-07-28</h3>
+<p>A modern server exposes one MCP endpoint, such as <code class="inline-code">/mcp</code>, that accepts POST.</p>
+<p>Every JSON-RPC request or notification is a new HTTP POST. The body contains one JSON-RPC message. Clients do not send JSON-RPC responses to the server.</p>
+<p>For a request, the server returns either:</p>
+<ul>
+<li><code class="inline-code">Content-Type: application/json</code> with one JSON-RPC response; or</li>
+<li><code class="inline-code">Content-Type: text/event-stream</code> with notifications related to that request, followed by the final JSON-RPC response.</li>
+</ul>
+<p>For an accepted notification, the server returns <code class="inline-code">202 Accepted</code> with no body.</p>
+<p>Clients advertise both response types:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">http</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-http"><span class="token header"><span class="token header-name keyword">Accept</span><span class="token punctuation">:</span> <span class="token header-value">application/json, text/event-stream</span></span></code></pre>
+</figure>
+<h3 id="post-only-means-post-only" class="prose-h prose-h3"><a class="prose-h__anchor" href="#post-only-means-post-only" aria-label="Link to this section">#</a>POST-only means POST-only</h3>
+<p>Modern Streamable HTTP has no standalone GET stream and no DELETE session endpoint.</p>
+<ul>
+<li><code class="inline-code">GET /mcp</code> returns <code class="inline-code">405 Method Not Allowed</code>.</li>
+<li><code class="inline-code">DELETE /mcp</code> returns <code class="inline-code">405 Method Not Allowed</code>.</li>
+<li><code class="inline-code">Mcp-Session-Id</code> is ignored and never minted or echoed.</li>
+<li><code class="inline-code">Last-Event-ID</code> is ignored because modern streams are not resumable.</li>
+</ul>
+<p>If a request-scoped stream breaks before its final response, the client has lost that in-flight request. It may issue a new request with a new JSON-RPC id when retry is safe. It must not attempt stream resumption.</p>
+<h3 id="origin-validation" class="prose-h prose-h3"><a class="prose-h__anchor" href="#origin-validation" aria-label="Link to this section">#</a>Origin validation</h3>
+<p>Servers validate <code class="inline-code">Origin</code> on incoming connections to prevent DNS rebinding. If the header is present and not explicitly allowed, return <code class="inline-code">403 Forbidden</code>. A non-browser client may omit <code class="inline-code">Origin</code>, which the official transport rules permit.</p>
+<p>Local servers should bind to <code class="inline-code">127.0.0.1</code>, not every interface. Network services still need authentication and authorization on every request. Origin validation is not authentication.</p>
+<p>Use exact origin matching after canonical configuration. Prefix checks such as <code class="inline-code">origin.startswith(&quot;https://trusted.example&quot;)</code> are unsafe because they can accept attacker-controlled suffixes.</p>
+<h3 id="required-http-metadata-headers" class="prose-h prose-h3"><a class="prose-h__anchor" href="#required-http-metadata-headers" aria-label="Link to this section">#</a>Required HTTP metadata headers</h3>
+<p>Every modern POST request includes:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">http</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-http"><span class="token header"><span class="token header-name keyword">MCP-Protocol-Version</span><span class="token punctuation">:</span> <span class="token header-value">2026-07-28</span></span>
+<span class="token header"><span class="token header-name keyword">Mcp-Method</span><span class="token punctuation">:</span> <span class="token header-value">tools/call</span></span>
+<span class="token header"><span class="token header-name keyword">Mcp-Name</span><span class="token punctuation">:</span> <span class="token header-value">notes_search</span></span></code></pre>
+</figure>
+<p>Header rules:</p>
+<ul>
+<li><code class="inline-code">MCP-Protocol-Version</code> is required and must equal <code class="inline-code">params._meta.io.modelcontextprotocol/protocolVersion</code>.</li>
+<li><code class="inline-code">Mcp-Method</code> is required and must equal the JSON-RPC <code class="inline-code">method</code>.</li>
+<li><code class="inline-code">Mcp-Name</code> is required for <code class="inline-code">tools/call</code>, <code class="inline-code">resources/read</code>, and <code class="inline-code">prompts/get</code>.</li>
+<li><code class="inline-code">Mcp-Name</code> equals <code class="inline-code">params.name</code>, or <code class="inline-code">params.uri</code> for <code class="inline-code">resources/read</code>.</li>
+<li>Header values are case-sensitive even though header names are case-insensitive.</li>
+</ul>
+<p>Unsafe or non-ASCII <code class="inline-code">Mcp-Name</code> values use the exact UTF-8 Base64 sentinel:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>=?base64?{Base64EncodedValue}?=</code></pre>
+</figure>
+<p>The server decodes that value before comparing it with the body.</p>
+<p>Missing, malformed, or mismatched mirrored headers return HTTP <code class="inline-code">400</code> with JSON-RPC code <code class="inline-code">-32020</code>. If header and body agree on a version the server does not support, return HTTP <code class="inline-code">400</code> with <code class="inline-code">-32022</code> and exact error data such as <code class="inline-code">{&quot;supported&quot;:[&quot;2026-07-28&quot;],&quot;requested&quot;:&quot;2027-01-01&quot;}</code>.</p>
+<p>An unknown modern method returns HTTP <code class="inline-code">404</code> with JSON-RPC <code class="inline-code">-32601</code>. The JSON-RPC body is important because a dual-era client uses it to distinguish a modern error from a legacy endpoint miss.</p>
+<h3 id="request-scoped-sse" class="prose-h prose-h3"><a class="prose-h__anchor" href="#request-scoped-sse" aria-label="Link to this section">#</a>Request-scoped SSE</h3>
+<p>A server may choose SSE for one long-running request:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>POST tools/call id=41
+  &lt;- notifications/progress related to id=41
+  &lt;- notifications/progress related to id=41
+  &lt;- JSON-RPC response id=41
+stream closes</code></pre>
+</figure>
+<p>The server must not send independent JSON-RPC requests on this stream. Sampling, elicitation, and roots interactions use Multi Round-Trip Request results. Closing the response stream cancels that request.</p>
+<p>Do not add SSE event ids for replay. <code class="inline-code">Last-Event-ID</code> resumption is not part of the modern revision.</p>
+<h3 id="long-lived-changes-use-subscriptions-listen" class="prose-h prose-h3"><a class="prose-h__anchor" href="#long-lived-changes-use-subscriptions-listen" aria-label="Link to this section">#</a>Long-lived changes use subscriptions/listen</h3>
+<p>Change notifications use a client-opened request, not standalone GET:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"jsonrpc"</span><span class="token operator">:</span> <span class="token string">"2.0"</span><span class="token punctuation">,</span>
+  <span class="token property">"id"</span><span class="token operator">:</span> <span class="token string">"listen-1"</span><span class="token punctuation">,</span>
+  <span class="token property">"method"</span><span class="token operator">:</span> <span class="token string">"subscriptions/listen"</span><span class="token punctuation">,</span>
+  <span class="token property">"params"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"notifications"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"toolsListChanged"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+      <span class="token property">"resourceSubscriptions"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"notes://note-1"</span><span class="token punctuation">]</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token property">"_meta"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"io.modelcontextprotocol/protocolVersion"</span><span class="token operator">:</span> <span class="token string">"2026-07-28"</span><span class="token punctuation">,</span>
+      <span class="token property">"io.modelcontextprotocol/clientCapabilities"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token property">"io.modelcontextprotocol/clientInfo"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"course-client"</span><span class="token punctuation">,</span>
+        <span class="token property">"version"</span><span class="token operator">:</span> <span class="token string">"1.0.0"</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<p>The POST response is a long-lived SSE stream. Its first protocol message is <code class="inline-code">notifications/subscriptions/acknowledged</code>. The acknowledgement, every change notification, and the final result carry <code class="inline-code">io.modelcontextprotocol/subscriptionId</code> in <code class="inline-code">_meta</code>, equal to the listen request id. The server may emit SSE comments as keepalives. When the stream drops, the client reissues <code class="inline-code">subscriptions/listen</code> with a new request id and refetches affected data.</p>
+<p><code class="inline-code">resources/subscribe</code> and <code class="inline-code">resources/unsubscribe</code> belong to the legacy era. Do not use them on a modern connection.</p>
+<h3 id="explicit-application-state" class="prose-h prose-h3"><a class="prose-h__anchor" href="#explicit-application-state" aria-label="Link to this section">#</a>Explicit application state</h3>
+<p>Removing protocol sessions does not forbid workflows with state. The server may mint an opaque state handle and return it as a normal tool result. The client passes that handle as an explicit argument on later calls.</p>
+<p>Bind handles to the authenticated principal, make them unguessable, expire them, and authorize every use. This makes state visible at the application layer instead of hiding it in transport affinity.</p>
+<p>The failure caused by hidden replica state is mechanical:</p>
+<ol>
+<li>Request A reaches replica 1 and creates a draft in that process&#39;s memory.</li>
+<li>The response does not return a draft handle because the implementation assumes the connection identifies the draft.</li>
+<li>Request B is a fresh POST and reaches replica 2.</li>
+<li>Replica 2 has valid protocol metadata but no way to name or load the draft, so the workflow fails or reads the wrong local object.</li>
+<li>Sticky routing appears to fix the symptom until a restart, rollout, reschedule, or failover moves the next request.</li>
+</ol>
+<p>The correct boundary has two parts. Protocol context stays in each request. Durable application state lives in a shared store under a server-minted handle returned to the client. The next call supplies that handle, any replica loads the same record, and authorization binds the record to the authenticated principal and tenant. Replica memory may cache a record, but it cannot be the only copy required for correctness.</p>
+<p>Choose the state mechanism by lifetime. Request-local variables can serve one call. A short MRTR continuation can use integrity-protected <code class="inline-code">requestState</code>. A draft or durable task needs an explicit handle plus shared persistence, expiry, concurrency control, and idempotency. None of those objects is an MCP protocol session.</p>
+<h3 id="http-dual-era-compatibility" class="prose-h prose-h3"><a class="prose-h__anchor" href="#http-dual-era-compatibility" aria-label="Link to this section">#</a>HTTP dual-era compatibility</h3>
+<p>A client that supports modern and legacy servers attempts a modern POST first. If it receives HTTP <code class="inline-code">400</code>, <code class="inline-code">404</code>, or <code class="inline-code">405</code>, it inspects the body:</p>
+<ul>
+<li>A recognized modern JSON-RPC error proves the server is modern. Correct the request or retry an advertised version. Do not downgrade.</li>
+<li>An empty body or an unrecognized response may indicate a legacy HTTP+SSE server. Only then try the old GET endpoint and expect its legacy <code class="inline-code">endpoint</code> event.</li>
+</ul>
+<p>A server can support both eras during migration by routing modern metadata to the modern POST-only implementation and retaining separate legacy endpoints for old clients. Never describe the legacy GET, DELETE, session id, or replay behavior as part of <code class="inline-code">2026-07-28</code>.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="tp-transport-handshake"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">tp-transport-handshake</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> tp transport handshake</figcaption>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p><code class="inline-code">code/main.py</code> implements a finite, modern Streamable HTTP server with the Python standard library. It validates Origin and mirrored headers, ignores removed session headers, returns JSON for normal calls, and demonstrates a finite <code class="inline-code">subscriptions/listen</code> SSE stream.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">bash</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-bash"><span class="token builtin class-name">cd</span> code
+python3 main.py <span class="token parameter variable">--probe</span>
+python3 <span class="token parameter variable">-m</span> unittest discover tests <span class="token parameter variable">-v</span></code></pre>
+</figure>
+<p>The probe checks:</p>
+<ul>
+<li>invalid Origin is rejected;</li>
+<li>discovery succeeds without a session id;</li>
+<li><code class="inline-code">Mcp-Session-Id</code> and <code class="inline-code">Last-Event-ID</code> are ignored;</li>
+<li>header mismatch returns <code class="inline-code">-32020</code>;</li>
+<li>unsupported version returns <code class="inline-code">-32022</code> with exact <code class="inline-code">supported</code> and <code class="inline-code">requested</code> data;</li>
+<li>an accepted id-less notification returns HTTP <code class="inline-code">202</code> with no body;</li>
+<li>GET and DELETE return <code class="inline-code">405</code>;</li>
+<li><code class="inline-code">subscriptions/listen</code> is a POST response stream whose acknowledgement, notifications, and final result carry its subscription id.</li>
+</ul>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson ships <code class="inline-code">outputs/skill-mcp-transport-migrator.md</code>. It removes modern protocol sessions, adds header-body validation, replaces standalone GET with <code class="inline-code">subscriptions/listen</code>, and keeps any legacy bridge visibly separate.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li>Remove <code class="inline-code">Mcp-Method</code> from a POST. Confirm HTTP <code class="inline-code">400</code> and error <code class="inline-code">-32020</code>.</li>
+<li>Send matching header and body version <code class="inline-code">2027-01-01</code>. Confirm HTTP <code class="inline-code">400</code>, error <code class="inline-code">-32022</code>, and exact data <code class="inline-code">{&quot;supported&quot;:[&quot;2026-07-28&quot;],&quot;requested&quot;:&quot;2027-01-01&quot;}</code>.</li>
+<li>Send a Base64 sentinel <code class="inline-code">Mcp-Name</code> for a non-ASCII resource URI. Confirm the decoded value is compared with <code class="inline-code">params.uri</code>.</li>
+<li>Break the finite listen stream before its final response. Reissue it with a new JSON-RPC id and refetch tools.</li>
+<li>Add an explicit workflow handle to the ping tool. Bind it to an authorization subject without using connection affinity.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>stdio</td>
+<td>Newline-delimited JSON-RPC over a client-launched subprocess</td>
+</tr>
+<tr>
+<td>Streamable HTTP</td>
+<td>Single endpoint where each modern message is a new POST</td>
+</tr>
+<tr>
+<td>Request-scoped SSE</td>
+<td>POST response stream containing related notifications and final response</td>
+</tr>
+<tr>
+<td><code class="inline-code">subscriptions/listen</code></td>
+<td>Long-lived POST request for opted-in change notifications</td>
+</tr>
+<tr>
+<td>Header mismatch</td>
+<td>HTTP <code class="inline-code">400</code> and JSON-RPC <code class="inline-code">-32020</code> when mirrored headers disagree with body</td>
+</tr>
+<tr>
+<td>Origin validation</td>
+<td>DNS-rebinding defense for incoming connections, not authentication</td>
+</tr>
+<tr>
+<td>Explicit state handle</td>
+<td>Application token passed as an ordinary argument instead of hidden session state</td>
+</tr>
+<tr>
+<td>Legacy bridge</td>
+<td>Separate earlier-era behavior kept only for compatibility</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/transports" target="_blank" rel="noopener">MCP Transport Overview</a></li>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/stdio" target="_blank" rel="noopener">MCP stdio Transport</a></li>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http" target="_blank" rel="noopener">MCP Streamable HTTP</a></li>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/subscriptions" target="_blank" rel="noopener">MCP Subscriptions</a></li>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/changelog" target="_blank" rel="noopener">MCP 2026-07-28 Changelog</a></li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="08-building-an-mcp-client.html">
+  <span class="label">← Previous</span>
+  <b>Building an MCP Client: Discovery, Routing, and Dual-Era Fallback</b>
+</a>
+      <a class="pager__item pager__item--next" href="10-mcp-resources-and-prompts.html">
+  <span class="label">Next →</span>
+  <b>MCP Resources and Prompts: Addressable Context for Stateless Servers</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>7 minutes</b> of Tools &amp; Protocols behind you.</p>
+      <a class="btn btn--solid" href="10-mcp-resources-and-prompts.html">Continue to MCP Resources and Prompts: Addressable Context for Stateless Servers →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#stdio">stdio</a></li><li class="mini__item mini__item--d3"><a href="#streamable-http-in-2026-07-28">Streamable HTTP in 2026-07-28</a></li><li class="mini__item mini__item--d3"><a href="#post-only-means-post-only">POST-only means POST-only</a></li><li class="mini__item mini__item--d3"><a href="#origin-validation">Origin validation</a></li><li class="mini__item mini__item--d3"><a href="#required-http-metadata-headers">Required HTTP metadata headers</a></li><li class="mini__item mini__item--d3"><a href="#request-scoped-sse">Request-scoped SSE</a></li><li class="mini__item mini__item--d3"><a href="#long-lived-changes-use-subscriptions-listen">Long-lived changes use subscriptions/listen</a></li><li class="mini__item mini__item--d3"><a href="#explicit-application-state">Explicit application state</a></li><li class="mini__item mini__item--d3"><a href="#http-dual-era-compatibility">HTTP dual-era compatibility</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

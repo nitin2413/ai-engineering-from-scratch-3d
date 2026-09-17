@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Speculative Decoding — Draft, Verify, Repeat — Transformers Deep Dive — AIFS</title>
+<meta name="description" content="Transformers Deep Dive: Speculative Decoding — Draft, Verify, Repeat. 7 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Speculative Decoding — Draft, Verify, Repeat — Transformers Deep Dive — AIFS">
+<meta property="og:description" content="Transformers Deep Dive: Speculative Decoding — Draft, Verify, Repeat. 7 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"draft-verify-tokens":["../assets/figures/figures-llms3.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-llms3.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#9B5CFF" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#9B5CFF;--accent-ink:#FFFFFF"
+  data-lesson-id="transformers-deep-dive/16-speculative-decoding" data-module="transformers-deep-dive"
+  data-prev="15-attention-variants.html" data-next="">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#9B5CFF">
+        <span class="label">Phase 07</span>
+        <b>Transformers Deep Dive</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="transformers-deep-dive/01-why-transformers"><a href="01-why-transformers.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Why Transformers — The Problems with RNNs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/02-self-attention-from-scratch"><a href="02-self-attention-from-scratch.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Self-Attention from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/03-multi-head-attention"><a href="03-multi-head-attention.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Multi-Head Attention</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/04-positional-encoding"><a href="04-positional-encoding.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Positional Encoding — Sinusoidal, RoPE, ALiBi</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/05-full-transformer"><a href="05-full-transformer.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">The Full Transformer — Encoder + Decoder</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/06-bert-masked-language-modeling"><a href="06-bert-masked-language-modeling.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">BERT — Masked Language Modeling</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/07-gpt-causal-language-modeling"><a href="07-gpt-causal-language-modeling.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">GPT — Causal Language Modeling</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/08-t5-bart-encoder-decoder"><a href="08-t5-bart-encoder-decoder.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">T5, BART — Encoder-Decoder Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/09-vision-transformers"><a href="09-vision-transformers.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Vision Transformers (ViT)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/10-audio-transformers-whisper"><a href="10-audio-transformers-whisper.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Audio Transformers — Whisper Architecture</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/11-mixture-of-experts"><a href="11-mixture-of-experts.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Mixture of Experts (MoE)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/12-kv-cache-flash-attention"><a href="12-kv-cache-flash-attention.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">KV Cache, Flash Attention &amp; Inference Optimization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/13-scaling-laws"><a href="13-scaling-laws.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Scaling Laws</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/14-build-a-transformer-capstone"><a href="14-build-a-transformer-capstone.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Build a Transformer from Scratch — The Capstone</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/15-attention-variants"><a href="15-attention-variants.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Attention Variants — Sliding Window, Sparse, Differential</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="transformers-deep-dive/16-speculative-decoding"><a href="16-speculative-decoding.html" class="is-current">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Speculative Decoding — Draft, Verify, Repeat</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Transformers Deep Dive</a></p>
+      <h1 class="page__title">Speculative Decoding — Draft, Verify, Repeat</h1>
+      <p class="page__lede">Autoregressive decoding is serial. Each token waits for the previous one. Speculative decoding breaks the chain: a cheap model drafts N tokens, the expensive model verifies all N in one forward pass. When the draft is right you paid one big forward for N generations.</p>
+      <div class="page__meta">
+        <span class="chip">7 min read</span>
+        <span class="chip">1,595 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 7 · 07 (GPT Causal LM), Phase 7 · 12 (KV Cache &amp; Flash Attention)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~60 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>A 70B LLM sampling one token takes ~30 ms on an H100. A 3B draft model takes ~3 ms. If we let the 3B draft 5 tokens ahead, then run the 70B <em>once</em> to verify all 5, the total is <code class="inline-code">5×3 + 30 = 45 ms</code> for up to 5 accepted tokens — versus <code class="inline-code">5×30 = 150 ms</code> for straight-line generation. That is the full speculative-decoding pitch: trade a small amount of extra GPU memory (draft model) for 2–4× lower decode latency.</p>
+<p>The trick has to preserve the distribution. Speculative sampling, introduced by Leviathan et al. (2023) and by Chen et al. concurrently, guarantees that the output sequence is <strong>identically distributed</strong> to what the big model would have produced on its own. No quality tradeoff. Just faster.</p>
+<p>Four families of draft-verifier pairs dominate 2026 inference:</p>
+<ol>
+<li><strong>Vanilla speculative (Leviathan 2023).</strong> Separate draft model (e.g., Llama 3 1B) + verifier (e.g., Llama 3 70B).</li>
+<li><strong>Medusa (Cai 2024).</strong> Multiple decoding heads on the verifier predict positions <code class="inline-code">t+1..t+k</code> in parallel. No separate draft model.</li>
+<li><strong>EAGLE family (Li 2024, 2025).</strong> Lightweight draft that reuses the verifier&#39;s hidden states; closer acceptance rate than vanilla; 3–4× typical.</li>
+<li><strong>Lookahead decoding (Fu 2024).</strong> Jacobi iteration; no draft model required at all. Self-speculation. Niche but dependency-free.</li>
+</ol>
+<p>Every production inference stack in 2026 ships speculative decoding by default. vLLM, TensorRT-LLM, SGLang, and llama.cpp all support at least vanilla + EAGLE-2.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="the-core-algorithm" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-core-algorithm" aria-label="Link to this section">#</a>The core algorithm</h3>
+<p>Given a verifier <code class="inline-code">M_q</code> and a cheaper draft <code class="inline-code">M_p</code>:</p>
+<ol>
+<li>Let <code class="inline-code">x_1..x_k</code> be the prefix already decoded.</li>
+<li><strong>Draft</strong>: use <code class="inline-code">M_p</code> to autoregressively propose <code class="inline-code">d_{k+1}, d_{k+2}, ..., d_{k+N}</code> with draft probabilities <code class="inline-code">p_1..p_N</code>.</li>
+<li><strong>Verify in parallel</strong>: run <code class="inline-code">M_q</code> once on <code class="inline-code">x_1..x_k, d_{k+1}, ..., d_{k+N}</code>, getting verifier probabilities <code class="inline-code">q_1..q_{N+1}</code> for positions <code class="inline-code">k+1..k+N+1</code>.</li>
+<li><strong>Accept/reject each draft token left to right</strong>: for each <code class="inline-code">i</code>, accept with probability <code class="inline-code">min(1, q_i(d_i) / p_i(d_i))</code>.</li>
+<li>On first rejection at position <code class="inline-code">j</code>: sample <code class="inline-code">t_j</code> from the &quot;residual&quot; distribution <code class="inline-code">(q_j - p_j)_+</code> normalized. All drafts after <code class="inline-code">j</code> are discarded.</li>
+<li>On accepting all <code class="inline-code">N</code>: sample one extra token <code class="inline-code">t_{N+1}</code> from <code class="inline-code">q_{N+1}</code> (the free bonus token).</li>
+</ol>
+<p>The residual distribution trick is the mathematical insight that keeps the output distributed exactly as if <code class="inline-code">M_q</code> had sampled from scratch.</p>
+<h3 id="what-determines-speedup" class="prose-h prose-h3"><a class="prose-h__anchor" href="#what-determines-speedup" aria-label="Link to this section">#</a>What determines speedup</h3>
+<p>Let <code class="inline-code">α</code> = expected acceptance rate per draft token. Let <code class="inline-code">c</code> = draft-to-verifier cost ratio. Per step:</p>
+<ul>
+<li>Naive generation makes 1 big-model call per token.</li>
+<li>Speculative makes 1 big-model call per <code class="inline-code">(1 - α^{N+1}) / (1 - α) ≈ 1/(1-α)</code> tokens when <code class="inline-code">α</code> is high.</li>
+</ul>
+<p>Typical rule of thumb at <code class="inline-code">α = 0.75</code> and <code class="inline-code">N = 5</code>: 3× fewer big-model calls. Draft cost is 5× cheap. Total wall-clock drops ~2.5×.</p>
+<p><strong>α depends on:</strong></p>
+<ul>
+<li>How well the draft approximates the verifier. Same family / same training data boosts α significantly.</li>
+<li>Decoding strategy. Greedy draft against greedy verifier: high α. Temperature sampling: harder to match; acceptance drops.</li>
+<li>Task type. Code and structured output accept more (predictable); free-form creative writing accepts less.</li>
+</ul>
+<h3 id="medusa-drafts-without-a-draft-model" class="prose-h prose-h3"><a class="prose-h__anchor" href="#medusa-drafts-without-a-draft-model" aria-label="Link to this section">#</a>Medusa — drafts without a draft model</h3>
+<p>Medusa replaces the draft model with extra output heads on the verifier. At position <code class="inline-code">t</code>:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>shared trunk → hidden h_t
+    ├── head_0: predict token at t+1  (standard LM head)
+    ├── head_1: predict token at t+2
+    ├── head_2: predict token at t+3
+    ├── head_3: predict token at t+4</code></pre>
+</figure>
+<p>Each head outputs its own logits. At inference you sample from each head to get a candidate sequence, then verify with one forward pass using a tree-attention scheme that considers all candidate continuations at once.</p>
+<p>Pros: no second model. Cons: adds trainable parameters; needs a supervised fine-tuning stage (~1B tokens); acceptance rate is a bit lower than vanilla speculative with a good draft.</p>
+<h3 id="eagle-better-draft-by-reusing-hidden-states" class="prose-h prose-h3"><a class="prose-h__anchor" href="#eagle-better-draft-by-reusing-hidden-states" aria-label="Link to this section">#</a>EAGLE — better draft by reusing hidden states</h3>
+<p>EAGLE-1/2/3 (Li et al., 2024–2025) makes the draft model a tiny transformer (typically 1 layer) that ingests the verifier&#39;s last-layer hidden states. Because the draft sees the verifier&#39;s feature representation, its predictions correlate strongly with the verifier&#39;s output distribution. Acceptance rates climb from ~0.6 (vanilla) to 0.85+.</p>
+<p>EAGLE-3 (2025) added tree search over candidate continuations. vLLM and SGLang ship EAGLE-2/3 as the default spec pathway for Llama 3/4 and Qwen 3.</p>
+<h3 id="the-kv-cache-dance" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-kv-cache-dance" aria-label="Link to this section">#</a>The KV cache dance</h3>
+<p>Verification feeds <code class="inline-code">N</code> draft tokens into the verifier in one forward pass. This extends the verifier&#39;s KV cache by <code class="inline-code">N</code> entries. If some drafts are rejected, you must roll the cache back to the accepted prefix length.</p>
+<p>Production implementations (vLLM&#39;s <code class="inline-code">--speculative-model</code>, TensorRT-LLM&#39;s LookaheadDecoder) handle this with scratch KV buffers. Write first, commit on acceptance. It&#39;s not conceptually hard, but it is fiddly.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="draft-verify-tokens"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">draft-verify-tokens</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> draft verify tokens</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<p>See <code class="inline-code">code/main.py</code>. We implement the core speculative-sampling algorithm (rejection step + residual distribution) with:</p>
+<ul>
+<li>A &quot;big model&quot; that is a deterministic-softmax over a hand-coded distribution (so we can verify acceptance math analytically).</li>
+<li>A &quot;draft model&quot; that is a perturbation of the big model.</li>
+<li>An acceptance / rejection loop that produces the same marginal distribution as direct sampling.</li>
+</ul>
+<h3 id="step-1-the-rejection-step" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-the-rejection-step" aria-label="Link to this section">#</a>Step 1: the rejection step</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">accept_or_reject</span><span class="token punctuation">(</span>q_prob<span class="token punctuation">,</span> p_prob<span class="token punctuation">,</span> draft_token<span class="token punctuation">,</span> u<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    ratio <span class="token operator">=</span> q_prob <span class="token operator">/</span> p_prob <span class="token keyword">if</span> p_prob <span class="token operator">></span> <span class="token number">0</span> <span class="token keyword">else</span> <span class="token builtin">float</span><span class="token punctuation">(</span><span class="token string">"inf"</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> u <span class="token operator">&lt;</span> <span class="token builtin">min</span><span class="token punctuation">(</span><span class="token number">1.0</span><span class="token punctuation">,</span> ratio<span class="token punctuation">)</span></code></pre>
+</figure>
+<p><code class="inline-code">u</code> is a uniform random number. <code class="inline-code">q_prob</code> is the verifier&#39;s probability for the drafted token. <code class="inline-code">p_prob</code> is the draft model&#39;s probability. The Leviathan theorem is that this Bernoulli decision, followed by sampling from the residual on rejection, preserves the verifier&#39;s distribution exactly.</p>
+<h3 id="step-2-residual-distribution" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-residual-distribution" aria-label="Link to this section">#</a>Step 2: residual distribution</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">residual_dist</span><span class="token punctuation">(</span>q<span class="token punctuation">,</span> p<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    raw <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token builtin">max</span><span class="token punctuation">(</span><span class="token number">0.0</span><span class="token punctuation">,</span> qi <span class="token operator">-</span> pi<span class="token punctuation">)</span> <span class="token keyword">for</span> qi<span class="token punctuation">,</span> pi <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>q<span class="token punctuation">,</span> p<span class="token punctuation">)</span><span class="token punctuation">]</span>
+    s <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>raw<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token punctuation">[</span>r <span class="token operator">/</span> s <span class="token keyword">for</span> r <span class="token keyword">in</span> raw<span class="token punctuation">]</span></code></pre>
+</figure>
+<p>Subtract <code class="inline-code">p</code> from <code class="inline-code">q</code> element-wise, clamp negative values to zero, renormalize. Sample from this on any rejection.</p>
+<h3 id="step-3-one-speculative-step" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-one-speculative-step" aria-label="Link to this section">#</a>Step 3: one speculative step</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">spec_step</span><span class="token punctuation">(</span>prefix<span class="token punctuation">,</span> q_model<span class="token punctuation">,</span> p_model<span class="token punctuation">,</span> N<span class="token punctuation">,</span> rng<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    drafts <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    p_probs <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    ctx <span class="token operator">=</span> <span class="token builtin">list</span><span class="token punctuation">(</span>prefix<span class="token punctuation">)</span>
+    <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>N<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        p_dist <span class="token operator">=</span> p_model<span class="token punctuation">(</span>ctx<span class="token punctuation">)</span>
+        d <span class="token operator">=</span> sample<span class="token punctuation">(</span>p_dist<span class="token punctuation">,</span> rng<span class="token punctuation">)</span>
+        drafts<span class="token punctuation">.</span>append<span class="token punctuation">(</span>d<span class="token punctuation">)</span>
+        p_probs<span class="token punctuation">.</span>append<span class="token punctuation">(</span>p_dist<span class="token punctuation">[</span>d<span class="token punctuation">]</span><span class="token punctuation">)</span>
+        ctx<span class="token punctuation">.</span>append<span class="token punctuation">(</span>d<span class="token punctuation">)</span>
+
+    q_dists <span class="token operator">=</span> <span class="token punctuation">[</span>q_model<span class="token punctuation">(</span>prefix <span class="token operator">+</span> drafts<span class="token punctuation">[</span><span class="token punctuation">:</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>N <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">for</span> i<span class="token punctuation">,</span> d <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>drafts<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        u <span class="token operator">=</span> rng<span class="token punctuation">.</span>random<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        q_prob <span class="token operator">=</span> q_dists<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>d<span class="token punctuation">]</span>
+        p_prob <span class="token operator">=</span> p_probs<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+        <span class="token keyword">if</span> u <span class="token operator">&lt;</span> <span class="token builtin">min</span><span class="token punctuation">(</span><span class="token number">1.0</span><span class="token punctuation">,</span> q_prob <span class="token operator">/</span> p_prob <span class="token keyword">if</span> p_prob <span class="token operator">></span> <span class="token number">0</span> <span class="token keyword">else</span> <span class="token builtin">float</span><span class="token punctuation">(</span><span class="token string">"inf"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            prefix <span class="token operator">=</span> prefix <span class="token operator">+</span> <span class="token punctuation">[</span>d<span class="token punctuation">]</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            res <span class="token operator">=</span> residual_dist<span class="token punctuation">(</span>q_dists<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> p_model<span class="token punctuation">(</span>prefix<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            prefix <span class="token operator">=</span> prefix <span class="token operator">+</span> <span class="token punctuation">[</span>sample<span class="token punctuation">(</span>res<span class="token punctuation">,</span> rng<span class="token punctuation">)</span><span class="token punctuation">]</span>
+            <span class="token keyword">return</span> prefix
+    prefix <span class="token operator">=</span> prefix <span class="token operator">+</span> <span class="token punctuation">[</span>sample<span class="token punctuation">(</span>q_dists<span class="token punctuation">[</span>N<span class="token punctuation">]</span><span class="token punctuation">,</span> rng<span class="token punctuation">)</span><span class="token punctuation">]</span>
+    <span class="token keyword">return</span> prefix</code></pre>
+</figure>
+<p>Five accepted → one bonus → six tokens produced in one verifier pass.</p>
+<h3 id="step-4-measure-acceptance-rate" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-measure-acceptance-rate" aria-label="Link to this section">#</a>Step 4: measure acceptance rate</h3>
+<p>Run 10,000 speculative steps at varying draft-quality levels. Plot acceptance rate vs. KL divergence between draft and verifier distributions. You should see a clean monotone relationship.</p>
+<h3 id="step-5-verify-distribution-equivalence" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-verify-distribution-equivalence" aria-label="Link to this section">#</a>Step 5: verify distribution equivalence</h3>
+<p>Empirically: the histogram of tokens produced by the speculative loop should match the histogram produced by sampling directly from the verifier. This is the Leviathan theorem in practice. A chi-square test confirms within sampling error.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>Production:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">bash</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-bash"><span class="token comment"># vLLM with EAGLE</span>
+vllm serve meta-llama/Llama-3.1-70B-Instruct <span class="token punctuation">\</span>
+    --speculative-model /models/llama-3.1-eagle-70b <span class="token punctuation">\</span>
+    --speculative-draft-tensor-parallel-size <span class="token number">1</span> <span class="token punctuation">\</span>
+    --num-speculative-tokens <span class="token number">5</span>
+
+<span class="token comment"># vLLM with vanilla draft model</span>
+vllm serve meta-llama/Llama-3.1-70B-Instruct <span class="token punctuation">\</span>
+    --speculative-model meta-llama/Llama-3.2-1B-Instruct <span class="token punctuation">\</span>
+    --num-speculative-tokens <span class="token number">5</span></code></pre>
+</figure>
+<p>TensorRT-LLM has the fastest Medusa path as of mid-2026. <code class="inline-code">faster-whisper</code> wraps speculative decoding for Whisper-large with a small draft.</p>
+<p><strong>Picking a draft:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Strategy</th>
+<th>When to pick</th>
+<th>Speedup</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Vanilla draft (1B/3B Llama family)</td>
+<td>Fast prototype, no training</td>
+<td>1.8–2.3×</td>
+</tr>
+<tr>
+<td>Medusa heads</td>
+<td>You can fine-tune the verifier</td>
+<td>2–3×</td>
+</tr>
+<tr>
+<td>EAGLE-2 / 3</td>
+<td>Production, max speed</td>
+<td>3–4×</td>
+</tr>
+<tr>
+<td>Lookahead</td>
+<td>No draft, no training, no extra params</td>
+<td>1.3–1.6×</td>
+</tr>
+</tbody></table>
+<p><strong>When NOT to spec-decode:</strong></p>
+<ul>
+<li>Single-sequence generation of 1–5 tokens. Overhead dominates.</li>
+<li>Wildly creative / high-temperature sampling (α drops).</li>
+<li>Memory-constrained deployments (draft model adds VRAM).</li>
+</ul>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>See <code class="inline-code">outputs/skill-spec-decode-picker.md</code>. The skill picks a speculative decoding strategy (vanilla / Medusa / EAGLE / lookahead) and tuning parameters (N, draft temperature) for a new inference workload.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><strong>Easy.</strong> Run <code class="inline-code">code/main.py</code>. Confirm the speculative token distribution matches the verifier&#39;s direct-sample distribution on 50,000 tokens within chi-square p &gt; 0.05.</li>
+<li><strong>Medium.</strong> Plot speedup (tokens per big-model forward) as a function of <code class="inline-code">N</code> for <code class="inline-code">α = 0.5, 0.7, 0.85</code>. Identify the optimal <code class="inline-code">N</code> for each α. (Hint: expected tokens per verify call = <code class="inline-code">(1 - α^{N+1}) / (1 - α)</code>.)</li>
+<li><strong>Hard.</strong> Implement a tiny Medusa: take the capstone GPT from Lesson 14, add 3 extra LM heads that predict positions t+2, t+3, t+4. Train on tinyshakespeare with a joint multi-head loss. Compare acceptance rates vs a vanilla draft made by truncating the same model.</li>
+<li><strong>Hard.</strong> Implement rollback: start with a 10-token prefix KV cache, feed 5 draft tokens, simulate a rejection at position 3. Verify your cache reads correctly match &quot;prefix + first 2 accepted drafts&quot; at the next iteration.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Draft model</td>
+<td>&quot;The cheap one&quot;</td>
+<td>A smaller model that proposes candidate tokens; usually 10–50× cheaper than the verifier.</td>
+</tr>
+<tr>
+<td>Verifier</td>
+<td>&quot;The big one&quot;</td>
+<td>The target model whose distribution we preserve; runs once per speculative step.</td>
+</tr>
+<tr>
+<td>Acceptance rate (α)</td>
+<td>&quot;How often the draft is right&quot;</td>
+<td>Per-token probability that the verifier accepts the draft. 0.7–0.9 typical.</td>
+</tr>
+<tr>
+<td>Residual distribution</td>
+<td>&quot;The rejection fallback&quot;</td>
+<td><code class="inline-code">(q - p)_+</code> normalized; sampling from this on rejection preserves the verifier&#39;s distribution.</td>
+</tr>
+<tr>
+<td>Bonus token</td>
+<td>&quot;The free one&quot;</td>
+<td>When all N drafts accepted, sample one more from the verifier&#39;s next-step distribution.</td>
+</tr>
+<tr>
+<td>Medusa</td>
+<td>&quot;Draft-less speculative&quot;</td>
+<td>Multiple LM heads on the verifier predict positions t+1..t+k in parallel.</td>
+</tr>
+<tr>
+<td>EAGLE</td>
+<td>&quot;Hidden-state draft&quot;</td>
+<td>Tiny transformer draft conditioned on the verifier&#39;s last-layer hidden states.</td>
+</tr>
+<tr>
+<td>Lookahead decoding</td>
+<td>&quot;Jacobi iteration&quot;</td>
+<td>Self-speculation using a fixed-point iteration; no draft model.</td>
+</tr>
+<tr>
+<td>Tree attention</td>
+<td>&quot;Verify many candidates at once&quot;</td>
+<td>Branching verification that considers several draft continuations simultaneously.</td>
+</tr>
+<tr>
+<td>KV rollback</td>
+<td>&quot;Undo rejected drafts&quot;</td>
+<td>Scratch KV buffer; commit on acceptance, discard on reject.</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2211.17192" target="_blank" rel="noopener">Leviathan, Kalman, Matias (2023). Fast Inference from Transformers via Speculative Decoding</a> — the core algorithm and the equivalence theorem.</li>
+<li><a href="https://arxiv.org/abs/2302.01318" target="_blank" rel="noopener">Chen et al. (2023). Accelerating Large Language Model Decoding with Speculative Sampling</a> — concurrent introduction; clean Bernoulli-rejection proof.</li>
+<li><a href="https://arxiv.org/abs/2401.10774" target="_blank" rel="noopener">Cai et al. (2024). Medusa: Simple LLM Inference Acceleration Framework with Multiple Decoding Heads</a> — Medusa paper; tree-attention verification.</li>
+<li><a href="https://arxiv.org/abs/2401.15077" target="_blank" rel="noopener">Li et al. (2024). EAGLE: Speculative Sampling Requires Rethinking Feature Uncertainty</a> — EAGLE-1; hidden-state-conditioned draft.</li>
+<li><a href="https://arxiv.org/abs/2406.16858" target="_blank" rel="noopener">Li et al. (2024). EAGLE-2: Faster Inference of Language Models with Dynamic Draft Trees</a> — EAGLE-2; dynamic tree depth.</li>
+<li><a href="https://arxiv.org/abs/2503.01840" target="_blank" rel="noopener">Li et al. (2025). EAGLE-3: Scaling up Inference Acceleration of Large Language Models via Training-Time Test</a> — EAGLE-3.</li>
+<li><a href="https://arxiv.org/abs/2402.02057" target="_blank" rel="noopener">Fu et al. (2024). Break the Sequential Dependency of LLM Inference Using Lookahead Decoding</a> — lookahead, no-draft approach.</li>
+<li><a href="https://docs.vllm.ai/en/latest/features/spec_decode.html" target="_blank" rel="noopener">vLLM docs — Speculative Decoding</a> — canonical production reference with all four strategies wired up.</li>
+<li><a href="https://github.com/SafeAILab/EAGLE" target="_blank" rel="noopener">SafeAILab / EAGLE reference implementation</a> — the reference code for EAGLE-1/2/3.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="15-attention-variants.html">
+  <span class="label">← Previous</span>
+  <b>Attention Variants — Sliding Window, Sparse, Differential</b>
+</a>
+      <span class="pager__item pager__item--next is-empty">
+  <span class="label">Next →</span>
+  <b>End of this module</b>
+</span>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>7 minutes</b> of Transformers Deep Dive behind you.</p>
+      <a class="btn btn--solid" href="../index.html#modules">Pick the next module →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#the-core-algorithm">The core algorithm</a></li><li class="mini__item mini__item--d3"><a href="#what-determines-speedup">What determines speedup</a></li><li class="mini__item mini__item--d3"><a href="#medusa-drafts-without-a-draft-model">Medusa — drafts without a draft model</a></li><li class="mini__item mini__item--d3"><a href="#eagle-better-draft-by-reusing-hidden-states">EAGLE — better draft by reusing hidden states</a></li><li class="mini__item mini__item--d3"><a href="#the-kv-cache-dance">The KV cache dance</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-the-rejection-step">Step 1: the rejection step</a></li><li class="mini__item mini__item--d3"><a href="#step-2-residual-distribution">Step 2: residual distribution</a></li><li class="mini__item mini__item--d3"><a href="#step-3-one-speculative-step">Step 3: one speculative step</a></li><li class="mini__item mini__item--d3"><a href="#step-4-measure-acceptance-rate">Step 4: measure acceptance rate</a></li><li class="mini__item mini__item--d3"><a href="#step-5-verify-distribution-equivalence">Step 5: verify distribution equivalence</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

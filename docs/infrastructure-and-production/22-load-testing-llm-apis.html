@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Load Testing LLM APIs — Why k6 and Locust Lie — Infrastructure &amp; Production — AIFS</title>
+<meta name="description" content="Infrastructure &amp; Production: Load Testing LLM APIs — Why k6 and Locust Lie. 4 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Load Testing LLM APIs — Why k6 and Locust Lie — Infrastructure &amp; Production — AIFS">
+<meta property="og:description" content="Infrastructure &amp; Production: Load Testing LLM APIs — Why k6 and Locust Lie. 4 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"load-pattern-waves":["../assets/figures/figures-infra2.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-infra2.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#C79BFF" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#C79BFF;--accent-ink:#111111"
+  data-lesson-id="infrastructure-and-production/22-load-testing-llm-apis" data-module="infrastructure-and-production"
+  data-prev="21-ab-testing-llm-features.html" data-next="23-sre-for-ai.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#C79BFF">
+        <span class="label">Phase 17</span>
+        <b>Infrastructure &amp; Production</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="infrastructure-and-production/01-managed-llm-platforms"><a href="01-managed-llm-platforms.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Managed LLM Platforms — Bedrock, Vertex AI, Azure OpenAI</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/02-inference-platform-economics"><a href="02-inference-platform-economics.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Inference Platform Economics — Fireworks, Together, Baseten, Modal, Replicate, Anyscale</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/03-gpu-autoscaling-kubernetes"><a href="03-gpu-autoscaling-kubernetes.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">GPU Autoscaling on Kubernetes — Karpenter, KAI Scheduler, Gang Scheduling</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/04-vllm-serving-internals"><a href="04-vllm-serving-internals.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Serving Engine Internals — PagedAttention, Continuous Batching, Chunked Prefill</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/05-eagle3-speculative-decoding"><a href="05-eagle3-speculative-decoding.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">EAGLE-3 Speculative Decoding in Production</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/06-sglang-radixattention"><a href="06-sglang-radixattention.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Prefix-Cache Serving — RadixAttention and KV Reuse</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/07-tensorrt-llm-blackwell"><a href="07-tensorrt-llm-blackwell.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Hardware-Specialized Inference Compilation — FP8 and NVFP4 on Blackwell</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/08-inference-metrics-goodput"><a href="08-inference-metrics-goodput.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Inference Metrics — TTFT, TPOT, ITL, Goodput, P99</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/09-production-quantization"><a href="09-production-quantization.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Production Quantization — AWQ, GPTQ, GGUF K-quants, FP8, MXFP4/NVFP4</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/10-cold-start-mitigation"><a href="10-cold-start-mitigation.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Cold Start Mitigation for Serverless LLMs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/11-multi-region-kv-locality"><a href="11-multi-region-kv-locality.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Multi-Region LLM Serving and KV Cache Locality</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/12-edge-inference"><a href="12-edge-inference.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Edge Inference — Apple Neural Engine, Qualcomm Hexagon, WebGPU/WebLLM, Jetson</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/13-llm-observability"><a href="13-llm-observability.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">LLM Observability Stack Selection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/14-prompt-semantic-caching"><a href="14-prompt-semantic-caching.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Prompt Caching and Semantic Caching Economics</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/15-batch-apis"><a href="15-batch-apis.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Batch APIs — the 50% Discount as Industry Standard</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/16-model-routing"><a href="16-model-routing.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Model Routing as a Cost-Reduction Primitive</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/17-disaggregated-prefill-decode"><a href="17-disaggregated-prefill-decode.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Disaggregated Prefill/Decode — NVIDIA Dynamo and llm-d</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/18-vllm-production-stack-lmcache"><a href="18-vllm-production-stack-lmcache.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Production Serving Stack — KV Offloading and Cache-Aware Routing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/19-ai-gateways"><a href="19-ai-gateways.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">AI Gateways — LiteLLM, Portkey, Kong AI Gateway, Bifrost</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/20-shadow-canary-progressive"><a href="20-shadow-canary-progressive.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Shadow Traffic, Canary Rollout, and Progressive Deployment for LLMs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/21-ab-testing-llm-features"><a href="21-ab-testing-llm-features.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">A/B Testing LLM Features — GrowthBook, Statsig, and the Vibes Problem</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/22-load-testing-llm-apis"><a href="22-load-testing-llm-apis.html" class="is-current">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Load Testing LLM APIs — Why k6 and Locust Lie</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/23-sre-for-ai"><a href="23-sre-for-ai.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">SRE for AI — Multi-Agent Incident Response, Runbooks, Predictive Detection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/24-chaos-engineering-llm"><a href="24-chaos-engineering-llm.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Chaos Engineering for LLM Production</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/25-security-secrets-audit"><a href="25-security-secrets-audit.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Security — Secrets, API Key Rotation, Audit Logs, Guardrails</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/26-compliance-frameworks"><a href="26-compliance-frameworks.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Compliance — SOC 2, HIPAA, GDPR, PCI-DSS, EU AI Act, ISO 42001</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/27-finops-llms"><a href="27-finops-llms.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">FinOps for LLMs — Unit Economics and Multi-Tenant Attribution</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/28-self-hosted-serving-selection"><a href="28-self-hosted-serving-selection.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">Self-Hosted Serving Selection — Matching Engine to Hardware and Scale</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Infrastructure &amp; Production</a></p>
+      <h1 class="page__title">Load Testing LLM APIs — Why k6 and Locust Lie</h1>
+      <p class="page__lede">Traditional load testers were not designed for streaming responses, variable output lengths, token-level metrics, or GPU saturation. Two traps bite most teams. The GIL trap: Locust's token-level measurement runs tokenization under the Python GIL, which competes with request generation under heavy concurrency; tokenization backlog then inflates reported inter-token latency — your client is the bottleneck, not the server. The prompt-uniformity trap: identical prompts in a loop test one point on the token distribution; real traffic has variable length and diverse prefix matches. LLMPerf fixes this with <code class="inline-code">--mean-input-tokens</code> + <code class="inline-code">--stddev-input-tokens</code>. Tool mapping in 2026: LLM-specialized (GenAI-Perf, LLMPerf, LLM-Locust, guidellm) for token-level accuracy; <b>k6 v2026.1.0</b> + <b>k6 Operator 1.0 GA (Sept 2025)</b> — streaming-aware, Kubernetes-native distributed via TestRun/PrivateLoadZone CRDs, best for CI/CD gates; Vegeta for Go constant-rate saturation; Locust 2.43.3 only with LLM-Locust extension for streaming. Load patterns: steady-state, ramp, spike (autoscaling test), soak (memory leaks).</p>
+      <div class="page__meta">
+        <span class="chip">4 min read</span>
+        <span class="chip">871 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (stdlib, toy realistic-prompt generator + latency collector)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 17 · 08 (Inference Metrics), Phase 17 · 03 (GPU Autoscaling)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Explain the two anti-patterns (GIL trap, prompt-uniformity trap) that make generic load testers lie for LLM APIs.</li>
+<li>Pick a tool for a given purpose: LLMPerf (benchmark run), k6 + streaming extension (CI gate), guidellm (large-scale synthetic), GenAI-Perf (NVIDIA reference).</li>
+<li>Design four load patterns (steady, ramp, spike, soak) and name the failure mode each catches.</li>
+<li>Build a realistic prompt distribution using mean + stddev of input tokens rather than fixed length.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>You k6-tested your LLM endpoint at 500 concurrent users. It held. You shipped. In production at 200 actual users the service fell over — P99 TTFT exploded, GPUs pinned.</p>
+<p>Two things happened. First, k6 sent 500 identical prompts — your request-coalescing and prefix caching made it look like you were handling 500 concurrent decodes when you were actually handling one. Second, k6 doesn&#39;t track inter-token latency on streaming responses the way the eye experiences it; it sees one HTTP connection, not 500 tokens arriving at varying intervals.</p>
+<p>Load testing for LLMs is its own discipline.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="the-gil-trap-locust" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-gil-trap-locust" aria-label="Link to this section">#</a>The GIL trap (Locust)</h3>
+<p>Locust uses Python and runs tokenization client-side under the GIL. Under high concurrency the tokenizer queues behind request generation. Reported inter-token latency includes client-side tokenization backlog. You think the server is slow; it&#39;s the test harness.</p>
+<p>Fix: LLM-Locust extension moves tokenization to separate processes, or use a compiled-language harness (k6, LLMPerf using tokenizers.rs).</p>
+<h3 id="the-prompt-uniformity-trap" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-prompt-uniformity-trap" aria-label="Link to this section">#</a>The prompt-uniformity trap</h3>
+<p>All known load testers let you configure one prompt. In a loop test of 10,000 iterations the exact same prompt sends each time. Server sees the same prefix every time — prefix cache hits approach 100%, throughput looks great.</p>
+<p>Fix: sample from a prompt distribution. LLMPerf uses <code class="inline-code">--mean-input-tokens 500 --stddev-input-tokens 150</code> — diverse lengths, diverse content.</p>
+<h3 id="four-load-patterns" class="prose-h prose-h3"><a class="prose-h__anchor" href="#four-load-patterns" aria-label="Link to this section">#</a>Four load patterns</h3>
+<ol>
+<li><strong>Steady-state</strong> — constant RPS for 30-60 min. Catches: baseline performance regressions.</li>
+<li><strong>Ramp</strong> — linearly increase RPS from 0 to target over 15 min. Catches: capacity breakpoint, warm-up anomalies.</li>
+<li><strong>Spike</strong> — sudden 3-10x RPS for 2 min then back. Catches: autoscaling latency, queue saturation, cold-start impact.</li>
+<li><strong>Soak</strong> — steady-state for 4-8 hours. Catches: memory leaks, connection-pool drift, observability overflow.</li>
+</ol>
+<h3 id="2026-tool-mapping" class="prose-h prose-h3"><a class="prose-h__anchor" href="#2026-tool-mapping" aria-label="Link to this section">#</a>2026 tool mapping</h3>
+<p><strong>LLMPerf</strong> (Anyscale) — Python but Rust-backed tokenization. Mean/stddev prompts. Streaming-aware. Best default for performance runs.</p>
+<p><strong>NVIDIA GenAI-Perf</strong> — NVIDIA&#39;s reference. Uses Triton client; comprehensive metric coverage. Note its ITL excludes TTFT; LLMPerf&#39;s includes it. Two tools produce different TPOT for the same server.</p>
+<p><strong>LLM-Locust</strong> (TrueFoundry) — Locust extension that fixes the GIL trap. Familiar Locust DSL + streaming metrics.</p>
+<p><strong>guidellm</strong> — large-scale synthetic benchmarking.</p>
+<p><strong>k6 v2026.1.0</strong> + <strong>k6 Operator 1.0 GA (Sept 2025)</strong>:</p>
+<ul>
+<li>k6 itself (Go, compiled, no GIL) added streaming-aware metrics.</li>
+<li>k6 Operator uses TestRun / PrivateLoadZone CRDs for Kubernetes-native distributed testing.</li>
+<li>Best for CI/CD gates and SLA testing.</li>
+</ul>
+<p><strong>Vegeta</strong> — Go, simpler than k6. Constant-rate HTTP saturation. Not LLM-aware but good for gateway / rate-limit testing.</p>
+<p><strong>Locust 2.43.3 stock</strong> — has the GIL trap for LLM. Only with LLM-Locust extension.</p>
+<h3 id="sla-gate-in-ci" class="prose-h prose-h3"><a class="prose-h__anchor" href="#sla-gate-in-ci" aria-label="Link to this section">#</a>SLA gate in CI</h3>
+<p>Run k6 on the PR with:</p>
+<ul>
+<li>30-50 iterations each at baseline RPS.</li>
+<li>Gate: P50/P95 TTFT, 5xx &lt; 5%, TPOT under threshold.</li>
+<li>Break the build on breach.</li>
+</ul>
+<h3 id="realistic-prompt-distribution" class="prose-h prose-h3"><a class="prose-h__anchor" href="#realistic-prompt-distribution" aria-label="Link to this section">#</a>Realistic prompt distribution</h3>
+<p>Build from real traffic samples (if you have them) or from published distributions (e.g., ShareGPT prompts for chat, HumanEval for code). Feed the mean + stddev to LLMPerf. Avoid loop-with-one-prompt at all costs.</p>
+<h3 id="numbers-you-should-remember" class="prose-h prose-h3"><a class="prose-h__anchor" href="#numbers-you-should-remember" aria-label="Link to this section">#</a>Numbers you should remember</h3>
+<ul>
+<li>k6 Operator 1.0 GA: September 2025.</li>
+<li>k6 v2026.1.0: streaming-aware metrics.</li>
+<li>Typical LLMPerf run: 100-1000 requests at concurrency X.</li>
+<li>Typical CI gate: 30-50 iterations per PR.</li>
+<li>Four patterns: steady, ramp, spike, soak.</li>
+</ul>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="load-pattern-waves"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">load-pattern-waves</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> load pattern waves</figcaption>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p><code class="inline-code">code/main.py</code> simulates a load test with realistic prompt distribution, measures effective TPOT, and demonstrates the uniform-prompt trap.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces <code class="inline-code">outputs/skill-load-test-plan.md</code>. Given workload and SLA, picks tool and designs the four load patterns.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li>Run <code class="inline-code">code/main.py</code>. Compare uniform vs realistic distribution — where is the gap?</li>
+<li>Write the k6 script for a CI gate: TTFT P95 &lt; 800 ms at 100 concurrent, runtime 5 minutes.</li>
+<li>Your soak test shows memory growing 50 MB/hour. Name three causes and the instrumentation to pick between them.</li>
+<li>Spike test from 10 RPS to 100 RPS. What&#39;s the expected recovery time if Karpenter + vLLM production-stack are in place (Phase 17 · 03 + 18)?</li>
+<li>GenAI-Perf reports TPOT=6ms; LLMPerf reports TPOT=11ms on the same server. Explain.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>LLMPerf</td>
+<td>&quot;the LLM harness&quot;</td>
+<td>Anyscale benchmark tool, streaming-aware</td>
+</tr>
+<tr>
+<td>GenAI-Perf</td>
+<td>&quot;NVIDIA tool&quot;</td>
+<td>NVIDIA reference harness</td>
+</tr>
+<tr>
+<td>LLM-Locust</td>
+<td>&quot;Locust for LLMs&quot;</td>
+<td>Locust extension fixing GIL trap</td>
+</tr>
+<tr>
+<td>guidellm</td>
+<td>&quot;synthetic benchmark&quot;</td>
+<td>Large-scale synthetic tool</td>
+</tr>
+<tr>
+<td>k6 Operator</td>
+<td>&quot;K8s k6&quot;</td>
+<td>CRD-based distributed k6</td>
+</tr>
+<tr>
+<td>GIL trap</td>
+<td>&quot;Python client overhead&quot;</td>
+<td>Tokenization backlog inflates reported latency</td>
+</tr>
+<tr>
+<td>Prompt-uniformity trap</td>
+<td>&quot;single-prompt lie&quot;</td>
+<td>Loop with same prompt hits cache, inflates throughput</td>
+</tr>
+<tr>
+<td>Steady-state</td>
+<td>&quot;constant load&quot;</td>
+<td>Flat RPS for N minutes</td>
+</tr>
+<tr>
+<td>Ramp</td>
+<td>&quot;linear up&quot;</td>
+<td>0 to target over duration</td>
+</tr>
+<tr>
+<td>Spike</td>
+<td>&quot;burst test&quot;</td>
+<td>Sudden multiplier then revert</td>
+</tr>
+<tr>
+<td>Soak</td>
+<td>&quot;long test&quot;</td>
+<td>Hours for leak detection</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://tianpan.co/blog/2026-03-19-load-testing-llm-applications" target="_blank" rel="noopener">TianPan — Load Testing LLM Applications</a></li>
+<li><a href="https://blog.premai.io/load-testing-llms-tools-metrics-realistic-traffic-simulation-2026/" target="_blank" rel="noopener">PremAI — Load Testing LLMs 2026</a></li>
+<li><a href="https://docs.nvidia.com/nim/large-language-models/1.0.0/benchmarking.html" target="_blank" rel="noopener">NVIDIA NIM — Introduction to LLM Inference Benchmarking</a></li>
+<li><a href="https://www.truefoundry.com/blog/llm-locust-a-tool-for-benchmarking-llm-performance" target="_blank" rel="noopener">TrueFoundry — LLM-Locust</a></li>
+<li><a href="https://github.com/ray-project/llmperf" target="_blank" rel="noopener">LLMPerf</a></li>
+<li><a href="https://github.com/grafana/k6-operator" target="_blank" rel="noopener">k6 Operator</a></li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="21-ab-testing-llm-features.html">
+  <span class="label">← Previous</span>
+  <b>A/B Testing LLM Features — GrowthBook, Statsig, and the Vibes Problem</b>
+</a>
+      <a class="pager__item pager__item--next" href="23-sre-for-ai.html">
+  <span class="label">Next →</span>
+  <b>SRE for AI — Multi-Agent Incident Response, Runbooks, Predictive Detection</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>4 minutes</b> of Infrastructure &amp; Production behind you.</p>
+      <a class="btn btn--solid" href="23-sre-for-ai.html">Continue to SRE for AI — Multi-Agent Incident Response, Runbooks, Predictive Detection →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#the-gil-trap-locust">The GIL trap (Locust)</a></li><li class="mini__item mini__item--d3"><a href="#the-prompt-uniformity-trap">The prompt-uniformity trap</a></li><li class="mini__item mini__item--d3"><a href="#four-load-patterns">Four load patterns</a></li><li class="mini__item mini__item--d3"><a href="#2026-tool-mapping">2026 tool mapping</a></li><li class="mini__item mini__item--d3"><a href="#sla-gate-in-ci">SLA gate in CI</a></li><li class="mini__item mini__item--d3"><a href="#realistic-prompt-distribution">Realistic prompt distribution</a></li><li class="mini__item mini__item--d3"><a href="#numbers-you-should-remember">Numbers you should remember</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

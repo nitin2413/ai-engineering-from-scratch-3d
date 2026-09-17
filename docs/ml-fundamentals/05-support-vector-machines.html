@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Support Vector Machines — ML Fundamentals — AIFS</title>
+<meta name="description" content="ML Fundamentals: Support Vector Machines. 7 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Support Vector Machines — ML Fundamentals — AIFS">
+<meta property="og:description" content="ML Fundamentals: Support Vector Machines. 7 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"svm-margin":["../assets/figures/figures-ml.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-ml.js"];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#00D4A0" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#00D4A0;--accent-ink:#111111"
+  data-lesson-id="ml-fundamentals/05-support-vector-machines" data-module="ml-fundamentals"
+  data-prev="04-decision-trees.html" data-next="06-knn-and-distances.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#00D4A0">
+        <span class="label">Phase 02</span>
+        <b>ML Fundamentals</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="ml-fundamentals/01-what-is-machine-learning"><a href="01-what-is-machine-learning.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">What Is Machine Learning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/02-linear-regression"><a href="02-linear-regression.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Linear Regression</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/03-logistic-regression"><a href="03-logistic-regression.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Logistic Regression</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/04-decision-trees"><a href="04-decision-trees.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Decision Trees and Random Forests</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/05-support-vector-machines"><a href="05-support-vector-machines.html" class="is-current">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Support Vector Machines</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/06-knn-and-distances"><a href="06-knn-and-distances.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">K-Nearest Neighbors and Distances</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/07-unsupervised-learning"><a href="07-unsupervised-learning.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Unsupervised Learning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/08-feature-engineering"><a href="08-feature-engineering.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Feature Engineering &amp; Selection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/09-model-evaluation"><a href="09-model-evaluation.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Model Evaluation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/10-bias-variance"><a href="10-bias-variance.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Bias-Variance Tradeoff</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/11-ensemble-methods"><a href="11-ensemble-methods.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Ensemble Methods</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/12-hyperparameter-tuning"><a href="12-hyperparameter-tuning.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Hyperparameter Tuning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/13-ml-pipelines"><a href="13-ml-pipelines.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">ML Pipelines</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/14-naive-bayes"><a href="14-naive-bayes.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Naive Bayes</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/15-time-series"><a href="15-time-series.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Time Series Fundamentals</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/16-anomaly-detection"><a href="16-anomaly-detection.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Anomaly Detection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/17-imbalanced-data"><a href="17-imbalanced-data.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Handling Imbalanced Data</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/18-feature-selection"><a href="18-feature-selection.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Feature Selection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">ML Fundamentals</a></p>
+      <h1 class="page__title">Support Vector Machines</h1>
+      <p class="page__lede">Find the widest street between two classes. That is the entire idea.</p>
+      <div class="page__meta">
+        <span class="chip">7 min read</span>
+        <span class="chip">1,587 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Language</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 1 (Lessons 08 Optimization, 14 Norms and Distances, 18 Convex Optimization)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~90 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Implement a linear SVM from scratch using hinge loss and gradient descent on the primal formulation</li>
+<li>Explain the maximum margin principle and identify support vectors from a trained model</li>
+<li>Compare linear, polynomial, and RBF kernels and explain how the kernel trick avoids explicit high-dimensional mapping</li>
+<li>Evaluate the tradeoff controlled by the C parameter between margin width and classification errors</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>You have two classes of data points and need to draw a line (or hyperplane) separating them. Infinitely many lines could work. Which one should you pick?</p>
+<p>The one with the biggest margin. The margin is the distance between the decision boundary and the nearest data points on each side. A wider margin means the classifier is more confident and generalizes better to unseen data.</p>
+<p>This intuition leads to Support Vector Machines, one of the most mathematically elegant algorithms in ML. SVMs were the dominant classification method before deep learning and remain the best choice for small datasets, high-dimensional data, and problems where you need a principled, well-understood model with theoretical guarantees.</p>
+<p>SVMs connect directly to Phase 1: the optimization is convex (Lesson 18), the margin is measured with norms (Lesson 14), and the kernel trick exploits dot products to handle nonlinear boundaries without ever computing in the high-dimensional space.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="the-maximum-margin-classifier" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-maximum-margin-classifier" aria-label="Link to this section">#</a>The maximum margin classifier</h3>
+<p>Given linearly separable data with labels y_i in {-1, +1} and feature vectors x_i, we want a hyperplane w^T x + b = 0 that separates the classes.</p>
+<p>The distance from a point x_i to the hyperplane is:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>distance = |w^T x_i + b| / ||w||</code></pre>
+</figure>
+<p>For a correctly classified point: y_i * (w^T x_i + b) &gt; 0. The margin is twice the distance from the hyperplane to the nearest point on either side.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph LR
+    subgraph Margin
+        direction TB
+        A[&quot;w^T x + b = +1&quot;] ~~~ B[&quot;w^T x + b = 0&quot;] ~~~ C[&quot;w^T x + b = -1&quot;]
+    end
+    D[&quot;\+ class points&quot;] --&gt; A
+    E[&quot;\- class points&quot;] --&gt; C
+    B --- F[&quot;Decision boundary&quot;]</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>The optimization problem:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>maximize    2 / ||w||     (the margin width)
+subject to  y_i * (w^T x_i + b) &gt;= 1  for all i</code></pre>
+</figure>
+<p>Equivalently (minimizing ||w||^2 is easier to optimize):</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>minimize    (1/2) ||w||^2
+subject to  y_i * (w^T x_i + b) &gt;= 1  for all i</code></pre>
+</figure>
+<p>This is a convex quadratic program. It has a unique global solution. The data points that sit exactly on the margin boundaries (where y_i * (w^T x_i + b) = 1) are the support vectors. They are the only points that determine the decision boundary. Move or remove any non-support-vector point, and the boundary does not change.</p>
+<h3 id="support-vectors-the-critical-few" class="prose-h prose-h3"><a class="prose-h__anchor" href="#support-vectors-the-critical-few" aria-label="Link to this section">#</a>Support vectors: the critical few</h3>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph TD
+    subgraph Classification
+        SV1[&quot;Support Vector (+ class)&lt;br&gt;y(w'x+b) = 1&quot;] --- DB[&quot;Decision Boundary&lt;br&gt;w'x+b = 0&quot;]
+        DB --- SV2[&quot;Support Vector (- class)&lt;br&gt;y(w'x+b) = 1&quot;]
+    end
+    O1[&quot;Other + points&lt;br&gt;(do not affect boundary)&quot;] -.-&gt; SV1
+    O2[&quot;Other - points&lt;br&gt;(do not affect boundary)&quot;] -.-&gt; SV2</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>Most training points are irrelevant. Only the support vectors matter. This is why SVMs are memory-efficient at prediction time: you only need to store the support vectors, not the entire training set.</p>
+<p>The number of support vectors also gives a bound on generalization error. Fewer support vectors relative to the dataset size means better generalization.</p>
+<h3 id="soft-margin-handling-noise-with-the-c-parameter" class="prose-h prose-h3"><a class="prose-h__anchor" href="#soft-margin-handling-noise-with-the-c-parameter" aria-label="Link to this section">#</a>Soft margin: handling noise with the C parameter</h3>
+<p>Real data is rarely perfectly separable. Some points may be on the wrong side of the boundary, or inside the margin. The soft margin formulation allows violations by introducing slack variables.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>minimize    (1/2) ||w||^2 + C * sum(xi_i)
+subject to  y_i * (w^T x_i + b) &gt;= 1 - xi_i
+            xi_i &gt;= 0  for all i</code></pre>
+</figure>
+<p>The slack variable xi_i measures how much point i violates the margin. C controls the trade-off:</p>
+<table>
+<thead>
+<tr>
+<th>C value</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Large C</td>
+<td>Penalizes violations heavily. Narrow margin, fewer misclassifications. Overfits</td>
+</tr>
+<tr>
+<td>Small C</td>
+<td>Allows more violations. Wide margin, more misclassifications. Underfits</td>
+</tr>
+</tbody></table>
+<p>C is the regularization strength, inverted. Large C = less regularization. Small C = more regularization.</p>
+<h3 id="hinge-loss-the-svm-loss-function" class="prose-h prose-h3"><a class="prose-h__anchor" href="#hinge-loss-the-svm-loss-function" aria-label="Link to this section">#</a>Hinge loss: the SVM loss function</h3>
+<p>The soft margin SVM can be rewritten as an unconstrained optimization:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>minimize    (1/2) ||w||^2 + C * sum(max(0, 1 - y_i * (w^T x_i + b)))</code></pre>
+</figure>
+<p>The term max(0, 1 - y_i * f(x_i)) is the hinge loss. It is zero when the point is correctly classified and beyond the margin. It is linear when the point is inside the margin or misclassified.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>Hinge loss for a single point:
+
+loss
+  |
+  | \
+  |  \
+  |   \
+  |    \
+  |     \_______________
+  |
+  +-----|-----|--------&gt;  y * f(x)
+       0     1
+
+Zero loss when y*f(x) &gt;= 1 (correctly classified, outside margin).
+Linear penalty when y*f(x) &lt; 1.</code></pre>
+</figure>
+<p>Compare with logistic loss (logistic regression):</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>Hinge:     max(0, 1 - y*f(x))          Hard cutoff at margin
+Logistic:  log(1 + exp(-y*f(x)))        Smooth, never exactly zero</code></pre>
+</figure>
+<p>Hinge loss produces sparse solutions (only support vectors have nonzero contribution). Logistic loss uses all data points. This makes SVMs more memory-efficient at prediction time.</p>
+<h3 id="training-a-linear-svm-with-gradient-descent" class="prose-h prose-h3"><a class="prose-h__anchor" href="#training-a-linear-svm-with-gradient-descent" aria-label="Link to this section">#</a>Training a linear SVM with gradient descent</h3>
+<p>You can train a linear SVM using gradient descent on the hinge loss plus L2 regularization, without solving the constrained QP:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>L(w, b) = (lambda/2) * ||w||^2 + (1/n) * sum(max(0, 1 - y_i * (w^T x_i + b)))
+
+Gradient with respect to w:
+  If y_i * (w^T x_i + b) &gt;= 1:  dL/dw = lambda * w
+  If y_i * (w^T x_i + b) &lt; 1:   dL/dw = lambda * w - y_i * x_i
+
+Gradient with respect to b:
+  If y_i * (w^T x_i + b) &gt;= 1:  dL/db = 0
+  If y_i * (w^T x_i + b) &lt; 1:   dL/db = -y_i</code></pre>
+</figure>
+<p>This is called the primal formulation. It runs in O(n * d) per epoch, where n is the number of samples and d is the number of features. For large, sparse, high-dimensional data (text classification), this is fast.</p>
+<h3 id="the-dual-formulation-and-the-kernel-trick" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-dual-formulation-and-the-kernel-trick" aria-label="Link to this section">#</a>The dual formulation and the kernel trick</h3>
+<p>The Lagrangian dual of the SVM problem (from Phase 1 Lesson 18, KKT conditions) is:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>maximize    sum(alpha_i) - (1/2) * sum_ij(alpha_i * alpha_j * y_i * y_j * (x_i . x_j))
+subject to  0 &lt;= alpha_i &lt;= C
+            sum(alpha_i * y_i) = 0</code></pre>
+</figure>
+<p>The dual only involves dot products x_i . x_j between data points. This is the key insight. Replace every dot product with a kernel function K(x_i, x_j) and the SVM can learn nonlinear boundaries without ever computing the transformation explicitly.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>Linear kernel:      K(x, z) = x . z
+Polynomial kernel:  K(x, z) = (x . z + c)^d
+RBF (Gaussian):     K(x, z) = exp(-gamma * ||x - z||^2)</code></pre>
+</figure>
+<p>The RBF kernel maps data into an infinite-dimensional space. Points that are close in input space have kernel value near 1. Points that are far apart have kernel value near 0. It can learn any smooth decision boundary.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph LR
+    subgraph &quot;Input Space (not separable)&quot;
+        A[&quot;Data points in 2D&lt;br&gt;circular boundary&quot;]
+    end
+    subgraph &quot;Feature Space (separable)&quot;
+        B[&quot;Data points in higher dim&lt;br&gt;linear boundary&quot;]
+    end
+    A --&gt;|&quot;Kernel trick&lt;br&gt;K(x,z) = phi(x).phi(z)&quot;| B</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>The kernel trick computes the dot product in the high-dimensional space without ever going there. For the polynomial kernel of degree d in D dimensions, the explicit feature space has O(D^d) dimensions. But K(x, z) is computed in O(D) time.</p>
+<h3 id="svm-for-regression-svr" class="prose-h prose-h3"><a class="prose-h__anchor" href="#svm-for-regression-svr" aria-label="Link to this section">#</a>SVM for regression (SVR)</h3>
+<p>Support Vector Regression fits a tube of width epsilon around the data. Points inside the tube have zero loss. Points outside the tube are penalized linearly.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>minimize    (1/2) ||w||^2 + C * sum(xi_i + xi_i*)
+subject to  y_i - (w^T x_i + b) &lt;= epsilon + xi_i
+            (w^T x_i + b) - y_i &lt;= epsilon + xi_i*
+            xi_i, xi_i* &gt;= 0</code></pre>
+</figure>
+<p>The epsilon parameter controls the tube width. Wider tube = fewer support vectors = smoother fit. Narrower tube = more support vectors = tighter fit.</p>
+<h3 id="why-svms-lost-to-deep-learning-and-when-they-still-win" class="prose-h prose-h3"><a class="prose-h__anchor" href="#why-svms-lost-to-deep-learning-and-when-they-still-win" aria-label="Link to this section">#</a>Why SVMs lost to deep learning (and when they still win)</h3>
+<p>SVMs dominated ML from the late 1990s through the early 2010s. Deep learning surpassed them for several reasons:</p>
+<table>
+<thead>
+<tr>
+<th>Factor</th>
+<th>SVMs</th>
+<th>Deep learning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Feature engineering</td>
+<td>Requires it</td>
+<td>Learns features</td>
+</tr>
+<tr>
+<td>Scalability</td>
+<td>O(n^2) to O(n^3) for kernel</td>
+<td>O(n) per epoch with SGD</td>
+</tr>
+<tr>
+<td>Image/text/audio</td>
+<td>Needs handcrafted features</td>
+<td>Learns from raw data</td>
+</tr>
+<tr>
+<td>Large datasets (&gt;100k)</td>
+<td>Slow</td>
+<td>Scales well</td>
+</tr>
+<tr>
+<td>GPU acceleration</td>
+<td>Limited benefit</td>
+<td>Massive speedup</td>
+</tr>
+</tbody></table>
+<p>SVMs still win in these situations:</p>
+<ul>
+<li>Small datasets (hundreds to low thousands of samples)</li>
+<li>High-dimensional sparse data (text with TF-IDF features)</li>
+<li>When you need mathematical guarantees (margin bounds)</li>
+<li>When training time must be minimal (linear SVM is very fast)</li>
+<li>Binary classification with clear margin structure</li>
+<li>Anomaly detection (one-class SVM)</li>
+</ul>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="svm-margin"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">svm-margin</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> svm margin</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-hinge-loss-and-gradient" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-hinge-loss-and-gradient" aria-label="Link to this section">#</a>Step 1: Hinge loss and gradient</h3>
+<p>The foundation. Compute hinge loss for a batch and its gradient.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">hinge_loss</span><span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">,</span> w<span class="token punctuation">,</span> b<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    n <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>X<span class="token punctuation">)</span>
+    total_loss <span class="token operator">=</span> <span class="token number">0.0</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        margin <span class="token operator">=</span> y<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token punctuation">(</span>dot<span class="token punctuation">(</span>w<span class="token punctuation">,</span> X<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">+</span> b<span class="token punctuation">)</span>
+        total_loss <span class="token operator">+=</span> <span class="token builtin">max</span><span class="token punctuation">(</span><span class="token number">0.0</span><span class="token punctuation">,</span> <span class="token number">1.0</span> <span class="token operator">-</span> margin<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> total_loss <span class="token operator">/</span> n</code></pre>
+</figure>
+<h3 id="step-2-linear-svm-via-gradient-descent" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-linear-svm-via-gradient-descent" aria-label="Link to this section">#</a>Step 2: Linear SVM via gradient descent</h3>
+<p>Train by minimizing regularized hinge loss. No QP solver needed.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">LinearSVM</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> lr<span class="token operator">=</span><span class="token number">0.001</span><span class="token punctuation">,</span> lambda_param<span class="token operator">=</span><span class="token number">0.01</span><span class="token punctuation">,</span> n_epochs<span class="token operator">=</span><span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>lr <span class="token operator">=</span> lr
+        self<span class="token punctuation">.</span>lambda_param <span class="token operator">=</span> lambda_param
+        self<span class="token punctuation">.</span>n_epochs <span class="token operator">=</span> n_epochs
+        self<span class="token punctuation">.</span>w <span class="token operator">=</span> <span class="token boolean">None</span>
+        self<span class="token punctuation">.</span>b <span class="token operator">=</span> <span class="token number">0.0</span>
+
+    <span class="token keyword">def</span> <span class="token function">fit</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> X<span class="token punctuation">,</span> y<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        n_features <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>X<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>w <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> n_features
+        self<span class="token punctuation">.</span>b <span class="token operator">=</span> <span class="token number">0.0</span>
+
+        <span class="token keyword">for</span> epoch <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>n_epochs<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>X<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                margin <span class="token operator">=</span> y<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token punctuation">(</span>dot<span class="token punctuation">(</span>self<span class="token punctuation">.</span>w<span class="token punctuation">,</span> X<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">+</span> self<span class="token punctuation">.</span>b<span class="token punctuation">)</span>
+                <span class="token keyword">if</span> margin <span class="token operator">>=</span> <span class="token number">1</span><span class="token punctuation">:</span>
+                    self<span class="token punctuation">.</span>w <span class="token operator">=</span> <span class="token punctuation">[</span>wj <span class="token operator">-</span> self<span class="token punctuation">.</span>lr <span class="token operator">*</span> self<span class="token punctuation">.</span>lambda_param <span class="token operator">*</span> wj
+                              <span class="token keyword">for</span> wj <span class="token keyword">in</span> self<span class="token punctuation">.</span>w<span class="token punctuation">]</span>
+                <span class="token keyword">else</span><span class="token punctuation">:</span>
+                    self<span class="token punctuation">.</span>w <span class="token operator">=</span> <span class="token punctuation">[</span>wj <span class="token operator">-</span> self<span class="token punctuation">.</span>lr <span class="token operator">*</span> <span class="token punctuation">(</span>self<span class="token punctuation">.</span>lambda_param <span class="token operator">*</span> wj <span class="token operator">-</span> y<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">*</span> X<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">)</span>
+                              <span class="token keyword">for</span> j<span class="token punctuation">,</span> wj <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>w<span class="token punctuation">)</span><span class="token punctuation">]</span>
+                    self<span class="token punctuation">.</span>b <span class="token operator">-=</span> self<span class="token punctuation">.</span>lr <span class="token operator">*</span> <span class="token punctuation">(</span><span class="token operator">-</span>y<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">predict</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> X<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token number">1</span> <span class="token keyword">if</span> dot<span class="token punctuation">(</span>self<span class="token punctuation">.</span>w<span class="token punctuation">,</span> x<span class="token punctuation">)</span> <span class="token operator">+</span> self<span class="token punctuation">.</span>b <span class="token operator">>=</span> <span class="token number">0</span> <span class="token keyword">else</span> <span class="token operator">-</span><span class="token number">1</span> <span class="token keyword">for</span> x <span class="token keyword">in</span> X<span class="token punctuation">]</span></code></pre>
+</figure>
+<h3 id="step-3-kernel-functions" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-kernel-functions" aria-label="Link to this section">#</a>Step 3: Kernel functions</h3>
+<p>Implement linear, polynomial, and RBF kernels.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">linear_kernel</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> z<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> dot<span class="token punctuation">(</span>x<span class="token punctuation">,</span> z<span class="token punctuation">)</span>
+
+<span class="token keyword">def</span> <span class="token function">polynomial_kernel</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> z<span class="token punctuation">,</span> degree<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">,</span> c<span class="token operator">=</span><span class="token number">1.0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span>dot<span class="token punctuation">(</span>x<span class="token punctuation">,</span> z<span class="token punctuation">)</span> <span class="token operator">+</span> c<span class="token punctuation">)</span> <span class="token operator">**</span> degree
+
+<span class="token keyword">def</span> <span class="token function">rbf_kernel</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> z<span class="token punctuation">,</span> gamma<span class="token operator">=</span><span class="token number">0.5</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    diff <span class="token operator">=</span> <span class="token punctuation">[</span>xi <span class="token operator">-</span> zi <span class="token keyword">for</span> xi<span class="token punctuation">,</span> zi <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> z<span class="token punctuation">)</span><span class="token punctuation">]</span>
+    <span class="token keyword">return</span> math<span class="token punctuation">.</span>exp<span class="token punctuation">(</span><span class="token operator">-</span>gamma <span class="token operator">*</span> dot<span class="token punctuation">(</span>diff<span class="token punctuation">,</span> diff<span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h3 id="step-4-margin-and-support-vector-identification" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-margin-and-support-vector-identification" aria-label="Link to this section">#</a>Step 4: Margin and support vector identification</h3>
+<p>After training, identify which points are support vectors and compute the margin width.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">find_support_vectors</span><span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">,</span> w<span class="token punctuation">,</span> b<span class="token punctuation">,</span> tol<span class="token operator">=</span><span class="token number">1e-3</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    support_vectors <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>X<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        margin <span class="token operator">=</span> y<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token punctuation">(</span>dot<span class="token punctuation">(</span>w<span class="token punctuation">,</span> X<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">+</span> b<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> <span class="token builtin">abs</span><span class="token punctuation">(</span>margin <span class="token operator">-</span> <span class="token number">1.0</span><span class="token punctuation">)</span> <span class="token operator">&lt;</span> tol<span class="token punctuation">:</span>
+            support_vectors<span class="token punctuation">.</span>append<span class="token punctuation">(</span>i<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> support_vectors</code></pre>
+</figure>
+<p>See <code class="inline-code">code/svm.py</code> for the complete implementation with all demos.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>With scikit-learn:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>svm <span class="token keyword">import</span> SVC<span class="token punctuation">,</span> LinearSVC<span class="token punctuation">,</span> SVR
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>preprocessing <span class="token keyword">import</span> StandardScaler
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>pipeline <span class="token keyword">import</span> Pipeline
+
+clf <span class="token operator">=</span> Pipeline<span class="token punctuation">(</span><span class="token punctuation">[</span>
+    <span class="token punctuation">(</span><span class="token string">"scaler"</span><span class="token punctuation">,</span> StandardScaler<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">(</span><span class="token string">"svm"</span><span class="token punctuation">,</span> SVC<span class="token punctuation">(</span>kernel<span class="token operator">=</span><span class="token string">"rbf"</span><span class="token punctuation">,</span> C<span class="token operator">=</span><span class="token number">1.0</span><span class="token punctuation">,</span> gamma<span class="token operator">=</span><span class="token string">"scale"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">]</span><span class="token punctuation">)</span>
+clf<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X_train<span class="token punctuation">,</span> y_train<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Accuracy: </span><span class="token interpolation"><span class="token punctuation">{</span>clf<span class="token punctuation">.</span>score<span class="token punctuation">(</span>X_test<span class="token punctuation">,</span> y_test<span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Support vectors: </span><span class="token interpolation"><span class="token punctuation">{</span>clf<span class="token punctuation">[</span><span class="token string">'svm'</span><span class="token punctuation">]</span><span class="token punctuation">.</span>n_support_<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Important: always scale your features before training an SVM. SVMs are sensitive to feature magnitudes because the margin depends on ||w||, and unscaled features distort the geometry.</p>
+<p>For large datasets, use <code class="inline-code">LinearSVC</code> (primal formulation, O(n) per epoch) instead of <code class="inline-code">SVC</code> (dual formulation, O(n^2) to O(n^3)):</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>svm <span class="token keyword">import</span> LinearSVC
+
+clf <span class="token operator">=</span> Pipeline<span class="token punctuation">(</span><span class="token punctuation">[</span>
+    <span class="token punctuation">(</span><span class="token string">"scaler"</span><span class="token punctuation">,</span> StandardScaler<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">(</span><span class="token string">"svm"</span><span class="token punctuation">,</span> LinearSVC<span class="token punctuation">(</span>C<span class="token operator">=</span><span class="token number">1.0</span><span class="token punctuation">,</span> max_iter<span class="token operator">=</span><span class="token number">10000</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p>Generate a 2D linearly separable dataset. Train your LinearSVM and identify the support vectors. Verify that the support vectors are the points closest to the decision boundary.</p>
+</li>
+<li><p>Vary C from 0.001 to 1000 on a noisy dataset. Plot the decision boundary for each C value. Observe the transition from wide margin (underfitting) to narrow margin (overfitting).</p>
+</li>
+<li><p>Create a dataset where class boundaries are circular (not linear). Show that a linear SVM fails. Compute the RBF kernel matrix and show that the classes become separable in the kernel-induced feature space.</p>
+</li>
+<li><p>Compare hinge loss vs logistic loss on the same dataset. Train a linear SVM and logistic regression. Count how many training points contribute to each model&#39;s decision boundary (support vectors vs all points).</p>
+</li>
+<li><p>Implement SVR (epsilon-insensitive loss). Fit it to y = sin(x) + noise. Plot the epsilon tube around the predictions and highlight the support vectors (points outside the tube).</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Support vectors</td>
+<td>The training points closest to the decision boundary. The only points that determine the hyperplane</td>
+</tr>
+<tr>
+<td>Margin</td>
+<td>The distance between the decision boundary and the nearest support vectors. SVMs maximize this</td>
+</tr>
+<tr>
+<td>Hinge loss</td>
+<td>max(0, 1 - y*f(x)). Zero when correctly classified and outside the margin. Linear penalty otherwise</td>
+</tr>
+<tr>
+<td>C parameter</td>
+<td>Trade-off between margin width and classification errors. Large C = narrow margin, small C = wide margin</td>
+</tr>
+<tr>
+<td>Soft margin</td>
+<td>SVM formulation that allows margin violations via slack variables. Handles non-separable data</td>
+</tr>
+<tr>
+<td>Kernel trick</td>
+<td>Computing dot products in a high-dimensional feature space without explicitly mapping to that space</td>
+</tr>
+<tr>
+<td>Linear kernel</td>
+<td>K(x, z) = x . z. Equivalent to standard dot product. For linearly separable data</td>
+</tr>
+<tr>
+<td>RBF kernel</td>
+<td>K(x, z) = exp(-gamma * ||x-z||^2). Maps to infinite dimensions. Learns any smooth boundary</td>
+</tr>
+<tr>
+<td>Polynomial kernel</td>
+<td>K(x, z) = (x . z + c)^d. Maps to a feature space of polynomial combinations</td>
+</tr>
+<tr>
+<td>Dual formulation</td>
+<td>Reformulation of the SVM problem that depends only on dot products between data points. Enables kernels</td>
+</tr>
+<tr>
+<td>SVR</td>
+<td>Support Vector Regression. Fits an epsilon-tube around the data. Points inside the tube have zero loss</td>
+</tr>
+<tr>
+<td>Slack variables</td>
+<td>xi_i: measures how much a point violates the margin. Zero for correctly classified points outside margin</td>
+</tr>
+<tr>
+<td>Maximum margin</td>
+<td>The principle of choosing the hyperplane that maximizes the distance to the nearest points of each class</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://link.springer.com/book/10.1007/978-1-4757-3264-1" target="_blank" rel="noopener">Vapnik: The Nature of Statistical Learning Theory (1995)</a> - the foundational text on SVMs and statistical learning</li>
+<li><a href="https://link.springer.com/article/10.1007/BF00994018" target="_blank" rel="noopener">Cortes &amp; Vapnik: Support-vector networks (1995)</a> - the original SVM paper</li>
+<li><a href="https://www.microsoft.com/en-us/research/publication/sequential-minimal-optimization-a-fast-algorithm-for-training-support-vector-machines/" target="_blank" rel="noopener">Platt: Sequential Minimal Optimization (1998)</a> - the SMO algorithm that made SVM training practical</li>
+<li><a href="https://scikit-learn.org/stable/modules/svm.html" target="_blank" rel="noopener">scikit-learn SVM documentation</a> - practical guide with implementation details</li>
+<li><a href="https://www.csie.ntu.edu.tw/~cjlin/libsvm/" target="_blank" rel="noopener">LIBSVM: A Library for Support Vector Machines</a> - the C++ library behind most SVM implementations</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="04-decision-trees.html">
+  <span class="label">← Previous</span>
+  <b>Decision Trees and Random Forests</b>
+</a>
+      <a class="pager__item pager__item--next" href="06-knn-and-distances.html">
+  <span class="label">Next →</span>
+  <b>K-Nearest Neighbors and Distances</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>7 minutes</b> of ML Fundamentals behind you.</p>
+      <a class="btn btn--solid" href="06-knn-and-distances.html">Continue to K-Nearest Neighbors and Distances →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#the-maximum-margin-classifier">The maximum margin classifier</a></li><li class="mini__item mini__item--d3"><a href="#support-vectors-the-critical-few">Support vectors: the critical few</a></li><li class="mini__item mini__item--d3"><a href="#soft-margin-handling-noise-with-the-c-parameter">Soft margin: handling noise with the C parameter</a></li><li class="mini__item mini__item--d3"><a href="#hinge-loss-the-svm-loss-function">Hinge loss: the SVM loss function</a></li><li class="mini__item mini__item--d3"><a href="#training-a-linear-svm-with-gradient-descent">Training a linear SVM with gradient descent</a></li><li class="mini__item mini__item--d3"><a href="#the-dual-formulation-and-the-kernel-trick">The dual formulation and the kernel trick</a></li><li class="mini__item mini__item--d3"><a href="#svm-for-regression-svr">SVM for regression (SVR)</a></li><li class="mini__item mini__item--d3"><a href="#why-svms-lost-to-deep-learning-and-when-they-still-win">Why SVMs lost to deep learning (and when they still win)</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-hinge-loss-and-gradient">Step 1: Hinge loss and gradient</a></li><li class="mini__item mini__item--d3"><a href="#step-2-linear-svm-via-gradient-descent">Step 2: Linear SVM via gradient descent</a></li><li class="mini__item mini__item--d3"><a href="#step-3-kernel-functions">Step 3: Kernel functions</a></li><li class="mini__item mini__item--d3"><a href="#step-4-margin-and-support-vector-identification">Step 4: Margin and support vector identification</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

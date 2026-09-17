@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GloVe, FastText, and Subword Embeddings — NLP, Foundations to Advanced — AIFS</title>
+<meta name="description" content="NLP, Foundations to Advanced: GloVe, FastText, and Subword Embeddings. 4 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="GloVe, FastText, and Subword Embeddings — NLP, Foundations to Advanced — AIFS">
+<meta property="og:description" content="NLP, Foundations to Advanced: GloVe, FastText, and Subword Embeddings. 4 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"n5-subword-merge":["../assets/figures/figures-nlp5.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-nlp5.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#B8FF3C" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#B8FF3C;--accent-ink:#111111"
+  data-lesson-id="nlp-foundations-to-advanced/04-glove-fasttext-subword" data-module="nlp-foundations-to-advanced"
+  data-prev="03-word-embeddings-word2vec.html" data-next="05-sentiment-analysis.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#B8FF3C">
+        <span class="label">Phase 05</span>
+        <b>NLP, Foundations to Advanced</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="nlp-foundations-to-advanced/01-text-processing"><a href="01-text-processing.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Text Processing — Tokenization, Stemming, Lemmatization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/02-bag-of-words-tfidf"><a href="02-bag-of-words-tfidf.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Bag of Words, TF-IDF, and Text Representation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/03-word-embeddings-word2vec"><a href="03-word-embeddings-word2vec.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Word Embeddings — Word2Vec from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/04-glove-fasttext-subword"><a href="04-glove-fasttext-subword.html" class="is-current">
+  <span class="snav__n">04</span>
+  <span class="snav__t">GloVe, FastText, and Subword Embeddings</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/05-sentiment-analysis"><a href="05-sentiment-analysis.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Sentiment Analysis</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/06-named-entity-recognition"><a href="06-named-entity-recognition.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Named Entity Recognition</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/07-pos-tagging-parsing"><a href="07-pos-tagging-parsing.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">POS Tagging and Syntactic Parsing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/08-cnns-rnns-for-text"><a href="08-cnns-rnns-for-text.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">CNNs and RNNs for Text</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/09-sequence-to-sequence"><a href="09-sequence-to-sequence.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Sequence-to-Sequence Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/10-attention-mechanism"><a href="10-attention-mechanism.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Attention Mechanism — The Breakthrough</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/11-machine-translation"><a href="11-machine-translation.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Machine Translation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/12-text-summarization"><a href="12-text-summarization.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Text Summarization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/13-question-answering"><a href="13-question-answering.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Question Answering Systems</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/14-information-retrieval-search"><a href="14-information-retrieval-search.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Information Retrieval and Search</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/15-topic-modeling"><a href="15-topic-modeling.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Topic Modeling — LDA and BERTopic</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/16-text-generation-pre-transformer"><a href="16-text-generation-pre-transformer.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Text Generation Before Transformers — N-gram Language Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/17-chatbots-rule-to-neural"><a href="17-chatbots-rule-to-neural.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Chatbots — Rule-Based to Neural to LLM Agents</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/18-multilingual-nlp"><a href="18-multilingual-nlp.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Multilingual NLP</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/19-subword-tokenization"><a href="19-subword-tokenization.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">Subword Tokenization — BPE, WordPiece, Unigram, SentencePiece</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/20-structured-outputs-constrained-decoding"><a href="20-structured-outputs-constrained-decoding.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Structured Outputs &amp; Constrained Decoding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/21-nli-textual-entailment"><a href="21-nli-textual-entailment.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Natural Language Inference — Textual Entailment</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/22-embedding-models-deep-dive"><a href="22-embedding-models-deep-dive.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Embedding Models — The 2026 Deep Dive</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/23-chunking-strategies-rag"><a href="23-chunking-strategies-rag.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Chunking Strategies for RAG</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/24-coreference-resolution"><a href="24-coreference-resolution.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Coreference Resolution</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/25-entity-linking"><a href="25-entity-linking.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Entity Linking &amp; Disambiguation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/26-relation-extraction-kg"><a href="26-relation-extraction-kg.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Relation Extraction &amp; Knowledge Graph Construction</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/27-llm-evaluation-frameworks"><a href="27-llm-evaluation-frameworks.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">LLM Evaluation — RAGAS, DeepEval, G-Eval</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/28-long-context-evaluation"><a href="28-long-context-evaluation.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">Long-Context Evaluation — NIAH, RULER, LongBench, MRCR</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/29-dialogue-state-tracking"><a href="29-dialogue-state-tracking.html" class="">
+  <span class="snav__n">29</span>
+  <span class="snav__t">Dialogue State Tracking</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">NLP, Foundations to Advanced</a></p>
+      <h1 class="page__title">GloVe, FastText, and Subword Embeddings</h1>
+      <p class="page__lede">Word2Vec trained one embedding per word. GloVe factorized the co-occurrence matrix. FastText embedded the pieces. BPE bridged to transformers.</p>
+      <div class="page__meta">
+        <span class="chip">4 min read</span>
+        <span class="chip">944 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 5 · 03 (Word2Vec from Scratch)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~45 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Word2Vec left two open questions.</p>
+<p>First, there was a parallel line of research that factorized the co-occurrence matrix directly (LSA, HAL) rather than doing online skip-gram updates. Was Word2Vec&#39;s iterative approach fundamentally better, or was the difference an artifact of how the two methods handled counts? <strong>GloVe</strong> answered that: matrix factorization with a thoughtfully chosen loss matches or beats Word2Vec, and costs less to train.</p>
+<p>Second, neither method had a story for words it had never seen. <code class="inline-code">Zoomer-approved</code>, <code class="inline-code">dogecoin</code>, any proper noun coined last week, every inflected form of a rare root. <strong>FastText</strong> fixed this by embedding character n-grams: a word is the sum of its parts, including morphemes, so even out-of-vocabulary words get a sensible vector.</p>
+<p>Third, once transformers arrived, the question shifted again. Word-level vocabularies cap out around a million entries; real language is more open than that. <strong>Byte-pair encoding (BPE)</strong> and its relatives solved this by learning a vocabulary of frequent subword units that covers everything. Every modern tokenizer for every modern LLM is a subword tokenizer.</p>
+<p>This lesson walks all three, then explains which to reach for when.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<p><strong>GloVe (Global Vectors).</strong> Build the word-word co-occurrence matrix <code class="inline-code">X</code> where <code class="inline-code">X[i][j]</code> is how often word <code class="inline-code">j</code> appears in the context of word <code class="inline-code">i</code>. Train vectors such that <code class="inline-code">v_i · v_j + b_i + b_j ≈ log(X[i][j])</code>. Weight the loss so frequent pairs do not dominate. Done.</p>
+<p><strong>FastText.</strong> A word is the sum of its character n-grams plus the word itself. <code class="inline-code">where</code> becomes <code class="inline-code">&lt;wh, whe, her, ere, re&gt;, &lt;where&gt;</code>. The word vector is the sum of those component vectors. Train as Word2Vec. Benefit: unseen words (<code class="inline-code">whereupon</code>) compose from known n-grams.</p>
+<p><strong>BPE (Byte-Pair Encoding).</strong> Start with a vocabulary of individual bytes (or characters). Count every adjacent pair in the corpus. Merge the most frequent pair into a new token. Repeat for <code class="inline-code">k</code> iterations. Result: a vocabulary of <code class="inline-code">k + 256</code> tokens where frequent sequences (<code class="inline-code">ing</code>, <code class="inline-code">tion</code>, <code class="inline-code">the</code>) are single tokens and rare words are broken into familiar pieces. Every sentence tokenizes into something.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="n5-subword-merge"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">n5-subword-merge</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> n5 subword merge</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="glove-factorize-the-co-occurrence-matrix" class="prose-h prose-h3"><a class="prose-h__anchor" href="#glove-factorize-the-co-occurrence-matrix" aria-label="Link to this section">#</a>GloVe: factorize the co-occurrence matrix</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+<span class="token keyword">from</span> collections <span class="token keyword">import</span> Counter
+
+
+<span class="token keyword">def</span> <span class="token function">build_cooccurrence</span><span class="token punctuation">(</span>docs<span class="token punctuation">,</span> window<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    pair_counts <span class="token operator">=</span> Counter<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    vocab <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+    <span class="token keyword">for</span> doc <span class="token keyword">in</span> docs<span class="token punctuation">:</span>
+        <span class="token keyword">for</span> token <span class="token keyword">in</span> doc<span class="token punctuation">:</span>
+            <span class="token keyword">if</span> token <span class="token keyword">not</span> <span class="token keyword">in</span> vocab<span class="token punctuation">:</span>
+                vocab<span class="token punctuation">[</span>token<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>vocab<span class="token punctuation">)</span>
+    <span class="token keyword">for</span> doc <span class="token keyword">in</span> docs<span class="token punctuation">:</span>
+        indexed <span class="token operator">=</span> <span class="token punctuation">[</span>vocab<span class="token punctuation">[</span>t<span class="token punctuation">]</span> <span class="token keyword">for</span> t <span class="token keyword">in</span> doc<span class="token punctuation">]</span>
+        <span class="token keyword">for</span> i<span class="token punctuation">,</span> center <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>indexed<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">max</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> i <span class="token operator">-</span> window<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token builtin">min</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>indexed<span class="token punctuation">)</span><span class="token punctuation">,</span> i <span class="token operator">+</span> window <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                <span class="token keyword">if</span> i <span class="token operator">!=</span> j<span class="token punctuation">:</span>
+                    distance <span class="token operator">=</span> <span class="token builtin">abs</span><span class="token punctuation">(</span>i <span class="token operator">-</span> j<span class="token punctuation">)</span>
+                    pair_counts<span class="token punctuation">[</span><span class="token punctuation">(</span>center<span class="token punctuation">,</span> indexed<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token operator">+=</span> <span class="token number">1.0</span> <span class="token operator">/</span> distance
+    <span class="token keyword">return</span> vocab<span class="token punctuation">,</span> pair_counts
+
+
+<span class="token keyword">def</span> <span class="token function">glove_train</span><span class="token punctuation">(</span>vocab<span class="token punctuation">,</span> pair_counts<span class="token punctuation">,</span> dim<span class="token operator">=</span><span class="token number">16</span><span class="token punctuation">,</span> epochs<span class="token operator">=</span><span class="token number">100</span><span class="token punctuation">,</span> lr<span class="token operator">=</span><span class="token number">0.05</span><span class="token punctuation">,</span> x_max<span class="token operator">=</span><span class="token number">100</span><span class="token punctuation">,</span> alpha<span class="token operator">=</span><span class="token number">0.75</span><span class="token punctuation">,</span> seed<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    n <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>vocab<span class="token punctuation">)</span>
+    rng <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>default_rng<span class="token punctuation">(</span>seed<span class="token punctuation">)</span>
+    W <span class="token operator">=</span> rng<span class="token punctuation">.</span>normal<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0.1</span><span class="token punctuation">,</span> size<span class="token operator">=</span><span class="token punctuation">(</span>n<span class="token punctuation">,</span> dim<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    W_tilde <span class="token operator">=</span> rng<span class="token punctuation">.</span>normal<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0.1</span><span class="token punctuation">,</span> size<span class="token operator">=</span><span class="token punctuation">(</span>n<span class="token punctuation">,</span> dim<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    b <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span>n<span class="token punctuation">)</span>
+    b_tilde <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span>n<span class="token punctuation">)</span>
+
+    <span class="token keyword">for</span> epoch <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>epochs<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span>i<span class="token punctuation">,</span> j<span class="token punctuation">)</span><span class="token punctuation">,</span> x_ij <span class="token keyword">in</span> pair_counts<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            weight <span class="token operator">=</span> <span class="token punctuation">(</span>x_ij <span class="token operator">/</span> x_max<span class="token punctuation">)</span> <span class="token operator">**</span> alpha <span class="token keyword">if</span> x_ij <span class="token operator">&lt;</span> x_max <span class="token keyword">else</span> <span class="token number">1.0</span>
+            diff <span class="token operator">=</span> W<span class="token punctuation">[</span>i<span class="token punctuation">]</span> @ W_tilde<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">+</span> b<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+</span> b_tilde<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">-</span> np<span class="token punctuation">.</span>log<span class="token punctuation">(</span>x_ij<span class="token punctuation">)</span>
+            coef <span class="token operator">=</span> weight <span class="token operator">*</span> diff
+
+            grad_W_i <span class="token operator">=</span> coef <span class="token operator">*</span> W_tilde<span class="token punctuation">[</span>j<span class="token punctuation">]</span>
+            grad_W_tilde_j <span class="token operator">=</span> coef <span class="token operator">*</span> W<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+            W<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">-=</span> lr <span class="token operator">*</span> grad_W_i
+            W_tilde<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">-=</span> lr <span class="token operator">*</span> grad_W_tilde_j
+            b<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">-=</span> lr <span class="token operator">*</span> coef
+            b_tilde<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">-=</span> lr <span class="token operator">*</span> coef
+
+    <span class="token keyword">return</span> W <span class="token operator">+</span> W_tilde</code></pre>
+</figure>
+<p>Two moving pieces worth naming. The weighting function <code class="inline-code">f(x) = (x/x_max)^alpha</code> downweights very frequent pairs (like <code class="inline-code">(the, and)</code>) so they do not dominate the loss. The final embedding is the sum of <code class="inline-code">W</code> (center) and <code class="inline-code">W_tilde</code> (context) tables. Summing both is a published trick that tends to outperform using just one.</p>
+<h3 id="fasttext-subword-aware-embeddings" class="prose-h prose-h3"><a class="prose-h__anchor" href="#fasttext-subword-aware-embeddings" aria-label="Link to this section">#</a>FastText: subword-aware embeddings</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">char_ngrams</span><span class="token punctuation">(</span>word<span class="token punctuation">,</span> n_min<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">,</span> n_max<span class="token operator">=</span><span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    wrapped <span class="token operator">=</span> <span class="token string-interpolation"><span class="token string">f"&lt;</span><span class="token interpolation"><span class="token punctuation">{</span>word<span class="token punctuation">}</span></span><span class="token string">>"</span></span>
+    grams <span class="token operator">=</span> <span class="token punctuation">{</span>wrapped<span class="token punctuation">}</span>
+    <span class="token keyword">for</span> n <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n_min<span class="token punctuation">,</span> n_max <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>wrapped<span class="token punctuation">)</span> <span class="token operator">-</span> n <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            grams<span class="token punctuation">.</span>add<span class="token punctuation">(</span>wrapped<span class="token punctuation">[</span>i<span class="token punctuation">:</span>i <span class="token operator">+</span> n<span class="token punctuation">]</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> grams</code></pre>
+</figure>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token operator">>></span><span class="token operator">></span> char_ngrams<span class="token punctuation">(</span><span class="token string">"where"</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span><span class="token string">'&lt;where>'</span><span class="token punctuation">,</span> <span class="token string">'&lt;wh'</span><span class="token punctuation">,</span> <span class="token string">'whe'</span><span class="token punctuation">,</span> <span class="token string">'her'</span><span class="token punctuation">,</span> <span class="token string">'ere'</span><span class="token punctuation">,</span> <span class="token string">'re>'</span><span class="token punctuation">,</span> <span class="token string">'&lt;whe'</span><span class="token punctuation">,</span> <span class="token string">'wher'</span><span class="token punctuation">,</span> <span class="token string">'here'</span><span class="token punctuation">,</span> <span class="token string">'ere>'</span><span class="token punctuation">,</span> <span class="token string">'&lt;wher'</span><span class="token punctuation">,</span> <span class="token string">'where'</span><span class="token punctuation">,</span> <span class="token string">'here>'</span><span class="token punctuation">}</span></code></pre>
+</figure>
+<p>Each word is represented by its set of n-grams (typically 3 to 6 characters). The word embedding is the sum of its n-gram embeddings. For skip-gram training, plug this in where Word2Vec used a single vector.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">fasttext_vector</span><span class="token punctuation">(</span>word<span class="token punctuation">,</span> ngram_table<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    grams <span class="token operator">=</span> char_ngrams<span class="token punctuation">(</span>word<span class="token punctuation">)</span>
+    vecs <span class="token operator">=</span> <span class="token punctuation">[</span>ngram_table<span class="token punctuation">[</span>g<span class="token punctuation">]</span> <span class="token keyword">for</span> g <span class="token keyword">in</span> grams <span class="token keyword">if</span> g <span class="token keyword">in</span> ngram_table<span class="token punctuation">]</span>
+    <span class="token keyword">if</span> <span class="token keyword">not</span> vecs<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token boolean">None</span>
+    <span class="token keyword">return</span> np<span class="token punctuation">.</span><span class="token builtin">sum</span><span class="token punctuation">(</span>vecs<span class="token punctuation">,</span> axis<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>For an unseen word, you still get a vector as long as some of its n-grams are known. <code class="inline-code">whereupon</code> shares <code class="inline-code">&lt;wh</code>, <code class="inline-code">her</code>, <code class="inline-code">ere</code>, and <code class="inline-code">&lt;where</code> with <code class="inline-code">where</code>, so the two land near each other.</p>
+<h3 id="bpe-learned-subword-vocabulary" class="prose-h prose-h3"><a class="prose-h__anchor" href="#bpe-learned-subword-vocabulary" aria-label="Link to this section">#</a>BPE: learned subword vocabulary</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">learn_bpe</span><span class="token punctuation">(</span>corpus<span class="token punctuation">,</span> k_merges<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    vocab <span class="token operator">=</span> Counter<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> word<span class="token punctuation">,</span> freq <span class="token keyword">in</span> corpus<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        tokens <span class="token operator">=</span> <span class="token builtin">tuple</span><span class="token punctuation">(</span>word<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token punctuation">(</span><span class="token string">"&lt;/w>"</span><span class="token punctuation">,</span><span class="token punctuation">)</span>
+        vocab<span class="token punctuation">[</span>tokens<span class="token punctuation">]</span> <span class="token operator">=</span> freq
+
+    merges <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>k_merges<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        pair_freq <span class="token operator">=</span> Counter<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">for</span> tokens<span class="token punctuation">,</span> freq <span class="token keyword">in</span> vocab<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">for</span> a<span class="token punctuation">,</span> b <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>tokens<span class="token punctuation">,</span> tokens<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                pair_freq<span class="token punctuation">[</span><span class="token punctuation">(</span>a<span class="token punctuation">,</span> b<span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token operator">+=</span> freq
+        <span class="token keyword">if</span> <span class="token keyword">not</span> pair_freq<span class="token punctuation">:</span>
+            <span class="token keyword">break</span>
+        best <span class="token operator">=</span> pair_freq<span class="token punctuation">.</span>most_common<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+        merges<span class="token punctuation">.</span>append<span class="token punctuation">(</span>best<span class="token punctuation">)</span>
+
+        new_vocab <span class="token operator">=</span> Counter<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">for</span> tokens<span class="token punctuation">,</span> freq <span class="token keyword">in</span> vocab<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            new_tokens <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+            i <span class="token operator">=</span> <span class="token number">0</span>
+            <span class="token keyword">while</span> i <span class="token operator">&lt;</span> <span class="token builtin">len</span><span class="token punctuation">(</span>tokens<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                <span class="token keyword">if</span> i <span class="token operator">+</span> <span class="token number">1</span> <span class="token operator">&lt;</span> <span class="token builtin">len</span><span class="token punctuation">(</span>tokens<span class="token punctuation">)</span> <span class="token keyword">and</span> <span class="token punctuation">(</span>tokens<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> tokens<span class="token punctuation">[</span>i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">==</span> best<span class="token punctuation">:</span>
+                    new_tokens<span class="token punctuation">.</span>append<span class="token punctuation">(</span>tokens<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+</span> tokens<span class="token punctuation">[</span>i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+                    i <span class="token operator">+=</span> <span class="token number">2</span>
+                <span class="token keyword">else</span><span class="token punctuation">:</span>
+                    new_tokens<span class="token punctuation">.</span>append<span class="token punctuation">(</span>tokens<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span>
+                    i <span class="token operator">+=</span> <span class="token number">1</span>
+            new_vocab<span class="token punctuation">[</span><span class="token builtin">tuple</span><span class="token punctuation">(</span>new_tokens<span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token operator">=</span> freq
+        vocab <span class="token operator">=</span> new_vocab
+    <span class="token keyword">return</span> merges
+
+
+<span class="token keyword">def</span> <span class="token function">apply_bpe</span><span class="token punctuation">(</span>word<span class="token punctuation">,</span> merges<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    tokens <span class="token operator">=</span> <span class="token builtin">list</span><span class="token punctuation">(</span>word<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token punctuation">[</span><span class="token string">"&lt;/w>"</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> a<span class="token punctuation">,</span> b <span class="token keyword">in</span> merges<span class="token punctuation">:</span>
+        new_tokens <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        i <span class="token operator">=</span> <span class="token number">0</span>
+        <span class="token keyword">while</span> i <span class="token operator">&lt;</span> <span class="token builtin">len</span><span class="token punctuation">(</span>tokens<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> i <span class="token operator">+</span> <span class="token number">1</span> <span class="token operator">&lt;</span> <span class="token builtin">len</span><span class="token punctuation">(</span>tokens<span class="token punctuation">)</span> <span class="token keyword">and</span> tokens<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">==</span> a <span class="token keyword">and</span> tokens<span class="token punctuation">[</span>i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">==</span> b<span class="token punctuation">:</span>
+                new_tokens<span class="token punctuation">.</span>append<span class="token punctuation">(</span>a <span class="token operator">+</span> b<span class="token punctuation">)</span>
+                i <span class="token operator">+=</span> <span class="token number">2</span>
+            <span class="token keyword">else</span><span class="token punctuation">:</span>
+                new_tokens<span class="token punctuation">.</span>append<span class="token punctuation">(</span>tokens<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span>
+                i <span class="token operator">+=</span> <span class="token number">1</span>
+        tokens <span class="token operator">=</span> new_tokens
+    <span class="token keyword">return</span> tokens</code></pre>
+</figure>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token operator">>></span><span class="token operator">></span> corpus <span class="token operator">=</span> Counter<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"low"</span><span class="token punctuation">:</span> <span class="token number">5</span><span class="token punctuation">,</span> <span class="token string">"lower"</span><span class="token punctuation">:</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token string">"newest"</span><span class="token punctuation">:</span> <span class="token number">6</span><span class="token punctuation">,</span> <span class="token string">"widest"</span><span class="token punctuation">:</span> <span class="token number">3</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token operator">>></span><span class="token operator">></span> merges <span class="token operator">=</span> learn_bpe<span class="token punctuation">(</span>corpus<span class="token punctuation">,</span> k_merges<span class="token operator">=</span><span class="token number">10</span><span class="token punctuation">)</span>
+<span class="token operator">>></span><span class="token operator">></span> apply_bpe<span class="token punctuation">(</span><span class="token string">"lowest"</span><span class="token punctuation">,</span> merges<span class="token punctuation">)</span>
+<span class="token punctuation">[</span><span class="token string">'low'</span><span class="token punctuation">,</span> <span class="token string">'est&lt;/w>'</span><span class="token punctuation">]</span></code></pre>
+</figure>
+<p>First iteration merges the most common adjacent pair. After enough iterations, frequent substrings (<code class="inline-code">low</code>, <code class="inline-code">est</code>, <code class="inline-code">tion</code>) become single tokens and rare words break cleanly.</p>
+<p>The real GPT / BERT / T5 tokenizers learn 30k-100k merges. Result: any text tokenizes into a bounded-length sequence of known IDs, no OOV ever.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>In practice, you rarely train any of these yourself. You load pre-trained checkpoints.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> fasttext<span class="token punctuation">.</span>util
+fasttext<span class="token punctuation">.</span>util<span class="token punctuation">.</span>download_model<span class="token punctuation">(</span><span class="token string">"en"</span><span class="token punctuation">,</span> if_exists<span class="token operator">=</span><span class="token string">"ignore"</span><span class="token punctuation">)</span>
+ft <span class="token operator">=</span> fasttext<span class="token punctuation">.</span>load_model<span class="token punctuation">(</span><span class="token string">"cc.en.300.bin"</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>ft<span class="token punctuation">.</span>get_word_vector<span class="token punctuation">(</span><span class="token string">"whereupon"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>shape<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>ft<span class="token punctuation">.</span>get_word_vector<span class="token punctuation">(</span><span class="token string">"zoomerapproved"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>shape<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>For BPE-style subword tokenization in the transformer era:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> transformers <span class="token keyword">import</span> AutoTokenizer
+
+tok <span class="token operator">=</span> AutoTokenizer<span class="token punctuation">.</span>from_pretrained<span class="token punctuation">(</span><span class="token string">"gpt2"</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>tok<span class="token punctuation">.</span>tokenize<span class="token punctuation">(</span><span class="token string">"unbelievably tokenized"</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>['un', 'bel', 'iev', 'ably', 'Ġtoken', 'ized']</code></pre>
+</figure>
+<p>The <code class="inline-code">Ġ</code> prefix marks word boundaries (a GPT-2 convention). Every modern tokenizer is a BPE variant, WordPiece (BERT), or SentencePiece (T5, LLaMA).</p>
+<h3 id="when-to-pick-which" class="prose-h prose-h3"><a class="prose-h__anchor" href="#when-to-pick-which" aria-label="Link to this section">#</a>When to pick which</h3>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Pick</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Pretrained general-purpose word vectors, no OOV tolerance needed</td>
+<td>GloVe 300d</td>
+</tr>
+<tr>
+<td>Pretrained general-purpose word vectors, must handle misspellings / neologisms / morphologically rich languages</td>
+<td>FastText</td>
+</tr>
+<tr>
+<td>Anything going into a transformer (training or inference)</td>
+<td>Whatever tokenizer the model shipped with. Never swap.</td>
+</tr>
+<tr>
+<td>Training your own language model from scratch</td>
+<td>Train a BPE or SentencePiece tokenizer on your corpus first</td>
+</tr>
+<tr>
+<td>Production text classification with a linear model</td>
+<td>Still TF-IDF. Lesson 02.</td>
+</tr>
+</tbody></table>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>Save as <code class="inline-code">outputs/skill-embeddings-picker.md</code>:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">markdown</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-markdown"><span class="token front-matter-block"><span class="token punctuation">---</span>
+<span class="token front-matter yaml language-yaml"><span class="token key atrule">name</span><span class="token punctuation">:</span> tokenizer<span class="token punctuation">-</span>picker
+<span class="token key atrule">description</span><span class="token punctuation">:</span> Pick a tokenization approach for a new language model or text pipeline.
+<span class="token key atrule">version</span><span class="token punctuation">:</span> 1.0.0
+<span class="token key atrule">phase</span><span class="token punctuation">:</span> <span class="token number">5</span>
+<span class="token key atrule">lesson</span><span class="token punctuation">:</span> <span class="token number">04</span>
+<span class="token key atrule">tags</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>nlp<span class="token punctuation">,</span> tokenization<span class="token punctuation">,</span> embeddings<span class="token punctuation">]</span></span>
+<span class="token punctuation">---</span></span>
+
+Given a task and dataset description, you output:
+
+<span class="token list punctuation">1.</span> Tokenization strategy (word-level, BPE, WordPiece, SentencePiece, byte-level). One-sentence reason.
+<span class="token list punctuation">2.</span> Vocabulary size target (e.g., 32k for an English-only LM, 64k-100k for multilingual).
+<span class="token list punctuation">3.</span> Library call with the exact training command. Name the library. Quote the arguments.
+<span class="token list punctuation">4.</span> One reproducibility pitfall. Tokenizer-model mismatch is the single most common silent production bug; call out which pair must be used together.
+
+Refuse to recommend training a custom tokenizer when the user is fine-tuning a pretrained LLM. Refuse to recommend word-level tokenization for any model targeting production inference. Flag non-English / multi-script corpora as needing SentencePiece with byte fallback.</code></pre>
+</figure>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><strong>Easy.</strong> Run <code class="inline-code">char_ngrams(&quot;playing&quot;)</code> and <code class="inline-code">char_ngrams(&quot;played&quot;)</code>. Compute the Jaccard overlap of the two n-gram sets. You should see substantial shared pieces (<code class="inline-code">pla</code>, <code class="inline-code">lay</code>, <code class="inline-code">play</code>), which is why FastText transfers well across morphological variants.</li>
+<li><strong>Medium.</strong> Extend <code class="inline-code">learn_bpe</code> to track vocabulary growth. Plot tokens-per-corpus-character as a function of number of merges. You should see rapid compression at first, asymptoting near ~2-3 chars per token.</li>
+<li><strong>Hard.</strong> Train a 1k-merge BPE on Shakespeare&#39;s complete works. Compare tokenization of common words vs. rare proper nouns. Measure average tokens per word before and after. Write up what surprised you.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Co-occurrence matrix</td>
+<td>Word-word frequency table</td>
+<td><code class="inline-code">X[i][j]</code> = how often word <code class="inline-code">j</code> appears in a window around word <code class="inline-code">i</code>.</td>
+</tr>
+<tr>
+<td>Subword</td>
+<td>Piece of a word</td>
+<td>A character n-gram (FastText) or learned token (BPE/WordPiece/SentencePiece).</td>
+</tr>
+<tr>
+<td>BPE</td>
+<td>Byte-pair encoding</td>
+<td>Iterative merging of most-frequent adjacent pairs until vocabulary hits target size.</td>
+</tr>
+<tr>
+<td>OOV</td>
+<td>Out of vocabulary</td>
+<td>Word the model has never seen. Word2Vec/GloVe fail. FastText and BPE handle it.</td>
+</tr>
+<tr>
+<td>Byte-level BPE</td>
+<td>BPE on raw bytes</td>
+<td>GPT-2&#39;s scheme. Vocabulary starts with 256 bytes, so nothing is ever OOV.</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://nlp.stanford.edu/pubs/glove.pdf" target="_blank" rel="noopener">Pennington, Socher, Manning (2014). GloVe: Global Vectors for Word Representation</a> — the GloVe paper, seven pages, still the best derivation of the loss.</li>
+<li><a href="https://arxiv.org/abs/1607.04606" target="_blank" rel="noopener">Bojanowski et al. (2017). Enriching Word Vectors with Subword Information</a> — FastText.</li>
+<li><a href="https://arxiv.org/abs/1508.07909" target="_blank" rel="noopener">Sennrich, Haddow, Birch (2016). Neural Machine Translation of Rare Words with Subword Units</a> — the paper that introduced BPE to modern NLP.</li>
+<li><a href="https://huggingface.co/docs/transformers/tokenizer_summary" target="_blank" rel="noopener">Hugging Face tokenizer summary</a> — how BPE, WordPiece, and SentencePiece actually differ in practice.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="03-word-embeddings-word2vec.html">
+  <span class="label">← Previous</span>
+  <b>Word Embeddings — Word2Vec from Scratch</b>
+</a>
+      <a class="pager__item pager__item--next" href="05-sentiment-analysis.html">
+  <span class="label">Next →</span>
+  <b>Sentiment Analysis</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>4 minutes</b> of NLP, Foundations to Advanced behind you.</p>
+      <a class="btn btn--solid" href="05-sentiment-analysis.html">Continue to Sentiment Analysis →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#glove-factorize-the-co-occurrence-matrix">GloVe: factorize the co-occurrence matrix</a></li><li class="mini__item mini__item--d3"><a href="#fasttext-subword-aware-embeddings">FastText: subword-aware embeddings</a></li><li class="mini__item mini__item--d3"><a href="#bpe-learned-subword-vocabulary">BPE: learned subword vocabulary</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d3"><a href="#when-to-pick-which">When to pick which</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

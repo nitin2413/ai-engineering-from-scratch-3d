@@ -1,0 +1,904 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scaling: Distributed Training, FSDP, DeepSpeed — LLMs from Scratch — AIFS</title>
+<meta name="description" content="LLMs from Scratch: Scaling: Distributed Training, FSDP, DeepSpeed. 13 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Scaling: Distributed Training, FSDP, DeepSpeed — LLMs from Scratch — AIFS">
+<meta property="og:description" content="LLMs from Scratch: Scaling: Distributed Training, FSDP, DeepSpeed. 13 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"paged-kv-cache":["../assets/figures/figures-llms2.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-llms2.js"];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#6C4DFF" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#6C4DFF;--accent-ink:#FFFFFF"
+  data-lesson-id="llms-from-scratch/05-scaling-distributed" data-module="llms-from-scratch"
+  data-prev="04-pre-training-mini-gpt.html" data-next="06-instruction-tuning-sft.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#6C4DFF">
+        <span class="label">Phase 10</span>
+        <b>LLMs from Scratch</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="llms-from-scratch/01-tokenizers"><a href="01-tokenizers.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Tokenizers: BPE, WordPiece, SentencePiece</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/02-building-a-tokenizer"><a href="02-building-a-tokenizer.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Building a Tokenizer from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/03-data-pipelines"><a href="03-data-pipelines.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Data Pipelines for Pre-Training</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/04-pre-training-mini-gpt"><a href="04-pre-training-mini-gpt.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Pre-Training a Mini GPT (124M Parameters)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/05-scaling-distributed"><a href="05-scaling-distributed.html" class="is-current">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Scaling: Distributed Training, FSDP, DeepSpeed</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/06-instruction-tuning-sft"><a href="06-instruction-tuning-sft.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Instruction Tuning (SFT)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/07-rlhf"><a href="07-rlhf.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">RLHF: Reward Model + PPO</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/08-dpo"><a href="08-dpo.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">DPO: Direct Preference Optimization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/09-constitutional-ai-self-improvement"><a href="09-constitutional-ai-self-improvement.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Constitutional AI and Self-Improvement</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/10-evaluation"><a href="10-evaluation.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Evaluation: Benchmarks, Evals, LM Harness</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/11-quantization"><a href="11-quantization.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Quantization: Making Models Fit</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/12-inference-optimization"><a href="12-inference-optimization.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Inference Optimization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/13-building-complete-llm-pipeline"><a href="13-building-complete-llm-pipeline.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Building a Complete LLM Pipeline</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/14-open-models-architecture-walkthroughs"><a href="14-open-models-architecture-walkthroughs.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Open Models: Architecture Walkthroughs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/15-speculative-decoding-eagle3"><a href="15-speculative-decoding-eagle3.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Speculative Decoding and EAGLE-3</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/16-differential-attention-v2"><a href="16-differential-attention-v2.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Differential Attention (V2)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/17-native-sparse-attention"><a href="17-native-sparse-attention.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Native Sparse Attention (DeepSeek NSA)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/18-multi-token-prediction"><a href="18-multi-token-prediction.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Multi-Token Prediction (MTP)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/19-dualpipe-parallelism"><a href="19-dualpipe-parallelism.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">DualPipe Parallelism</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/20-deepseek-v3-walkthrough"><a href="20-deepseek-v3-walkthrough.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">DeepSeek-V3 Architecture Walkthrough</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/21-jamba-hybrid-ssm-transformer"><a href="21-jamba-hybrid-ssm-transformer.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Jamba — Hybrid SSM-Transformer</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/22-async-hogwild-inference"><a href="22-async-hogwild-inference.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Async and Hogwild! Inference</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/25-speculative-decoding"><a href="25-speculative-decoding.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Speculative Decoding and EAGLE</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/34-gradient-checkpointing"><a href="34-gradient-checkpointing.html" class="">
+  <span class="snav__n">34</span>
+  <span class="snav__t">Gradient Checkpointing and Activation Recomputation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">LLMs from Scratch</a></p>
+      <h1 class="page__title">Scaling: Distributed Training, FSDP, DeepSpeed</h1>
+      <p class="page__lede">Your 124M model trained on one GPU. Now try 7 billion parameters. The model doesn't fit in memory. The data takes weeks on a single machine. Distributed training isn't optional at scale. It's the only path forward.</p>
+      <div class="page__meta">
+        <span class="chip">13 min read</span>
+        <span class="chip">2,830 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 10, Lesson 04 (Pre-Training a Mini GPT)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~120 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Explain the three types of parallelism (data, tensor, pipeline) and when each is necessary based on model and cluster size</li>
+<li>Implement data-parallel training using PyTorch DDP with gradient synchronization across multiple GPUs</li>
+<li>Calculate the memory budget for a given model size (weights + optimizer states + gradients + activations) to determine the minimum hardware</li>
+<li>Configure FSDP or DeepSpeed ZeRO stages to shard model states across GPUs and fit models that exceed single-GPU memory</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>A 7B parameter model in FP16 needs 14GB just for the weights. Adam optimizer stores two additional copies of every parameter (first and second moment estimates). That is another 28GB. Gradients during backpropagation add 14GB more. You are at 56GB before a single activation is stored.</p>
+<p>An NVIDIA A100 has 80GB of memory.</p>
+<p>56GB out of 80GB consumed. That leaves 24GB for activations -- the intermediate values computed during the forward pass that must be kept alive for backpropagation. For a 2048-token sequence with a 4096-dimensional model, a single layer&#39;s activations use about 64MB. With 32 layers, you need 2GB per sample. A batch size of 8 requires 16GB. You have 24GB. A batch size of 12 blows up.</p>
+<p>Now try 70B parameters. Weights alone: 140GB in FP16. Does not fit on one GPU. You need at least 2 A100s (2 x 80GB = 160GB) just to hold the weights. Add optimizer states and gradients and you need far more: 3+ GPUs minimum, and realistically 8-16 depending on sharding strategy.</p>
+<p>Llama 3 405B was trained on 16,384 NVIDIA H100 GPUs. The training run cost an estimated $100 million in compute. DeepSeek V3 trained a comparable model for roughly $5.6 million by being clever about architecture (Mixture of Experts means only a fraction of parameters activate per token) and training efficiency.</p>
+<p>This lesson covers the four strategies that make large-scale training possible: data parallelism, tensor parallelism, pipeline parallelism, and fully sharded data parallelism. You will simulate each one in pure Python to understand the mechanics before ever touching a distributed training framework.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="why-distribution-is-required" class="prose-h prose-h3"><a class="prose-h__anchor" href="#why-distribution-is-required" aria-label="Link to this section">#</a>Why Distribution is Required</h3>
+<p>Here is the memory math for real models. Every number is calculated, not estimated.</p>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Params</th>
+<th>Weights (FP16)</th>
+<th>Adam States</th>
+<th>Gradients (FP16)</th>
+<th>Total (no activations)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GPT-2 Small</td>
+<td>124M</td>
+<td>248 MB</td>
+<td>992 MB</td>
+<td>248 MB</td>
+<td>1.5 GB</td>
+</tr>
+<tr>
+<td>Llama 3 8B</td>
+<td>8B</td>
+<td>16 GB</td>
+<td>64 GB</td>
+<td>16 GB</td>
+<td>96 GB</td>
+</tr>
+<tr>
+<td>Llama 3 70B</td>
+<td>70B</td>
+<td>140 GB</td>
+<td>560 GB</td>
+<td>140 GB</td>
+<td>840 GB</td>
+</tr>
+<tr>
+<td>Llama 3 405B</td>
+<td>405B</td>
+<td>810 GB</td>
+<td>3,240 GB</td>
+<td>810 GB</td>
+<td>4,860 GB</td>
+</tr>
+</tbody></table>
+<p>The &quot;Adam States&quot; column is the killer. Adam stores a running mean (m) and a running variance (v) for every parameter, both in FP32. For a 70B model, that is 70B x 4 bytes x 2 = 560GB. The optimizer alone needs seven A100s.</p>
+<p>A single H100 has 80GB. Llama 3 405B needs at least 61 H100s to hold the weights, optimizer, and gradients. Add activations and the number grows further. Meta used 16,384 GPUs not because they wanted to -- because they had to.</p>
+<h3 id="data-parallelism" class="prose-h prose-h3"><a class="prose-h__anchor" href="#data-parallelism" aria-label="Link to this section">#</a>Data Parallelism</h3>
+<p>The simplest distributed strategy. Copy the entire model to N GPUs. Split each training batch into N equal parts. Each GPU runs a forward and backward pass on its shard of the data. After the backward pass, average the gradients across all GPUs. Every GPU updates its copy of the weights with the same averaged gradients, keeping all copies in sync.</p>
+<p><strong>The good:</strong> Linear throughput scaling. N GPUs process N times more data per step. Communication is limited to gradient averaging, which overlaps with computation.</p>
+<p><strong>The bad:</strong> Every GPU holds a complete copy of the model, optimizer states, and gradients. For a 70B model, each GPU needs 840GB. Data parallelism does nothing to reduce per-GPU memory. It only reduces training time.</p>
+<p><strong>The math:</strong> Effective batch size = per_gpu_batch_size x N. For N=64 GPUs with per-GPU batch of 16, the effective batch is 1,024. Llama 3 used an effective batch size of 16 million tokens per step.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph TD
+    subgraph DataParallel[&quot;Data Parallelism (N=4 GPUs)&quot;]
+        B[&quot;Full Batch&lt;br/&gt;(1024 samples)&quot;] --&gt; S[&quot;Split&quot;]
+        S --&gt; G1[&quot;GPU 1&lt;br/&gt;Full Model Copy&lt;br/&gt;256 samples&quot;]
+        S --&gt; G2[&quot;GPU 2&lt;br/&gt;Full Model Copy&lt;br/&gt;256 samples&quot;]
+        S --&gt; G3[&quot;GPU 3&lt;br/&gt;Full Model Copy&lt;br/&gt;256 samples&quot;]
+        S --&gt; G4[&quot;GPU 4&lt;br/&gt;Full Model Copy&lt;br/&gt;256 samples&quot;]
+        G1 --&gt; AR[&quot;AllReduce&lt;br/&gt;Average Gradients&quot;]
+        G2 --&gt; AR
+        G3 --&gt; AR
+        G4 --&gt; AR
+        AR --&gt; U[&quot;Update&lt;br/&gt;(identical on all GPUs)&quot;]
+    end
+
+    style B fill:#1a1a2e,stroke:#e94560,color:#fff
+    style G1 fill:#1a1a2e,stroke:#0f3460,color:#fff
+    style G2 fill:#1a1a2e,stroke:#0f3460,color:#fff
+    style G3 fill:#1a1a2e,stroke:#0f3460,color:#fff
+    style G4 fill:#1a1a2e,stroke:#0f3460,color:#fff
+    style AR fill:#1a1a2e,stroke:#51cf66,color:#fff
+    style U fill:#1a1a2e,stroke:#51cf66,color:#fff</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<h3 id="tensor-parallelism" class="prose-h prose-h3"><a class="prose-h__anchor" href="#tensor-parallelism" aria-label="Link to this section">#</a>Tensor Parallelism</h3>
+<p>Split individual layers across GPUs. A single matrix multiplication is divided among GPUs, each computing part of the result.</p>
+<p>Consider a weight matrix of shape (8192, 8192) in a feedforward layer. With 4-way tensor parallelism, each GPU holds a (8192, 2048) shard. Each GPU multiplies the input by its shard, producing a partial result. The partial results are combined (via all-reduce or all-gather) to produce the full output.</p>
+<p><strong>The good:</strong> Reduces per-GPU memory for model weights. A 70B model split across 8 GPUs means each GPU holds ~8.75B parameters worth of weights.</p>
+<p><strong>The bad:</strong> Requires fast inter-GPU communication after every layer. The all-reduce after each matmul adds latency. This works well with NVLink (900 GB/s between GPUs on the same node) but poorly across nodes connected by InfiniBand (400 Gb/s, about 50 GB/s). Tensor parallelism is almost always limited to within a single node (8 GPUs).</p>
+<p><strong>Real usage:</strong> Megatron-LM pioneered tensor parallelism. Llama 3 405B uses 8-way tensor parallelism within each node.</p>
+<h3 id="pipeline-parallelism" class="prose-h prose-h3"><a class="prose-h__anchor" href="#pipeline-parallelism" aria-label="Link to this section">#</a>Pipeline Parallelism</h3>
+<p>Split the model by layers. GPU 1 runs layers 1-8. GPU 2 runs layers 9-16. GPU 3 runs layers 17-24. GPU 4 runs layers 25-32. Data flows through the pipeline: GPU 1 computes its layers and sends activations to GPU 2, which computes its layers and sends to GPU 3, and so on.</p>
+<p><strong>The good:</strong> Minimal communication between GPUs -- just the activations at layer boundaries, which are small compared to gradients or weights. Works across nodes because bandwidth requirements are low.</p>
+<p><strong>The bad:</strong> Pipeline bubbles. When GPU 4 is computing the forward pass on micro-batch 1, GPUs 1, 2, and 3 are idle (they have already forwarded their portion). During backward pass, the pattern reverses. With naive pipelining, GPU utilization is only 1/N for N pipeline stages.</p>
+<p><strong>GPipe and PipeDream</strong> solve the bubble problem by splitting the batch into micro-batches. GPU 1 starts on micro-batch 2 as soon as it finishes forwarding micro-batch 1. This overlaps computation across pipeline stages. With M micro-batches and N stages, the bubble fraction drops to (N-1)/M. Use M=16 micro-batches with N=4 stages and the bubble is 3/16 = 18.75% idle time.</p>
+<h3 id="fsdp-fully-sharded-data-parallel" class="prose-h prose-h3"><a class="prose-h__anchor" href="#fsdp-fully-sharded-data-parallel" aria-label="Link to this section">#</a>FSDP: Fully Sharded Data Parallel</h3>
+<p>FSDP combines the scalability of data parallelism with the memory efficiency of sharding. Instead of each GPU holding a complete copy of the model, each GPU holds only 1/N of the parameters, gradients, and optimizer states.</p>
+<p>Before a layer&#39;s forward pass, FSDP runs an <strong>all-gather</strong> to collect the full parameters from all GPUs into each GPU&#39;s memory. After the forward pass, each GPU discards the non-local parameters. During backward, the all-gather runs again to reconstruct parameters for gradient computation. After the backward pass, a <strong>reduce-scatter</strong> distributes gradient shards so each GPU only stores 1/N of the gradients.</p>
+<p><strong>The math for a 70B model on 8 GPUs:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Without FSDP</th>
+<th>With FSDP</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Weights (FP16)</td>
+<td>140 GB per GPU</td>
+<td>17.5 GB per GPU</td>
+</tr>
+<tr>
+<td>Adam States (FP32)</td>
+<td>560 GB per GPU</td>
+<td>70 GB per GPU</td>
+</tr>
+<tr>
+<td>Gradients (FP16)</td>
+<td>140 GB per GPU</td>
+<td>17.5 GB per GPU</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>840 GB per GPU</strong></td>
+<td><strong>105 GB per GPU</strong></td>
+</tr>
+</tbody></table>
+<p>Without FSDP, you cannot fit a 70B model on a single 80GB GPU. With FSDP on 8 GPUs, each GPU uses 105GB -- wait, that still does not fit. You need at least 16 GPUs to get under 80GB per GPU, or you combine FSDP with activation checkpointing (recompute activations during backward instead of storing them).</p>
+<p>The communication cost is higher than vanilla data parallelism because of the all-gather before each layer. But the memory savings make previously impossible training runs possible.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph TD
+    subgraph FSDP[&quot;FSDP: Fully Sharded Data Parallel (4 GPUs)&quot;]
+        direction TB
+        S[&quot;Model: 4 layers, sharded&quot;]
+
+        subgraph GPU1[&quot;GPU 1&quot;]
+            G1S[&quot;Shard: 1/4 params&lt;br/&gt;1/4 optimizer&lt;br/&gt;1/4 gradients&quot;]
+        end
+        subgraph GPU2[&quot;GPU 2&quot;]
+            G2S[&quot;Shard: 1/4 params&lt;br/&gt;1/4 optimizer&lt;br/&gt;1/4 gradients&quot;]
+        end
+        subgraph GPU3[&quot;GPU 3&quot;]
+            G3S[&quot;Shard: 1/4 params&lt;br/&gt;1/4 optimizer&lt;br/&gt;1/4 gradients&quot;]
+        end
+        subgraph GPU4[&quot;GPU 4&quot;]
+            G4S[&quot;Shard: 1/4 params&lt;br/&gt;1/4 optimizer&lt;br/&gt;1/4 gradients&quot;]
+        end
+
+        AG[&quot;All-Gather&lt;br/&gt;(reconstruct full params&lt;br/&gt;before each layer)&quot;]
+        FW[&quot;Forward Pass&lt;br/&gt;(full params temporarily)&quot;]
+        RS[&quot;Reduce-Scatter&lt;br/&gt;(distribute gradient shards&lt;br/&gt;after backward)&quot;]
+
+        S --&gt; GPU1
+        S --&gt; GPU2
+        S --&gt; GPU3
+        S --&gt; GPU4
+        GPU1 --&gt; AG
+        GPU2 --&gt; AG
+        GPU3 --&gt; AG
+        GPU4 --&gt; AG
+        AG --&gt; FW
+        FW --&gt; RS
+    end
+
+    style G1S fill:#1a1a2e,stroke:#0f3460,color:#fff
+    style G2S fill:#1a1a2e,stroke:#0f3460,color:#fff
+    style G3S fill:#1a1a2e,stroke:#0f3460,color:#fff
+    style G4S fill:#1a1a2e,stroke:#0f3460,color:#fff
+    style AG fill:#1a1a2e,stroke:#e94560,color:#fff
+    style FW fill:#1a1a2e,stroke:#51cf66,color:#fff
+    style RS fill:#1a1a2e,stroke:#e94560,color:#fff</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<h3 id="deepspeed-zero" class="prose-h prose-h3"><a class="prose-h__anchor" href="#deepspeed-zero" aria-label="Link to this section">#</a>DeepSpeed ZeRO</h3>
+<p>DeepSpeed&#39;s ZeRO (Zero Redundancy Optimizer) is conceptually identical to FSDP but was developed independently by Microsoft. It defines three stages, each sharding more aggressively:</p>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Shards</th>
+<th>Memory Savings</th>
+<th>Communication</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ZeRO-1</td>
+<td>Optimizer states only</td>
+<td>~4x reduction</td>
+<td>Same as data parallel</td>
+</tr>
+<tr>
+<td>ZeRO-2</td>
+<td>+ Gradients</td>
+<td>~8x reduction</td>
+<td>Slightly more</td>
+</tr>
+<tr>
+<td>ZeRO-3</td>
+<td>+ Parameters</td>
+<td>~Nx reduction (N GPUs)</td>
+<td>All-gather per layer</td>
+</tr>
+</tbody></table>
+<p>ZeRO-3 is equivalent to FSDP. The naming is different, the mechanism is the same. PyTorch added FSDP as a native implementation after DeepSpeed proved the concept.</p>
+<p>DeepSpeed also introduced ZeRO-Offload (offload optimizer states to CPU RAM, which is cheaper and larger) and ZeRO-Infinity (offload to NVMe SSDs). These trade compute speed for memory capacity -- the offloaded operations are slower but free up GPU memory.</p>
+<h3 id="mixed-precision-training" class="prose-h prose-h3"><a class="prose-h__anchor" href="#mixed-precision-training" aria-label="Link to this section">#</a>Mixed Precision Training</h3>
+<p>Modern training uses multiple floating-point formats simultaneously:</p>
+<ul>
+<li><strong>Forward pass</strong>: FP16 or BF16 (16-bit). Half the memory of FP32. Matmuls run 2x faster on tensor cores.</li>
+<li><strong>Master weights</strong>: FP32 (32-bit). Maintained by the optimizer for numerical precision during weight updates.</li>
+<li><strong>Loss scaling</strong>: Multiply the loss by a large constant before backward pass to prevent FP16 gradients from underflowing to zero. Divide by the same constant before the optimizer step.</li>
+</ul>
+<p>BF16 (Brain Float 16) has the same exponent range as FP32 (8 exponent bits) but reduced precision (7 mantissa bits vs FP32&#39;s 23). It rarely needs loss scaling because it can represent the same range of values. FP16 has 5 exponent bits and 10 mantissa bits -- it can represent fine-grained values but overflows/underflows at extreme magnitudes.</p>
+<p>Google&#39;s TPUs use BF16 natively. NVIDIA&#39;s A100 and H100 support both FP16 and BF16. The industry has largely moved to BF16 because it eliminates loss scaling headaches.</p>
+<p><strong>Memory comparison for a 7B model:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Precision</th>
+<th>Weights</th>
+<th>Optimizer</th>
+<th>Gradients</th>
+<th>Total</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>FP32 everywhere</td>
+<td>28 GB</td>
+<td>56 GB</td>
+<td>28 GB</td>
+<td>112 GB</td>
+</tr>
+<tr>
+<td>Mixed (BF16 + FP32 master)</td>
+<td>14 GB</td>
+<td>56 GB</td>
+<td>14 GB</td>
+<td>84 GB</td>
+</tr>
+</tbody></table>
+<p>Mixed precision saves 28GB on this model. The optimizer states stay in FP32 regardless -- this is where most of the memory goes.</p>
+<h3 id="megatron-lm-and-3d-parallelism" class="prose-h prose-h3"><a class="prose-h__anchor" href="#megatron-lm-and-3d-parallelism" aria-label="Link to this section">#</a>Megatron-LM and 3D Parallelism</h3>
+<p>Real large-scale training combines all three parallelisms:</p>
+<ul>
+<li><strong>Data parallelism</strong> across groups of nodes (scale batch size)</li>
+<li><strong>Tensor parallelism</strong> within a node (split layers across 8 GPUs)</li>
+<li><strong>Pipeline parallelism</strong> across nodes (split layer groups across machines)</li>
+</ul>
+<p>Llama 3 405B on 16,384 H100s:</p>
+<ul>
+<li>8-way tensor parallelism within each node (8 GPUs per node)</li>
+<li>16-way pipeline parallelism across nodes (16 pipeline stages)</li>
+<li>128-way data parallelism across the remaining dimension (16,384 / 8 / 16 = 128)</li>
+</ul>
+<p>This 3D decomposition (8 x 16 x 128 = 16,384) is how you scale to thousands of GPUs. Each GPU sees a different data shard (data parallel), holds one slice of each layer (tensor parallel), and computes a different set of layers (pipeline parallel).</p>
+<p>DeepSeek V3 took a different approach. Their Mixture of Experts architecture activates only 37B out of 671B parameters per token. This means each GPU only needs to compute (and store activations for) the active parameters. They trained on 2,048 H800 GPUs -- less than 1/8 of Meta&#39;s GPU count -- for $5.6M vs Meta&#39;s estimated $100M.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph TD
+    subgraph ThreeD[&quot;3D Parallelism (Llama 3 405B)&quot;]
+        direction TB
+        subgraph DP[&quot;Data Parallel (128-way)&lt;br/&gt;Split batch across 128 groups&quot;]
+            subgraph PP[&quot;Pipeline Parallel (16-way)&lt;br/&gt;Split layers across 16 stages&quot;]
+                subgraph TP[&quot;Tensor Parallel (8-way)&lt;br/&gt;Split each layer across 8 GPUs&quot;]
+                    G1[&quot;GPU 1&lt;br/&gt;Slice of layers 1-N&quot;]
+                    G2[&quot;GPU 2&lt;br/&gt;Slice of layers 1-N&quot;]
+                    G8[&quot;GPU 8&lt;br/&gt;Slice of layers 1-N&quot;]
+                end
+            end
+        end
+    end
+
+    N1[&quot;Total: 8 x 16 x 128 = 16,384 GPUs&quot;]
+
+    style G1 fill:#1a1a2e,stroke:#0f3460,color:#fff
+    style G2 fill:#1a1a2e,stroke:#0f3460,color:#fff
+    style G8 fill:#1a1a2e,stroke:#0f3460,color:#fff
+    style N1 fill:#1a1a2e,stroke:#e94560,color:#fff</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="paged-kv-cache"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">paged-kv-cache</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> paged kv cache</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-simulate-data-parallelism" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-simulate-data-parallelism" aria-label="Link to this section">#</a>Step 1: Simulate Data Parallelism</h3>
+<p>Split a batch across simulated GPUs. Each GPU computes a forward pass on its shard. Average the &quot;gradients&quot; (we simulate them as the loss values).</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+
+<span class="token keyword">def</span> <span class="token function">simulate_data_parallelism</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> num_gpus<span class="token punctuation">,</span> model_fn<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    batch_size <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span>
+    shard_size <span class="token operator">=</span> batch_size <span class="token operator">//</span> num_gpus
+    remainder <span class="token operator">=</span> batch_size <span class="token operator">%</span> num_gpus
+
+    gpu_losses <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    gpu_gradients <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+
+    offset <span class="token operator">=</span> <span class="token number">0</span>
+    <span class="token keyword">for</span> gpu_id <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>num_gpus<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        extra <span class="token operator">=</span> <span class="token number">1</span> <span class="token keyword">if</span> gpu_id <span class="token operator">&lt;</span> remainder <span class="token keyword">else</span> <span class="token number">0</span>
+        shard <span class="token operator">=</span> data<span class="token punctuation">[</span>offset<span class="token punctuation">:</span>offset <span class="token operator">+</span> shard_size <span class="token operator">+</span> extra<span class="token punctuation">]</span>
+        offset <span class="token operator">+=</span> shard_size <span class="token operator">+</span> extra
+
+        loss<span class="token punctuation">,</span> grad <span class="token operator">=</span> model_fn<span class="token punctuation">(</span>shard<span class="token punctuation">)</span>
+        gpu_losses<span class="token punctuation">.</span>append<span class="token punctuation">(</span>loss<span class="token punctuation">)</span>
+        gpu_gradients<span class="token punctuation">.</span>append<span class="token punctuation">(</span>grad<span class="token punctuation">)</span>
+
+    avg_loss <span class="token operator">=</span> np<span class="token punctuation">.</span>mean<span class="token punctuation">(</span>gpu_losses<span class="token punctuation">)</span>
+    avg_gradient <span class="token operator">=</span> np<span class="token punctuation">.</span>mean<span class="token punctuation">(</span>gpu_gradients<span class="token punctuation">,</span> axis<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> avg_loss<span class="token punctuation">,</span> avg_gradient</code></pre>
+</figure>
+<p>The all-reduce operation (averaging gradients) is the only communication in data parallelism. In practice, this uses the NCCL library on NVIDIA GPUs, which implements ring all-reduce: each GPU sends 1/N of its gradients to its neighbor, receives 1/N from the other neighbor, and after N-1 steps every GPU has the complete average. Total communication volume: 2 x gradient_size x (N-1)/N, approaching 2x the gradient size for large N.</p>
+<h3 id="step-2-simulate-tensor-parallelism" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-simulate-tensor-parallelism" aria-label="Link to this section">#</a>Step 2: Simulate Tensor Parallelism</h3>
+<p>Split a weight matrix across GPUs. Each GPU computes a partial matrix multiplication. Combine the results.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">simulate_tensor_parallelism</span><span class="token punctuation">(</span>input_data<span class="token punctuation">,</span> weight_matrix<span class="token punctuation">,</span> num_gpus<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    d_in<span class="token punctuation">,</span> d_out <span class="token operator">=</span> weight_matrix<span class="token punctuation">.</span>shape
+    <span class="token keyword">assert</span> d_out <span class="token operator">%</span> num_gpus <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token string-interpolation"><span class="token string">f"d_out </span><span class="token interpolation"><span class="token punctuation">{</span>d_out<span class="token punctuation">}</span></span><span class="token string"> not divisible by num_gpus </span><span class="token interpolation"><span class="token punctuation">{</span>num_gpus<span class="token punctuation">}</span></span><span class="token string">"</span></span>
+    shard_size <span class="token operator">=</span> d_out <span class="token operator">//</span> num_gpus
+
+    partial_results <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> gpu_id <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>num_gpus<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        start <span class="token operator">=</span> gpu_id <span class="token operator">*</span> shard_size
+        end <span class="token operator">=</span> start <span class="token operator">+</span> shard_size
+        weight_shard <span class="token operator">=</span> weight_matrix<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> start<span class="token punctuation">:</span>end<span class="token punctuation">]</span>
+
+        partial <span class="token operator">=</span> input_data @ weight_shard
+        partial_results<span class="token punctuation">.</span>append<span class="token punctuation">(</span>partial<span class="token punctuation">)</span>
+
+    full_output <span class="token operator">=</span> np<span class="token punctuation">.</span>concatenate<span class="token punctuation">(</span>partial_results<span class="token punctuation">,</span> axis<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+
+    direct_output <span class="token operator">=</span> input_data @ weight_matrix
+    error <span class="token operator">=</span> np<span class="token punctuation">.</span><span class="token builtin">abs</span><span class="token punctuation">(</span>full_output <span class="token operator">-</span> direct_output<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token builtin">max</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> full_output<span class="token punctuation">,</span> error</code></pre>
+</figure>
+<p>The error should be exactly zero (or machine epsilon). Tensor parallelism is mathematically exact -- it produces the same result as computing the full matmul on one GPU. The split is along the output dimension, so each GPU produces a different chunk of columns, and concatenation reconstructs the full result.</p>
+<p>For column-parallel linear layers (splitting the output dimension), you concatenate. For row-parallel (splitting the input dimension), you sum. In a transformer FFN, the first linear (expand) uses column-parallel and the second linear (contract) uses row-parallel. This avoids an all-reduce between the two layers.</p>
+<h3 id="step-3-simulate-pipeline-parallelism" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-simulate-pipeline-parallelism" aria-label="Link to this section">#</a>Step 3: Simulate Pipeline Parallelism</h3>
+<p>Split a model&#39;s layers across virtual GPUs. Show the bubble problem where early stages sit idle while later stages compute.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">simulate_pipeline_parallelism</span><span class="token punctuation">(</span>num_layers<span class="token punctuation">,</span> num_stages<span class="token punctuation">,</span> num_microbatches<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    layers_per_stage <span class="token operator">=</span> num_layers <span class="token operator">//</span> num_stages
+
+    timeline <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+    clock <span class="token operator">=</span> <span class="token number">0</span>
+
+    <span class="token keyword">for</span> mb <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>num_microbatches<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">for</span> stage <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>num_stages<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            start_time <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span>
+                timeline<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token punctuation">(</span>stage<span class="token punctuation">,</span> mb <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token string">"fwd"</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token keyword">if</span> mb <span class="token operator">></span> <span class="token number">0</span> <span class="token keyword">else</span> <span class="token number">0</span><span class="token punctuation">,</span>
+                timeline<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token punctuation">(</span>stage <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">,</span> mb<span class="token punctuation">,</span> <span class="token string">"fwd"</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token keyword">if</span> stage <span class="token operator">></span> <span class="token number">0</span> <span class="token keyword">else</span> <span class="token number">0</span><span class="token punctuation">,</span>
+            <span class="token punctuation">)</span>
+            end_time <span class="token operator">=</span> start_time <span class="token operator">+</span> layers_per_stage
+            timeline<span class="token punctuation">[</span><span class="token punctuation">(</span>stage<span class="token punctuation">,</span> mb<span class="token punctuation">,</span> <span class="token string">"fwd"</span><span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span>start_time<span class="token punctuation">,</span> end_time<span class="token punctuation">)</span>
+
+    last_fwd_end <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span>v<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token keyword">for</span> v <span class="token keyword">in</span> timeline<span class="token punctuation">.</span>values<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">for</span> mb <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>num_microbatches <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">for</span> stage <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>num_stages <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            deps <span class="token operator">=</span> <span class="token punctuation">[</span>last_fwd_end<span class="token punctuation">]</span>
+            <span class="token keyword">if</span> mb <span class="token operator">&lt;</span> num_microbatches <span class="token operator">-</span> <span class="token number">1</span> <span class="token keyword">and</span> <span class="token punctuation">(</span>stage<span class="token punctuation">,</span> mb <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token string">"bwd"</span><span class="token punctuation">)</span> <span class="token keyword">in</span> timeline<span class="token punctuation">:</span>
+                deps<span class="token punctuation">.</span>append<span class="token punctuation">(</span>timeline<span class="token punctuation">[</span><span class="token punctuation">(</span>stage<span class="token punctuation">,</span> mb <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token string">"bwd"</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+            <span class="token keyword">if</span> stage <span class="token operator">&lt;</span> num_stages <span class="token operator">-</span> <span class="token number">1</span> <span class="token keyword">and</span> <span class="token punctuation">(</span>stage <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> mb<span class="token punctuation">,</span> <span class="token string">"bwd"</span><span class="token punctuation">)</span> <span class="token keyword">in</span> timeline<span class="token punctuation">:</span>
+                deps<span class="token punctuation">.</span>append<span class="token punctuation">(</span>timeline<span class="token punctuation">[</span><span class="token punctuation">(</span>stage <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> mb<span class="token punctuation">,</span> <span class="token string">"bwd"</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+            start_time <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span>deps<span class="token punctuation">)</span>
+            end_time <span class="token operator">=</span> start_time <span class="token operator">+</span> layers_per_stage
+            timeline<span class="token punctuation">[</span><span class="token punctuation">(</span>stage<span class="token punctuation">,</span> mb<span class="token punctuation">,</span> <span class="token string">"bwd"</span><span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span>start_time<span class="token punctuation">,</span> end_time<span class="token punctuation">)</span>
+
+    total_time <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span>v<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token keyword">for</span> v <span class="token keyword">in</span> timeline<span class="token punctuation">.</span>values<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    compute_time <span class="token operator">=</span> num_microbatches <span class="token operator">*</span> num_stages <span class="token operator">*</span> layers_per_stage <span class="token operator">*</span> <span class="token number">2</span>
+    bubble_fraction <span class="token operator">=</span> <span class="token number">1.0</span> <span class="token operator">-</span> compute_time <span class="token operator">/</span> <span class="token punctuation">(</span>total_time <span class="token operator">*</span> num_stages<span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> timeline<span class="token punctuation">,</span> total_time<span class="token punctuation">,</span> bubble_fraction</code></pre>
+</figure>
+<p>With 4 stages and 1 micro-batch, the bubble fraction is 75% -- three out of four GPUs idle at any time. With 16 micro-batches, it drops to about 19%. The cost of eliminating bubbles is memory: you must store activations for all in-flight micro-batches simultaneously.</p>
+<h3 id="step-4-memory-calculator" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-memory-calculator" aria-label="Link to this section">#</a>Step 4: Memory Calculator</h3>
+<p>Compute the exact memory requirements for training any model size.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">memory_calculator</span><span class="token punctuation">(</span>
+    params_billions<span class="token punctuation">,</span>
+    precision_bytes<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">,</span>
+    optimizer<span class="token operator">=</span><span class="token string">"adam"</span><span class="token punctuation">,</span>
+    num_gpus<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span>
+    sharding<span class="token operator">=</span><span class="token string">"none"</span><span class="token punctuation">,</span>
+    sequence_length<span class="token operator">=</span><span class="token number">2048</span><span class="token punctuation">,</span>
+    batch_size_per_gpu<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span>
+    hidden_dim<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">,</span>
+    num_layers<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">,</span>
+<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    params <span class="token operator">=</span> params_billions <span class="token operator">*</span> <span class="token number">1e9</span>
+
+    weight_memory <span class="token operator">=</span> params <span class="token operator">*</span> precision_bytes
+
+    <span class="token keyword">if</span> optimizer <span class="token operator">==</span> <span class="token string">"adam"</span><span class="token punctuation">:</span>
+        optimizer_memory <span class="token operator">=</span> params <span class="token operator">*</span> <span class="token number">4</span> <span class="token operator">*</span> <span class="token number">2</span>
+    <span class="token keyword">elif</span> optimizer <span class="token operator">==</span> <span class="token string">"sgd"</span><span class="token punctuation">:</span>
+        optimizer_memory <span class="token operator">=</span> params <span class="token operator">*</span> <span class="token number">4</span>
+    <span class="token keyword">else</span><span class="token punctuation">:</span>
+        optimizer_memory <span class="token operator">=</span> <span class="token number">0</span>
+
+    gradient_memory <span class="token operator">=</span> params <span class="token operator">*</span> precision_bytes
+
+    total_no_activation <span class="token operator">=</span> weight_memory <span class="token operator">+</span> optimizer_memory <span class="token operator">+</span> gradient_memory
+
+    <span class="token keyword">if</span> hidden_dim <span class="token keyword">and</span> num_layers<span class="token punctuation">:</span>
+        activation_per_layer <span class="token operator">=</span> <span class="token punctuation">(</span>
+            sequence_length <span class="token operator">*</span> batch_size_per_gpu <span class="token operator">*</span> hidden_dim <span class="token operator">*</span> precision_bytes <span class="token operator">*</span> <span class="token number">4</span>
+        <span class="token punctuation">)</span>
+        activation_memory <span class="token operator">=</span> activation_per_layer <span class="token operator">*</span> num_layers
+    <span class="token keyword">else</span><span class="token punctuation">:</span>
+        activation_memory <span class="token operator">=</span> params <span class="token operator">*</span> precision_bytes <span class="token operator">*</span> <span class="token number">0.5</span>
+
+    <span class="token keyword">if</span> sharding <span class="token operator">==</span> <span class="token string">"fsdp"</span> <span class="token keyword">or</span> sharding <span class="token operator">==</span> <span class="token string">"zero3"</span><span class="token punctuation">:</span>
+        weight_memory <span class="token operator">/=</span> num_gpus
+        optimizer_memory <span class="token operator">/=</span> num_gpus
+        gradient_memory <span class="token operator">/=</span> num_gpus
+    <span class="token keyword">elif</span> sharding <span class="token operator">==</span> <span class="token string">"zero2"</span><span class="token punctuation">:</span>
+        optimizer_memory <span class="token operator">/=</span> num_gpus
+        gradient_memory <span class="token operator">/=</span> num_gpus
+    <span class="token keyword">elif</span> sharding <span class="token operator">==</span> <span class="token string">"zero1"</span><span class="token punctuation">:</span>
+        optimizer_memory <span class="token operator">/=</span> num_gpus
+
+    per_gpu_total <span class="token operator">=</span> weight_memory <span class="token operator">+</span> optimizer_memory <span class="token operator">+</span> gradient_memory <span class="token operator">+</span> activation_memory
+
+    <span class="token keyword">return</span> <span class="token punctuation">{</span>
+        <span class="token string">"params_billions"</span><span class="token punctuation">:</span> params_billions<span class="token punctuation">,</span>
+        <span class="token string">"weights_gb"</span><span class="token punctuation">:</span> weight_memory <span class="token operator">/</span> <span class="token number">1e9</span><span class="token punctuation">,</span>
+        <span class="token string">"optimizer_gb"</span><span class="token punctuation">:</span> optimizer_memory <span class="token operator">/</span> <span class="token number">1e9</span><span class="token punctuation">,</span>
+        <span class="token string">"gradients_gb"</span><span class="token punctuation">:</span> gradient_memory <span class="token operator">/</span> <span class="token number">1e9</span><span class="token punctuation">,</span>
+        <span class="token string">"activations_gb"</span><span class="token punctuation">:</span> activation_memory <span class="token operator">/</span> <span class="token number">1e9</span><span class="token punctuation">,</span>
+        <span class="token string">"per_gpu_total_gb"</span><span class="token punctuation">:</span> per_gpu_total <span class="token operator">/</span> <span class="token number">1e9</span><span class="token punctuation">,</span>
+        <span class="token string">"total_across_gpus_gb"</span><span class="token punctuation">:</span> per_gpu_total <span class="token operator">*</span> num_gpus <span class="token operator">/</span> <span class="token number">1e9</span><span class="token punctuation">,</span>
+        <span class="token string">"fits_on_80gb"</span><span class="token punctuation">:</span> per_gpu_total <span class="token operator">/</span> <span class="token number">1e9</span> <span class="token operator">&lt;=</span> <span class="token number">80</span><span class="token punctuation">,</span>
+        <span class="token string">"num_gpus"</span><span class="token punctuation">:</span> num_gpus<span class="token punctuation">,</span>
+        <span class="token string">"sharding"</span><span class="token punctuation">:</span> sharding<span class="token punctuation">,</span>
+    <span class="token punctuation">}</span></code></pre>
+</figure>
+<p>This calculator answers the question every ML engineer asks: &quot;How many GPUs do I need?&quot; Feed it the model size and see whether it fits. Adjust sharding strategy until the per-GPU total drops below 80GB.</p>
+<h3 id="step-5-mixed-precision-simulation" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-mixed-precision-simulation" aria-label="Link to this section">#</a>Step 5: Mixed Precision Simulation</h3>
+<p>Compare memory usage between FP32, FP16, and mixed precision training.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">mixed_precision_comparison</span><span class="token punctuation">(</span>params_billions<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    params <span class="token operator">=</span> params_billions <span class="token operator">*</span> <span class="token number">1e9</span>
+
+    fp32_weights <span class="token operator">=</span> params <span class="token operator">*</span> <span class="token number">4</span>
+    fp32_optimizer <span class="token operator">=</span> params <span class="token operator">*</span> <span class="token number">4</span> <span class="token operator">*</span> <span class="token number">2</span>
+    fp32_gradients <span class="token operator">=</span> params <span class="token operator">*</span> <span class="token number">4</span>
+    fp32_total <span class="token operator">=</span> fp32_weights <span class="token operator">+</span> fp32_optimizer <span class="token operator">+</span> fp32_gradients
+
+    fp16_weights <span class="token operator">=</span> params <span class="token operator">*</span> <span class="token number">2</span>
+    fp16_master <span class="token operator">=</span> params <span class="token operator">*</span> <span class="token number">4</span>
+    fp16_optimizer <span class="token operator">=</span> params <span class="token operator">*</span> <span class="token number">4</span> <span class="token operator">*</span> <span class="token number">2</span>
+    fp16_gradients <span class="token operator">=</span> params <span class="token operator">*</span> <span class="token number">2</span>
+    fp16_total <span class="token operator">=</span> fp16_weights <span class="token operator">+</span> fp16_master <span class="token operator">+</span> fp16_optimizer <span class="token operator">+</span> fp16_gradients
+
+    mixed_weights <span class="token operator">=</span> params <span class="token operator">*</span> <span class="token number">2</span>
+    mixed_optimizer <span class="token operator">=</span> params <span class="token operator">*</span> <span class="token number">4</span> <span class="token operator">*</span> <span class="token number">2</span>
+    mixed_gradients <span class="token operator">=</span> params <span class="token operator">*</span> <span class="token number">2</span>
+    mixed_total <span class="token operator">=</span> mixed_weights <span class="token operator">+</span> mixed_optimizer <span class="token operator">+</span> mixed_gradients
+
+    <span class="token keyword">return</span> <span class="token punctuation">{</span>
+        <span class="token string">"fp32_total_gb"</span><span class="token punctuation">:</span> fp32_total <span class="token operator">/</span> <span class="token number">1e9</span><span class="token punctuation">,</span>
+        <span class="token string">"fp16_with_master_gb"</span><span class="token punctuation">:</span> fp16_total <span class="token operator">/</span> <span class="token number">1e9</span><span class="token punctuation">,</span>
+        <span class="token string">"mixed_bf16_gb"</span><span class="token punctuation">:</span> mixed_total <span class="token operator">/</span> <span class="token number">1e9</span><span class="token punctuation">,</span>
+        <span class="token string">"savings_vs_fp32"</span><span class="token punctuation">:</span> <span class="token number">1</span> <span class="token operator">-</span> mixed_total <span class="token operator">/</span> fp32_total<span class="token punctuation">,</span>
+    <span class="token punctuation">}</span></code></pre>
+</figure>
+<p>The biggest surprise for most people: mixed precision does not halve the memory. The optimizer states (Adam&#39;s m and v) stay in FP32 regardless of precision. For a 7B model, FP32 training uses 112GB. Mixed precision uses 84GB. That is a 25% reduction, not 50%. The optimizer dominates.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<h3 id="run-all-simulations" class="prose-h prose-h3"><a class="prose-h__anchor" href="#run-all-simulations" aria-label="Link to this section">#</a>Run All Simulations</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">run_all_demos</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">70</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"DATA PARALLELISM SIMULATION"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">70</span><span class="token punctuation">)</span>
+
+    np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>seed<span class="token punctuation">(</span><span class="token number">42</span><span class="token punctuation">)</span>
+    data <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>randn<span class="token punctuation">(</span><span class="token number">64</span><span class="token punctuation">,</span> <span class="token number">32</span><span class="token punctuation">)</span>
+    weight <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>randn<span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">,</span> <span class="token number">16</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">model_fn</span><span class="token punctuation">(</span>batch<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        output <span class="token operator">=</span> batch @ weight
+        loss <span class="token operator">=</span> np<span class="token punctuation">.</span>mean<span class="token punctuation">(</span>output <span class="token operator">**</span> <span class="token number">2</span><span class="token punctuation">)</span>
+        grad <span class="token operator">=</span> <span class="token number">2</span> <span class="token operator">*</span> batch<span class="token punctuation">.</span>T @ <span class="token punctuation">(</span>batch @ weight<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>batch<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> loss<span class="token punctuation">,</span> grad
+
+    <span class="token keyword">for</span> n_gpus <span class="token keyword">in</span> <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token number">8</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
+        loss<span class="token punctuation">,</span> grad <span class="token operator">=</span> simulate_data_parallelism<span class="token punctuation">(</span>data<span class="token punctuation">,</span> n_gpus<span class="token punctuation">,</span> model_fn<span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  </span><span class="token interpolation"><span class="token punctuation">{</span>n_gpus<span class="token punctuation">}</span></span><span class="token string"> GPUs: loss=</span><span class="token interpolation"><span class="token punctuation">{</span>loss<span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">, grad_norm=</span><span class="token interpolation"><span class="token punctuation">{</span>np<span class="token punctuation">.</span>linalg<span class="token punctuation">.</span>norm<span class="token punctuation">(</span>grad<span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">70</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"TENSOR PARALLELISM SIMULATION"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">70</span><span class="token punctuation">)</span>
+
+    x <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>randn<span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">,</span> <span class="token number">8192</span><span class="token punctuation">)</span>
+    W <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>randn<span class="token punctuation">(</span><span class="token number">8192</span><span class="token punctuation">,</span> <span class="token number">8192</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">for</span> n_gpus <span class="token keyword">in</span> <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token number">8</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
+        output<span class="token punctuation">,</span> error <span class="token operator">=</span> simulate_tensor_parallelism<span class="token punctuation">(</span>x<span class="token punctuation">,</span> W<span class="token punctuation">,</span> n_gpus<span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  </span><span class="token interpolation"><span class="token punctuation">{</span>n_gpus<span class="token punctuation">}</span></span><span class="token string"> GPUs: output_shape=</span><span class="token interpolation"><span class="token punctuation">{</span>output<span class="token punctuation">.</span>shape<span class="token punctuation">}</span></span><span class="token string">, max_error=</span><span class="token interpolation"><span class="token punctuation">{</span>error<span class="token punctuation">:</span><span class="token format-spec">.2e</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">70</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"PIPELINE PARALLELISM SIMULATION"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">70</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">for</span> n_mb <span class="token keyword">in</span> <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token number">8</span><span class="token punctuation">,</span> <span class="token number">16</span><span class="token punctuation">,</span> <span class="token number">32</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
+        _<span class="token punctuation">,</span> total_t<span class="token punctuation">,</span> bubble <span class="token operator">=</span> simulate_pipeline_parallelism<span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">,</span> n_mb<span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  </span><span class="token interpolation"><span class="token punctuation">{</span>n_mb<span class="token punctuation">:</span><span class="token format-spec">2d</span><span class="token punctuation">}</span></span><span class="token string"> micro-batches: total_time=</span><span class="token interpolation"><span class="token punctuation">{</span>total_t<span class="token punctuation">:</span><span class="token format-spec">4d</span><span class="token punctuation">}</span></span><span class="token string">, bubble=</span><span class="token interpolation"><span class="token punctuation">{</span>bubble<span class="token punctuation">:</span><span class="token format-spec">.1%</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">70</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"MEMORY CALCULATOR"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">70</span><span class="token punctuation">)</span>
+
+    configs <span class="token operator">=</span> <span class="token punctuation">[</span>
+        <span class="token punctuation">(</span><span class="token number">7</span><span class="token punctuation">,</span> <span class="token string">"none"</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">(</span><span class="token number">7</span><span class="token punctuation">,</span> <span class="token string">"fsdp"</span><span class="token punctuation">,</span> <span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">(</span><span class="token number">70</span><span class="token punctuation">,</span> <span class="token string">"none"</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">(</span><span class="token number">70</span><span class="token punctuation">,</span> <span class="token string">"fsdp"</span><span class="token punctuation">,</span> <span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">(</span><span class="token number">70</span><span class="token punctuation">,</span> <span class="token string">"fsdp"</span><span class="token punctuation">,</span> <span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">(</span><span class="token number">405</span><span class="token punctuation">,</span> <span class="token string">"fsdp"</span><span class="token punctuation">,</span> <span class="token number">64</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">(</span><span class="token number">405</span><span class="token punctuation">,</span> <span class="token string">"fsdp"</span><span class="token punctuation">,</span> <span class="token number">128</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'Model'</span><span class="token punctuation">:</span><span class="token format-spec">>8</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'Sharding'</span><span class="token punctuation">:</span><span class="token format-spec">>8</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'GPUs'</span><span class="token punctuation">:</span><span class="token format-spec">>5</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'Per-GPU'</span><span class="token punctuation">:</span><span class="token format-spec">>10</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'Fits 80GB'</span><span class="token punctuation">:</span><span class="token format-spec">>10</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"  "</span> <span class="token operator">+</span> <span class="token string">"-"</span> <span class="token operator">*</span> <span class="token number">50</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> params<span class="token punctuation">,</span> shard<span class="token punctuation">,</span> gpus <span class="token keyword">in</span> configs<span class="token punctuation">:</span>
+        result <span class="token operator">=</span> memory_calculator<span class="token punctuation">(</span>params<span class="token punctuation">,</span> num_gpus<span class="token operator">=</span>gpus<span class="token punctuation">,</span> sharding<span class="token operator">=</span>shard<span class="token punctuation">)</span>
+        fits <span class="token operator">=</span> <span class="token string">"Yes"</span> <span class="token keyword">if</span> result<span class="token punctuation">[</span><span class="token string">"fits_on_80gb"</span><span class="token punctuation">]</span> <span class="token keyword">else</span> <span class="token string">"No"</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  </span><span class="token interpolation"><span class="token punctuation">{</span>params<span class="token punctuation">:</span><span class="token format-spec">>6</span><span class="token punctuation">}</span></span><span class="token string">B </span><span class="token interpolation"><span class="token punctuation">{</span>shard<span class="token punctuation">:</span><span class="token format-spec">>8</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span>gpus<span class="token punctuation">:</span><span class="token format-spec">>5</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span>result<span class="token punctuation">[</span><span class="token string">'per_gpu_total_gb'</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">>8.1f</span><span class="token punctuation">}</span></span><span class="token string">GB </span><span class="token interpolation"><span class="token punctuation">{</span>fits<span class="token punctuation">:</span><span class="token format-spec">>10</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">70</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"MIXED PRECISION COMPARISON"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">70</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">for</span> params_b <span class="token keyword">in</span> <span class="token punctuation">[</span><span class="token number">7</span><span class="token punctuation">,</span> <span class="token number">13</span><span class="token punctuation">,</span> <span class="token number">70</span><span class="token punctuation">,</span> <span class="token number">405</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
+        result <span class="token operator">=</span> mixed_precision_comparison<span class="token punctuation">(</span>params_b<span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  </span><span class="token interpolation"><span class="token punctuation">{</span>params_b<span class="token punctuation">}</span></span><span class="token string">B: FP32=</span><span class="token interpolation"><span class="token punctuation">{</span>result<span class="token punctuation">[</span><span class="token string">'fp32_total_gb'</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.0f</span><span class="token punctuation">}</span></span><span class="token string">GB, "</span></span>
+              <span class="token string-interpolation"><span class="token string">f"Mixed BF16=</span><span class="token interpolation"><span class="token punctuation">{</span>result<span class="token punctuation">[</span><span class="token string">'mixed_bf16_gb'</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.0f</span><span class="token punctuation">}</span></span><span class="token string">GB, "</span></span>
+              <span class="token string-interpolation"><span class="token string">f"Savings=</span><span class="token interpolation"><span class="token punctuation">{</span>result<span class="token punctuation">[</span><span class="token string">'savings_vs_fp32'</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.0%</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces <code class="inline-code">outputs/prompt-distributed-training-planner.md</code> -- a prompt that takes a model size and available hardware, then produces a complete distributed training plan: parallelism strategy, memory budget, communication overhead, and expected throughput.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p>Modify the memory calculator to include activation checkpointing. With checkpointing, only store activations at every K-th layer (typical K=1, meaning recompute all). Show the memory-compute tradeoff: how much memory does checkpointing save, and how much does it slow down training (roughly 33% more compute for full checkpointing)?</p>
+</li>
+<li><p>Extend the pipeline parallelism simulation to implement the 1F1B (one forward, one backward) schedule used by PipeDream. Compare the bubble fraction against the naive schedule for 4 stages and 8 micro-batches. The 1F1B schedule should have a smaller peak memory because it starts backward passes earlier.</p>
+</li>
+<li><p>Implement a gradient accumulation simulator. Instead of all-reducing after every micro-batch, accumulate gradients locally for K steps, then all-reduce. Show how this reduces communication by K times but produces identical final gradients (and thus identical training).</p>
+</li>
+<li><p>Build a cost estimator. Given a model size, target token count, GPU type (A100 at $2/hr, H100 at $3.50/hr), and parallelism strategy, estimate the total training cost in dollars. Validate against known costs: Llama 3 405B reportedly cost ~$100M, DeepSeek V3 cost ~$5.6M.</p>
+</li>
+<li><p>Add ZeRO-Offload to the memory calculator. Assume CPU RAM is 512GB per node and NVMe is 2TB. Show how offloading optimizer states to CPU allows a 70B model to train on 4 GPUs instead of 16, at the cost of 30-50% slower optimizer steps.</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Data parallelism</td>
+<td>&quot;Copy the model to every GPU&quot;</td>
+<td>Each GPU processes a different data shard; gradients are averaged via all-reduce after each step</td>
+</tr>
+<tr>
+<td>Tensor parallelism</td>
+<td>&quot;Split a layer across GPUs&quot;</td>
+<td>Partition weight matrices so each GPU computes part of the matmul; requires fast NVLink interconnect</td>
+</tr>
+<tr>
+<td>Pipeline parallelism</td>
+<td>&quot;Split layers across GPUs&quot;</td>
+<td>Each GPU runs a different group of layers; data flows through the pipeline with micro-batches to reduce bubbles</td>
+</tr>
+<tr>
+<td>FSDP</td>
+<td>&quot;Shard everything&quot;</td>
+<td>Fully Sharded Data Parallel -- each GPU holds 1/N of weights, gradients, and optimizer states; all-gather before compute</td>
+</tr>
+<tr>
+<td>ZeRO</td>
+<td>&quot;DeepSpeed&#39;s version of FSDP&quot;</td>
+<td>Zero Redundancy Optimizer with 3 stages: shard optimizer (Stage 1), + gradients (Stage 2), + parameters (Stage 3)</td>
+</tr>
+<tr>
+<td>All-reduce</td>
+<td>&quot;Average across GPUs&quot;</td>
+<td>Collective operation where every GPU ends with the sum (or average) of all GPUs&#39; inputs -- typically implemented as ring all-reduce</td>
+</tr>
+<tr>
+<td>All-gather</td>
+<td>&quot;Collect from all GPUs&quot;</td>
+<td>Collective operation where every GPU ends with the concatenation of all GPUs&#39; data -- used in FSDP to reconstruct full parameters</td>
+</tr>
+<tr>
+<td>Reduce-scatter</td>
+<td>&quot;Sum and distribute&quot;</td>
+<td>Collective operation that reduces (sums) data and scatters different chunks to different GPUs -- used in FSDP for gradient sharding</td>
+</tr>
+<tr>
+<td>Mixed precision</td>
+<td>&quot;Train in half precision&quot;</td>
+<td>Use FP16/BF16 for forward/backward and FP32 for optimizer states -- saves ~25% memory, not 50%, because the optimizer dominates</td>
+</tr>
+<tr>
+<td>Pipeline bubble</td>
+<td>&quot;Idle time in the pipeline&quot;</td>
+<td>Fraction of time GPUs sit idle waiting for data from the previous stage -- reduced by using more micro-batches</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/1910.02054" target="_blank" rel="noopener">Rajbhandari et al., 2020 -- &quot;ZeRO: Memory Optimizations Toward Training Trillion Parameter Models&quot;</a> -- the DeepSpeed ZeRO paper that defined the three sharding stages</li>
+<li><a href="https://arxiv.org/abs/1909.08053" target="_blank" rel="noopener">Shoeybi et al., 2020 -- &quot;Megatron-LM: Training Multi-Billion Parameter Language Models Using Model Parallelism&quot;</a> -- NVIDIA&#39;s tensor parallelism for transformers</li>
+<li><a href="https://arxiv.org/abs/2104.04473" target="_blank" rel="noopener">Narayanan et al., 2021 -- &quot;Efficient Large-Scale Language Model Training on GPU Clusters Using Megatron-LM&quot;</a> -- 3D parallelism combining data, tensor, and pipeline</li>
+<li><a href="https://arxiv.org/abs/2304.11277" target="_blank" rel="noopener">Zhao et al., 2023 -- &quot;PyTorch FSDP: Experiences on Scaling Fully Sharded Data Parallel&quot;</a> -- PyTorch&#39;s native FSDP implementation</li>
+<li><a href="https://arxiv.org/abs/2407.21783" target="_blank" rel="noopener">Llama 3 Technical Report</a> -- 16,384 GPU training with 3D parallelism details</li>
+<li><a href="https://arxiv.org/abs/2412.19437" target="_blank" rel="noopener">DeepSeek-V3 Technical Report</a> -- how MoE architecture reduces training cost by an order of magnitude</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="04-pre-training-mini-gpt.html">
+  <span class="label">← Previous</span>
+  <b>Pre-Training a Mini GPT (124M Parameters)</b>
+</a>
+      <a class="pager__item pager__item--next" href="06-instruction-tuning-sft.html">
+  <span class="label">Next →</span>
+  <b>Instruction Tuning (SFT)</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>13 minutes</b> of LLMs from Scratch behind you.</p>
+      <a class="btn btn--solid" href="06-instruction-tuning-sft.html">Continue to Instruction Tuning (SFT) →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#why-distribution-is-required">Why Distribution is Required</a></li><li class="mini__item mini__item--d3"><a href="#data-parallelism">Data Parallelism</a></li><li class="mini__item mini__item--d3"><a href="#tensor-parallelism">Tensor Parallelism</a></li><li class="mini__item mini__item--d3"><a href="#pipeline-parallelism">Pipeline Parallelism</a></li><li class="mini__item mini__item--d3"><a href="#fsdp-fully-sharded-data-parallel">FSDP: Fully Sharded Data Parallel</a></li><li class="mini__item mini__item--d3"><a href="#deepspeed-zero">DeepSpeed ZeRO</a></li><li class="mini__item mini__item--d3"><a href="#mixed-precision-training">Mixed Precision Training</a></li><li class="mini__item mini__item--d3"><a href="#megatron-lm-and-3d-parallelism">Megatron-LM and 3D Parallelism</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-simulate-data-parallelism">Step 1: Simulate Data Parallelism</a></li><li class="mini__item mini__item--d3"><a href="#step-2-simulate-tensor-parallelism">Step 2: Simulate Tensor Parallelism</a></li><li class="mini__item mini__item--d3"><a href="#step-3-simulate-pipeline-parallelism">Step 3: Simulate Pipeline Parallelism</a></li><li class="mini__item mini__item--d3"><a href="#step-4-memory-calculator">Step 4: Memory Calculator</a></li><li class="mini__item mini__item--d3"><a href="#step-5-mixed-precision-simulation">Step 5: Mixed Precision Simulation</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d3"><a href="#run-all-simulations">Run All Simulations</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

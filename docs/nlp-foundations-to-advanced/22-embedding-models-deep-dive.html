@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Embedding Models — The 2026 Deep Dive — NLP, Foundations to Advanced — AIFS</title>
+<meta name="description" content="NLP, Foundations to Advanced: Embedding Models — The 2026 Deep Dive. 5 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Embedding Models — The 2026 Deep Dive — NLP, Foundations to Advanced — AIFS">
+<meta property="og:description" content="NLP, Foundations to Advanced: Embedding Models — The 2026 Deep Dive. 5 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"gx-matryoshka":["../assets/figures/figures-genai3.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-genai3.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#B8FF3C" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#B8FF3C;--accent-ink:#111111"
+  data-lesson-id="nlp-foundations-to-advanced/22-embedding-models-deep-dive" data-module="nlp-foundations-to-advanced"
+  data-prev="21-nli-textual-entailment.html" data-next="23-chunking-strategies-rag.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#B8FF3C">
+        <span class="label">Phase 05</span>
+        <b>NLP, Foundations to Advanced</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="nlp-foundations-to-advanced/01-text-processing"><a href="01-text-processing.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Text Processing — Tokenization, Stemming, Lemmatization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/02-bag-of-words-tfidf"><a href="02-bag-of-words-tfidf.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Bag of Words, TF-IDF, and Text Representation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/03-word-embeddings-word2vec"><a href="03-word-embeddings-word2vec.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Word Embeddings — Word2Vec from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/04-glove-fasttext-subword"><a href="04-glove-fasttext-subword.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">GloVe, FastText, and Subword Embeddings</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/05-sentiment-analysis"><a href="05-sentiment-analysis.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Sentiment Analysis</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/06-named-entity-recognition"><a href="06-named-entity-recognition.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Named Entity Recognition</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/07-pos-tagging-parsing"><a href="07-pos-tagging-parsing.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">POS Tagging and Syntactic Parsing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/08-cnns-rnns-for-text"><a href="08-cnns-rnns-for-text.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">CNNs and RNNs for Text</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/09-sequence-to-sequence"><a href="09-sequence-to-sequence.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Sequence-to-Sequence Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/10-attention-mechanism"><a href="10-attention-mechanism.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Attention Mechanism — The Breakthrough</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/11-machine-translation"><a href="11-machine-translation.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Machine Translation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/12-text-summarization"><a href="12-text-summarization.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Text Summarization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/13-question-answering"><a href="13-question-answering.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Question Answering Systems</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/14-information-retrieval-search"><a href="14-information-retrieval-search.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Information Retrieval and Search</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/15-topic-modeling"><a href="15-topic-modeling.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Topic Modeling — LDA and BERTopic</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/16-text-generation-pre-transformer"><a href="16-text-generation-pre-transformer.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Text Generation Before Transformers — N-gram Language Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/17-chatbots-rule-to-neural"><a href="17-chatbots-rule-to-neural.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Chatbots — Rule-Based to Neural to LLM Agents</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/18-multilingual-nlp"><a href="18-multilingual-nlp.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Multilingual NLP</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/19-subword-tokenization"><a href="19-subword-tokenization.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">Subword Tokenization — BPE, WordPiece, Unigram, SentencePiece</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/20-structured-outputs-constrained-decoding"><a href="20-structured-outputs-constrained-decoding.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Structured Outputs &amp; Constrained Decoding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/21-nli-textual-entailment"><a href="21-nli-textual-entailment.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Natural Language Inference — Textual Entailment</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/22-embedding-models-deep-dive"><a href="22-embedding-models-deep-dive.html" class="is-current">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Embedding Models — The 2026 Deep Dive</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/23-chunking-strategies-rag"><a href="23-chunking-strategies-rag.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Chunking Strategies for RAG</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/24-coreference-resolution"><a href="24-coreference-resolution.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Coreference Resolution</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/25-entity-linking"><a href="25-entity-linking.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Entity Linking &amp; Disambiguation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/26-relation-extraction-kg"><a href="26-relation-extraction-kg.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Relation Extraction &amp; Knowledge Graph Construction</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/27-llm-evaluation-frameworks"><a href="27-llm-evaluation-frameworks.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">LLM Evaluation — RAGAS, DeepEval, G-Eval</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/28-long-context-evaluation"><a href="28-long-context-evaluation.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">Long-Context Evaluation — NIAH, RULER, LongBench, MRCR</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/29-dialogue-state-tracking"><a href="29-dialogue-state-tracking.html" class="">
+  <span class="snav__n">29</span>
+  <span class="snav__t">Dialogue State Tracking</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">NLP, Foundations to Advanced</a></p>
+      <h1 class="page__title">Embedding Models — The 2026 Deep Dive</h1>
+      <p class="page__lede">Word2Vec gave you a vector per word. Modern embedding models give you a vector per passage, cross-lingual, with sparse, dense, and multi-vector views, sized to fit your index. Pick wrong and your RAG retrieves the wrong thing.</p>
+      <div class="page__meta">
+        <span class="chip">5 min read</span>
+        <span class="chip">1,040 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Learn</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 5 · 03 (Word2Vec), Phase 5 · 14 (Information Retrieval)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~60 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Your RAG system retrieves the wrong passage 40% of the time. The culprit is rarely the vector database or the prompt. It is the embedding model.</p>
+<p>Choosing an embedding in 2026 means picking across five axes:</p>
+<ol>
+<li><strong>Dense vs sparse vs multi-vector.</strong> One vector per passage, or one per token, or a sparse weighted bag of words.</li>
+<li><strong>Language coverage.</strong> Monolingual English models still win on English-only tasks. Multilingual models win when corpora are mixed.</li>
+<li><strong>Context length.</strong> 512 tokens vs 8,192 vs 32,768 — and real effective capacity is often 60-70% of the advertised max.</li>
+<li><strong>Dimension budget.</strong> 3,072 floats at full precision = 12 KB per vector. At 100M vectors, storage is $1,300/month. Matryoshka truncation cuts this 4×.</li>
+<li><strong>Open vs hosted.</strong> Open-weight means you control the stack and data. Hosted means you trade control for always-latest.</li>
+</ol>
+<p>This lesson names the tradeoffs so you can pick on evidence, not on whatever was popular last quarter.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<p><img src="assets/22-embedding-models-deep-dive/embedding-modes.svg" alt="Dense, sparse, and multi-vector embeddings" loading="lazy"></p>
+<p><strong>Dense embeddings.</strong> One vector per passage (usually 384-3,072 dimensions). Cosine similarity ranks passages by semantic proximity. OpenAI <code class="inline-code">text-embedding-3-large</code>, BGE-M3 dense mode, Voyage-3. Default choice.</p>
+<p><strong>Sparse embeddings.</strong> SPLADE-style. A transformer predicts a weight for every vocab token, then zeros out most of them. Result is a sparse vector of size |vocab|. Captures lexical matching (like BM25) but with learned term weights. Strong on keyword-heavy queries.</p>
+<p><strong>Multi-vector (late interaction).</strong> ColBERTv2, Jina-ColBERT. One vector per token. Scoring with MaxSim: for each query token, find the most similar document token, sum the scores. More expensive to store and score, but wins on long queries and domain-specific corpora.</p>
+<p><strong>BGE-M3: all three at once.</strong> Single model outputs dense, sparse, and multi-vector representations simultaneously. Each can be queried independently; scores fuse via weighted sum. The 2026 default when you want flexibility from one checkpoint.</p>
+<p><strong>Matryoshka Representation Learning.</strong> Trained so the first N dimensions of the vector form a useful standalone embedding. Truncate a 1,536-dim vector to 256 dim and pay ~1% accuracy for 6× storage savings. Supported by OpenAI text-3, Cohere v4, Voyage-4, Jina v5, Gemini Embedding 2, Nomic v1.5+.</p>
+<h3 id="the-mteb-leaderboard-tells-a-partial-story" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-mteb-leaderboard-tells-a-partial-story" aria-label="Link to this section">#</a>The MTEB leaderboard tells a partial story</h3>
+<p>Massive Text Embedding Benchmark — 56 tasks across 8 task types at launch (2022), expanded to 100+ tasks in MTEB v2. In early 2026, Gemini Embedding 2 tops retrieval (67.71 MTEB-R). Cohere embed-v4 leads general (65.2 MTEB). BGE-M3 leads open-weight multilingual (63.0). The leaderboard is necessary but not sufficient — always benchmark on your domain.</p>
+<h3 id="the-three-tier-pattern" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-three-tier-pattern" aria-label="Link to this section">#</a>The three-tier pattern</h3>
+<table>
+<thead>
+<tr>
+<th>Use case</th>
+<th>Pattern</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Fast first-pass</td>
+<td>Dense bi-encoder (BGE-M3, text-3-small)</td>
+</tr>
+<tr>
+<td>Recall boost</td>
+<td>Sparse (SPLADE, BGE-M3 sparse) + RRF fuse</td>
+</tr>
+<tr>
+<td>Precision on top-50</td>
+<td>Multi-vector (ColBERTv2) or cross-encoder reranker</td>
+</tr>
+</tbody></table>
+<p>Most production stacks use all three.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="gx-matryoshka"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">gx-matryoshka</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> gx matryoshka</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-baseline-dense-embeddings-with-sentence-bert" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-baseline-dense-embeddings-with-sentence-bert" aria-label="Link to this section">#</a>Step 1: baseline — dense embeddings with Sentence-BERT</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> sentence_transformers <span class="token keyword">import</span> SentenceTransformer
+<span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+
+encoder <span class="token operator">=</span> SentenceTransformer<span class="token punctuation">(</span><span class="token string">"BAAI/bge-small-en-v1.5"</span><span class="token punctuation">)</span>
+corpus <span class="token operator">=</span> <span class="token punctuation">[</span>
+    <span class="token string">"The first iPhone launched in 2007."</span><span class="token punctuation">,</span>
+    <span class="token string">"Apple released the iPod in 2001."</span><span class="token punctuation">,</span>
+    <span class="token string">"Android is an operating system from Google."</span><span class="token punctuation">,</span>
+<span class="token punctuation">]</span>
+emb <span class="token operator">=</span> encoder<span class="token punctuation">.</span>encode<span class="token punctuation">(</span>corpus<span class="token punctuation">,</span> normalize_embeddings<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+
+query <span class="token operator">=</span> <span class="token string">"When was the iPhone released?"</span>
+q_emb <span class="token operator">=</span> encoder<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token punctuation">[</span>query<span class="token punctuation">]</span><span class="token punctuation">,</span> normalize_embeddings<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+scores <span class="token operator">=</span> emb @ q_emb
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token builtin">sorted</span><span class="token punctuation">(</span><span class="token builtin">enumerate</span><span class="token punctuation">(</span>scores<span class="token punctuation">)</span><span class="token punctuation">,</span> key<span class="token operator">=</span><span class="token keyword">lambda</span> x<span class="token punctuation">:</span> <span class="token operator">-</span>x<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p><code class="inline-code">normalize_embeddings=True</code> makes the dot product equal cosine similarity. Always set it.</p>
+<h3 id="step-2-matryoshka-truncation" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-matryoshka-truncation" aria-label="Link to this section">#</a>Step 2: Matryoshka truncation</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">truncate</span><span class="token punctuation">(</span>vectors<span class="token punctuation">,</span> dim<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    out <span class="token operator">=</span> vectors<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token punctuation">:</span>dim<span class="token punctuation">]</span>
+    <span class="token keyword">return</span> out <span class="token operator">/</span> np<span class="token punctuation">.</span>linalg<span class="token punctuation">.</span>norm<span class="token punctuation">(</span>out<span class="token punctuation">,</span> axis<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span> keepdims<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+
+emb_256 <span class="token operator">=</span> truncate<span class="token punctuation">(</span>emb<span class="token punctuation">,</span> <span class="token number">256</span><span class="token punctuation">)</span>
+emb_128 <span class="token operator">=</span> truncate<span class="token punctuation">(</span>emb<span class="token punctuation">,</span> <span class="token number">128</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Re-normalize after truncation. Nomic v1.5, OpenAI text-3, and Voyage-4 are trained so this is lossless for the first few levels. Non-Matryoshka models (original Sentence-BERT) degrade sharply when truncated.</p>
+<h3 id="step-3-bge-m3-multi-functionality" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-bge-m3-multi-functionality" aria-label="Link to this section">#</a>Step 3: BGE-M3 multi-functionality</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> FlagEmbedding <span class="token keyword">import</span> BGEM3FlagModel
+
+model <span class="token operator">=</span> BGEM3FlagModel<span class="token punctuation">(</span><span class="token string">"BAAI/bge-m3"</span><span class="token punctuation">,</span> use_fp16<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+
+output <span class="token operator">=</span> model<span class="token punctuation">.</span>encode<span class="token punctuation">(</span>
+    corpus<span class="token punctuation">,</span>
+    return_dense<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">,</span>
+    return_sparse<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">,</span>
+    return_colbert_vecs<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">,</span>
+<span class="token punctuation">)</span>
+<span class="token comment"># output["dense_vecs"]:    (n_docs, 1024)</span>
+<span class="token comment"># output["lexical_weights"]: list of dict {token_id: weight}</span>
+<span class="token comment"># output["colbert_vecs"]:  list of (n_tokens, 1024) arrays</span></code></pre>
+</figure>
+<p>Three indexes, one inference call. Score fusion:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python">dense_score <span class="token operator">=</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span> <span class="token comment"># cosine over dense_vecs</span>
+sparse_score <span class="token operator">=</span> model<span class="token punctuation">.</span>compute_lexical_matching_score<span class="token punctuation">(</span>q_lex<span class="token punctuation">,</span> d_lex<span class="token punctuation">)</span>
+colbert_score <span class="token operator">=</span> model<span class="token punctuation">.</span>colbert_score<span class="token punctuation">(</span>q_col<span class="token punctuation">,</span> d_col<span class="token punctuation">)</span>
+final <span class="token operator">=</span> <span class="token number">0.4</span> <span class="token operator">*</span> dense_score <span class="token operator">+</span> <span class="token number">0.2</span> <span class="token operator">*</span> sparse_score <span class="token operator">+</span> <span class="token number">0.4</span> <span class="token operator">*</span> colbert_score</code></pre>
+</figure>
+<p>Tune the weights on your domain.</p>
+<h3 id="step-4-mteb-eval-on-a-custom-task" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-mteb-eval-on-a-custom-task" aria-label="Link to this section">#</a>Step 4: MTEB eval on a custom task</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> mteb <span class="token keyword">import</span> MTEB
+
+tasks <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">"ArguAna"</span><span class="token punctuation">,</span> <span class="token string">"SciFact"</span><span class="token punctuation">,</span> <span class="token string">"NFCorpus"</span><span class="token punctuation">]</span>
+evaluation <span class="token operator">=</span> MTEB<span class="token punctuation">(</span>tasks<span class="token operator">=</span>tasks<span class="token punctuation">)</span>
+results <span class="token operator">=</span> evaluation<span class="token punctuation">.</span>run<span class="token punctuation">(</span>encoder<span class="token punctuation">,</span> output_folder<span class="token operator">=</span><span class="token string">"./mteb-results"</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Run your candidate models on a <em>representative</em> subset. Do not trust leaderboard rank alone — your domain matters.</p>
+<h3 id="step-5-hand-rolled-cosine-from-scratch" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-hand-rolled-cosine-from-scratch" aria-label="Link to this section">#</a>Step 5: hand-rolled cosine from scratch</h3>
+<p>See <code class="inline-code">code/main.py</code>. Averaged Hashing Trick embeddings (stdlib-only). Not competitive with transformer embeddings, but shows the shape: tokenize → vector → normalize → dot product.</p>
+<h2 id="pitfalls" class="prose-h prose-h2"><a class="prose-h__anchor" href="#pitfalls" aria-label="Link to this section">#</a>Pitfalls</h2>
+<ul>
+<li><strong>Same model for query and doc.</strong> Some models (Voyage, Jina-ColBERT) use asymmetric encoding — query and document pass through different paths. Always check the model card.</li>
+<li><strong>Missing prefix.</strong> <code class="inline-code">bge-*</code> models need <code class="inline-code">&quot;Represent this sentence for searching relevant passages: &quot;</code> prepended to queries. 3-5 point recall gap if you forget.</li>
+<li><strong>Over-trimming Matryoshka.</strong> 1,536 → 256 is usually safe. 1,536 → 64 is not. Validate on your eval set.</li>
+<li><strong>Context truncation.</strong> Most models silently truncate inputs over their max length. Long docs need chunking (see lesson 23).</li>
+<li><strong>Ignoring latency tail.</strong> MTEB scores hide p99 latency. A 600M model might beat a 335M model by 2 points but cost 3× more per query.</li>
+</ul>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>The 2026 stack:</p>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Pick</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>English-only, fast, API</td>
+<td><code class="inline-code">text-embedding-3-large</code> or <code class="inline-code">voyage-3-large</code></td>
+</tr>
+<tr>
+<td>Open-weight, English</td>
+<td><code class="inline-code">BAAI/bge-large-en-v1.5</code></td>
+</tr>
+<tr>
+<td>Open-weight, multilingual</td>
+<td><code class="inline-code">BAAI/bge-m3</code> or <code class="inline-code">Qwen3-Embedding-8B</code></td>
+</tr>
+<tr>
+<td>Long context (32k+)</td>
+<td>Voyage-3-large, Cohere embed-v4, Qwen3-Embedding-8B</td>
+</tr>
+<tr>
+<td>CPU-only deployment</td>
+<td>Nomic Embed v2 (137M params, MoE)</td>
+</tr>
+<tr>
+<td>Storage-constrained</td>
+<td>Matryoshka-truncated + int8 quantization</td>
+</tr>
+<tr>
+<td>Keyword-heavy queries</td>
+<td>Add SPLADE sparse, RRF-fuse with dense</td>
+</tr>
+</tbody></table>
+<p>2026 pattern: start with BGE-M3 or text-3-large, evaluate on your domain with MTEB, swap if a domain-specific model wins by more than 3 points.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>Save as <code class="inline-code">outputs/skill-embedding-picker.md</code>:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">markdown</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-markdown"><span class="token front-matter-block"><span class="token punctuation">---</span>
+<span class="token front-matter yaml language-yaml"><span class="token key atrule">name</span><span class="token punctuation">:</span> embedding<span class="token punctuation">-</span>picker
+<span class="token key atrule">description</span><span class="token punctuation">:</span> Pick embedding model<span class="token punctuation">,</span> dimension<span class="token punctuation">,</span> and retrieval mode for a given corpus and deployment.
+<span class="token key atrule">version</span><span class="token punctuation">:</span> 1.0.0
+<span class="token key atrule">phase</span><span class="token punctuation">:</span> <span class="token number">5</span>
+<span class="token key atrule">lesson</span><span class="token punctuation">:</span> <span class="token number">22</span>
+<span class="token key atrule">tags</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>nlp<span class="token punctuation">,</span> embeddings<span class="token punctuation">,</span> retrieval<span class="token punctuation">]</span></span>
+<span class="token punctuation">---</span></span>
+
+Given a corpus (size, languages, domain, avg length), deployment target (cloud / edge / on-prem), latency budget, and storage budget, output:
+
+<span class="token list punctuation">1.</span> Model. Named checkpoint or API. One-sentence reason.
+<span class="token list punctuation">2.</span> Dimension. Full / Matryoshka-truncated / int8-quantized. Reason tied to storage budget.
+<span class="token list punctuation">3.</span> Mode. Dense / sparse / multi-vector / hybrid. Reason.
+<span class="token list punctuation">4.</span> Query prefix / template if required by the model card.
+<span class="token list punctuation">5.</span> Evaluation plan. MTEB tasks relevant to domain + held-out domain eval with nDCG@10.
+
+Refuse recommendations that truncate Matryoshka to &lt;64 dims without domain validation. Refuse ColBERTv2 for corpora under 10k passages (overhead not justified). Flag long-document corpora (>8k tokens) routed to models with 512-token windows.</code></pre>
+</figure>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><strong>Easy.</strong> Encode 100 sentences with <code class="inline-code">bge-small-en-v1.5</code> at full dim (384), then at Matryoshka 128. Measure MRR drop on 10 queries.</li>
+<li><strong>Medium.</strong> Compare BGE-M3 dense, sparse, and colbert on 500 passages from your domain. Which wins on recall@10? Does RRF fusion beat the best single mode?</li>
+<li><strong>Hard.</strong> Run MTEB on three candidate models across your top-2 domain tasks. Report MTEB score, p99 latency on a 100-query batch, and $/1M queries. Pick the Pareto-optimal one.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Dense embedding</td>
+<td>The vector</td>
+<td>One fixed-size vector per text. Cosine similarity for ranking.</td>
+</tr>
+<tr>
+<td>Sparse embedding</td>
+<td>Learned BM25</td>
+<td>One weight per vocab token; mostly zeros; trained end-to-end.</td>
+</tr>
+<tr>
+<td>Multi-vector</td>
+<td>ColBERT-style</td>
+<td>One vector per token; MaxSim scoring; bigger index, better recall.</td>
+</tr>
+<tr>
+<td>Matryoshka</td>
+<td>Russian doll trick</td>
+<td>First N dims are a valid smaller embedding on their own.</td>
+</tr>
+<tr>
+<td>MTEB</td>
+<td>The benchmark</td>
+<td>Massive Text Embedding Benchmark — 56 tasks at launch, 100+ in v2.</td>
+</tr>
+<tr>
+<td>BEIR</td>
+<td>The retrieval benchmark</td>
+<td>18 zero-shot retrieval tasks; often cited for cross-domain robustness.</td>
+</tr>
+<tr>
+<td>Asymmetric encoding</td>
+<td>Query ≠ doc path</td>
+<td>Model uses different projections for queries and documents.</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/1908.10084" target="_blank" rel="noopener">Reimers, Gurevych (2019). Sentence-BERT</a> — the bi-encoder paper.</li>
+<li><a href="https://arxiv.org/abs/2210.07316" target="_blank" rel="noopener">Muennighoff et al. (2022). MTEB: Massive Text Embedding Benchmark</a> — the leaderboard paper.</li>
+<li><a href="https://arxiv.org/abs/2402.03216" target="_blank" rel="noopener">Chen et al. (2024). BGE-M3: Multi-lingual, Multi-functionality, Multi-granularity</a> — the unified three-mode model.</li>
+<li><a href="https://arxiv.org/abs/2205.13147" target="_blank" rel="noopener">Kusupati et al. (2022). Matryoshka Representation Learning</a> — the dimension-ladder training objective.</li>
+<li><a href="https://arxiv.org/abs/2112.01488" target="_blank" rel="noopener">Santhanam et al. (2022). ColBERTv2: Effective and Efficient Retrieval via Lightweight Late Interaction</a> — late interaction in production.</li>
+<li><a href="https://huggingface.co/spaces/mteb/leaderboard" target="_blank" rel="noopener">MTEB leaderboard on Hugging Face</a> — live rankings.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="21-nli-textual-entailment.html">
+  <span class="label">← Previous</span>
+  <b>Natural Language Inference — Textual Entailment</b>
+</a>
+      <a class="pager__item pager__item--next" href="23-chunking-strategies-rag.html">
+  <span class="label">Next →</span>
+  <b>Chunking Strategies for RAG</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>5 minutes</b> of NLP, Foundations to Advanced behind you.</p>
+      <a class="btn btn--solid" href="23-chunking-strategies-rag.html">Continue to Chunking Strategies for RAG →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#the-mteb-leaderboard-tells-a-partial-story">The MTEB leaderboard tells a partial story</a></li><li class="mini__item mini__item--d3"><a href="#the-three-tier-pattern">The three-tier pattern</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-baseline-dense-embeddings-with-sentence-bert">Step 1: baseline — dense embeddings with Sentence-BERT</a></li><li class="mini__item mini__item--d3"><a href="#step-2-matryoshka-truncation">Step 2: Matryoshka truncation</a></li><li class="mini__item mini__item--d3"><a href="#step-3-bge-m3-multi-functionality">Step 3: BGE-M3 multi-functionality</a></li><li class="mini__item mini__item--d3"><a href="#step-4-mteb-eval-on-a-custom-task">Step 4: MTEB eval on a custom task</a></li><li class="mini__item mini__item--d3"><a href="#step-5-hand-rolled-cosine-from-scratch">Step 5: hand-rolled cosine from scratch</a></li><li class="mini__item mini__item--d2"><a href="#pitfalls">Pitfalls</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

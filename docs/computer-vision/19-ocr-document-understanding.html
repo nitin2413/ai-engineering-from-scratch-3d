@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OCR &amp; Document Understanding — Computer Vision — AIFS</title>
+<meta name="description" content="Computer Vision: OCR &amp; Document Understanding. 4 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="OCR &amp; Document Understanding — Computer Vision — AIFS">
+<meta property="og:description" content="Computer Vision: OCR &amp; Document Understanding. 4 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"cv3-ctc-collapse":["../assets/figures/figures-cv3.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-cv3.js"];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#FF6B1A" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#FF6B1A;--accent-ink:#111111"
+  data-lesson-id="computer-vision/19-ocr-document-understanding" data-module="computer-vision"
+  data-prev="18-open-vocab-clip.html" data-next="20-image-retrieval-metric.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#FF6B1A">
+        <span class="label">Phase 04</span>
+        <b>Computer Vision</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="computer-vision/01-image-fundamentals"><a href="01-image-fundamentals.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Image Fundamentals — Pixels, Channels, Color Spaces</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/02-convolutions-from-scratch"><a href="02-convolutions-from-scratch.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Convolutions from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/03-cnns-lenet-to-resnet"><a href="03-cnns-lenet-to-resnet.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">CNNs — LeNet to ResNet</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/04-image-classification"><a href="04-image-classification.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Image Classification</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/05-transfer-learning"><a href="05-transfer-learning.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Transfer Learning &amp; Fine-Tuning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/06-object-detection-yolo"><a href="06-object-detection-yolo.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Object Detection — YOLO from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/07-semantic-segmentation-unet"><a href="07-semantic-segmentation-unet.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Semantic Segmentation — U-Net</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/08-instance-segmentation-mask-rcnn"><a href="08-instance-segmentation-mask-rcnn.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Instance Segmentation — Mask R-CNN</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/09-image-generation-gans"><a href="09-image-generation-gans.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Image Generation — GANs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/10-image-generation-diffusion"><a href="10-image-generation-diffusion.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Image Generation — Diffusion Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/11-stable-diffusion"><a href="11-stable-diffusion.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Stable Diffusion — Architecture &amp; Fine-Tuning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/12-video-understanding"><a href="12-video-understanding.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Video Understanding — Temporal Modeling</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/13-3d-vision-nerf"><a href="13-3d-vision-nerf.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">3D Vision — Point Clouds &amp; NeRFs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/14-vision-transformers"><a href="14-vision-transformers.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Vision Transformers (ViT)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/15-real-time-edge"><a href="15-real-time-edge.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Real-Time Vision — Edge Deployment</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/16-vision-pipeline-capstone"><a href="16-vision-pipeline-capstone.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Build a Complete Vision Pipeline — Capstone</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/17-self-supervised-vision"><a href="17-self-supervised-vision.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Self-Supervised Vision — SimCLR, DINO, MAE</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/18-open-vocab-clip"><a href="18-open-vocab-clip.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Open-Vocabulary Vision — CLIP</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/19-ocr-document-understanding"><a href="19-ocr-document-understanding.html" class="is-current">
+  <span class="snav__n">19</span>
+  <span class="snav__t">OCR &amp; Document Understanding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/20-image-retrieval-metric"><a href="20-image-retrieval-metric.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Image Retrieval &amp; Metric Learning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/21-keypoint-pose"><a href="21-keypoint-pose.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Keypoint Detection &amp; Pose Estimation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/22-3d-gaussian-splatting"><a href="22-3d-gaussian-splatting.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">3D Gaussian Splatting from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/23-diffusion-transformers-rectified-flow"><a href="23-diffusion-transformers-rectified-flow.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Diffusion Transformers &amp; Rectified Flow</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/24-sam3-open-vocab-segmentation"><a href="24-sam3-open-vocab-segmentation.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">SAM 3 &amp; Open-Vocabulary Segmentation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/25-vision-language-models"><a href="25-vision-language-models.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Vision-Language Models — The ViT-MLP-LLM Pattern</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/26-monocular-depth"><a href="26-monocular-depth.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Monocular Depth &amp; Geometry Estimation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/27-multi-object-tracking"><a href="27-multi-object-tracking.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">Multi-Object Tracking &amp; Video Memory</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/28-world-models-video-diffusion"><a href="28-world-models-video-diffusion.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">World Models &amp; Video Diffusion</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Computer Vision</a></p>
+      <h1 class="page__title">OCR &amp; Document Understanding</h1>
+      <p class="page__lede">OCR is a three-stage pipeline — detect text boxes, recognise the characters, then lay them out. Every modern OCR system reorders these stages or merges them.</p>
+      <div class="page__meta">
+        <span class="chip">4 min read</span>
+        <span class="chip">979 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Learn + Use</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 4 Lesson 06 (Detection), Phase 7 Lesson 02 (Self-Attention)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~45 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Trace the classical OCR pipeline (detect -&gt; recognise -&gt; layout) and the modern end-to-end alternatives (Donut, Qwen-VL-OCR)</li>
+<li>Implement CTC (Connectionist Temporal Classification) loss for sequence-to-sequence OCR training</li>
+<li>Use PaddleOCR or EasyOCR for production document parsing without training</li>
+<li>Distinguish OCR, layout parsing, and document understanding — and pick the right tool per task</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Images full of text are everywhere: receipts, invoices, IDs, scanned books, forms, whiteboards, signs, screenshots. Extracting structured data from them — not just the characters, but &quot;this is the total amount&quot; — is one of the highest-value applied-vision problems.</p>
+<p>The field splits into three skill layers:</p>
+<ol>
+<li><strong>OCR proper</strong>: turn pixels into text.</li>
+<li><strong>Layout parsing</strong>: group OCR output into regions (title, body, table, header).</li>
+<li><strong>Document understanding</strong>: extract structured fields (&quot;invoice_total = $42.50&quot;) from layout.</li>
+</ol>
+<p>Each layer has classical and modern approaches, and the gap between &quot;I want text from an image&quot; and &quot;I need the total amount from this receipt&quot; is bigger than most teams realise.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="the-classical-pipeline" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-classical-pipeline" aria-label="Link to this section">#</a>The classical pipeline</h3>
+<figure class="mermaid-figure">
+  <pre class="mermaid">flowchart LR
+    IMG[&quot;Image&quot;] --&gt; DET[&quot;Text detection&lt;br/&gt;(DB, EAST, CRAFT)&quot;]
+    DET --&gt; BOX[&quot;Word/line&lt;br/&gt;bounding boxes&quot;]
+    BOX --&gt; CROP[&quot;Crop each region&quot;]
+    CROP --&gt; REC[&quot;Recognition&lt;br/&gt;(CRNN + CTC)&quot;]
+    REC --&gt; TXT[&quot;Text strings&quot;]
+    TXT --&gt; LAY[&quot;Layout&lt;br/&gt;ordering&quot;]
+    LAY --&gt; OUT[&quot;Reading-order text&quot;]
+
+    style DET fill:#dbeafe,stroke:#2563eb
+    style REC fill:#fef3c7,stroke:#d97706
+    style OUT fill:#dcfce7,stroke:#16a34a</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<ul>
+<li><strong>Text detection</strong> produces per-line or per-word quadrilaterals.</li>
+<li><strong>Recognition</strong> crops each region to a fixed height, runs a CNN + BiLSTM + CTC to produce a character sequence.</li>
+<li><strong>Layout</strong> rebuilds reading order (top-to-bottom, left-to-right for Latin; different for Arabic, Japanese).</li>
+</ul>
+<h3 id="ctc-in-one-paragraph" class="prose-h prose-h3"><a class="prose-h__anchor" href="#ctc-in-one-paragraph" aria-label="Link to this section">#</a>CTC in one paragraph</h3>
+<p>OCR recognition produces a variable-length sequence from a fixed-length feature map. CTC (Graves et al., 2006) lets you train this without character-level alignment. The model outputs a distribution over (vocab + blank) at every time step; CTC loss marginalises over all alignments that reduce to the target text after merging repeats and removing blanks.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>raw output: &quot;h h h _ _ e e l l _ l l o _ _&quot;
+after merge repeats and remove blanks: &quot;hello&quot;</code></pre>
+</figure>
+<p>CTC is the reason CRNN worked in 2015 and still trains most production OCR models in 2026.</p>
+<h3 id="modern-end-to-end-models" class="prose-h prose-h3"><a class="prose-h__anchor" href="#modern-end-to-end-models" aria-label="Link to this section">#</a>Modern end-to-end models</h3>
+<ul>
+<li><strong>Donut</strong> (Kim et al., 2022) — a ViT encoder + a text decoder; reads an image and emits JSON directly. No text detector, no layout module.</li>
+<li><strong>TrOCR</strong> — ViT + transformer decoder for line-level OCR.</li>
+<li><strong>Qwen-VL-OCR / InternVL</strong> — full vision-language models fine-tuned for OCR tasks; best accuracy in 2026 on complex documents.</li>
+<li><strong>PaddleOCR</strong> — classical DB + CRNN pipeline in a mature production package; still the open-source workhorse.</li>
+</ul>
+<p>End-to-end models need more data and compute but skip the error accumulation of multi-stage pipelines.</p>
+<h3 id="layout-parsing" class="prose-h prose-h3"><a class="prose-h__anchor" href="#layout-parsing" aria-label="Link to this section">#</a>Layout parsing</h3>
+<p>For structured documents, run a layout detector (LayoutLMv3, DocLayNet) that labels each region: Title, Paragraph, Figure, Table, Footnote. Reading order then becomes &quot;iterate through regions in layout order, concatenate.&quot;</p>
+<p>For forms, use <strong>Key-Value extraction</strong> models (Donut for visually-rich documents, LayoutLMv3 for plain scans). They take image + detected text + positions and predict structured key-value pairs.</p>
+<h3 id="evaluation-metrics" class="prose-h prose-h3"><a class="prose-h__anchor" href="#evaluation-metrics" aria-label="Link to this section">#</a>Evaluation metrics</h3>
+<ul>
+<li><strong>Character Error Rate (CER)</strong> — Levenshtein distance / length of reference. Lower is better. Production target: &lt; 2% on clean scans.</li>
+<li><strong>Word Error Rate (WER)</strong> — same at the word level.</li>
+<li><strong>F1 on structured fields</strong> — for key-value tasks; measures whether <code class="inline-code">{invoice_total: 42.50}</code> appears correctly.</li>
+<li><strong>Edit distance on JSON</strong> — for end-to-end document parsing; the Donut paper introduced normalised tree edit distance.</li>
+</ul>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="cv3-ctc-collapse"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">cv3-ctc-collapse</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> cv3 ctc collapse</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-ctc-loss-greedy-decoder" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-ctc-loss-greedy-decoder" aria-label="Link to this section">#</a>Step 1: CTC loss + greedy decoder</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> torch
+<span class="token keyword">import</span> torch<span class="token punctuation">.</span>nn <span class="token keyword">as</span> nn
+<span class="token keyword">import</span> torch<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>functional <span class="token keyword">as</span> F
+
+
+<span class="token keyword">def</span> <span class="token function">ctc_loss</span><span class="token punctuation">(</span>log_probs<span class="token punctuation">,</span> targets<span class="token punctuation">,</span> input_lengths<span class="token punctuation">,</span> target_lengths<span class="token punctuation">,</span> blank<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""
+    log_probs:      (T, N, C) log-softmax over vocab including blank at index 0
+    targets:        (N, S) int targets (no blanks)
+    input_lengths:  (N,) per-sample time steps used
+    target_lengths: (N,) per-sample target length
+    """</span>
+    <span class="token keyword">return</span> F<span class="token punctuation">.</span>ctc_loss<span class="token punctuation">(</span>log_probs<span class="token punctuation">,</span> targets<span class="token punctuation">,</span> input_lengths<span class="token punctuation">,</span> target_lengths<span class="token punctuation">,</span>
+                      blank<span class="token operator">=</span>blank<span class="token punctuation">,</span> reduction<span class="token operator">=</span><span class="token string">"mean"</span><span class="token punctuation">,</span> zero_infinity<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+
+
+<span class="token keyword">def</span> <span class="token function">greedy_ctc_decode</span><span class="token punctuation">(</span>log_probs<span class="token punctuation">,</span> blank<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""
+    log_probs: (T, N, C) log-softmax
+    returns: list of index sequences (blanks removed, repeats merged)
+    """</span>
+    preds <span class="token operator">=</span> log_probs<span class="token punctuation">.</span>argmax<span class="token punctuation">(</span>dim<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">.</span>transpose<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">.</span>cpu<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>tolist<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    out <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> seq <span class="token keyword">in</span> preds<span class="token punctuation">:</span>
+        decoded <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        prev <span class="token operator">=</span> <span class="token boolean">None</span>
+        <span class="token keyword">for</span> idx <span class="token keyword">in</span> seq<span class="token punctuation">:</span>
+            <span class="token keyword">if</span> idx <span class="token operator">!=</span> prev <span class="token keyword">and</span> idx <span class="token operator">!=</span> blank<span class="token punctuation">:</span>
+                decoded<span class="token punctuation">.</span>append<span class="token punctuation">(</span>idx<span class="token punctuation">)</span>
+            prev <span class="token operator">=</span> idx
+        out<span class="token punctuation">.</span>append<span class="token punctuation">(</span>decoded<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> out</code></pre>
+</figure>
+<p><code class="inline-code">F.ctc_loss</code> uses the efficient CuDNN implementation when available. The greedy decoder is simpler than a beam search and usually within 1% CER of it.</p>
+<h3 id="step-2-tiny-crnn-recogniser" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-tiny-crnn-recogniser" aria-label="Link to this section">#</a>Step 2: Tiny CRNN recogniser</h3>
+<p>Minimal CNN + BiLSTM for line OCR.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">TinyCRNN</span><span class="token punctuation">(</span>nn<span class="token punctuation">.</span>Module<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> vocab_size<span class="token operator">=</span><span class="token number">40</span><span class="token punctuation">,</span> hidden<span class="token operator">=</span><span class="token number">128</span><span class="token punctuation">,</span> feat<span class="token operator">=</span><span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token builtin">super</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>__init__<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>cnn <span class="token operator">=</span> nn<span class="token punctuation">.</span>Sequential<span class="token punctuation">(</span>
+            nn<span class="token punctuation">.</span>Conv2d<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> feat<span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nn<span class="token punctuation">.</span>BatchNorm2d<span class="token punctuation">(</span>feat<span class="token punctuation">)</span><span class="token punctuation">,</span> nn<span class="token punctuation">.</span>ReLU<span class="token punctuation">(</span>inplace<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            nn<span class="token punctuation">.</span>MaxPool2d<span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            nn<span class="token punctuation">.</span>Conv2d<span class="token punctuation">(</span>feat<span class="token punctuation">,</span> feat <span class="token operator">*</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nn<span class="token punctuation">.</span>BatchNorm2d<span class="token punctuation">(</span>feat <span class="token operator">*</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nn<span class="token punctuation">.</span>ReLU<span class="token punctuation">(</span>inplace<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            nn<span class="token punctuation">.</span>MaxPool2d<span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            nn<span class="token punctuation">.</span>Conv2d<span class="token punctuation">(</span>feat <span class="token operator">*</span> <span class="token number">2</span><span class="token punctuation">,</span> feat <span class="token operator">*</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nn<span class="token punctuation">.</span>BatchNorm2d<span class="token punctuation">(</span>feat <span class="token operator">*</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nn<span class="token punctuation">.</span>ReLU<span class="token punctuation">(</span>inplace<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            nn<span class="token punctuation">.</span>MaxPool2d<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            nn<span class="token punctuation">.</span>Conv2d<span class="token punctuation">(</span>feat <span class="token operator">*</span> <span class="token number">4</span><span class="token punctuation">,</span> feat <span class="token operator">*</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nn<span class="token punctuation">.</span>BatchNorm2d<span class="token punctuation">(</span>feat <span class="token operator">*</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nn<span class="token punctuation">.</span>ReLU<span class="token punctuation">(</span>inplace<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            nn<span class="token punctuation">.</span>MaxPool2d<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>rnn <span class="token operator">=</span> nn<span class="token punctuation">.</span>LSTM<span class="token punctuation">(</span>feat <span class="token operator">*</span> <span class="token number">4</span><span class="token punctuation">,</span> hidden<span class="token punctuation">,</span> bidirectional<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">,</span> batch_first<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>head <span class="token operator">=</span> nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span>hidden <span class="token operator">*</span> <span class="token number">2</span><span class="token punctuation">,</span> vocab_size<span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">forward</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token comment"># x: (N, 1, H, W)</span>
+        f <span class="token operator">=</span> self<span class="token punctuation">.</span>cnn<span class="token punctuation">(</span>x<span class="token punctuation">)</span>                <span class="token comment"># (N, C, H', W')</span>
+        f <span class="token operator">=</span> f<span class="token punctuation">.</span>mean<span class="token punctuation">(</span>dim<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">.</span>transpose<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span>  <span class="token comment"># (N, W', C)</span>
+        h<span class="token punctuation">,</span> _ <span class="token operator">=</span> self<span class="token punctuation">.</span>rnn<span class="token punctuation">(</span>f<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> F<span class="token punctuation">.</span>log_softmax<span class="token punctuation">(</span>self<span class="token punctuation">.</span>head<span class="token punctuation">(</span>h<span class="token punctuation">)</span><span class="token punctuation">.</span>transpose<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span> dim<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>  <span class="token comment"># (W', N, vocab)</span></code></pre>
+</figure>
+<p>Fixed-height input (the CNN max-pools height to 1). Width is the time dimension for CTC.</p>
+<h3 id="step-3-synthetic-ocr" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-synthetic-ocr" aria-label="Link to this section">#</a>Step 3: Synthetic OCR</h3>
+<p>Generate black-on-white digit strings for an end-to-end smoke test.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+
+<span class="token keyword">def</span> <span class="token function">synthetic_line</span><span class="token punctuation">(</span>text<span class="token punctuation">,</span> height<span class="token operator">=</span><span class="token number">32</span><span class="token punctuation">,</span> char_width<span class="token operator">=</span><span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    W <span class="token operator">=</span> char_width <span class="token operator">*</span> <span class="token builtin">len</span><span class="token punctuation">(</span>text<span class="token punctuation">)</span>
+    img <span class="token operator">=</span> np<span class="token punctuation">.</span>ones<span class="token punctuation">(</span><span class="token punctuation">(</span>height<span class="token punctuation">,</span> W<span class="token punctuation">)</span><span class="token punctuation">,</span> dtype<span class="token operator">=</span>np<span class="token punctuation">.</span>float32<span class="token punctuation">)</span>
+    <span class="token keyword">for</span> i<span class="token punctuation">,</span> c <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>text<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        x <span class="token operator">=</span> i <span class="token operator">*</span> char_width
+        shade <span class="token operator">=</span> <span class="token number">0.0</span> <span class="token keyword">if</span> c<span class="token punctuation">.</span>isalnum<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">else</span> <span class="token number">0.5</span>
+        img<span class="token punctuation">[</span><span class="token number">6</span><span class="token punctuation">:</span>height <span class="token operator">-</span> <span class="token number">6</span><span class="token punctuation">,</span> x <span class="token operator">+</span> <span class="token number">2</span><span class="token punctuation">:</span>x <span class="token operator">+</span> char_width <span class="token operator">-</span> <span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">=</span> shade
+    <span class="token keyword">return</span> img
+
+
+<span class="token keyword">def</span> <span class="token function">build_batch</span><span class="token punctuation">(</span>strings<span class="token punctuation">,</span> vocab<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    H <span class="token operator">=</span> <span class="token number">32</span>
+    W <span class="token operator">=</span> <span class="token number">16</span> <span class="token operator">*</span> <span class="token builtin">max</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span> <span class="token keyword">for</span> s <span class="token keyword">in</span> strings<span class="token punctuation">)</span>
+    imgs <span class="token operator">=</span> np<span class="token punctuation">.</span>ones<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>strings<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> H<span class="token punctuation">,</span> W<span class="token punctuation">)</span><span class="token punctuation">,</span> dtype<span class="token operator">=</span>np<span class="token punctuation">.</span>float32<span class="token punctuation">)</span>
+    target_lengths <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    targets <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> i<span class="token punctuation">,</span> s <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>strings<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        imgs<span class="token punctuation">[</span>i<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token number">16</span> <span class="token operator">*</span> <span class="token builtin">len</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token operator">=</span> synthetic_line<span class="token punctuation">(</span>s<span class="token punctuation">)</span>
+        ids <span class="token operator">=</span> <span class="token punctuation">[</span>vocab<span class="token punctuation">.</span>index<span class="token punctuation">(</span>c<span class="token punctuation">)</span> <span class="token keyword">for</span> c <span class="token keyword">in</span> s<span class="token punctuation">]</span>
+        targets<span class="token punctuation">.</span>extend<span class="token punctuation">(</span>ids<span class="token punctuation">)</span>
+        target_lengths<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>ids<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> torch<span class="token punctuation">.</span>from_numpy<span class="token punctuation">(</span>imgs<span class="token punctuation">)</span><span class="token punctuation">,</span> torch<span class="token punctuation">.</span>tensor<span class="token punctuation">(</span>targets<span class="token punctuation">)</span><span class="token punctuation">,</span> torch<span class="token punctuation">.</span>tensor<span class="token punctuation">(</span>target_lengths<span class="token punctuation">)</span>
+
+
+vocab <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">"_"</span><span class="token punctuation">]</span> <span class="token operator">+</span> <span class="token builtin">list</span><span class="token punctuation">(</span><span class="token string">"0123456789abcdefghijklmnopqrstuvwxyz"</span><span class="token punctuation">)</span>
+imgs<span class="token punctuation">,</span> targets<span class="token punctuation">,</span> lengths <span class="token operator">=</span> build_batch<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">"hello"</span><span class="token punctuation">,</span> <span class="token string">"world"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> vocab<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"images: </span><span class="token interpolation"><span class="token punctuation">{</span>imgs<span class="token punctuation">.</span>shape<span class="token punctuation">}</span></span><span class="token string">   targets: </span><span class="token interpolation"><span class="token punctuation">{</span>targets<span class="token punctuation">.</span>shape<span class="token punctuation">}</span></span><span class="token string">   lengths: </span><span class="token interpolation"><span class="token punctuation">{</span>lengths<span class="token punctuation">.</span>tolist<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>A real OCR dataset adds fonts, noise, rotation, blur, and colour. The pipeline above is identical.</p>
+<h3 id="step-4-training-sketch" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-training-sketch" aria-label="Link to this section">#</a>Step 4: Training sketch</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python">model <span class="token operator">=</span> TinyCRNN<span class="token punctuation">(</span>vocab_size<span class="token operator">=</span><span class="token builtin">len</span><span class="token punctuation">(</span>vocab<span class="token punctuation">)</span><span class="token punctuation">)</span>
+opt <span class="token operator">=</span> torch<span class="token punctuation">.</span>optim<span class="token punctuation">.</span>Adam<span class="token punctuation">(</span>model<span class="token punctuation">.</span>parameters<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> lr<span class="token operator">=</span><span class="token number">1e-3</span><span class="token punctuation">)</span>
+
+<span class="token keyword">for</span> step <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    strings <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">"abc"</span> <span class="token operator">+</span> <span class="token builtin">str</span><span class="token punctuation">(</span>step <span class="token operator">%</span> <span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token number">4</span> <span class="token operator">+</span> <span class="token punctuation">[</span><span class="token string">"xyz"</span> <span class="token operator">+</span> <span class="token builtin">str</span><span class="token punctuation">(</span><span class="token punctuation">(</span>step <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token number">4</span>
+    imgs<span class="token punctuation">,</span> targets<span class="token punctuation">,</span> target_lens <span class="token operator">=</span> build_batch<span class="token punctuation">(</span>strings<span class="token punctuation">,</span> vocab<span class="token punctuation">)</span>
+    log_probs <span class="token operator">=</span> model<span class="token punctuation">(</span>imgs<span class="token punctuation">)</span>  <span class="token comment"># (W', 8, vocab)</span>
+    input_lens <span class="token operator">=</span> torch<span class="token punctuation">.</span>full<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">,</span><span class="token punctuation">)</span><span class="token punctuation">,</span> log_probs<span class="token punctuation">.</span>size<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span> dtype<span class="token operator">=</span>torch<span class="token punctuation">.</span><span class="token builtin">long</span><span class="token punctuation">)</span>
+    loss <span class="token operator">=</span> ctc_loss<span class="token punctuation">(</span>log_probs<span class="token punctuation">,</span> targets<span class="token punctuation">,</span> input_lens<span class="token punctuation">,</span> target_lens<span class="token punctuation">,</span> blank<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span>
+    opt<span class="token punctuation">.</span>zero_grad<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> loss<span class="token punctuation">.</span>backward<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> opt<span class="token punctuation">.</span>step<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Loss should drop from ~3 to ~0.2 over 200 steps on this trivial synthetic data.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>Three production paths:</p>
+<ul>
+<li><strong>PaddleOCR</strong> — mature, fast, multilingual. One-line usage: <code class="inline-code">paddleocr.PaddleOCR(lang=&quot;en&quot;).ocr(image_path)</code>.</li>
+<li><strong>EasyOCR</strong> — Python-native, multilingual, PyTorch backbone.</li>
+<li><strong>Tesseract</strong> — classical; still useful for old scanned documents when models struggle.</li>
+</ul>
+<p>For end-to-end document parsing, use Donut or a VLM:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> transformers <span class="token keyword">import</span> DonutProcessor<span class="token punctuation">,</span> VisionEncoderDecoderModel
+
+processor <span class="token operator">=</span> DonutProcessor<span class="token punctuation">.</span>from_pretrained<span class="token punctuation">(</span><span class="token string">"naver-clova-ix/donut-base-finetuned-cord-v2"</span><span class="token punctuation">)</span>
+model <span class="token operator">=</span> VisionEncoderDecoderModel<span class="token punctuation">.</span>from_pretrained<span class="token punctuation">(</span><span class="token string">"naver-clova-ix/donut-base-finetuned-cord-v2"</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>For receipts, invoices, and forms with repeatable structure, fine-tune Donut. For arbitrary documents or OCR with reasoning, a VLM like Qwen-VL-OCR is the current default.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces:</p>
+<ul>
+<li><code class="inline-code">outputs/prompt-ocr-stack-picker.md</code> — a prompt that picks Tesseract / PaddleOCR / Donut / VLM-OCR given document type, language, and structure.</li>
+<li><code class="inline-code">outputs/skill-ctc-decoder.md</code> — a skill that writes greedy and beam-search CTC decoders from scratch, including length normalisation.</li>
+</ul>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><strong>(Easy)</strong> Train the TinyCRNN on 5-digit random numeric strings for 500 steps. Report CER on a held-out set.</li>
+<li><strong>(Medium)</strong> Replace greedy decoding with beam search (beam_width=5). Report CER delta. On which inputs does beam search win?</li>
+<li><strong>(Hard)</strong> Use PaddleOCR on a set of 20 receipts, extract line items, and compute F1 against hand-labelled ground truth for {item_name, price} pairs.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>OCR</td>
+<td>&quot;Text from pixels&quot;</td>
+<td>Turning image regions into character sequences</td>
+</tr>
+<tr>
+<td>CTC</td>
+<td>&quot;Alignment-free loss&quot;</td>
+<td>Loss that trains a sequence model without per-timestep labels; marginalises over alignments</td>
+</tr>
+<tr>
+<td>CRNN</td>
+<td>&quot;Classic OCR model&quot;</td>
+<td>Conv feature extractor + BiLSTM + CTC; the 2015 baseline still used in production</td>
+</tr>
+<tr>
+<td>Donut</td>
+<td>&quot;End-to-end OCR&quot;</td>
+<td>ViT encoder + text decoder; emits JSON directly from image</td>
+</tr>
+<tr>
+<td>Layout parsing</td>
+<td>&quot;Find regions&quot;</td>
+<td>Detect and label Title/Table/Figure/Paragraph regions in a document</td>
+</tr>
+<tr>
+<td>Reading order</td>
+<td>&quot;Text sequence&quot;</td>
+<td>Ordering of recognised regions into a sentence; trivial for Latin, non-trivial for mixed layouts</td>
+</tr>
+<tr>
+<td>CER / WER</td>
+<td>&quot;Error rates&quot;</td>
+<td>Levenshtein distance / reference length at character or word granularity</td>
+</tr>
+<tr>
+<td>VLM-OCR</td>
+<td>&quot;LLM that reads&quot;</td>
+<td>A vision-language model trained or prompted for OCR tasks; current SOTA on complex documents</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/1507.05717" target="_blank" rel="noopener">CRNN (Shi et al., 2015)</a> — the original CNN+RNN+CTC architecture</li>
+<li><a href="https://www.cs.toronto.edu/~graves/icml_2006.pdf" target="_blank" rel="noopener">CTC (Graves et al., 2006)</a> — the original CTC paper; densely packed with the algorithmic ideas</li>
+<li><a href="https://arxiv.org/abs/2111.15664" target="_blank" rel="noopener">Donut (Kim et al., 2022)</a> — OCR-free document understanding transformer</li>
+<li><a href="https://github.com/PaddlePaddle/PaddleOCR" target="_blank" rel="noopener">PaddleOCR</a> — the open-source production OCR stack</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="18-open-vocab-clip.html">
+  <span class="label">← Previous</span>
+  <b>Open-Vocabulary Vision — CLIP</b>
+</a>
+      <a class="pager__item pager__item--next" href="20-image-retrieval-metric.html">
+  <span class="label">Next →</span>
+  <b>Image Retrieval &amp; Metric Learning</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>4 minutes</b> of Computer Vision behind you.</p>
+      <a class="btn btn--solid" href="20-image-retrieval-metric.html">Continue to Image Retrieval &amp; Metric Learning →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#the-classical-pipeline">The classical pipeline</a></li><li class="mini__item mini__item--d3"><a href="#ctc-in-one-paragraph">CTC in one paragraph</a></li><li class="mini__item mini__item--d3"><a href="#modern-end-to-end-models">Modern end-to-end models</a></li><li class="mini__item mini__item--d3"><a href="#layout-parsing">Layout parsing</a></li><li class="mini__item mini__item--d3"><a href="#evaluation-metrics">Evaluation metrics</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-ctc-loss-greedy-decoder">Step 1: CTC loss + greedy decoder</a></li><li class="mini__item mini__item--d3"><a href="#step-2-tiny-crnn-recogniser">Step 2: Tiny CRNN recogniser</a></li><li class="mini__item mini__item--d3"><a href="#step-3-synthetic-ocr">Step 3: Synthetic OCR</a></li><li class="mini__item mini__item--d3"><a href="#step-4-training-sketch">Step 4: Training sketch</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Harness as a Library — Subagents and Session Store — Agent Engineering — AIFS</title>
+<meta name="description" content="Agent Engineering: The Harness as a Library — Subagents and Session Store. 4 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="The Harness as a Library — Subagents and Session Store — Agent Engineering — AIFS">
+<meta property="og:description" content="Agent Engineering: The Harness as a Library — Subagents and Session Store. 4 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"ae-subagent-isolation":["../assets/figures/figures-agents4.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-agents4.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#0091FF" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#0091FF;--accent-ink:#FFFFFF"
+  data-lesson-id="agent-engineering/17-claude-agent-sdk" data-module="agent-engineering"
+  data-prev="16-openai-agents-sdk.html" data-next="18-agno-and-mastra-runtimes.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#0091FF">
+        <span class="label">Phase 14</span>
+        <b>Agent Engineering</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="agent-engineering/01-the-agent-loop"><a href="01-the-agent-loop.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">The Agent Loop: Observe, Think, Act</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/02-rewoo-plan-and-execute"><a href="02-rewoo-plan-and-execute.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">ReWOO and Plan-and-Execute: Decoupled Planning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/03-reflexion-verbal-rl"><a href="03-reflexion-verbal-rl.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Reflexion: Verbal Reinforcement Learning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/04-tree-of-thoughts-lats"><a href="04-tree-of-thoughts-lats.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Tree of Thoughts and LATS: Deliberate Search</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/05-self-refine-and-critic"><a href="05-self-refine-and-critic.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Self-Refine and CRITIC: Iterative Output Improvement</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/06-tool-use-and-function-calling"><a href="06-tool-use-and-function-calling.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Tool Use and Function Calling</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/07-memory-virtual-context-memgpt"><a href="07-memory-virtual-context-memgpt.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Agent Memory — Virtual Context and Memory Paging</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/08-memory-blocks-sleep-time-compute"><a href="08-memory-blocks-sleep-time-compute.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Memory Blocks and Sleep-Time Compute</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/09-hybrid-memory-mem0"><a href="09-hybrid-memory-mem0.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Hybrid Memory: Vector + Graph + KV</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/10-skill-libraries-voyager"><a href="10-skill-libraries-voyager.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Skill Libraries and Lifelong Learning (Voyager)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/11-planning-htn-and-evolutionary"><a href="11-planning-htn-and-evolutionary.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Planning with HTN and Evolutionary Search</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/12-anthropic-workflow-patterns"><a href="12-anthropic-workflow-patterns.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Anthropic's Workflow Patterns: Simple Over Complex</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/13-langgraph-stateful-graphs"><a href="13-langgraph-stateful-graphs.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Stateful Graph Orchestration — Durable Execution and Checkpoints</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/14-autogen-actor-model"><a href="14-autogen-actor-model.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">The Actor Model for Agents — Async Messages and Typed Runtimes</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/15-crewai-role-based-crews"><a href="15-crewai-role-based-crews.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Role-Based Agent Teams — Roles, Tasks, Processes</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/16-openai-agents-sdk"><a href="16-openai-agents-sdk.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">OpenAI Agents SDK: Handoffs, Guardrails, Tracing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/17-claude-agent-sdk"><a href="17-claude-agent-sdk.html" class="is-current">
+  <span class="snav__n">17</span>
+  <span class="snav__t">The Harness as a Library — Subagents and Session Store</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/18-agno-and-mastra-runtimes"><a href="18-agno-and-mastra-runtimes.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Production Agent Runtimes — Fast Instantiation and Typed Workflows</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/19-benchmarks-swebench-gaia"><a href="19-benchmarks-swebench-gaia.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">Benchmarks: SWE-bench, GAIA, AgentBench</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/20-benchmarks-webarena-osworld"><a href="20-benchmarks-webarena-osworld.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Benchmarks: WebArena and OSWorld</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/21-computer-use-agents"><a href="21-computer-use-agents.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Computer Use: Claude, OpenAI CUA, Gemini</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/22-voice-agents-pipecat-livekit"><a href="22-voice-agents-pipecat-livekit.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Voice Agents: Pipecat and LiveKit</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/23-otel-genai-conventions"><a href="23-otel-genai-conventions.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">OpenTelemetry GenAI Semantic Conventions</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/24-agent-observability-platforms"><a href="24-agent-observability-platforms.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Agent Observability: Langfuse, Phoenix, Opik</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/25-multi-agent-debate"><a href="25-multi-agent-debate.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Multi-Agent Debate and Collaboration</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/26-failure-modes-agentic"><a href="26-failure-modes-agentic.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Failure Modes: Why Agents Break</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/27-prompt-injection-defense"><a href="27-prompt-injection-defense.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">Prompt Injection and the PVE Defense</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/28-orchestration-patterns"><a href="28-orchestration-patterns.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">Orchestration Patterns: Supervisor, Swarm, Hierarchical</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/29-production-runtimes"><a href="29-production-runtimes.html" class="">
+  <span class="snav__n">29</span>
+  <span class="snav__t">Production Runtimes: Queue, Event, Cron</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/30-eval-driven-agent-development"><a href="30-eval-driven-agent-development.html" class="">
+  <span class="snav__n">30</span>
+  <span class="snav__t">Eval-Driven Agent Development</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/31-agent-workbench-why-models-fail"><a href="31-agent-workbench-why-models-fail.html" class="">
+  <span class="snav__n">31</span>
+  <span class="snav__t">Agent Workbench Engineering: Why Capable Models Still Fail</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/32-minimal-agent-workbench"><a href="32-minimal-agent-workbench.html" class="">
+  <span class="snav__n">32</span>
+  <span class="snav__t">The Minimal Agent Workbench</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/33-instructions-as-executable-constraints"><a href="33-instructions-as-executable-constraints.html" class="">
+  <span class="snav__n">33</span>
+  <span class="snav__t">Agent Instructions as Executable Constraints</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/34-repo-memory-and-state"><a href="34-repo-memory-and-state.html" class="">
+  <span class="snav__n">34</span>
+  <span class="snav__t">Repo Memory and Durable State</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/35-initialization-scripts"><a href="35-initialization-scripts.html" class="">
+  <span class="snav__n">35</span>
+  <span class="snav__t">Initialization Scripts for Agents</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/36-scope-contracts"><a href="36-scope-contracts.html" class="">
+  <span class="snav__n">36</span>
+  <span class="snav__t">Scope Contracts and Task Boundaries</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/37-runtime-feedback-loops"><a href="37-runtime-feedback-loops.html" class="">
+  <span class="snav__n">37</span>
+  <span class="snav__t">Runtime Feedback Loops</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/38-verification-gates"><a href="38-verification-gates.html" class="">
+  <span class="snav__n">38</span>
+  <span class="snav__t">Verification Gates</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/39-reviewer-agent"><a href="39-reviewer-agent.html" class="">
+  <span class="snav__n">39</span>
+  <span class="snav__t">Reviewer Agent: Separate Builder from Marker</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/40-multi-session-handoff"><a href="40-multi-session-handoff.html" class="">
+  <span class="snav__n">40</span>
+  <span class="snav__t">Multi-Session Handoff</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/41-workbench-for-real-repos"><a href="41-workbench-for-real-repos.html" class="">
+  <span class="snav__n">41</span>
+  <span class="snav__t">The Workbench on a Real Repo</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/42-agent-workbench-capstone"><a href="42-agent-workbench-capstone.html" class="">
+  <span class="snav__n">42</span>
+  <span class="snav__t">Capstone: Ship a Reusable Agent Workbench Pack</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/43-frame-the-task-before-code"><a href="43-frame-the-task-before-code.html" class="">
+  <span class="snav__n">43</span>
+  <span class="snav__t">Frame the Task Before the Agent Writes Code</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/44-plan-from-evidence"><a href="44-plan-from-evidence.html" class="">
+  <span class="snav__n">44</span>
+  <span class="snav__t">Build an Evidence-Backed Execution Plan</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/45-delegate-with-isolation"><a href="45-delegate-with-isolation.html" class="">
+  <span class="snav__n">45</span>
+  <span class="snav__t">Delegate Agent Work with Isolation and Merge Contracts</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/46-turn-feedback-into-system"><a href="46-turn-feedback-into-system.html" class="">
+  <span class="snav__n">46</span>
+  <span class="snav__t">Turn Every Agent Correction into a System Improvement</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/47-outcomes-before-output"><a href="47-outcomes-before-output.html" class="">
+  <span class="snav__n">47</span>
+  <span class="snav__t">Define the Outcome Before You Choose the Output</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/48-discover-the-real-workflow"><a href="48-discover-the-real-workflow.html" class="">
+  <span class="snav__n">48</span>
+  <span class="snav__t">Discover the Workflow People Actually Perform</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/49-map-assumptions-and-risk"><a href="49-map-assumptions-and-risk.html" class="">
+  <span class="snav__n">49</span>
+  <span class="snav__t">Map Assumptions and Resolve the Riskiest One First</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/50-choose-the-smallest-testable-slice"><a href="50-choose-the-smallest-testable-slice.html" class="">
+  <span class="snav__n">50</span>
+  <span class="snav__t">Choose the Smallest Slice That Can Change the Decision</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/51-write-specifications-that-preserve-judgment"><a href="51-write-specifications-that-preserve-judgment.html" class="">
+  <span class="snav__n">51</span>
+  <span class="snav__t">Write Specifications That Preserve Judgment</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/52-design-success-metrics"><a href="52-design-success-metrics.html" class="">
+  <span class="snav__n">52</span>
+  <span class="snav__t">Design Success Metrics Before the Result Exists</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/53-prototype-pilot-or-production"><a href="53-prototype-pilot-or-production.html" class="">
+  <span class="snav__n">53</span>
+  <span class="snav__t">Choose Prototype, Pilot, or Production Deliberately</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/54-build-the-feedback-ratchet"><a href="54-build-the-feedback-ratchet.html" class="">
+  <span class="snav__n">54</span>
+  <span class="snav__t">Build a Feedback Ratchet with Ownership and Retirement</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Agent Engineering</a></p>
+      <h1 class="page__title">The Harness as a Library — Subagents and Session Store</h1>
+      <p class="page__lede">A harness you can import: built-in tools, subagents for context isolation, hooks, W3C trace propagation, session persistence. The Claude Agent SDK is the reference example — the library form of the Claude Code harness — and Claude Managed Agents is the hosted alternative for long-running async work.</p>
+      <div class="page__meta">
+        <span class="chip">4 min read</span>
+        <span class="chip">878 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Learn + Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (stdlib)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 14 · 01 (Agent Loop), Phase 14 · 10 (Skill Libraries)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Explain the difference between the Anthropic Client SDK (raw API) and the Claude Agent SDK (harness shape).</li>
+<li>Describe subagents — parallelization and context isolation — and when to reach for them.</li>
+<li>Name the Python SDK&#39;s session store surface (<code class="inline-code">append</code>, <code class="inline-code">load</code>, <code class="inline-code">list_sessions</code>, <code class="inline-code">delete</code>, <code class="inline-code">list_subkeys</code>) and the role of <code class="inline-code">--session-mirror</code>.</li>
+<li>Implement a stdlib harness with built-in tools, subagent spawning with isolated context, lifecycle hooks, and a session store.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>A raw LLM API gets you one round-trip. A production agent needs tool execution, MCP servers, lifecycle hooks, subagent spawning, session persistence, trace propagation. Claude Agent SDK ships this shape as a library — the same harness Claude Code uses, exposed for custom agents.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="client-sdk-vs-agent-sdk" class="prose-h prose-h3"><a class="prose-h__anchor" href="#client-sdk-vs-agent-sdk" aria-label="Link to this section">#</a>Client SDK vs Agent SDK</h3>
+<ul>
+<li><strong>Client SDK (<code class="inline-code">anthropic</code>).</strong> Raw Messages API. You own the loop, the tools, the state.</li>
+<li><strong>Agent SDK (<code class="inline-code">claude-agent-sdk</code>).</strong> Built-in tool execution, MCP connections, hooks, subagent spawning, session store. The Claude Code loop as a library.</li>
+</ul>
+<h3 id="built-in-tools" class="prose-h prose-h3"><a class="prose-h__anchor" href="#built-in-tools" aria-label="Link to this section">#</a>Built-in tools</h3>
+<p>The SDK ships 10+ tools out of the box: file read/write, shell, grep, glob, web fetch, more. Custom tools register via the standard tool-schema interface.</p>
+<h3 id="subagents" class="prose-h prose-h3"><a class="prose-h__anchor" href="#subagents" aria-label="Link to this section">#</a>Subagents</h3>
+<p>Two purposes documented by Anthropic:</p>
+<ol>
+<li><strong>Parallelization.</strong> Run independent work concurrently. &quot;Find the test file for each of these 20 modules&quot; is 20 parallel subagent tasks.</li>
+<li><strong>Context isolation.</strong> Subagents use their own context window; only results return to the orchestrator. The orchestrator&#39;s budget is preserved.</li>
+</ol>
+<p>Python SDK recent additions: <code class="inline-code">list_subagents()</code>, <code class="inline-code">get_subagent_messages()</code> for reading subagent transcripts.</p>
+<h3 id="session-store" class="prose-h prose-h3"><a class="prose-h__anchor" href="#session-store" aria-label="Link to this section">#</a>Session store</h3>
+<p>Protocol parity with TypeScript:</p>
+<ul>
+<li><code class="inline-code">append(session_id, message)</code> — add a turn.</li>
+<li><code class="inline-code">load(session_id)</code> — restore conversation.</li>
+<li><code class="inline-code">list_sessions()</code> — enumerate.</li>
+<li><code class="inline-code">delete(session_id)</code> — with cascade to subagent sessions.</li>
+<li><code class="inline-code">list_subkeys(session_id)</code> — list subagent keys.</li>
+</ul>
+<p><code class="inline-code">--session-mirror</code> (CLI flag) mirrors the transcript to an external file as it streams, for debugging.</p>
+<h3 id="hooks" class="prose-h prose-h3"><a class="prose-h__anchor" href="#hooks" aria-label="Link to this section">#</a>Hooks</h3>
+<p>Lifecycle hooks you can register:</p>
+<ul>
+<li><code class="inline-code">PreToolUse</code>, <code class="inline-code">PostToolUse</code> — gate or audit tool calls.</li>
+<li><code class="inline-code">SessionStart</code>, <code class="inline-code">SessionEnd</code> — set up and tear down.</li>
+<li><code class="inline-code">UserPromptSubmit</code> — act on user input before the model sees it.</li>
+<li><code class="inline-code">PreCompact</code> — run before context compaction.</li>
+<li><code class="inline-code">Stop</code> — cleanup on agent exit.</li>
+<li><code class="inline-code">Notification</code> — side-channel alerts.</li>
+</ul>
+<p>Hooks are how pro-workflow (Phase 14 curriculum reference) and similar systems add cross-cutting behavior.</p>
+<h3 id="w3c-trace-context" class="prose-h prose-h3"><a class="prose-h__anchor" href="#w3c-trace-context" aria-label="Link to this section">#</a>W3C trace context</h3>
+<p>OTel spans active on the caller propagate into the CLI subprocess via W3C trace context headers. The whole multi-process trace shows up as one trace in your backend.</p>
+<h3 id="claude-managed-agents" class="prose-h prose-h3"><a class="prose-h__anchor" href="#claude-managed-agents" aria-label="Link to this section">#</a>Claude Managed Agents</h3>
+<p>The hosted alternative (beta header <code class="inline-code">managed-agents-2026-04-01</code>). Long-running async work, built-in prompt caching, built-in compaction. Trade control for managed infrastructure.</p>
+<h3 id="where-this-pattern-goes-wrong" class="prose-h prose-h3"><a class="prose-h__anchor" href="#where-this-pattern-goes-wrong" aria-label="Link to this section">#</a>Where this pattern goes wrong</h3>
+<ul>
+<li><strong>Subagent over-spawn.</strong> Spawning 100 subagents for 100 tiny tasks. Overhead dominates. Batch instead.</li>
+<li><strong>Hook creep.</strong> Every team adds hooks; startup time balloons. Review hooks quarterly.</li>
+<li><strong>Session bloat.</strong> Sessions accumulate; size grows. Use <code class="inline-code">list_sessions</code> + expiry policy.</li>
+</ul>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="ae-subagent-isolation"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">ae-subagent-isolation</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> ae subagent isolation</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<p><code class="inline-code">code/main.py</code> implements the SDK shape in stdlib:</p>
+<ul>
+<li><code class="inline-code">Tool</code>, <code class="inline-code">ToolRegistry</code> with built-in <code class="inline-code">read_file</code>, <code class="inline-code">write_file</code>, <code class="inline-code">list_dir</code>.</li>
+<li><code class="inline-code">Subagent</code> — private context, isolated run, results returned.</li>
+<li><code class="inline-code">SessionStore</code> — append, load, list, delete, list_subkeys.</li>
+<li><code class="inline-code">Hooks</code> — <code class="inline-code">pre_tool_use</code>, <code class="inline-code">post_tool_use</code>, <code class="inline-code">session_start</code>, <code class="inline-code">session_end</code>.</li>
+<li>A demo: main agent spawns 3 subagents in parallel (each isolated), aggregates results, persists session.</li>
+</ul>
+<p>Run it:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>python3 code/main.py</code></pre>
+</figure>
+<p>The trace shows subagent context isolation (orchestrator context size stays bounded), hook execution, and session persistence.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<ul>
+<li><strong>Claude Agent SDK</strong> for Claude-first products that want the Claude Code harness shape.</li>
+<li><strong>Claude Managed Agents</strong> for hosted long-running async work.</li>
+<li><strong>OpenAI Agents SDK</strong> (Lesson 16) for OpenAI-first counterparts.</li>
+<li><strong>LangGraph + custom tools</strong> if you want the graph-shaped state machine instead.</li>
+</ul>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p><code class="inline-code">outputs/skill-claude-agent-scaffold.md</code> scaffolds a Claude Agent SDK app with subagents, hooks, session store, MCP server attachment, and W3C trace propagation.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li>Add a subagent spawner that batches 20 tasks into groups of 5 parallel subagents. Measure orchestrator context size vs one-per-task.</li>
+<li>Implement a <code class="inline-code">PreToolUse</code> hook that rate-limits <code class="inline-code">write_file</code> calls (5 per minute per session). Trace the behavior.</li>
+<li>Wire <code class="inline-code">list_subkeys</code> to render a subagent tree. What does deep nesting look like?</li>
+<li>Port the toy to the real <code class="inline-code">claude-agent-sdk</code> Python package. What changes about tool registration?</li>
+<li>Read the Claude Managed Agents docs. When would you switch from self-hosted to managed?</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Agent SDK</td>
+<td>&quot;Claude Code as a library&quot;</td>
+<td>Harness shape: tools, MCP, hooks, subagents, session store</td>
+</tr>
+<tr>
+<td>Subagent</td>
+<td>&quot;Child agent&quot;</td>
+<td>Separate context, own budget; results bubble up</td>
+</tr>
+<tr>
+<td>Session store</td>
+<td>&quot;Conversation DB&quot;</td>
+<td>Persist, load, list, delete turns with subagent cascade</td>
+</tr>
+<tr>
+<td>Hook</td>
+<td>&quot;Lifecycle callback&quot;</td>
+<td>Pre/post tool, session, prompt submit, compact, stop</td>
+</tr>
+<tr>
+<td>W3C trace context</td>
+<td>&quot;Cross-process trace&quot;</td>
+<td>Parent span propagates into CLI subprocess</td>
+</tr>
+<tr>
+<td>Managed Agents</td>
+<td>&quot;Hosted harness&quot;</td>
+<td>Anthropic-hosted long-running async work</td>
+</tr>
+<tr>
+<td><code class="inline-code">--session-mirror</code></td>
+<td>&quot;Transcript mirror&quot;</td>
+<td>Writes session turns to an external file as they stream</td>
+</tr>
+<tr>
+<td>MCP server</td>
+<td>&quot;Tool surface&quot;</td>
+<td>External tool/resource source attached to the agent</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://platform.claude.com/docs/en/agent-sdk/overview" target="_blank" rel="noopener">Claude Agent SDK overview</a> — the library form of Claude Code</li>
+<li><a href="https://www.anthropic.com/engineering/building-agents-with-the-claude-agent-sdk" target="_blank" rel="noopener">Anthropic, Building agents with the Claude Agent SDK</a> — production patterns</li>
+<li><a href="https://platform.claude.com/docs/en/managed-agents/overview" target="_blank" rel="noopener">Claude Managed Agents overview</a> — hosted alternative</li>
+<li><a href="https://openai.github.io/openai-agents-python/" target="_blank" rel="noopener">OpenAI Agents SDK</a> — counterpart</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="16-openai-agents-sdk.html">
+  <span class="label">← Previous</span>
+  <b>OpenAI Agents SDK: Handoffs, Guardrails, Tracing</b>
+</a>
+      <a class="pager__item pager__item--next" href="18-agno-and-mastra-runtimes.html">
+  <span class="label">Next →</span>
+  <b>Production Agent Runtimes — Fast Instantiation and Typed Workflows</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>4 minutes</b> of Agent Engineering behind you.</p>
+      <a class="btn btn--solid" href="18-agno-and-mastra-runtimes.html">Continue to Production Agent Runtimes — Fast Instantiation and Typed Workflows →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#client-sdk-vs-agent-sdk">Client SDK vs Agent SDK</a></li><li class="mini__item mini__item--d3"><a href="#built-in-tools">Built-in tools</a></li><li class="mini__item mini__item--d3"><a href="#subagents">Subagents</a></li><li class="mini__item mini__item--d3"><a href="#session-store">Session store</a></li><li class="mini__item mini__item--d3"><a href="#hooks">Hooks</a></li><li class="mini__item mini__item--d3"><a href="#w3c-trace-context">W3C trace context</a></li><li class="mini__item mini__item--d3"><a href="#claude-managed-agents">Claude Managed Agents</a></li><li class="mini__item mini__item--d3"><a href="#where-this-pattern-goes-wrong">Where this pattern goes wrong</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

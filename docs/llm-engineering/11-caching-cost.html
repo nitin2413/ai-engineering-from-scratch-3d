@@ -1,0 +1,1246 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Caching, Rate Limiting &amp; Cost Optimization — LLM Engineering — AIFS</title>
+<meta name="description" content="LLM Engineering: Caching, Rate Limiting &amp; Cost Optimization. 10 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Caching, Rate Limiting &amp; Cost Optimization — LLM Engineering — AIFS">
+<meta property="og:description" content="LLM Engineering: Caching, Rate Limiting &amp; Cost Optimization. 10 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"semantic-cache":["../assets/figures/figures-llmeng.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-llmeng.js"];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#00E0C6" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#00E0C6;--accent-ink:#111111"
+  data-lesson-id="llm-engineering/11-caching-cost" data-module="llm-engineering"
+  data-prev="10-evaluation.html" data-next="12-guardrails.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#00E0C6">
+        <span class="label">Phase 11</span>
+        <b>LLM Engineering</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="llm-engineering/01-prompt-engineering"><a href="01-prompt-engineering.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Prompt Engineering: Techniques &amp; Patterns</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/02-few-shot-cot"><a href="02-few-shot-cot.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Few-Shot, Chain-of-Thought, Tree-of-Thought</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/03-structured-outputs"><a href="03-structured-outputs.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Structured Outputs: JSON, Schema Validation, Constrained Decoding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/04-embeddings"><a href="04-embeddings.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Embeddings &amp; Vector Representations</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/05-context-engineering"><a href="05-context-engineering.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Context Engineering: Windows, Budgets, Memory, and Retrieval</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/06-rag"><a href="06-rag.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">RAG (Retrieval-Augmented Generation)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/07-advanced-rag"><a href="07-advanced-rag.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Advanced RAG (Chunking, Reranking, Hybrid Search)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/08-fine-tuning-lora"><a href="08-fine-tuning-lora.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Fine-Tuning with LoRA &amp; QLoRA</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/09-function-calling"><a href="09-function-calling.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Function Calling &amp; Tool Use</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/10-evaluation"><a href="10-evaluation.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Evaluation &amp; Testing LLM Applications</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/11-caching-cost"><a href="11-caching-cost.html" class="is-current">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Caching, Rate Limiting &amp; Cost Optimization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/12-guardrails"><a href="12-guardrails.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Guardrails, Safety &amp; Content Filtering</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/13-production-app"><a href="13-production-app.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Building a Production LLM Application</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/14-model-context-protocol"><a href="14-model-context-protocol.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Model Context Protocol (MCP)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/15-prompt-caching"><a href="15-prompt-caching.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Prompt Caching and Context Caching</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/16-langgraph-state-machines"><a href="16-langgraph-state-machines.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Agent State Machines — Graphs, Nodes, Checkpoints</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/17-agent-framework-tradeoffs"><a href="17-agent-framework-tradeoffs.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Agent Framework Tradeoffs — Graph, Role, and Actor Orchestration</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">LLM Engineering</a></p>
+      <h1 class="page__title">Caching, Rate Limiting &amp; Cost Optimization</h1>
+      <p class="page__lede">Most AI startups do not die from bad models. They die from bad unit economics. A single GPT-4o call costs fractions of a cent. Ten thousand users making ten calls per day costs $250 in input tokens alone -- before you charge a single dollar. The companies that survive are the ones that treat every API call as a financial transaction, not a function call.</p>
+      <div class="page__meta">
+        <span class="chip">10 min read</span>
+        <span class="chip">2,220 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 11 Lesson 09 (Function Calling)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~45 minutes</dd></div><div class="facts__pair"><dt class="label">Related</dt><dd>Phase 11 · 15 (Prompt Caching) — this lesson covers application-layer caching (semantic cache, exact hash cache, model routing). Lesson 15 covers provider-layer prompt caching (Anthropic cache_control, OpenAI automatic, Gemini CachedContent). Combine both for 50-95% cost reduction.</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Implement semantic caching that serves repeated or similar queries from cache instead of making a new API call</li>
+<li>Calculate per-request costs across providers and implement token-aware rate limiting and budget alerts</li>
+<li>Build a cost optimization layer with prompt compression, model routing (expensive vs cheap), and response caching</li>
+<li>Design a tiered caching strategy using exact match, semantic similarity, and prefix caching for different query types</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>You build a RAG chatbot. It works beautifully. Users love it.</p>
+<p>Then the invoice arrives.</p>
+<p>GPT-5 costs $5 per million input tokens and $15 per million output. Claude Opus 4.7 costs $15 input / $75 output. Gemini 3 Pro costs $1.25 input / $5 output. GPT-5-mini is $0.25/$2. Prices below are illustrative; always check the provider&#39;s current pricing page.</p>
+<p>Here is the math that kills startups:</p>
+<ul>
+<li>10,000 daily active users</li>
+<li>10 queries per user per day</li>
+<li>1,000 input tokens per query (system prompt + context + user message)</li>
+<li>500 output tokens per response</li>
+</ul>
+<p><strong>Daily input cost:</strong> 10,000 x 10 x 1,000 / 1,000,000 x $2.50 = <strong>$250/day</strong>
+<strong>Daily output cost:</strong> 10,000 x 10 x 500 / 1,000,000 x $10.00 = <strong>$500/day</strong>
+<strong>Monthly total:</strong> <strong>$22,500/month</strong></p>
+<p>That is just the LLM. Add embeddings, vector database hosting, infrastructure. You are looking at $30,000/month for a chatbot.</p>
+<p>The brutal part: 40-60% of those queries are near-duplicates. Users ask the same questions in slightly different words. Your system prompt -- identical across every request -- gets billed every single time. Context documents retrieved by RAG repeat across users who ask about the same topic.</p>
+<p>You are paying full price for redundant computation.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="the-cost-anatomy-of-an-llm-call" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-cost-anatomy-of-an-llm-call" aria-label="Link to this section">#</a>The Cost Anatomy of an LLM Call</h3>
+<p>Every API call has five cost components.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph LR
+    A[User Query] --&gt; B[System Prompt&lt;br/&gt;500-2000 tokens]
+    A --&gt; C[Retrieved Context&lt;br/&gt;500-4000 tokens]
+    A --&gt; D[User Message&lt;br/&gt;50-500 tokens]
+    B --&gt; E[Input Cost&lt;br/&gt;$2.50/1M tokens]
+    C --&gt; E
+    D --&gt; E
+    E --&gt; F[Model Processing]
+    F --&gt; G[Output Cost&lt;br/&gt;$10.00/1M tokens]</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>System prompts are the silent killer. A 1,500-token system prompt sent with every request costs $3.75 per million requests just for that prefix. At 100K requests per day, that is $375/day -- $11,250/month -- for text that never changes.</p>
+<h3 id="provider-caching-built-in-discounts" class="prose-h prose-h3"><a class="prose-h__anchor" href="#provider-caching-built-in-discounts" aria-label="Link to this section">#</a>Provider Caching: Built-in Discounts</h3>
+<p>All three major providers offer provider-side prompt caching in 2026, but the mechanics differ. See Phase 11 · 15 for the deep dive.</p>
+<table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Mechanism</th>
+<th>Discount</th>
+<th>Minimum</th>
+<th>Cache Duration</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Anthropic</td>
+<td>Explicit cache_control markers</td>
+<td>90% on cache hits (pay 25% extra on write)</td>
+<td>1,024 tokens (Sonnet/Opus), 2,048 (Haiku)</td>
+<td>5 min default; 1h extended (2x write premium)</td>
+</tr>
+<tr>
+<td>OpenAI</td>
+<td>Automatic prefix matching</td>
+<td>50% on cache hits</td>
+<td>1,024 tokens</td>
+<td>Best-effort up to 1 hour</td>
+</tr>
+<tr>
+<td>Google Gemini</td>
+<td>Explicit CachedContent API</td>
+<td>~75% reduction (plus storage)</td>
+<td>4,096 (Flash) / 32,768 (Pro)</td>
+<td>User-configurable TTL</td>
+</tr>
+</tbody></table>
+<p><strong>Anthropic&#39;s approach</strong> is explicit. You mark sections of your prompt with <code class="inline-code">cache_control: {&quot;type&quot;: &quot;ephemeral&quot;}</code>. The first request pays a 25% write premium. Subsequent requests with the same prefix get a 90% discount. A 2,000-token system prompt that costs $0.005 normally costs $0.000625 on cache hits. Over 100K requests, that saves $437.50/day.</p>
+<p><strong>OpenAI&#39;s approach</strong> is automatic. Any prompt prefix that matches a previous request gets a 50% discount. No markers needed. The tradeoff: less discount, less control, but zero implementation effort.</p>
+<h3 id="semantic-caching-your-custom-layer" class="prose-h prose-h3"><a class="prose-h__anchor" href="#semantic-caching-your-custom-layer" aria-label="Link to this section">#</a>Semantic Caching: Your Custom Layer</h3>
+<p>Provider caching only works for identical prefixes. Semantic caching handles the harder case: different queries with the same meaning.</p>
+<p>&quot;What is the return policy?&quot; and &quot;How do I return an item?&quot; are different strings but identical intent. A semantic cache embeds both queries, computes cosine similarity, and returns the cached response if similarity exceeds a threshold (typically 0.92-0.95).</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">flowchart TD
+    A[User Query] --&gt; B[Embed Query]
+    B --&gt; C{Similar query&lt;br/&gt;in cache?}
+    C --&gt;|sim &gt; 0.95| D[Return Cached Response]
+    C --&gt;|sim &lt; 0.95| E[Call LLM API]
+    E --&gt; F[Cache Response&lt;br/&gt;with Embedding]
+    F --&gt; G[Return Response]
+    D --&gt; G</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>The embedding costs are negligible. OpenAI&#39;s text-embedding-3-small costs $0.02 per million tokens. Checking the cache costs almost nothing compared to a full LLM call.</p>
+<h3 id="exact-caching-hash-and-match" class="prose-h prose-h3"><a class="prose-h__anchor" href="#exact-caching-hash-and-match" aria-label="Link to this section">#</a>Exact Caching: Hash and Match</h3>
+<p>For deterministic calls (temperature=0, same model, same prompt), exact caching is simpler and faster. Hash the full prompt, check the cache, return if found.</p>
+<p>This works perfectly for:</p>
+<ul>
+<li>System prompt + fixed context + identical user queries</li>
+<li>Function calling with identical tool definitions</li>
+<li>Batch processing where the same document gets processed multiple times</li>
+</ul>
+<h3 id="rate-limiting-protecting-your-budget" class="prose-h prose-h3"><a class="prose-h__anchor" href="#rate-limiting-protecting-your-budget" aria-label="Link to this section">#</a>Rate Limiting: Protecting Your Budget</h3>
+<p>Rate limiting is not just about fairness. It is about survival.</p>
+<p><strong>Token bucket algorithm:</strong> each user gets a bucket of N tokens that refills at rate R per second. A request consumes tokens from the bucket. If the bucket is empty, the request is rejected. This allows bursts (use the full bucket at once) while enforcing an average rate.</p>
+<p><strong>Per-user quotas:</strong> set daily/monthly token limits per user tier.</p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Daily Token Limit</th>
+<th>Max Requests/min</th>
+<th>Model Access</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Free</td>
+<td>50,000</td>
+<td>10</td>
+<td>GPT-4o-mini only</td>
+</tr>
+<tr>
+<td>Pro</td>
+<td>500,000</td>
+<td>60</td>
+<td>GPT-4o, Claude Sonnet</td>
+</tr>
+<tr>
+<td>Enterprise</td>
+<td>5,000,000</td>
+<td>300</td>
+<td>All models</td>
+</tr>
+</tbody></table>
+<h3 id="model-routing-right-model-for-the-right-job" class="prose-h prose-h3"><a class="prose-h__anchor" href="#model-routing-right-model-for-the-right-job" aria-label="Link to this section">#</a>Model Routing: Right Model for the Right Job</h3>
+<p>Not every query needs GPT-4o.</p>
+<p>&quot;What time does the store close?&quot; does not require a $10/M-output model. GPT-4o-mini at $0.60/M output handles it perfectly. Claude Haiku at $1.25/M output handles it. A simple classifier routes cheap queries to cheap models and complex queries to expensive models.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">flowchart TD
+    A[User Query] --&gt; B[Complexity Classifier]
+    B --&gt;|Simple: lookup, FAQ| C[GPT-4o-mini&lt;br/&gt;$0.15/$0.60 per 1M]
+    B --&gt;|Medium: analysis, summary| D[Claude Sonnet&lt;br/&gt;$3.00/$15.00 per 1M]
+    B --&gt;|Complex: reasoning, code| E[GPT-4o / Claude Opus&lt;br/&gt;$2.50/$10.00+]</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>A well-tuned router saves 40-70% on model costs alone.</p>
+<h3 id="cost-tracking-know-where-the-money-goes" class="prose-h prose-h3"><a class="prose-h__anchor" href="#cost-tracking-know-where-the-money-goes" aria-label="Link to this section">#</a>Cost Tracking: Know Where the Money Goes</h3>
+<p>You cannot optimize what you do not measure. Log every API call with:</p>
+<ul>
+<li>Timestamp</li>
+<li>Model name</li>
+<li>Input tokens</li>
+<li>Output tokens</li>
+<li>Latency (ms)</li>
+<li>Computed cost ($)</li>
+<li>User ID</li>
+<li>Cache hit/miss</li>
+<li>Request category</li>
+</ul>
+<p>This data reveals which features are expensive, which users are heavy consumers, and where caching has the most impact.</p>
+<h3 id="batching-bulk-discounts" class="prose-h prose-h3"><a class="prose-h__anchor" href="#batching-bulk-discounts" aria-label="Link to this section">#</a>Batching: Bulk Discounts</h3>
+<p>OpenAI&#39;s Batch API processes requests asynchronously at a 50% discount. You submit a batch of up to 50,000 requests, and results come back within 24 hours.</p>
+<p>Use batching for:</p>
+<ul>
+<li>Nightly document processing</li>
+<li>Bulk classification</li>
+<li>Evaluation runs</li>
+<li>Data enrichment pipelines</li>
+</ul>
+<p>Not for: real-time user-facing queries (latency matters).</p>
+<h3 id="budget-alerts-and-circuit-breakers" class="prose-h prose-h3"><a class="prose-h__anchor" href="#budget-alerts-and-circuit-breakers" aria-label="Link to this section">#</a>Budget Alerts and Circuit Breakers</h3>
+<p>A circuit breaker stops spending when you hit a limit. Without one, a bug or abuse can burn through your monthly budget in hours.</p>
+<p>Set three thresholds:</p>
+<ol>
+<li><strong>Warning</strong> (70% of budget): send an alert</li>
+<li><strong>Throttle</strong> (85% of budget): switch to cheaper models only</li>
+<li><strong>Stop</strong> (95% of budget): reject new requests, return cached responses only</li>
+</ol>
+<h3 id="the-optimization-stack" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-optimization-stack" aria-label="Link to this section">#</a>The Optimization Stack</h3>
+<p>Apply these techniques in order. Each layer compounds on the previous ones.</p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Technique</th>
+<th>Typical Savings</th>
+<th>Implementation Effort</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>Provider prompt caching</td>
+<td>30-50%</td>
+<td>Low (add cache markers)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Exact caching</td>
+<td>10-20%</td>
+<td>Low (hash + dict)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Semantic caching</td>
+<td>15-30%</td>
+<td>Medium (embeddings + similarity)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Model routing</td>
+<td>40-70%</td>
+<td>Medium (classifier)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Rate limiting</td>
+<td>Budget protection</td>
+<td>Low (token bucket)</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Prompt compression</td>
+<td>10-30%</td>
+<td>Medium (rewrite prompts)</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Batching</td>
+<td>50% on eligible</td>
+<td>Low (batch API)</td>
+</tr>
+</tbody></table>
+<p>A RAG app applying layers 1-5 typically reduces costs from $22,500/month to $4,000-6,000/month. That is the difference between burning runway and building a business.</p>
+<h3 id="real-savings-before-and-after" class="prose-h prose-h3"><a class="prose-h__anchor" href="#real-savings-before-and-after" aria-label="Link to this section">#</a>Real Savings: Before and After</h3>
+<p>Here is a real breakdown for a RAG chatbot serving 10,000 DAU.</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Before Optimization</th>
+<th>After Optimization</th>
+<th>Savings</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Monthly LLM cost</td>
+<td>$22,500</td>
+<td>$5,200</td>
+<td>77%</td>
+</tr>
+<tr>
+<td>Avg cost per query</td>
+<td>$0.0075</td>
+<td>$0.0017</td>
+<td>77%</td>
+</tr>
+<tr>
+<td>Cache hit rate</td>
+<td>0%</td>
+<td>52%</td>
+<td>--</td>
+</tr>
+<tr>
+<td>Queries routed to mini</td>
+<td>0%</td>
+<td>65%</td>
+<td>--</td>
+</tr>
+<tr>
+<td>P95 latency</td>
+<td>2,800ms</td>
+<td>900ms (cache hits: 50ms)</td>
+<td>68%</td>
+</tr>
+<tr>
+<td>Monthly embedding cost</td>
+<td>$0</td>
+<td>$180</td>
+<td>(new cost)</td>
+</tr>
+<tr>
+<td>Total monthly cost</td>
+<td>$22,500</td>
+<td>$5,380</td>
+<td>76%</td>
+</tr>
+</tbody></table>
+<p>The embedding cost for semantic caching ($180/month) pays for itself within the first hour of cache hits.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="semantic-cache"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">semantic-cache</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> semantic cache</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-cost-calculator" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-cost-calculator" aria-label="Link to this section">#</a>Step 1: Cost Calculator</h3>
+<p>Build a token cost calculator that knows current pricing for major models.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> hashlib
+<span class="token keyword">import</span> time
+<span class="token keyword">import</span> json
+<span class="token keyword">import</span> math
+<span class="token keyword">from</span> dataclasses <span class="token keyword">import</span> dataclass<span class="token punctuation">,</span> field
+
+
+MODEL_PRICING <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">"gpt-4o"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"input"</span><span class="token punctuation">:</span> <span class="token number">2.50</span><span class="token punctuation">,</span> <span class="token string">"output"</span><span class="token punctuation">:</span> <span class="token number">10.00</span><span class="token punctuation">,</span> <span class="token string">"cached_input"</span><span class="token punctuation">:</span> <span class="token number">1.25</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token string">"gpt-4o-mini"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"input"</span><span class="token punctuation">:</span> <span class="token number">0.15</span><span class="token punctuation">,</span> <span class="token string">"output"</span><span class="token punctuation">:</span> <span class="token number">0.60</span><span class="token punctuation">,</span> <span class="token string">"cached_input"</span><span class="token punctuation">:</span> <span class="token number">0.075</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token string">"gpt-4.1"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"input"</span><span class="token punctuation">:</span> <span class="token number">2.00</span><span class="token punctuation">,</span> <span class="token string">"output"</span><span class="token punctuation">:</span> <span class="token number">8.00</span><span class="token punctuation">,</span> <span class="token string">"cached_input"</span><span class="token punctuation">:</span> <span class="token number">0.50</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token string">"gpt-4.1-mini"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"input"</span><span class="token punctuation">:</span> <span class="token number">0.40</span><span class="token punctuation">,</span> <span class="token string">"output"</span><span class="token punctuation">:</span> <span class="token number">1.60</span><span class="token punctuation">,</span> <span class="token string">"cached_input"</span><span class="token punctuation">:</span> <span class="token number">0.10</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token string">"gpt-4.1-nano"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"input"</span><span class="token punctuation">:</span> <span class="token number">0.10</span><span class="token punctuation">,</span> <span class="token string">"output"</span><span class="token punctuation">:</span> <span class="token number">0.40</span><span class="token punctuation">,</span> <span class="token string">"cached_input"</span><span class="token punctuation">:</span> <span class="token number">0.025</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token string">"o3"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"input"</span><span class="token punctuation">:</span> <span class="token number">2.00</span><span class="token punctuation">,</span> <span class="token string">"output"</span><span class="token punctuation">:</span> <span class="token number">8.00</span><span class="token punctuation">,</span> <span class="token string">"cached_input"</span><span class="token punctuation">:</span> <span class="token number">0.50</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token string">"o3-mini"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"input"</span><span class="token punctuation">:</span> <span class="token number">1.10</span><span class="token punctuation">,</span> <span class="token string">"output"</span><span class="token punctuation">:</span> <span class="token number">4.40</span><span class="token punctuation">,</span> <span class="token string">"cached_input"</span><span class="token punctuation">:</span> <span class="token number">0.55</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token string">"o4-mini"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"input"</span><span class="token punctuation">:</span> <span class="token number">1.10</span><span class="token punctuation">,</span> <span class="token string">"output"</span><span class="token punctuation">:</span> <span class="token number">4.40</span><span class="token punctuation">,</span> <span class="token string">"cached_input"</span><span class="token punctuation">:</span> <span class="token number">0.275</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token string">"claude-opus-4"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"input"</span><span class="token punctuation">:</span> <span class="token number">15.00</span><span class="token punctuation">,</span> <span class="token string">"output"</span><span class="token punctuation">:</span> <span class="token number">75.00</span><span class="token punctuation">,</span> <span class="token string">"cached_input"</span><span class="token punctuation">:</span> <span class="token number">1.50</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token string">"claude-sonnet-4"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"input"</span><span class="token punctuation">:</span> <span class="token number">3.00</span><span class="token punctuation">,</span> <span class="token string">"output"</span><span class="token punctuation">:</span> <span class="token number">15.00</span><span class="token punctuation">,</span> <span class="token string">"cached_input"</span><span class="token punctuation">:</span> <span class="token number">0.30</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token string">"claude-haiku-3.5"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"input"</span><span class="token punctuation">:</span> <span class="token number">0.80</span><span class="token punctuation">,</span> <span class="token string">"output"</span><span class="token punctuation">:</span> <span class="token number">4.00</span><span class="token punctuation">,</span> <span class="token string">"cached_input"</span><span class="token punctuation">:</span> <span class="token number">0.08</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token string">"gemini-2.5-pro"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"input"</span><span class="token punctuation">:</span> <span class="token number">1.25</span><span class="token punctuation">,</span> <span class="token string">"output"</span><span class="token punctuation">:</span> <span class="token number">10.00</span><span class="token punctuation">,</span> <span class="token string">"cached_input"</span><span class="token punctuation">:</span> <span class="token number">0.3125</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token string">"gemini-2.5-flash"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"input"</span><span class="token punctuation">:</span> <span class="token number">0.15</span><span class="token punctuation">,</span> <span class="token string">"output"</span><span class="token punctuation">:</span> <span class="token number">0.60</span><span class="token punctuation">,</span> <span class="token string">"cached_input"</span><span class="token punctuation">:</span> <span class="token number">0.0375</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span>
+
+
+<span class="token keyword">def</span> <span class="token function">calculate_cost</span><span class="token punctuation">(</span>model<span class="token punctuation">,</span> input_tokens<span class="token punctuation">,</span> output_tokens<span class="token punctuation">,</span> cached_input_tokens<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> model <span class="token keyword">not</span> <span class="token keyword">in</span> MODEL_PRICING<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token string">"error"</span><span class="token punctuation">:</span> <span class="token string-interpolation"><span class="token string">f"Unknown model: </span><span class="token interpolation"><span class="token punctuation">{</span>model<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">}</span>
+    pricing <span class="token operator">=</span> MODEL_PRICING<span class="token punctuation">[</span>model<span class="token punctuation">]</span>
+    non_cached <span class="token operator">=</span> input_tokens <span class="token operator">-</span> cached_input_tokens
+    input_cost <span class="token operator">=</span> <span class="token punctuation">(</span>non_cached <span class="token operator">/</span> <span class="token number">1_000_000</span><span class="token punctuation">)</span> <span class="token operator">*</span> pricing<span class="token punctuation">[</span><span class="token string">"input"</span><span class="token punctuation">]</span>
+    cached_cost <span class="token operator">=</span> <span class="token punctuation">(</span>cached_input_tokens <span class="token operator">/</span> <span class="token number">1_000_000</span><span class="token punctuation">)</span> <span class="token operator">*</span> pricing<span class="token punctuation">[</span><span class="token string">"cached_input"</span><span class="token punctuation">]</span>
+    output_cost <span class="token operator">=</span> <span class="token punctuation">(</span>output_tokens <span class="token operator">/</span> <span class="token number">1_000_000</span><span class="token punctuation">)</span> <span class="token operator">*</span> pricing<span class="token punctuation">[</span><span class="token string">"output"</span><span class="token punctuation">]</span>
+    total <span class="token operator">=</span> input_cost <span class="token operator">+</span> cached_cost <span class="token operator">+</span> output_cost
+    <span class="token keyword">return</span> <span class="token punctuation">{</span>
+        <span class="token string">"model"</span><span class="token punctuation">:</span> model<span class="token punctuation">,</span>
+        <span class="token string">"input_tokens"</span><span class="token punctuation">:</span> input_tokens<span class="token punctuation">,</span>
+        <span class="token string">"output_tokens"</span><span class="token punctuation">:</span> output_tokens<span class="token punctuation">,</span>
+        <span class="token string">"cached_input_tokens"</span><span class="token punctuation">:</span> cached_input_tokens<span class="token punctuation">,</span>
+        <span class="token string">"input_cost"</span><span class="token punctuation">:</span> <span class="token builtin">round</span><span class="token punctuation">(</span>input_cost<span class="token punctuation">,</span> <span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token string">"cached_input_cost"</span><span class="token punctuation">:</span> <span class="token builtin">round</span><span class="token punctuation">(</span>cached_cost<span class="token punctuation">,</span> <span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token string">"output_cost"</span><span class="token punctuation">:</span> <span class="token builtin">round</span><span class="token punctuation">(</span>output_cost<span class="token punctuation">,</span> <span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token string">"total_cost"</span><span class="token punctuation">:</span> <span class="token builtin">round</span><span class="token punctuation">(</span>total<span class="token punctuation">,</span> <span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span></code></pre>
+</figure>
+<h3 id="step-2-exact-cache" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-exact-cache" aria-label="Link to this section">#</a>Step 2: Exact Cache</h3>
+<p>Hash the full prompt and return cached responses for identical requests.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">ExactCache</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> max_size<span class="token operator">=</span><span class="token number">1000</span><span class="token punctuation">,</span> ttl_seconds<span class="token operator">=</span><span class="token number">3600</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>cache <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+        self<span class="token punctuation">.</span>max_size <span class="token operator">=</span> max_size
+        self<span class="token punctuation">.</span>ttl <span class="token operator">=</span> ttl_seconds
+        self<span class="token punctuation">.</span>hits <span class="token operator">=</span> <span class="token number">0</span>
+        self<span class="token punctuation">.</span>misses <span class="token operator">=</span> <span class="token number">0</span>
+
+    <span class="token keyword">def</span> <span class="token function">_hash</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> model<span class="token punctuation">,</span> messages<span class="token punctuation">,</span> temperature<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        key_data <span class="token operator">=</span> json<span class="token punctuation">.</span>dumps<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"model"</span><span class="token punctuation">:</span> model<span class="token punctuation">,</span> <span class="token string">"messages"</span><span class="token punctuation">:</span> messages<span class="token punctuation">,</span> <span class="token string">"temperature"</span><span class="token punctuation">:</span> temperature<span class="token punctuation">}</span><span class="token punctuation">,</span> sort_keys<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> hashlib<span class="token punctuation">.</span>sha256<span class="token punctuation">(</span>key_data<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span>hexdigest<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">get</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> model<span class="token punctuation">,</span> messages<span class="token punctuation">,</span> temperature<span class="token operator">=</span><span class="token number">0.0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> temperature <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">:</span>
+            self<span class="token punctuation">.</span>misses <span class="token operator">+=</span> <span class="token number">1</span>
+            <span class="token keyword">return</span> <span class="token boolean">None</span>
+        key <span class="token operator">=</span> self<span class="token punctuation">.</span>_hash<span class="token punctuation">(</span>model<span class="token punctuation">,</span> messages<span class="token punctuation">,</span> temperature<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> key <span class="token keyword">in</span> self<span class="token punctuation">.</span>cache<span class="token punctuation">:</span>
+            entry <span class="token operator">=</span> self<span class="token punctuation">.</span>cache<span class="token punctuation">[</span>key<span class="token punctuation">]</span>
+            <span class="token keyword">if</span> time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span> entry<span class="token punctuation">[</span><span class="token string">"timestamp"</span><span class="token punctuation">]</span> <span class="token operator">&lt;</span> self<span class="token punctuation">.</span>ttl<span class="token punctuation">:</span>
+                self<span class="token punctuation">.</span>hits <span class="token operator">+=</span> <span class="token number">1</span>
+                entry<span class="token punctuation">[</span><span class="token string">"access_count"</span><span class="token punctuation">]</span> <span class="token operator">+=</span> <span class="token number">1</span>
+                <span class="token keyword">return</span> entry<span class="token punctuation">[</span><span class="token string">"response"</span><span class="token punctuation">]</span>
+            <span class="token keyword">del</span> self<span class="token punctuation">.</span>cache<span class="token punctuation">[</span>key<span class="token punctuation">]</span>
+        self<span class="token punctuation">.</span>misses <span class="token operator">+=</span> <span class="token number">1</span>
+        <span class="token keyword">return</span> <span class="token boolean">None</span>
+
+    <span class="token keyword">def</span> <span class="token function">put</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> model<span class="token punctuation">,</span> messages<span class="token punctuation">,</span> temperature<span class="token punctuation">,</span> response<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> temperature <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">:</span>
+            <span class="token keyword">return</span>
+        <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>cache<span class="token punctuation">)</span> <span class="token operator">>=</span> self<span class="token punctuation">.</span>max_size<span class="token punctuation">:</span>
+            oldest_key <span class="token operator">=</span> <span class="token builtin">min</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>cache<span class="token punctuation">,</span> key<span class="token operator">=</span><span class="token keyword">lambda</span> k<span class="token punctuation">:</span> self<span class="token punctuation">.</span>cache<span class="token punctuation">[</span>k<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">"timestamp"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+            <span class="token keyword">del</span> self<span class="token punctuation">.</span>cache<span class="token punctuation">[</span>oldest_key<span class="token punctuation">]</span>
+        key <span class="token operator">=</span> self<span class="token punctuation">.</span>_hash<span class="token punctuation">(</span>model<span class="token punctuation">,</span> messages<span class="token punctuation">,</span> temperature<span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>cache<span class="token punctuation">[</span>key<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
+            <span class="token string">"response"</span><span class="token punctuation">:</span> response<span class="token punctuation">,</span>
+            <span class="token string">"timestamp"</span><span class="token punctuation">:</span> time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            <span class="token string">"access_count"</span><span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span>
+
+    <span class="token keyword">def</span> <span class="token function">stats</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        total <span class="token operator">=</span> self<span class="token punctuation">.</span>hits <span class="token operator">+</span> self<span class="token punctuation">.</span>misses
+        <span class="token keyword">return</span> <span class="token punctuation">{</span>
+            <span class="token string">"hits"</span><span class="token punctuation">:</span> self<span class="token punctuation">.</span>hits<span class="token punctuation">,</span>
+            <span class="token string">"misses"</span><span class="token punctuation">:</span> self<span class="token punctuation">.</span>misses<span class="token punctuation">,</span>
+            <span class="token string">"hit_rate"</span><span class="token punctuation">:</span> <span class="token builtin">round</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>hits <span class="token operator">/</span> total<span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span> <span class="token keyword">if</span> total <span class="token operator">></span> <span class="token number">0</span> <span class="token keyword">else</span> <span class="token number">0</span><span class="token punctuation">,</span>
+            <span class="token string">"cache_size"</span><span class="token punctuation">:</span> <span class="token builtin">len</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>cache<span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span></code></pre>
+</figure>
+<h3 id="step-3-semantic-cache" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-semantic-cache" aria-label="Link to this section">#</a>Step 3: Semantic Cache</h3>
+<p>Embed queries and return cached responses when similarity exceeds a threshold.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">simple_embed</span><span class="token punctuation">(</span>text<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    words <span class="token operator">=</span> text<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    vocab <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+    <span class="token keyword">for</span> w <span class="token keyword">in</span> words<span class="token punctuation">:</span>
+        vocab<span class="token punctuation">[</span>w<span class="token punctuation">]</span> <span class="token operator">=</span> vocab<span class="token punctuation">.</span>get<span class="token punctuation">(</span>w<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span>
+    norm <span class="token operator">=</span> math<span class="token punctuation">.</span>sqrt<span class="token punctuation">(</span><span class="token builtin">sum</span><span class="token punctuation">(</span>v <span class="token operator">*</span> v <span class="token keyword">for</span> v <span class="token keyword">in</span> vocab<span class="token punctuation">.</span>values<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> norm <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+    <span class="token keyword">return</span> <span class="token punctuation">{</span>k<span class="token punctuation">:</span> v <span class="token operator">/</span> norm <span class="token keyword">for</span> k<span class="token punctuation">,</span> v <span class="token keyword">in</span> vocab<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span>
+
+
+<span class="token keyword">def</span> <span class="token function">cosine_similarity</span><span class="token punctuation">(</span>a<span class="token punctuation">,</span> b<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> <span class="token keyword">not</span> a <span class="token keyword">or</span> <span class="token keyword">not</span> b<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token number">0.0</span>
+    all_keys <span class="token operator">=</span> <span class="token builtin">set</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span> <span class="token operator">|</span> <span class="token builtin">set</span><span class="token punctuation">(</span>b<span class="token punctuation">)</span>
+    dot <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>a<span class="token punctuation">.</span>get<span class="token punctuation">(</span>k<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">*</span> b<span class="token punctuation">.</span>get<span class="token punctuation">(</span>k<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token keyword">for</span> k <span class="token keyword">in</span> all_keys<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> dot
+
+
+<span class="token keyword">class</span> <span class="token class-name">SemanticCache</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> similarity_threshold<span class="token operator">=</span><span class="token number">0.85</span><span class="token punctuation">,</span> max_size<span class="token operator">=</span><span class="token number">500</span><span class="token punctuation">,</span> ttl_seconds<span class="token operator">=</span><span class="token number">3600</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>entries <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        self<span class="token punctuation">.</span>threshold <span class="token operator">=</span> similarity_threshold
+        self<span class="token punctuation">.</span>max_size <span class="token operator">=</span> max_size
+        self<span class="token punctuation">.</span>ttl <span class="token operator">=</span> ttl_seconds
+        self<span class="token punctuation">.</span>hits <span class="token operator">=</span> <span class="token number">0</span>
+        self<span class="token punctuation">.</span>misses <span class="token operator">=</span> <span class="token number">0</span>
+
+    <span class="token keyword">def</span> <span class="token function">get</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> query<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        query_embedding <span class="token operator">=</span> simple_embed<span class="token punctuation">(</span>query<span class="token punctuation">)</span>
+        now <span class="token operator">=</span> time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        best_match <span class="token operator">=</span> <span class="token boolean">None</span>
+        best_sim <span class="token operator">=</span> <span class="token number">0.0</span>
+        <span class="token keyword">for</span> entry <span class="token keyword">in</span> self<span class="token punctuation">.</span>entries<span class="token punctuation">:</span>
+            <span class="token keyword">if</span> now <span class="token operator">-</span> entry<span class="token punctuation">[</span><span class="token string">"timestamp"</span><span class="token punctuation">]</span> <span class="token operator">></span> self<span class="token punctuation">.</span>ttl<span class="token punctuation">:</span>
+                <span class="token keyword">continue</span>
+            sim <span class="token operator">=</span> cosine_similarity<span class="token punctuation">(</span>query_embedding<span class="token punctuation">,</span> entry<span class="token punctuation">[</span><span class="token string">"embedding"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+            <span class="token keyword">if</span> sim <span class="token operator">></span> best_sim<span class="token punctuation">:</span>
+                best_sim <span class="token operator">=</span> sim
+                best_match <span class="token operator">=</span> entry
+        <span class="token keyword">if</span> best_match <span class="token keyword">and</span> best_sim <span class="token operator">>=</span> self<span class="token punctuation">.</span>threshold<span class="token punctuation">:</span>
+            self<span class="token punctuation">.</span>hits <span class="token operator">+=</span> <span class="token number">1</span>
+            best_match<span class="token punctuation">[</span><span class="token string">"access_count"</span><span class="token punctuation">]</span> <span class="token operator">+=</span> <span class="token number">1</span>
+            <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token string">"response"</span><span class="token punctuation">:</span> best_match<span class="token punctuation">[</span><span class="token string">"response"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token string">"similarity"</span><span class="token punctuation">:</span> <span class="token builtin">round</span><span class="token punctuation">(</span>best_sim<span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">"original_query"</span><span class="token punctuation">:</span> best_match<span class="token punctuation">[</span><span class="token string">"query"</span><span class="token punctuation">]</span><span class="token punctuation">}</span>
+        self<span class="token punctuation">.</span>misses <span class="token operator">+=</span> <span class="token number">1</span>
+        <span class="token keyword">return</span> <span class="token boolean">None</span>
+
+    <span class="token keyword">def</span> <span class="token function">put</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> query<span class="token punctuation">,</span> response<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>entries<span class="token punctuation">)</span> <span class="token operator">>=</span> self<span class="token punctuation">.</span>max_size<span class="token punctuation">:</span>
+            self<span class="token punctuation">.</span>entries<span class="token punctuation">.</span>sort<span class="token punctuation">(</span>key<span class="token operator">=</span><span class="token keyword">lambda</span> e<span class="token punctuation">:</span> e<span class="token punctuation">[</span><span class="token string">"timestamp"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+            self<span class="token punctuation">.</span>entries<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>entries<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">{</span>
+            <span class="token string">"query"</span><span class="token punctuation">:</span> query<span class="token punctuation">,</span>
+            <span class="token string">"embedding"</span><span class="token punctuation">:</span> simple_embed<span class="token punctuation">(</span>query<span class="token punctuation">)</span><span class="token punctuation">,</span>
+            <span class="token string">"response"</span><span class="token punctuation">:</span> response<span class="token punctuation">,</span>
+            <span class="token string">"timestamp"</span><span class="token punctuation">:</span> time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            <span class="token string">"access_count"</span><span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">stats</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        total <span class="token operator">=</span> self<span class="token punctuation">.</span>hits <span class="token operator">+</span> self<span class="token punctuation">.</span>misses
+        <span class="token keyword">return</span> <span class="token punctuation">{</span>
+            <span class="token string">"hits"</span><span class="token punctuation">:</span> self<span class="token punctuation">.</span>hits<span class="token punctuation">,</span>
+            <span class="token string">"misses"</span><span class="token punctuation">:</span> self<span class="token punctuation">.</span>misses<span class="token punctuation">,</span>
+            <span class="token string">"hit_rate"</span><span class="token punctuation">:</span> <span class="token builtin">round</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>hits <span class="token operator">/</span> total<span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span> <span class="token keyword">if</span> total <span class="token operator">></span> <span class="token number">0</span> <span class="token keyword">else</span> <span class="token number">0</span><span class="token punctuation">,</span>
+            <span class="token string">"cache_size"</span><span class="token punctuation">:</span> <span class="token builtin">len</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>entries<span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span></code></pre>
+</figure>
+<h3 id="step-4-rate-limiter" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-rate-limiter" aria-label="Link to this section">#</a>Step 4: Rate Limiter</h3>
+<p>Token bucket rate limiter with per-user quotas.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">TokenBucketRateLimiter</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>buckets <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+        self<span class="token punctuation">.</span>tiers <span class="token operator">=</span> <span class="token punctuation">{</span>
+            <span class="token string">"free"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"capacity"</span><span class="token punctuation">:</span> <span class="token number">50_000</span><span class="token punctuation">,</span> <span class="token string">"refill_rate"</span><span class="token punctuation">:</span> <span class="token number">500</span><span class="token punctuation">,</span> <span class="token string">"max_requests_per_min"</span><span class="token punctuation">:</span> <span class="token number">10</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+            <span class="token string">"pro"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"capacity"</span><span class="token punctuation">:</span> <span class="token number">500_000</span><span class="token punctuation">,</span> <span class="token string">"refill_rate"</span><span class="token punctuation">:</span> <span class="token number">5_000</span><span class="token punctuation">,</span> <span class="token string">"max_requests_per_min"</span><span class="token punctuation">:</span> <span class="token number">60</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+            <span class="token string">"enterprise"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"capacity"</span><span class="token punctuation">:</span> <span class="token number">5_000_000</span><span class="token punctuation">,</span> <span class="token string">"refill_rate"</span><span class="token punctuation">:</span> <span class="token number">50_000</span><span class="token punctuation">,</span> <span class="token string">"max_requests_per_min"</span><span class="token punctuation">:</span> <span class="token number">300</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span>
+
+    <span class="token keyword">def</span> <span class="token function">_get_bucket</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> user_id<span class="token punctuation">,</span> tier<span class="token operator">=</span><span class="token string">"free"</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> user_id <span class="token keyword">not</span> <span class="token keyword">in</span> self<span class="token punctuation">.</span>buckets<span class="token punctuation">:</span>
+            tier_config <span class="token operator">=</span> self<span class="token punctuation">.</span>tiers<span class="token punctuation">.</span>get<span class="token punctuation">(</span>tier<span class="token punctuation">,</span> self<span class="token punctuation">.</span>tiers<span class="token punctuation">[</span><span class="token string">"free"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+            self<span class="token punctuation">.</span>buckets<span class="token punctuation">[</span>user_id<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
+                <span class="token string">"tokens"</span><span class="token punctuation">:</span> tier_config<span class="token punctuation">[</span><span class="token string">"capacity"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+                <span class="token string">"capacity"</span><span class="token punctuation">:</span> tier_config<span class="token punctuation">[</span><span class="token string">"capacity"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+                <span class="token string">"refill_rate"</span><span class="token punctuation">:</span> tier_config<span class="token punctuation">[</span><span class="token string">"refill_rate"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+                <span class="token string">"last_refill"</span><span class="token punctuation">:</span> time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                <span class="token string">"request_timestamps"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+                <span class="token string">"max_rpm"</span><span class="token punctuation">:</span> tier_config<span class="token punctuation">[</span><span class="token string">"max_requests_per_min"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+                <span class="token string">"tier"</span><span class="token punctuation">:</span> tier<span class="token punctuation">,</span>
+                <span class="token string">"total_tokens_used"</span><span class="token punctuation">:</span> <span class="token number">0</span><span class="token punctuation">,</span>
+            <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> self<span class="token punctuation">.</span>buckets<span class="token punctuation">[</span>user_id<span class="token punctuation">]</span>
+
+    <span class="token keyword">def</span> <span class="token function">_refill</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> bucket<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        now <span class="token operator">=</span> time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        elapsed <span class="token operator">=</span> now <span class="token operator">-</span> bucket<span class="token punctuation">[</span><span class="token string">"last_refill"</span><span class="token punctuation">]</span>
+        refill <span class="token operator">=</span> <span class="token builtin">int</span><span class="token punctuation">(</span>elapsed <span class="token operator">*</span> bucket<span class="token punctuation">[</span><span class="token string">"refill_rate"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> refill <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">:</span>
+            bucket<span class="token punctuation">[</span><span class="token string">"tokens"</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token builtin">min</span><span class="token punctuation">(</span>bucket<span class="token punctuation">[</span><span class="token string">"capacity"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> bucket<span class="token punctuation">[</span><span class="token string">"tokens"</span><span class="token punctuation">]</span> <span class="token operator">+</span> refill<span class="token punctuation">)</span>
+            bucket<span class="token punctuation">[</span><span class="token string">"last_refill"</span><span class="token punctuation">]</span> <span class="token operator">=</span> now
+
+    <span class="token keyword">def</span> <span class="token function">check</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> user_id<span class="token punctuation">,</span> tokens_needed<span class="token punctuation">,</span> tier<span class="token operator">=</span><span class="token string">"free"</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        bucket <span class="token operator">=</span> self<span class="token punctuation">.</span>_get_bucket<span class="token punctuation">(</span>user_id<span class="token punctuation">,</span> tier<span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>_refill<span class="token punctuation">(</span>bucket<span class="token punctuation">)</span>
+        now <span class="token operator">=</span> time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        bucket<span class="token punctuation">[</span><span class="token string">"request_timestamps"</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">[</span>t <span class="token keyword">for</span> t <span class="token keyword">in</span> bucket<span class="token punctuation">[</span><span class="token string">"request_timestamps"</span><span class="token punctuation">]</span> <span class="token keyword">if</span> now <span class="token operator">-</span> t <span class="token operator">&lt;</span> <span class="token number">60</span><span class="token punctuation">]</span>
+        <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>bucket<span class="token punctuation">[</span><span class="token string">"request_timestamps"</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">>=</span> bucket<span class="token punctuation">[</span><span class="token string">"max_rpm"</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
+            <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token string">"allowed"</span><span class="token punctuation">:</span> <span class="token boolean">False</span><span class="token punctuation">,</span> <span class="token string">"reason"</span><span class="token punctuation">:</span> <span class="token string">"rate_limit"</span><span class="token punctuation">,</span> <span class="token string">"retry_after_seconds"</span><span class="token punctuation">:</span> <span class="token number">60</span> <span class="token operator">-</span> <span class="token punctuation">(</span>now <span class="token operator">-</span> bucket<span class="token punctuation">[</span><span class="token string">"request_timestamps"</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">}</span>
+        <span class="token keyword">if</span> bucket<span class="token punctuation">[</span><span class="token string">"tokens"</span><span class="token punctuation">]</span> <span class="token operator">&lt;</span> tokens_needed<span class="token punctuation">:</span>
+            deficit <span class="token operator">=</span> tokens_needed <span class="token operator">-</span> bucket<span class="token punctuation">[</span><span class="token string">"tokens"</span><span class="token punctuation">]</span>
+            wait <span class="token operator">=</span> deficit <span class="token operator">/</span> bucket<span class="token punctuation">[</span><span class="token string">"refill_rate"</span><span class="token punctuation">]</span>
+            <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token string">"allowed"</span><span class="token punctuation">:</span> <span class="token boolean">False</span><span class="token punctuation">,</span> <span class="token string">"reason"</span><span class="token punctuation">:</span> <span class="token string">"token_limit"</span><span class="token punctuation">,</span> <span class="token string">"tokens_available"</span><span class="token punctuation">:</span> bucket<span class="token punctuation">[</span><span class="token string">"tokens"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token string">"retry_after_seconds"</span><span class="token punctuation">:</span> <span class="token builtin">round</span><span class="token punctuation">(</span>wait<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">}</span>
+        <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token string">"allowed"</span><span class="token punctuation">:</span> <span class="token boolean">True</span><span class="token punctuation">,</span> <span class="token string">"tokens_available"</span><span class="token punctuation">:</span> bucket<span class="token punctuation">[</span><span class="token string">"tokens"</span><span class="token punctuation">]</span><span class="token punctuation">}</span>
+
+    <span class="token keyword">def</span> <span class="token function">consume</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> user_id<span class="token punctuation">,</span> tokens_used<span class="token punctuation">,</span> tier<span class="token operator">=</span><span class="token string">"free"</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        bucket <span class="token operator">=</span> self<span class="token punctuation">.</span>_get_bucket<span class="token punctuation">(</span>user_id<span class="token punctuation">,</span> tier<span class="token punctuation">)</span>
+        bucket<span class="token punctuation">[</span><span class="token string">"tokens"</span><span class="token punctuation">]</span> <span class="token operator">-=</span> tokens_used
+        bucket<span class="token punctuation">[</span><span class="token string">"request_timestamps"</span><span class="token punctuation">]</span><span class="token punctuation">.</span>append<span class="token punctuation">(</span>time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        bucket<span class="token punctuation">[</span><span class="token string">"total_tokens_used"</span><span class="token punctuation">]</span> <span class="token operator">+=</span> tokens_used
+
+    <span class="token keyword">def</span> <span class="token function">get_usage</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> user_id<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> user_id <span class="token keyword">not</span> <span class="token keyword">in</span> self<span class="token punctuation">.</span>buckets<span class="token punctuation">:</span>
+            <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token string">"error"</span><span class="token punctuation">:</span> <span class="token string">"User not found"</span><span class="token punctuation">}</span>
+        b <span class="token operator">=</span> self<span class="token punctuation">.</span>buckets<span class="token punctuation">[</span>user_id<span class="token punctuation">]</span>
+        <span class="token keyword">return</span> <span class="token punctuation">{</span>
+            <span class="token string">"user_id"</span><span class="token punctuation">:</span> user_id<span class="token punctuation">,</span>
+            <span class="token string">"tier"</span><span class="token punctuation">:</span> b<span class="token punctuation">[</span><span class="token string">"tier"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+            <span class="token string">"tokens_remaining"</span><span class="token punctuation">:</span> b<span class="token punctuation">[</span><span class="token string">"tokens"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+            <span class="token string">"capacity"</span><span class="token punctuation">:</span> b<span class="token punctuation">[</span><span class="token string">"capacity"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+            <span class="token string">"total_tokens_used"</span><span class="token punctuation">:</span> b<span class="token punctuation">[</span><span class="token string">"total_tokens_used"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+            <span class="token string">"utilization"</span><span class="token punctuation">:</span> <span class="token builtin">round</span><span class="token punctuation">(</span>b<span class="token punctuation">[</span><span class="token string">"total_tokens_used"</span><span class="token punctuation">]</span> <span class="token operator">/</span> b<span class="token punctuation">[</span><span class="token string">"capacity"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span> <span class="token keyword">if</span> b<span class="token punctuation">[</span><span class="token string">"capacity"</span><span class="token punctuation">]</span> <span class="token keyword">else</span> <span class="token number">0</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span></code></pre>
+</figure>
+<h3 id="step-5-cost-tracker" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-cost-tracker" aria-label="Link to this section">#</a>Step 5: Cost Tracker</h3>
+<p>Log every call and compute running totals.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">CostTracker</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> monthly_budget<span class="token operator">=</span><span class="token number">1000.0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>logs <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        self<span class="token punctuation">.</span>monthly_budget <span class="token operator">=</span> monthly_budget
+        self<span class="token punctuation">.</span>alerts <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">def</span> <span class="token function">log_call</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> model<span class="token punctuation">,</span> input_tokens<span class="token punctuation">,</span> output_tokens<span class="token punctuation">,</span> cached_input_tokens<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">,</span> latency_ms<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">,</span> user_id<span class="token operator">=</span><span class="token string">"anonymous"</span><span class="token punctuation">,</span> cache_status<span class="token operator">=</span><span class="token string">"miss"</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        cost <span class="token operator">=</span> calculate_cost<span class="token punctuation">(</span>model<span class="token punctuation">,</span> input_tokens<span class="token punctuation">,</span> output_tokens<span class="token punctuation">,</span> cached_input_tokens<span class="token punctuation">)</span>
+        entry <span class="token operator">=</span> <span class="token punctuation">{</span>
+            <span class="token string">"timestamp"</span><span class="token punctuation">:</span> time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            <span class="token string">"model"</span><span class="token punctuation">:</span> model<span class="token punctuation">,</span>
+            <span class="token string">"input_tokens"</span><span class="token punctuation">:</span> input_tokens<span class="token punctuation">,</span>
+            <span class="token string">"output_tokens"</span><span class="token punctuation">:</span> output_tokens<span class="token punctuation">,</span>
+            <span class="token string">"cached_input_tokens"</span><span class="token punctuation">:</span> cached_input_tokens<span class="token punctuation">,</span>
+            <span class="token string">"latency_ms"</span><span class="token punctuation">:</span> latency_ms<span class="token punctuation">,</span>
+            <span class="token string">"cost"</span><span class="token punctuation">:</span> cost<span class="token punctuation">[</span><span class="token string">"total_cost"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+            <span class="token string">"user_id"</span><span class="token punctuation">:</span> user_id<span class="token punctuation">,</span>
+            <span class="token string">"cache_status"</span><span class="token punctuation">:</span> cache_status<span class="token punctuation">,</span>
+        <span class="token punctuation">}</span>
+        self<span class="token punctuation">.</span>logs<span class="token punctuation">.</span>append<span class="token punctuation">(</span>entry<span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>_check_budget<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> entry
+
+    <span class="token keyword">def</span> <span class="token function">_check_budget</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        total <span class="token operator">=</span> self<span class="token punctuation">.</span>total_cost<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        pct <span class="token operator">=</span> total <span class="token operator">/</span> self<span class="token punctuation">.</span>monthly_budget <span class="token keyword">if</span> self<span class="token punctuation">.</span>monthly_budget <span class="token operator">></span> <span class="token number">0</span> <span class="token keyword">else</span> <span class="token number">0</span>
+        <span class="token keyword">if</span> pct <span class="token operator">>=</span> <span class="token number">0.95</span> <span class="token keyword">and</span> <span class="token keyword">not</span> <span class="token builtin">any</span><span class="token punctuation">(</span>a<span class="token punctuation">[</span><span class="token string">"level"</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token string">"stop"</span> <span class="token keyword">for</span> a <span class="token keyword">in</span> self<span class="token punctuation">.</span>alerts<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            self<span class="token punctuation">.</span>alerts<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"level"</span><span class="token punctuation">:</span> <span class="token string">"stop"</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string-interpolation"><span class="token string">f"Budget 95% consumed: $</span><span class="token interpolation"><span class="token punctuation">{</span>total<span class="token punctuation">:</span><span class="token format-spec">.2f</span><span class="token punctuation">}</span></span><span class="token string">/$</span><span class="token interpolation"><span class="token punctuation">{</span>self<span class="token punctuation">.</span>monthly_budget<span class="token punctuation">:</span><span class="token format-spec">.2f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">,</span> <span class="token string">"timestamp"</span><span class="token punctuation">:</span> time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+        <span class="token keyword">elif</span> pct <span class="token operator">>=</span> <span class="token number">0.85</span> <span class="token keyword">and</span> <span class="token keyword">not</span> <span class="token builtin">any</span><span class="token punctuation">(</span>a<span class="token punctuation">[</span><span class="token string">"level"</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token string">"throttle"</span> <span class="token keyword">for</span> a <span class="token keyword">in</span> self<span class="token punctuation">.</span>alerts<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            self<span class="token punctuation">.</span>alerts<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"level"</span><span class="token punctuation">:</span> <span class="token string">"throttle"</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string-interpolation"><span class="token string">f"Budget 85% consumed: $</span><span class="token interpolation"><span class="token punctuation">{</span>total<span class="token punctuation">:</span><span class="token format-spec">.2f</span><span class="token punctuation">}</span></span><span class="token string">/$</span><span class="token interpolation"><span class="token punctuation">{</span>self<span class="token punctuation">.</span>monthly_budget<span class="token punctuation">:</span><span class="token format-spec">.2f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">,</span> <span class="token string">"timestamp"</span><span class="token punctuation">:</span> time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+        <span class="token keyword">elif</span> pct <span class="token operator">>=</span> <span class="token number">0.70</span> <span class="token keyword">and</span> <span class="token keyword">not</span> <span class="token builtin">any</span><span class="token punctuation">(</span>a<span class="token punctuation">[</span><span class="token string">"level"</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token string">"warning"</span> <span class="token keyword">for</span> a <span class="token keyword">in</span> self<span class="token punctuation">.</span>alerts<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            self<span class="token punctuation">.</span>alerts<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"level"</span><span class="token punctuation">:</span> <span class="token string">"warning"</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string-interpolation"><span class="token string">f"Budget 70% consumed: $</span><span class="token interpolation"><span class="token punctuation">{</span>total<span class="token punctuation">:</span><span class="token format-spec">.2f</span><span class="token punctuation">}</span></span><span class="token string">/$</span><span class="token interpolation"><span class="token punctuation">{</span>self<span class="token punctuation">.</span>monthly_budget<span class="token punctuation">:</span><span class="token format-spec">.2f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">,</span> <span class="token string">"timestamp"</span><span class="token punctuation">:</span> time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">total_cost</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token builtin">round</span><span class="token punctuation">(</span><span class="token builtin">sum</span><span class="token punctuation">(</span>e<span class="token punctuation">[</span><span class="token string">"cost"</span><span class="token punctuation">]</span> <span class="token keyword">for</span> e <span class="token keyword">in</span> self<span class="token punctuation">.</span>logs<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">6</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">cost_by_model</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        by_model <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+        <span class="token keyword">for</span> e <span class="token keyword">in</span> self<span class="token punctuation">.</span>logs<span class="token punctuation">:</span>
+            m <span class="token operator">=</span> e<span class="token punctuation">[</span><span class="token string">"model"</span><span class="token punctuation">]</span>
+            <span class="token keyword">if</span> m <span class="token keyword">not</span> <span class="token keyword">in</span> by_model<span class="token punctuation">:</span>
+                by_model<span class="token punctuation">[</span>m<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"calls"</span><span class="token punctuation">:</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">"cost"</span><span class="token punctuation">:</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">"input_tokens"</span><span class="token punctuation">:</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">"output_tokens"</span><span class="token punctuation">:</span> <span class="token number">0</span><span class="token punctuation">}</span>
+            by_model<span class="token punctuation">[</span>m<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">"calls"</span><span class="token punctuation">]</span> <span class="token operator">+=</span> <span class="token number">1</span>
+            by_model<span class="token punctuation">[</span>m<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">"cost"</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token builtin">round</span><span class="token punctuation">(</span>by_model<span class="token punctuation">[</span>m<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">"cost"</span><span class="token punctuation">]</span> <span class="token operator">+</span> e<span class="token punctuation">[</span><span class="token string">"cost"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">6</span><span class="token punctuation">)</span>
+            by_model<span class="token punctuation">[</span>m<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">"input_tokens"</span><span class="token punctuation">]</span> <span class="token operator">+=</span> e<span class="token punctuation">[</span><span class="token string">"input_tokens"</span><span class="token punctuation">]</span>
+            by_model<span class="token punctuation">[</span>m<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">"output_tokens"</span><span class="token punctuation">]</span> <span class="token operator">+=</span> e<span class="token punctuation">[</span><span class="token string">"output_tokens"</span><span class="token punctuation">]</span>
+        <span class="token keyword">return</span> by_model
+
+    <span class="token keyword">def</span> <span class="token function">cache_savings</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        cache_hits <span class="token operator">=</span> <span class="token punctuation">[</span>e <span class="token keyword">for</span> e <span class="token keyword">in</span> self<span class="token punctuation">.</span>logs <span class="token keyword">if</span> e<span class="token punctuation">[</span><span class="token string">"cache_status"</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token string">"hit"</span><span class="token punctuation">]</span>
+        <span class="token keyword">if</span> <span class="token keyword">not</span> cache_hits<span class="token punctuation">:</span>
+            <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token string">"saved"</span><span class="token punctuation">:</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">"cache_hits"</span><span class="token punctuation">:</span> <span class="token number">0</span><span class="token punctuation">}</span>
+        saved <span class="token operator">=</span> <span class="token number">0</span>
+        <span class="token keyword">for</span> e <span class="token keyword">in</span> cache_hits<span class="token punctuation">:</span>
+            full_cost <span class="token operator">=</span> calculate_cost<span class="token punctuation">(</span>e<span class="token punctuation">[</span><span class="token string">"model"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> e<span class="token punctuation">[</span><span class="token string">"input_tokens"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> e<span class="token punctuation">[</span><span class="token string">"output_tokens"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+            saved <span class="token operator">+=</span> full_cost<span class="token punctuation">[</span><span class="token string">"total_cost"</span><span class="token punctuation">]</span>
+        <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token string">"saved"</span><span class="token punctuation">:</span> <span class="token builtin">round</span><span class="token punctuation">(</span>saved<span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">"cache_hits"</span><span class="token punctuation">:</span> <span class="token builtin">len</span><span class="token punctuation">(</span>cache_hits<span class="token punctuation">)</span><span class="token punctuation">}</span>
+
+    <span class="token keyword">def</span> <span class="token function">summary</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> <span class="token keyword">not</span> self<span class="token punctuation">.</span>logs<span class="token punctuation">:</span>
+            <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token string">"total_calls"</span><span class="token punctuation">:</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">"total_cost"</span><span class="token punctuation">:</span> <span class="token number">0</span><span class="token punctuation">}</span>
+        total_latency <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>e<span class="token punctuation">[</span><span class="token string">"latency_ms"</span><span class="token punctuation">]</span> <span class="token keyword">for</span> e <span class="token keyword">in</span> self<span class="token punctuation">.</span>logs<span class="token punctuation">)</span>
+        cache_hits <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token keyword">for</span> e <span class="token keyword">in</span> self<span class="token punctuation">.</span>logs <span class="token keyword">if</span> e<span class="token punctuation">[</span><span class="token string">"cache_status"</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token string">"hit"</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token punctuation">{</span>
+            <span class="token string">"total_calls"</span><span class="token punctuation">:</span> <span class="token builtin">len</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>logs<span class="token punctuation">)</span><span class="token punctuation">,</span>
+            <span class="token string">"total_cost"</span><span class="token punctuation">:</span> self<span class="token punctuation">.</span>total_cost<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            <span class="token string">"avg_cost_per_call"</span><span class="token punctuation">:</span> <span class="token builtin">round</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>total_cost<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>logs<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            <span class="token string">"avg_latency_ms"</span><span class="token punctuation">:</span> <span class="token builtin">round</span><span class="token punctuation">(</span>total_latency <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>logs<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            <span class="token string">"cache_hit_rate"</span><span class="token punctuation">:</span> <span class="token builtin">round</span><span class="token punctuation">(</span>cache_hits <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>logs<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            <span class="token string">"cost_by_model"</span><span class="token punctuation">:</span> self<span class="token punctuation">.</span>cost_by_model<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            <span class="token string">"cache_savings"</span><span class="token punctuation">:</span> self<span class="token punctuation">.</span>cache_savings<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            <span class="token string">"budget_remaining"</span><span class="token punctuation">:</span> <span class="token builtin">round</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>monthly_budget <span class="token operator">-</span> self<span class="token punctuation">.</span>total_cost<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            <span class="token string">"budget_utilization"</span><span class="token punctuation">:</span> <span class="token builtin">round</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>total_cost<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">/</span> self<span class="token punctuation">.</span>monthly_budget<span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span> <span class="token keyword">if</span> self<span class="token punctuation">.</span>monthly_budget <span class="token operator">></span> <span class="token number">0</span> <span class="token keyword">else</span> <span class="token number">0</span><span class="token punctuation">,</span>
+            <span class="token string">"alerts"</span><span class="token punctuation">:</span> self<span class="token punctuation">.</span>alerts<span class="token punctuation">,</span>
+        <span class="token punctuation">}</span></code></pre>
+</figure>
+<h3 id="step-6-model-router" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-6-model-router" aria-label="Link to this section">#</a>Step 6: Model Router</h3>
+<p>Route queries to the cheapest model that can handle them.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python">SIMPLE_KEYWORDS <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">"what time"</span><span class="token punctuation">,</span> <span class="token string">"hours"</span><span class="token punctuation">,</span> <span class="token string">"address"</span><span class="token punctuation">,</span> <span class="token string">"phone"</span><span class="token punctuation">,</span> <span class="token string">"price"</span><span class="token punctuation">,</span> <span class="token string">"return policy"</span><span class="token punctuation">,</span> <span class="token string">"hello"</span><span class="token punctuation">,</span> <span class="token string">"hi"</span><span class="token punctuation">,</span> <span class="token string">"thanks"</span><span class="token punctuation">,</span> <span class="token string">"yes"</span><span class="token punctuation">,</span> <span class="token string">"no"</span><span class="token punctuation">]</span>
+COMPLEX_KEYWORDS <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">"analyze"</span><span class="token punctuation">,</span> <span class="token string">"compare"</span><span class="token punctuation">,</span> <span class="token string">"explain why"</span><span class="token punctuation">,</span> <span class="token string">"write code"</span><span class="token punctuation">,</span> <span class="token string">"debug"</span><span class="token punctuation">,</span> <span class="token string">"architect"</span><span class="token punctuation">,</span> <span class="token string">"design"</span><span class="token punctuation">,</span> <span class="token string">"trade-off"</span><span class="token punctuation">,</span> <span class="token string">"evaluate"</span><span class="token punctuation">]</span>
+
+
+<span class="token keyword">def</span> <span class="token function">classify_complexity</span><span class="token punctuation">(</span>query<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    q <span class="token operator">=</span> query<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>q<span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&lt;=</span> <span class="token number">5</span> <span class="token keyword">or</span> <span class="token builtin">any</span><span class="token punctuation">(</span>kw <span class="token keyword">in</span> q <span class="token keyword">for</span> kw <span class="token keyword">in</span> SIMPLE_KEYWORDS<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token string">"simple"</span>
+    <span class="token keyword">if</span> <span class="token builtin">any</span><span class="token punctuation">(</span>kw <span class="token keyword">in</span> q <span class="token keyword">for</span> kw <span class="token keyword">in</span> COMPLEX_KEYWORDS<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token string">"complex"</span>
+    <span class="token keyword">return</span> <span class="token string">"medium"</span>
+
+
+<span class="token keyword">def</span> <span class="token function">route_model</span><span class="token punctuation">(</span>query<span class="token punctuation">,</span> tier<span class="token operator">=</span><span class="token string">"pro"</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    complexity <span class="token operator">=</span> classify_complexity<span class="token punctuation">(</span>query<span class="token punctuation">)</span>
+    routing_table <span class="token operator">=</span> <span class="token punctuation">{</span>
+        <span class="token string">"simple"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"free"</span><span class="token punctuation">:</span> <span class="token string">"gpt-4.1-nano"</span><span class="token punctuation">,</span> <span class="token string">"pro"</span><span class="token punctuation">:</span> <span class="token string">"gpt-4o-mini"</span><span class="token punctuation">,</span> <span class="token string">"enterprise"</span><span class="token punctuation">:</span> <span class="token string">"gpt-4o-mini"</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token string">"medium"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"free"</span><span class="token punctuation">:</span> <span class="token string">"gpt-4o-mini"</span><span class="token punctuation">,</span> <span class="token string">"pro"</span><span class="token punctuation">:</span> <span class="token string">"claude-sonnet-4"</span><span class="token punctuation">,</span> <span class="token string">"enterprise"</span><span class="token punctuation">:</span> <span class="token string">"claude-sonnet-4"</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token string">"complex"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"free"</span><span class="token punctuation">:</span> <span class="token string">"gpt-4o-mini"</span><span class="token punctuation">,</span> <span class="token string">"pro"</span><span class="token punctuation">:</span> <span class="token string">"gpt-4o"</span><span class="token punctuation">,</span> <span class="token string">"enterprise"</span><span class="token punctuation">:</span> <span class="token string">"claude-opus-4"</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span>
+    model <span class="token operator">=</span> routing_table<span class="token punctuation">[</span>complexity<span class="token punctuation">]</span><span class="token punctuation">.</span>get<span class="token punctuation">(</span>tier<span class="token punctuation">,</span> <span class="token string">"gpt-4o-mini"</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token string">"query"</span><span class="token punctuation">:</span> query<span class="token punctuation">,</span> <span class="token string">"complexity"</span><span class="token punctuation">:</span> complexity<span class="token punctuation">,</span> <span class="token string">"model"</span><span class="token punctuation">:</span> model<span class="token punctuation">,</span> <span class="token string">"tier"</span><span class="token punctuation">:</span> tier<span class="token punctuation">}</span></code></pre>
+</figure>
+<h3 id="step-7-run-the-demo" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-7-run-the-demo" aria-label="Link to this section">#</a>Step 7: Run the Demo</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">simulate_llm_call</span><span class="token punctuation">(</span>model<span class="token punctuation">,</span> query<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    input_tokens <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>query<span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">4</span> <span class="token operator">+</span> <span class="token number">500</span>
+    output_tokens <span class="token operator">=</span> <span class="token number">150</span> <span class="token operator">+</span> <span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>query<span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">2</span><span class="token punctuation">)</span>
+    latency <span class="token operator">=</span> <span class="token number">200</span> <span class="token operator">+</span> <span class="token punctuation">(</span>output_tokens <span class="token operator">*</span> <span class="token number">2</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token punctuation">{</span>
+        <span class="token string">"model"</span><span class="token punctuation">:</span> model<span class="token punctuation">,</span>
+        <span class="token string">"response"</span><span class="token punctuation">:</span> <span class="token string-interpolation"><span class="token string">f"[Simulated </span><span class="token interpolation"><span class="token punctuation">{</span>model<span class="token punctuation">}</span></span><span class="token string"> response to: </span><span class="token interpolation"><span class="token punctuation">{</span>query<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token format-spec">50]</span><span class="token punctuation">}</span></span><span class="token string">...]"</span></span><span class="token punctuation">,</span>
+        <span class="token string">"input_tokens"</span><span class="token punctuation">:</span> input_tokens<span class="token punctuation">,</span>
+        <span class="token string">"output_tokens"</span><span class="token punctuation">:</span> output_tokens<span class="token punctuation">,</span>
+        <span class="token string">"latency_ms"</span><span class="token punctuation">:</span> latency<span class="token punctuation">,</span>
+    <span class="token punctuation">}</span>
+
+
+<span class="token keyword">def</span> <span class="token function">run_demo</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">60</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"  Caching, Rate Limiting &amp; Cost Optimization Demo"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">60</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n--- Model Pricing ---"</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> model<span class="token punctuation">,</span> pricing <span class="token keyword">in</span> <span class="token builtin">list</span><span class="token punctuation">(</span>MODEL_PRICING<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">6</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
+        cost_1k <span class="token operator">=</span> calculate_cost<span class="token punctuation">(</span>model<span class="token punctuation">,</span> <span class="token number">1000</span><span class="token punctuation">,</span> <span class="token number">500</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  </span><span class="token interpolation"><span class="token punctuation">{</span>model<span class="token punctuation">}</span></span><span class="token string">: $</span><span class="token interpolation"><span class="token punctuation">{</span>cost_1k<span class="token punctuation">[</span><span class="token string">'total_cost'</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.6f</span><span class="token punctuation">}</span></span><span class="token string"> per 1K in + 500 out"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n--- Cost Comparison: 100K Requests ---"</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> model <span class="token keyword">in</span> <span class="token punctuation">[</span><span class="token string">"gpt-4o"</span><span class="token punctuation">,</span> <span class="token string">"gpt-4o-mini"</span><span class="token punctuation">,</span> <span class="token string">"claude-sonnet-4"</span><span class="token punctuation">,</span> <span class="token string">"claude-haiku-3.5"</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
+        cost <span class="token operator">=</span> calculate_cost<span class="token punctuation">(</span>model<span class="token punctuation">,</span> <span class="token number">1000</span> <span class="token operator">*</span> <span class="token number">100_000</span><span class="token punctuation">,</span> <span class="token number">500</span> <span class="token operator">*</span> <span class="token number">100_000</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  </span><span class="token interpolation"><span class="token punctuation">{</span>model<span class="token punctuation">}</span></span><span class="token string">: $</span><span class="token interpolation"><span class="token punctuation">{</span>cost<span class="token punctuation">[</span><span class="token string">'total_cost'</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.2f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n--- Anthropic Cache Savings ---"</span><span class="token punctuation">)</span>
+    no_cache <span class="token operator">=</span> calculate_cost<span class="token punctuation">(</span><span class="token string">"claude-sonnet-4"</span><span class="token punctuation">,</span> <span class="token number">2000</span><span class="token punctuation">,</span> <span class="token number">500</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
+    with_cache <span class="token operator">=</span> calculate_cost<span class="token punctuation">(</span><span class="token string">"claude-sonnet-4"</span><span class="token punctuation">,</span> <span class="token number">2000</span><span class="token punctuation">,</span> <span class="token number">500</span><span class="token punctuation">,</span> <span class="token number">1500</span><span class="token punctuation">)</span>
+    saving <span class="token operator">=</span> no_cache<span class="token punctuation">[</span><span class="token string">"total_cost"</span><span class="token punctuation">]</span> <span class="token operator">-</span> with_cache<span class="token punctuation">[</span><span class="token string">"total_cost"</span><span class="token punctuation">]</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Without cache: $</span><span class="token interpolation"><span class="token punctuation">{</span>no_cache<span class="token punctuation">[</span><span class="token string">'total_cost'</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.6f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  With 1500 cached tokens: $</span><span class="token interpolation"><span class="token punctuation">{</span>with_cache<span class="token punctuation">[</span><span class="token string">'total_cost'</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.6f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Savings per call: $</span><span class="token interpolation"><span class="token punctuation">{</span>saving<span class="token punctuation">:</span><span class="token format-spec">.6f</span><span class="token punctuation">}</span></span><span class="token string"> (</span><span class="token interpolation"><span class="token punctuation">{</span>saving<span class="token operator">/</span>no_cache<span class="token punctuation">[</span><span class="token string">'total_cost'</span><span class="token punctuation">]</span><span class="token operator">*</span><span class="token number">100</span><span class="token punctuation">:</span><span class="token format-spec">.1f</span><span class="token punctuation">}</span></span><span class="token string">%)"</span></span><span class="token punctuation">)</span>
+
+    exact_cache <span class="token operator">=</span> ExactCache<span class="token punctuation">(</span>max_size<span class="token operator">=</span><span class="token number">100</span><span class="token punctuation">,</span> ttl_seconds<span class="token operator">=</span><span class="token number">300</span><span class="token punctuation">)</span>
+    semantic_cache <span class="token operator">=</span> SemanticCache<span class="token punctuation">(</span>similarity_threshold<span class="token operator">=</span><span class="token number">0.75</span><span class="token punctuation">,</span> max_size<span class="token operator">=</span><span class="token number">100</span><span class="token punctuation">)</span>
+    rate_limiter <span class="token operator">=</span> TokenBucketRateLimiter<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    tracker <span class="token operator">=</span> CostTracker<span class="token punctuation">(</span>monthly_budget<span class="token operator">=</span><span class="token number">100.0</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n--- Exact Cache ---"</span><span class="token punctuation">)</span>
+    messages_1 <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">"role"</span><span class="token punctuation">:</span> <span class="token string">"user"</span><span class="token punctuation">,</span> <span class="token string">"content"</span><span class="token punctuation">:</span> <span class="token string">"What is the return policy?"</span><span class="token punctuation">}</span><span class="token punctuation">]</span>
+    result <span class="token operator">=</span> exact_cache<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"gpt-4o-mini"</span><span class="token punctuation">,</span> messages_1<span class="token punctuation">,</span> <span class="token number">0.0</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  First lookup: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'HIT'</span> <span class="token keyword">if</span> result <span class="token keyword">else</span> <span class="token string">'MISS'</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    exact_cache<span class="token punctuation">.</span>put<span class="token punctuation">(</span><span class="token string">"gpt-4o-mini"</span><span class="token punctuation">,</span> messages_1<span class="token punctuation">,</span> <span class="token number">0.0</span><span class="token punctuation">,</span> <span class="token string">"You can return items within 30 days."</span><span class="token punctuation">)</span>
+    result <span class="token operator">=</span> exact_cache<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"gpt-4o-mini"</span><span class="token punctuation">,</span> messages_1<span class="token punctuation">,</span> <span class="token number">0.0</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Second lookup: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'HIT'</span> <span class="token keyword">if</span> result <span class="token keyword">else</span> <span class="token string">'MISS'</span><span class="token punctuation">}</span></span><span class="token string"> -> </span><span class="token interpolation"><span class="token punctuation">{</span>result<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    result <span class="token operator">=</span> exact_cache<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"gpt-4o-mini"</span><span class="token punctuation">,</span> messages_1<span class="token punctuation">,</span> <span class="token number">0.7</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  With temp=0.7: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'HIT'</span> <span class="token keyword">if</span> result <span class="token keyword">else</span> <span class="token string">'MISS (non-deterministic, skip cache)'</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Stats: </span><span class="token interpolation"><span class="token punctuation">{</span>exact_cache<span class="token punctuation">.</span>stats<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n--- Semantic Cache ---"</span><span class="token punctuation">)</span>
+    test_queries <span class="token operator">=</span> <span class="token punctuation">[</span>
+        <span class="token punctuation">(</span><span class="token string">"What is the return policy?"</span><span class="token punctuation">,</span> <span class="token string">"Items can be returned within 30 days with receipt."</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">(</span><span class="token string">"How do I return an item?"</span><span class="token punctuation">,</span> <span class="token boolean">None</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">(</span><span class="token string">"What are your store hours?"</span><span class="token punctuation">,</span> <span class="token string">"We are open 9am-9pm Monday through Saturday."</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">(</span><span class="token string">"When does the store open?"</span><span class="token punctuation">,</span> <span class="token boolean">None</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">(</span><span class="token string">"Tell me about quantum computing"</span><span class="token punctuation">,</span> <span class="token string">"Quantum computers use qubits..."</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">(</span><span class="token string">"Explain quantum mechanics"</span><span class="token punctuation">,</span> <span class="token boolean">None</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span>
+    <span class="token keyword">for</span> query<span class="token punctuation">,</span> response <span class="token keyword">in</span> test_queries<span class="token punctuation">:</span>
+        cached <span class="token operator">=</span> semantic_cache<span class="token punctuation">.</span>get<span class="token punctuation">(</span>query<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> cached<span class="token punctuation">:</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  '</span><span class="token interpolation"><span class="token punctuation">{</span>query<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token format-spec">40]</span><span class="token punctuation">}</span></span><span class="token string">' -> CACHE HIT (sim=</span><span class="token interpolation"><span class="token punctuation">{</span>cached<span class="token punctuation">[</span><span class="token string">'similarity'</span><span class="token punctuation">]</span><span class="token punctuation">}</span></span><span class="token string">, original='</span><span class="token interpolation"><span class="token punctuation">{</span>cached<span class="token punctuation">[</span><span class="token string">'original_query'</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token format-spec">40]</span><span class="token punctuation">}</span></span><span class="token string">')"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">elif</span> response<span class="token punctuation">:</span>
+            semantic_cache<span class="token punctuation">.</span>put<span class="token punctuation">(</span>query<span class="token punctuation">,</span> response<span class="token punctuation">)</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  '</span><span class="token interpolation"><span class="token punctuation">{</span>query<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token format-spec">40]</span><span class="token punctuation">}</span></span><span class="token string">' -> MISS (stored)"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  '</span><span class="token interpolation"><span class="token punctuation">{</span>query<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token format-spec">40]</span><span class="token punctuation">}</span></span><span class="token string">' -> MISS (no match)"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Stats: </span><span class="token interpolation"><span class="token punctuation">{</span>semantic_cache<span class="token punctuation">.</span>stats<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n--- Rate Limiting ---"</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">12</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        check <span class="token operator">=</span> rate_limiter<span class="token punctuation">.</span>check<span class="token punctuation">(</span><span class="token string">"user_1"</span><span class="token punctuation">,</span> <span class="token number">1000</span><span class="token punctuation">,</span> <span class="token string">"free"</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> check<span class="token punctuation">[</span><span class="token string">"allowed"</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
+            rate_limiter<span class="token punctuation">.</span>consume<span class="token punctuation">(</span><span class="token string">"user_1"</span><span class="token punctuation">,</span> <span class="token number">1000</span><span class="token punctuation">,</span> <span class="token string">"free"</span><span class="token punctuation">)</span>
+        status <span class="token operator">=</span> <span class="token string">"OK"</span> <span class="token keyword">if</span> check<span class="token punctuation">[</span><span class="token string">"allowed"</span><span class="token punctuation">]</span> <span class="token keyword">else</span> <span class="token string-interpolation"><span class="token string">f"BLOCKED (</span><span class="token interpolation"><span class="token punctuation">{</span>check<span class="token punctuation">[</span><span class="token string">'reason'</span><span class="token punctuation">]</span><span class="token punctuation">}</span></span><span class="token string">)"</span></span>
+        <span class="token keyword">if</span> i <span class="token operator">&lt;</span> <span class="token number">5</span> <span class="token keyword">or</span> <span class="token keyword">not</span> check<span class="token punctuation">[</span><span class="token string">"allowed"</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Request </span><span class="token interpolation"><span class="token punctuation">{</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">}</span></span><span class="token string">: </span><span class="token interpolation"><span class="token punctuation">{</span>status<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Usage: </span><span class="token interpolation"><span class="token punctuation">{</span>rate_limiter<span class="token punctuation">.</span>get_usage<span class="token punctuation">(</span><span class="token string">'user_1'</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n--- Model Routing ---"</span><span class="token punctuation">)</span>
+    routing_queries <span class="token operator">=</span> <span class="token punctuation">[</span>
+        <span class="token string">"What time do you close?"</span><span class="token punctuation">,</span>
+        <span class="token string">"Summarize this quarterly earnings report"</span><span class="token punctuation">,</span>
+        <span class="token string">"Analyze the trade-offs between microservices and monoliths"</span><span class="token punctuation">,</span>
+        <span class="token string">"Hello"</span><span class="token punctuation">,</span>
+        <span class="token string">"Write code for a binary search tree with deletion"</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span>
+    <span class="token keyword">for</span> q <span class="token keyword">in</span> routing_queries<span class="token punctuation">:</span>
+        route <span class="token operator">=</span> route_model<span class="token punctuation">(</span>q<span class="token punctuation">,</span> <span class="token string">"pro"</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  '</span><span class="token interpolation"><span class="token punctuation">{</span>q<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token format-spec">50]</span><span class="token punctuation">}</span></span><span class="token string">' -> </span><span class="token interpolation"><span class="token punctuation">{</span>route<span class="token punctuation">[</span><span class="token string">'model'</span><span class="token punctuation">]</span><span class="token punctuation">}</span></span><span class="token string"> (</span><span class="token interpolation"><span class="token punctuation">{</span>route<span class="token punctuation">[</span><span class="token string">'complexity'</span><span class="token punctuation">]</span><span class="token punctuation">}</span></span><span class="token string">)"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n--- Full Pipeline: Before vs After Optimization ---"</span><span class="token punctuation">)</span>
+    queries <span class="token operator">=</span> <span class="token punctuation">[</span>
+        <span class="token string">"What is the return policy?"</span><span class="token punctuation">,</span>
+        <span class="token string">"How do I return something?"</span><span class="token punctuation">,</span>
+        <span class="token string">"What are your hours?"</span><span class="token punctuation">,</span>
+        <span class="token string">"When do you open?"</span><span class="token punctuation">,</span>
+        <span class="token string">"Explain the difference between TCP and UDP"</span><span class="token punctuation">,</span>
+        <span class="token string">"Compare TCP vs UDP protocols"</span><span class="token punctuation">,</span>
+        <span class="token string">"Hello"</span><span class="token punctuation">,</span>
+        <span class="token string">"What is your phone number?"</span><span class="token punctuation">,</span>
+        <span class="token string">"Write a Python function to sort a list"</span><span class="token punctuation">,</span>
+        <span class="token string">"Analyze the pros and cons of serverless architecture"</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n  [Before: no caching, single model (gpt-4o)]"</span><span class="token punctuation">)</span>
+    tracker_before <span class="token operator">=</span> CostTracker<span class="token punctuation">(</span>monthly_budget<span class="token operator">=</span><span class="token number">1000.0</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> q <span class="token keyword">in</span> queries<span class="token punctuation">:</span>
+        result <span class="token operator">=</span> simulate_llm_call<span class="token punctuation">(</span><span class="token string">"gpt-4o"</span><span class="token punctuation">,</span> q<span class="token punctuation">)</span>
+        tracker_before<span class="token punctuation">.</span>log_call<span class="token punctuation">(</span><span class="token string">"gpt-4o"</span><span class="token punctuation">,</span> result<span class="token punctuation">[</span><span class="token string">"input_tokens"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> result<span class="token punctuation">[</span><span class="token string">"output_tokens"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> latency_ms<span class="token operator">=</span>result<span class="token punctuation">[</span><span class="token string">"latency_ms"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> cache_status<span class="token operator">=</span><span class="token string">"miss"</span><span class="token punctuation">)</span>
+    before <span class="token operator">=</span> tracker_before<span class="token punctuation">.</span>summary<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Total cost: $</span><span class="token interpolation"><span class="token punctuation">{</span>before<span class="token punctuation">[</span><span class="token string">'total_cost'</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.6f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Avg cost/call: $</span><span class="token interpolation"><span class="token punctuation">{</span>before<span class="token punctuation">[</span><span class="token string">'avg_cost_per_call'</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.6f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Avg latency: </span><span class="token interpolation"><span class="token punctuation">{</span>before<span class="token punctuation">[</span><span class="token string">'avg_latency_ms'</span><span class="token punctuation">]</span><span class="token punctuation">}</span></span><span class="token string">ms"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n  [After: caching + routing + rate limiting]"</span><span class="token punctuation">)</span>
+    exact_c <span class="token operator">=</span> ExactCache<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    semantic_c <span class="token operator">=</span> SemanticCache<span class="token punctuation">(</span>similarity_threshold<span class="token operator">=</span><span class="token number">0.75</span><span class="token punctuation">)</span>
+    tracker_after <span class="token operator">=</span> CostTracker<span class="token punctuation">(</span>monthly_budget<span class="token operator">=</span><span class="token number">1000.0</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">for</span> q <span class="token keyword">in</span> queries<span class="token punctuation">:</span>
+        messages <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">"role"</span><span class="token punctuation">:</span> <span class="token string">"user"</span><span class="token punctuation">,</span> <span class="token string">"content"</span><span class="token punctuation">:</span> q<span class="token punctuation">}</span><span class="token punctuation">]</span>
+        cached <span class="token operator">=</span> exact_c<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"gpt-4o"</span><span class="token punctuation">,</span> messages<span class="token punctuation">,</span> <span class="token number">0.0</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> cached<span class="token punctuation">:</span>
+            tracker_after<span class="token punctuation">.</span>log_call<span class="token punctuation">(</span><span class="token string">"gpt-4o-mini"</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> latency_ms<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">,</span> cache_status<span class="token operator">=</span><span class="token string">"hit"</span><span class="token punctuation">)</span>
+            <span class="token keyword">continue</span>
+        sem_cached <span class="token operator">=</span> semantic_c<span class="token punctuation">.</span>get<span class="token punctuation">(</span>q<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> sem_cached<span class="token punctuation">:</span>
+            tracker_after<span class="token punctuation">.</span>log_call<span class="token punctuation">(</span><span class="token string">"gpt-4o-mini"</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> latency_ms<span class="token operator">=</span><span class="token number">15</span><span class="token punctuation">,</span> cache_status<span class="token operator">=</span><span class="token string">"hit"</span><span class="token punctuation">)</span>
+            <span class="token keyword">continue</span>
+        route <span class="token operator">=</span> route_model<span class="token punctuation">(</span>q<span class="token punctuation">)</span>
+        result <span class="token operator">=</span> simulate_llm_call<span class="token punctuation">(</span>route<span class="token punctuation">[</span><span class="token string">"model"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> q<span class="token punctuation">)</span>
+        tracker_after<span class="token punctuation">.</span>log_call<span class="token punctuation">(</span>route<span class="token punctuation">[</span><span class="token string">"model"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> result<span class="token punctuation">[</span><span class="token string">"input_tokens"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> result<span class="token punctuation">[</span><span class="token string">"output_tokens"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> latency_ms<span class="token operator">=</span>result<span class="token punctuation">[</span><span class="token string">"latency_ms"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> cache_status<span class="token operator">=</span><span class="token string">"miss"</span><span class="token punctuation">)</span>
+        exact_c<span class="token punctuation">.</span>put<span class="token punctuation">(</span>route<span class="token punctuation">[</span><span class="token string">"model"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> messages<span class="token punctuation">,</span> <span class="token number">0.0</span><span class="token punctuation">,</span> result<span class="token punctuation">[</span><span class="token string">"response"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+        semantic_c<span class="token punctuation">.</span>put<span class="token punctuation">(</span>q<span class="token punctuation">,</span> result<span class="token punctuation">[</span><span class="token string">"response"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+    after <span class="token operator">=</span> tracker_after<span class="token punctuation">.</span>summary<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Total cost: $</span><span class="token interpolation"><span class="token punctuation">{</span>after<span class="token punctuation">[</span><span class="token string">'total_cost'</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.6f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Avg cost/call: $</span><span class="token interpolation"><span class="token punctuation">{</span>after<span class="token punctuation">[</span><span class="token string">'avg_cost_per_call'</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.6f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Avg latency: </span><span class="token interpolation"><span class="token punctuation">{</span>after<span class="token punctuation">[</span><span class="token string">'avg_latency_ms'</span><span class="token punctuation">]</span><span class="token punctuation">}</span></span><span class="token string">ms"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Cache hit rate: </span><span class="token interpolation"><span class="token punctuation">{</span>after<span class="token punctuation">[</span><span class="token string">'cache_hit_rate'</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.0%</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">if</span> before<span class="token punctuation">[</span><span class="token string">"total_cost"</span><span class="token punctuation">]</span> <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">:</span>
+        savings_pct <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> after<span class="token punctuation">[</span><span class="token string">"total_cost"</span><span class="token punctuation">]</span> <span class="token operator">/</span> before<span class="token punctuation">[</span><span class="token string">"total_cost"</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">100</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"\n  SAVINGS: </span><span class="token interpolation"><span class="token punctuation">{</span>savings_pct<span class="token punctuation">:</span><span class="token format-spec">.1f</span><span class="token punctuation">}</span></span><span class="token string">% cost reduction"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Latency improvement: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> after<span class="token punctuation">[</span><span class="token string">'avg_latency_ms'</span><span class="token punctuation">]</span> <span class="token operator">/</span> before<span class="token punctuation">[</span><span class="token string">'avg_latency_ms'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">100</span><span class="token punctuation">:</span><span class="token format-spec">.1f</span><span class="token punctuation">}</span></span><span class="token string">% faster"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n--- Budget Alerts Demo ---"</span><span class="token punctuation">)</span>
+    alert_tracker <span class="token operator">=</span> CostTracker<span class="token punctuation">(</span>monthly_budget<span class="token operator">=</span><span class="token number">0.01</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        alert_tracker<span class="token punctuation">.</span>log_call<span class="token punctuation">(</span><span class="token string">"gpt-4o"</span><span class="token punctuation">,</span> <span class="token number">5000</span><span class="token punctuation">,</span> <span class="token number">2000</span><span class="token punctuation">,</span> latency_ms<span class="token operator">=</span><span class="token number">500</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Total spent: $</span><span class="token interpolation"><span class="token punctuation">{</span>alert_tracker<span class="token punctuation">.</span>total_cost<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.6f</span><span class="token punctuation">}</span></span><span class="token string"> / $</span><span class="token interpolation"><span class="token punctuation">{</span>alert_tracker<span class="token punctuation">.</span>monthly_budget<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> alert <span class="token keyword">in</span> alert_tracker<span class="token punctuation">.</span>alerts<span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  ALERT [</span><span class="token interpolation"><span class="token punctuation">{</span>alert<span class="token punctuation">[</span><span class="token string">'level'</span><span class="token punctuation">]</span><span class="token punctuation">.</span>upper<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">]: </span><span class="token interpolation"><span class="token punctuation">{</span>alert<span class="token punctuation">[</span><span class="token string">'message'</span><span class="token punctuation">]</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n--- Cost Breakdown by Model ---"</span><span class="token punctuation">)</span>
+    multi_tracker <span class="token operator">=</span> CostTracker<span class="token punctuation">(</span>monthly_budget<span class="token operator">=</span><span class="token number">500.0</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">50</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        multi_tracker<span class="token punctuation">.</span>log_call<span class="token punctuation">(</span><span class="token string">"gpt-4o-mini"</span><span class="token punctuation">,</span> <span class="token number">800</span><span class="token punctuation">,</span> <span class="token number">200</span><span class="token punctuation">,</span> latency_ms<span class="token operator">=</span><span class="token number">150</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">30</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        multi_tracker<span class="token punctuation">.</span>log_call<span class="token punctuation">(</span><span class="token string">"claude-sonnet-4"</span><span class="token punctuation">,</span> <span class="token number">1500</span><span class="token punctuation">,</span> <span class="token number">500</span><span class="token punctuation">,</span> latency_ms<span class="token operator">=</span><span class="token number">400</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        multi_tracker<span class="token punctuation">.</span>log_call<span class="token punctuation">(</span><span class="token string">"gpt-4o"</span><span class="token punctuation">,</span> <span class="token number">2000</span><span class="token punctuation">,</span> <span class="token number">800</span><span class="token punctuation">,</span> latency_ms<span class="token operator">=</span><span class="token number">600</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        multi_tracker<span class="token punctuation">.</span>log_call<span class="token punctuation">(</span><span class="token string">"claude-opus-4"</span><span class="token punctuation">,</span> <span class="token number">3000</span><span class="token punctuation">,</span> <span class="token number">1000</span><span class="token punctuation">,</span> latency_ms<span class="token operator">=</span><span class="token number">1200</span><span class="token punctuation">)</span>
+    breakdown <span class="token operator">=</span> multi_tracker<span class="token punctuation">.</span>cost_by_model<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> model<span class="token punctuation">,</span> data <span class="token keyword">in</span> <span class="token builtin">sorted</span><span class="token punctuation">(</span>breakdown<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> key<span class="token operator">=</span><span class="token keyword">lambda</span> x<span class="token punctuation">:</span> x<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">"cost"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> reverse<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  </span><span class="token interpolation"><span class="token punctuation">{</span>model<span class="token punctuation">}</span></span><span class="token string">: </span><span class="token interpolation"><span class="token punctuation">{</span>data<span class="token punctuation">[</span><span class="token string">'calls'</span><span class="token punctuation">]</span><span class="token punctuation">}</span></span><span class="token string"> calls, $</span><span class="token interpolation"><span class="token punctuation">{</span>data<span class="token punctuation">[</span><span class="token string">'cost'</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.6f</span><span class="token punctuation">}</span></span><span class="token string">, </span><span class="token interpolation"><span class="token punctuation">{</span>data<span class="token punctuation">[</span><span class="token string">'input_tokens'</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">,</span><span class="token punctuation">}</span></span><span class="token string"> in / </span><span class="token interpolation"><span class="token punctuation">{</span>data<span class="token punctuation">[</span><span class="token string">'output_tokens'</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">,</span><span class="token punctuation">}</span></span><span class="token string"> out"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Total: $</span><span class="token interpolation"><span class="token punctuation">{</span>multi_tracker<span class="token punctuation">.</span>total_cost<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.6f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n"</span> <span class="token operator">+</span> <span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">60</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"  Demo complete."</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span> <span class="token operator">*</span> <span class="token number">60</span><span class="token punctuation">)</span>
+
+
+<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">"__main__"</span><span class="token punctuation">:</span>
+    run_demo<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<h3 id="anthropic-prompt-caching" class="prose-h prose-h3"><a class="prose-h__anchor" href="#anthropic-prompt-caching" aria-label="Link to this section">#</a>Anthropic Prompt Caching</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token comment"># import anthropic</span>
+<span class="token comment">#</span>
+<span class="token comment"># client = anthropic.Anthropic()</span>
+<span class="token comment">#</span>
+<span class="token comment"># response = client.messages.create(</span>
+<span class="token comment">#     model="claude-sonnet-5",</span>
+<span class="token comment">#     max_tokens=1024,</span>
+<span class="token comment">#     system=[</span>
+<span class="token comment">#         {</span>
+<span class="token comment">#             "type": "text",</span>
+<span class="token comment">#             "text": "You are a helpful customer support agent for Acme Corp...",</span>
+<span class="token comment">#             "cache_control": {"type": "ephemeral"},</span>
+<span class="token comment">#         }</span>
+<span class="token comment">#     ],</span>
+<span class="token comment">#     messages=[{"role": "user", "content": "What is the return policy?"}],</span>
+<span class="token comment"># )</span>
+<span class="token comment">#</span>
+<span class="token comment"># print(f"Input tokens: {response.usage.input_tokens}")</span>
+<span class="token comment"># print(f"Cache creation tokens: {response.usage.cache_creation_input_tokens}")</span>
+<span class="token comment"># print(f"Cache read tokens: {response.usage.cache_read_input_tokens}")</span></code></pre>
+</figure>
+<p>The first call writes to the cache (25% premium). Every subsequent call with the same system prompt prefix reads from the cache (90% discount). The cache lasts 5 minutes and resets the timer on every hit.</p>
+<h3 id="openai-automatic-caching" class="prose-h prose-h3"><a class="prose-h__anchor" href="#openai-automatic-caching" aria-label="Link to this section">#</a>OpenAI Automatic Caching</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token comment"># from openai import OpenAI</span>
+<span class="token comment">#</span>
+<span class="token comment"># client = OpenAI()</span>
+<span class="token comment">#</span>
+<span class="token comment"># response = client.chat.completions.create(</span>
+<span class="token comment">#     model="gpt-4o",</span>
+<span class="token comment">#     messages=[</span>
+<span class="token comment">#         {"role": "system", "content": "You are a helpful customer support agent..."},</span>
+<span class="token comment">#         {"role": "user", "content": "What is the return policy?"},</span>
+<span class="token comment">#     ],</span>
+<span class="token comment"># )</span>
+<span class="token comment">#</span>
+<span class="token comment"># print(f"Prompt tokens: {response.usage.prompt_tokens}")</span>
+<span class="token comment"># print(f"Cached tokens: {response.usage.prompt_tokens_details.cached_tokens}")</span>
+<span class="token comment"># print(f"Completion tokens: {response.usage.completion_tokens}")</span></code></pre>
+</figure>
+<p>OpenAI caches automatically. Any prompt prefix of 1,024+ tokens that matches a recent request gets a 50% discount. No code changes needed -- just check <code class="inline-code">prompt_tokens_details.cached_tokens</code> in the response to verify it is working.</p>
+<h3 id="openai-batch-api" class="prose-h prose-h3"><a class="prose-h__anchor" href="#openai-batch-api" aria-label="Link to this section">#</a>OpenAI Batch API</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token comment"># import json</span>
+<span class="token comment"># from openai import OpenAI</span>
+<span class="token comment">#</span>
+<span class="token comment"># client = OpenAI()</span>
+<span class="token comment">#</span>
+<span class="token comment"># requests = []</span>
+<span class="token comment"># for i, query in enumerate(queries):</span>
+<span class="token comment">#     requests.append({</span>
+<span class="token comment">#         "custom_id": f"request-{i}",</span>
+<span class="token comment">#         "method": "POST",</span>
+<span class="token comment">#         "url": "/v1/chat/completions",</span>
+<span class="token comment">#         "body": {</span>
+<span class="token comment">#             "model": "gpt-4o-mini",</span>
+<span class="token comment">#             "messages": [{"role": "user", "content": query}],</span>
+<span class="token comment">#         },</span>
+<span class="token comment">#     })</span>
+<span class="token comment">#</span>
+<span class="token comment"># with open("batch_input.jsonl", "w") as f:</span>
+<span class="token comment">#     for r in requests:</span>
+<span class="token comment">#         f.write(json.dumps(r) + "\n")</span>
+<span class="token comment">#</span>
+<span class="token comment"># batch_file = client.files.create(file=open("batch_input.jsonl", "rb"), purpose="batch")</span>
+<span class="token comment"># batch = client.batches.create(input_file_id=batch_file.id, endpoint="/v1/chat/completions", completion_window="24h")</span>
+<span class="token comment"># print(f"Batch ID: {batch.id}, Status: {batch.status}")</span></code></pre>
+</figure>
+<p>Batch API gives a flat 50% discount on all tokens. Results arrive within 24 hours. Perfect for non-real-time workloads: evaluations, data labeling, bulk summarization.</p>
+<h3 id="production-semantic-cache-with-redis" class="prose-h prose-h3"><a class="prose-h__anchor" href="#production-semantic-cache-with-redis" aria-label="Link to this section">#</a>Production Semantic Cache with Redis</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token comment"># import redis</span>
+<span class="token comment"># import numpy as np</span>
+<span class="token comment"># from openai import OpenAI</span>
+<span class="token comment">#</span>
+<span class="token comment"># r = redis.Redis()</span>
+<span class="token comment"># client = OpenAI()</span>
+<span class="token comment">#</span>
+<span class="token comment"># def get_embedding(text):</span>
+<span class="token comment">#     response = client.embeddings.create(model="text-embedding-3-small", input=text)</span>
+<span class="token comment">#     return response.data[0].embedding</span>
+<span class="token comment">#</span>
+<span class="token comment"># def semantic_cache_lookup(query, threshold=0.95):</span>
+<span class="token comment">#     query_emb = np.array(get_embedding(query))</span>
+<span class="token comment">#     keys = r.keys("cache:emb:*")</span>
+<span class="token comment">#     best_sim, best_key = 0, None</span>
+<span class="token comment">#     for key in keys:</span>
+<span class="token comment">#         stored_emb = np.frombuffer(r.get(key), dtype=np.float32)</span>
+<span class="token comment">#         sim = np.dot(query_emb, stored_emb) / (np.linalg.norm(query_emb) * np.linalg.norm(stored_emb))</span>
+<span class="token comment">#         if sim > best_sim:</span>
+<span class="token comment">#             best_sim, best_key = sim, key</span>
+<span class="token comment">#     if best_sim >= threshold and best_key:</span>
+<span class="token comment">#         response_key = best_key.decode().replace("cache:emb:", "cache:resp:")</span>
+<span class="token comment">#         return r.get(response_key).decode()</span>
+<span class="token comment">#     return None</span></code></pre>
+</figure>
+<p>In production, replace the linear scan with a vector index (Redis Vector Search, Pinecone, or pgvector). Linear scan works for &lt;1,000 entries. Beyond that, use ANN (approximate nearest neighbor) for O(log n) lookup.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces <code class="inline-code">outputs/prompt-cost-optimizer.md</code> -- a reusable prompt that analyzes your LLM application and recommends specific cost optimizations with projected savings.</p>
+<p>It also produces <code class="inline-code">outputs/skill-cost-patterns.md</code> -- a decision framework for choosing the right caching strategy, rate limiting configuration, and model routing rules for your use case.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p><strong>Implement LRU eviction for the semantic cache.</strong> Replace the oldest-first eviction with least-recently-used. Track the last access time for each entry and evict the entry with the oldest access time when the cache is full. Compare hit rates between the two strategies over 100 queries.</p>
+</li>
+<li><p><strong>Build a cost projection tool.</strong> Given a log of API calls (the CostTracker logs), project the monthly cost based on the trailing 7-day average. Account for weekday/weekend patterns. Trigger an alert if the projected monthly cost exceeds the budget by more than 20%.</p>
+</li>
+<li><p><strong>Implement tiered semantic caching.</strong> Use two similarity thresholds: 0.98 for high-confidence hits (return immediately) and 0.90 for medium-confidence hits (return with a disclaimer: &quot;Based on a similar previous question...&quot;). Track which tier each hit came from and measure user satisfaction differences.</p>
+</li>
+<li><p><strong>Build a model routing classifier.</strong> Replace the keyword-based classifier with an embedding-based one. Embed 50 labeled queries (simple/medium/complex), then classify new queries by finding the nearest labeled example. Measure classification accuracy against a test set of 20 queries.</p>
+</li>
+<li><p><strong>Implement a circuit breaker with degradation levels.</strong> At 70% budget, log a warning. At 85%, automatically switch all routing to the cheapest model (gpt-4o-mini). At 95%, serve only cached responses and reject new queries. Test by simulating 1,000 requests against a $1.00 budget and verify each threshold triggers correctly.</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Prompt caching</td>
+<td>&quot;Cache the system prompt&quot;</td>
+<td>Provider-level caching where repeated prompt prefixes get a discount (90% Anthropic, 50% OpenAI) -- no code changes for OpenAI, explicit markers for Anthropic</td>
+</tr>
+<tr>
+<td>Semantic caching</td>
+<td>&quot;Smart caching&quot;</td>
+<td>Embedding the query, computing similarity to past queries, and returning the cached response if similarity exceeds a threshold -- catches paraphrases that exact matching misses</td>
+</tr>
+<tr>
+<td>Exact caching</td>
+<td>&quot;Hash caching&quot;</td>
+<td>Hashing the full prompt (model + messages + temperature) and returning the cached response for identical inputs -- only works for temperature=0 deterministic calls</td>
+</tr>
+<tr>
+<td>Token bucket</td>
+<td>&quot;Rate limiter&quot;</td>
+<td>An algorithm where each user has a bucket of N tokens that refills at rate R per second -- allows bursts up to N while enforcing an average rate of R</td>
+</tr>
+<tr>
+<td>Model routing</td>
+<td>&quot;Cheapskate routing&quot;</td>
+<td>Using a classifier to send simple queries to cheap models (GPT-4o-mini, Haiku) and complex queries to expensive models (GPT-4o, Opus) -- saves 40-70% on model costs</td>
+</tr>
+<tr>
+<td>Cost tracking</td>
+<td>&quot;Metering&quot;</td>
+<td>Logging every API call with model, tokens, latency, cost, and user ID so you know exactly where money goes and which features are expensive</td>
+</tr>
+<tr>
+<td>Circuit breaker</td>
+<td>&quot;Kill switch&quot;</td>
+<td>Automatically degrading service (cheaper models, cached-only) or stopping requests entirely when spending approaches the budget limit</td>
+</tr>
+<tr>
+<td>Batch API</td>
+<td>&quot;Bulk discount&quot;</td>
+<td>OpenAI&#39;s asynchronous processing at 50% discount -- submit up to 50,000 requests, get results within 24 hours</td>
+</tr>
+<tr>
+<td>Prompt compression</td>
+<td>&quot;Token diet&quot;</td>
+<td>Rewriting system prompts and context to use fewer tokens while preserving meaning -- shorter prompts cost less and often perform better</td>
+</tr>
+<tr>
+<td>Cache hit rate</td>
+<td>&quot;Cache efficiency&quot;</td>
+<td>The percentage of requests served from cache instead of calling the LLM -- 40-60% is typical for production chatbots, saves proportionally on cost</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching" target="_blank" rel="noopener">Anthropic Prompt Caching Guide</a> -- the official docs for Anthropic&#39;s explicit cache_control markers, pricing, and cache lifetime behavior</li>
+<li><a href="https://platform.openai.com/docs/guides/prompt-caching" target="_blank" rel="noopener">OpenAI Prompt Caching</a> -- OpenAI&#39;s automatic caching, how to verify cache hits via usage fields, and minimum prefix lengths</li>
+<li><a href="https://platform.openai.com/docs/guides/batch" target="_blank" rel="noopener">OpenAI Batch API</a> -- 50% discount for asynchronous processing, JSONL format, 24-hour completion window, and 50K request limits</li>
+<li><a href="https://github.com/zilliztech/GPTCache" target="_blank" rel="noopener">GPTCache</a> -- open-source semantic caching library supporting multiple embedding backends, vector stores, and eviction policies</li>
+<li><a href="https://docs.withmartian.com" target="_blank" rel="noopener">Martian Model Router</a> -- production model routing that automatically selects the cheapest model capable of handling each query</li>
+<li><a href="https://www.notdiamond.ai" target="_blank" rel="noopener">Not Diamond</a> -- ML-based model router that learns from your traffic patterns to optimize cost/quality tradeoffs across providers</li>
+<li><a href="https://www.helicone.ai" target="_blank" rel="noopener">Helicone</a> -- LLM observability platform with cost tracking, caching, rate limiting, and budget alerts as a proxy layer</li>
+<li><a href="https://research.google/pubs/the-tail-at-scale/" target="_blank" rel="noopener">Dean &amp; Barroso, &quot;The Tail at Scale&quot; (CACM 2013)</a> -- latency, throughput, TTFT/TPOT percentiles, and hedged requests; the cost model behind &quot;pick the cheapest model that still meets P95.&quot;</li>
+<li><a href="https://arxiv.org/abs/2309.06180" target="_blank" rel="noopener">Kwon et al., &quot;Efficient Memory Management for Large Language Model Serving with PagedAttention&quot; (SOSP 2023)</a> -- the vLLM paper; why paged KV-cache + continuous batching beat naive servers 24× on throughput, the infra layer under &quot;caching and cost.&quot;</li>
+<li><a href="https://arxiv.org/abs/2307.08691" target="_blank" rel="noopener">Dao et al., &quot;FlashAttention-2: Faster Attention with Better Parallelism and Work Partitioning&quot; (ICLR 2024)</a> -- kernel-level cost reduction orthogonal to prompt caching; read alongside speculative decoding and GQA for the full cost-curve picture.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="10-evaluation.html">
+  <span class="label">← Previous</span>
+  <b>Evaluation &amp; Testing LLM Applications</b>
+</a>
+      <a class="pager__item pager__item--next" href="12-guardrails.html">
+  <span class="label">Next →</span>
+  <b>Guardrails, Safety &amp; Content Filtering</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>10 minutes</b> of LLM Engineering behind you.</p>
+      <a class="btn btn--solid" href="12-guardrails.html">Continue to Guardrails, Safety &amp; Content Filtering →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#the-cost-anatomy-of-an-llm-call">The Cost Anatomy of an LLM Call</a></li><li class="mini__item mini__item--d3"><a href="#provider-caching-built-in-discounts">Provider Caching: Built-in Discounts</a></li><li class="mini__item mini__item--d3"><a href="#semantic-caching-your-custom-layer">Semantic Caching: Your Custom Layer</a></li><li class="mini__item mini__item--d3"><a href="#exact-caching-hash-and-match">Exact Caching: Hash and Match</a></li><li class="mini__item mini__item--d3"><a href="#rate-limiting-protecting-your-budget">Rate Limiting: Protecting Your Budget</a></li><li class="mini__item mini__item--d3"><a href="#model-routing-right-model-for-the-right-job">Model Routing: Right Model for the Right Job</a></li><li class="mini__item mini__item--d3"><a href="#cost-tracking-know-where-the-money-goes">Cost Tracking: Know Where the Money Goes</a></li><li class="mini__item mini__item--d3"><a href="#batching-bulk-discounts">Batching: Bulk Discounts</a></li><li class="mini__item mini__item--d3"><a href="#budget-alerts-and-circuit-breakers">Budget Alerts and Circuit Breakers</a></li><li class="mini__item mini__item--d3"><a href="#the-optimization-stack">The Optimization Stack</a></li><li class="mini__item mini__item--d3"><a href="#real-savings-before-and-after">Real Savings: Before and After</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-cost-calculator">Step 1: Cost Calculator</a></li><li class="mini__item mini__item--d3"><a href="#step-2-exact-cache">Step 2: Exact Cache</a></li><li class="mini__item mini__item--d3"><a href="#step-3-semantic-cache">Step 3: Semantic Cache</a></li><li class="mini__item mini__item--d3"><a href="#step-4-rate-limiter">Step 4: Rate Limiter</a></li><li class="mini__item mini__item--d3"><a href="#step-5-cost-tracker">Step 5: Cost Tracker</a></li><li class="mini__item mini__item--d3"><a href="#step-6-model-router">Step 6: Model Router</a></li><li class="mini__item mini__item--d3"><a href="#step-7-run-the-demo">Step 7: Run the Demo</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d3"><a href="#anthropic-prompt-caching">Anthropic Prompt Caching</a></li><li class="mini__item mini__item--d3"><a href="#openai-automatic-caching">OpenAI Automatic Caching</a></li><li class="mini__item mini__item--d3"><a href="#openai-batch-api">OpenAI Batch API</a></li><li class="mini__item mini__item--d3"><a href="#production-semantic-cache-with-redis">Production Semantic Cache with Redis</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inference Metrics — TTFT, TPOT, ITL, Goodput, P99 — Infrastructure &amp; Production — AIFS</title>
+<meta name="description" content="Infrastructure &amp; Production: Inference Metrics — TTFT, TPOT, ITL, Goodput, P99. 2 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Inference Metrics — TTFT, TPOT, ITL, Goodput, P99 — Infrastructure &amp; Production — AIFS">
+<meta property="og:description" content="Infrastructure &amp; Production: Inference Metrics — TTFT, TPOT, ITL, Goodput, P99. 2 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"throughput-latency":["../assets/figures/figures-infra.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-infra.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#C79BFF" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#C79BFF;--accent-ink:#111111"
+  data-lesson-id="infrastructure-and-production/08-inference-metrics-goodput" data-module="infrastructure-and-production"
+  data-prev="07-tensorrt-llm-blackwell.html" data-next="09-production-quantization.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#C79BFF">
+        <span class="label">Phase 17</span>
+        <b>Infrastructure &amp; Production</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="infrastructure-and-production/01-managed-llm-platforms"><a href="01-managed-llm-platforms.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Managed LLM Platforms — Bedrock, Vertex AI, Azure OpenAI</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/02-inference-platform-economics"><a href="02-inference-platform-economics.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Inference Platform Economics — Fireworks, Together, Baseten, Modal, Replicate, Anyscale</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/03-gpu-autoscaling-kubernetes"><a href="03-gpu-autoscaling-kubernetes.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">GPU Autoscaling on Kubernetes — Karpenter, KAI Scheduler, Gang Scheduling</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/04-vllm-serving-internals"><a href="04-vllm-serving-internals.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Serving Engine Internals — PagedAttention, Continuous Batching, Chunked Prefill</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/05-eagle3-speculative-decoding"><a href="05-eagle3-speculative-decoding.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">EAGLE-3 Speculative Decoding in Production</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/06-sglang-radixattention"><a href="06-sglang-radixattention.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Prefix-Cache Serving — RadixAttention and KV Reuse</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/07-tensorrt-llm-blackwell"><a href="07-tensorrt-llm-blackwell.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Hardware-Specialized Inference Compilation — FP8 and NVFP4 on Blackwell</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/08-inference-metrics-goodput"><a href="08-inference-metrics-goodput.html" class="is-current">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Inference Metrics — TTFT, TPOT, ITL, Goodput, P99</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/09-production-quantization"><a href="09-production-quantization.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Production Quantization — AWQ, GPTQ, GGUF K-quants, FP8, MXFP4/NVFP4</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/10-cold-start-mitigation"><a href="10-cold-start-mitigation.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Cold Start Mitigation for Serverless LLMs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/11-multi-region-kv-locality"><a href="11-multi-region-kv-locality.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Multi-Region LLM Serving and KV Cache Locality</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/12-edge-inference"><a href="12-edge-inference.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Edge Inference — Apple Neural Engine, Qualcomm Hexagon, WebGPU/WebLLM, Jetson</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/13-llm-observability"><a href="13-llm-observability.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">LLM Observability Stack Selection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/14-prompt-semantic-caching"><a href="14-prompt-semantic-caching.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Prompt Caching and Semantic Caching Economics</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/15-batch-apis"><a href="15-batch-apis.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Batch APIs — the 50% Discount as Industry Standard</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/16-model-routing"><a href="16-model-routing.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Model Routing as a Cost-Reduction Primitive</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/17-disaggregated-prefill-decode"><a href="17-disaggregated-prefill-decode.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Disaggregated Prefill/Decode — NVIDIA Dynamo and llm-d</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/18-vllm-production-stack-lmcache"><a href="18-vllm-production-stack-lmcache.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Production Serving Stack — KV Offloading and Cache-Aware Routing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/19-ai-gateways"><a href="19-ai-gateways.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">AI Gateways — LiteLLM, Portkey, Kong AI Gateway, Bifrost</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/20-shadow-canary-progressive"><a href="20-shadow-canary-progressive.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Shadow Traffic, Canary Rollout, and Progressive Deployment for LLMs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/21-ab-testing-llm-features"><a href="21-ab-testing-llm-features.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">A/B Testing LLM Features — GrowthBook, Statsig, and the Vibes Problem</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/22-load-testing-llm-apis"><a href="22-load-testing-llm-apis.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Load Testing LLM APIs — Why k6 and Locust Lie</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/23-sre-for-ai"><a href="23-sre-for-ai.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">SRE for AI — Multi-Agent Incident Response, Runbooks, Predictive Detection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/24-chaos-engineering-llm"><a href="24-chaos-engineering-llm.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Chaos Engineering for LLM Production</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/25-security-secrets-audit"><a href="25-security-secrets-audit.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Security — Secrets, API Key Rotation, Audit Logs, Guardrails</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/26-compliance-frameworks"><a href="26-compliance-frameworks.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Compliance — SOC 2, HIPAA, GDPR, PCI-DSS, EU AI Act, ISO 42001</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/27-finops-llms"><a href="27-finops-llms.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">FinOps for LLMs — Unit Economics and Multi-Tenant Attribution</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/28-self-hosted-serving-selection"><a href="28-self-hosted-serving-selection.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">Self-Hosted Serving Selection — Matching Engine to Hardware and Scale</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Infrastructure &amp; Production</a></p>
+      <h1 class="page__title">Inference Metrics — TTFT, TPOT, ITL, Goodput, P99</h1>
+      <p class="page__lede">Four metrics decide whether an inference deployment is working. TTFT is prefill plus queue plus network. TPOT (equivalently ITL) is the memory-bound decode cost per token. End-to-end latency is TTFT plus TPOT times output length. Throughput is tokens per second aggregated across the fleet. But the one that matters for product is goodput — the fraction of requests that met every SLO simultaneously. High throughput at low goodput means you are processing tokens that never reach users on time. Reference numbers for Llama-3.1-8B-Instruct on TRT-LLM in 2026: mean TTFT 162 ms, mean TPOT 7.33 ms, mean E2E 1,093 ms. Always report P50, P90, P99 — never just mean. And watch the measurement trap: GenAI-Perf excludes TTFT from ITL calculation, LLMPerf includes it; two tools disagree on TPOT for the same run.</p>
+      <div class="page__meta">
+        <span class="chip">2 min read</span>
+        <span class="chip">513 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Learn</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (stdlib, toy percentile calculator and goodput reporter)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 17 · 04 (Serving Engine Internals)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~60 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Define TTFT, TPOT, ITL, E2E, throughput, and goodput precisely and name the component each one measures.</li>
+<li>Explain why mean is the wrong statistic for LLM serving and how to read P50/P90/P99.</li>
+<li>Construct an SLO multi-constraint (e.g. TTFT&lt;500 ms AND TPOT&lt;15 ms AND E2E&lt;2 s) and compute goodput against it.</li>
+<li>Name two benchmark tools that disagree on TPOT for the same run and explain why.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>&quot;Our throughput is 15,000 tokens per second.&quot; So what? If 40% of requests blew past 2 seconds end-to-end, users abandoned the session. Throughput alone does not tell you whether the product works.</p>
+<p>Inference has multiple axes of latency and each one fails differently. Prefill is compute-bound and scales with prompt length. Decode is memory-bound and scales with batch size. Queuing delay is an operational problem. Network is a physical-distance problem. You need distinct metrics for each, and you need percentiles, and you need a single composite that says &quot;did the user get what they expected&quot; — that is goodput.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="ttft-time-to-first-token" class="prose-h prose-h3"><a class="prose-h__anchor" href="#ttft-time-to-first-token" aria-label="Link to this section">#</a>TTFT — time to first token</h3>
+<p><code class="inline-code">TTFT = queue_time + network_request + prefill_time</code></p>
+<p>Prefill dominates when prompts are long. On Llama-3.3-70B FP8 on H100, a 32k prompt takes ~800 ms of pure prefill. Queue time is scheduler behavior under load. Network request is wire time including TLS. TTFT is the latency the user sees before anything streams back.</p>
+<h3 id="tpot-itl-inter-token-latency" class="prose-h prose-h3"><a class="prose-h__anchor" href="#tpot-itl-inter-token-latency" aria-label="Link to this section">#</a>TPOT / ITL — inter-token latency</h3>
+<p>Many names for one quantity. <code class="inline-code">TPOT</code> (time per output token), <code class="inline-code">ITL</code> (inter-token latency), <code class="inline-code">decode latency per token</code> — all the same. It is the time between consecutive streamed tokens after the first.</p>
+<p><code class="inline-code">TPOT = (decode_forward_time + scheduler_overhead) / tokens_produced</code></p>
+<p>On the same Llama-3.3-70B H100 stack with chunked prefill, TPOT mean ~7 ms. Without chunked prefill, during a long prefill on a neighboring sequence, TPOT can spike to 50 ms. Watch P99, not mean.</p>
+<h3 id="e2e-latency" class="prose-h prose-h3"><a class="prose-h__anchor" href="#e2e-latency" aria-label="Link to this section">#</a>E2E latency</h3>
+<p><code class="inline-code">E2E = TTFT + TPOT * output_tokens + network_response</code></p>
+<p>For long outputs (&gt;500 tokens), E2E is TPOT-dominated. For short outputs with long prompts, E2E is TTFT-dominated. Report output-length-conditioned E2E.</p>
+<h3 id="throughput" class="prose-h prose-h3"><a class="prose-h__anchor" href="#throughput" aria-label="Link to this section">#</a>Throughput</h3>
+<p><code class="inline-code">throughput = total_output_tokens / elapsed_time</code></p>
+<p>Aggregate metric. Tells you fleet efficiency. Does not tell you individual-request health.</p>
+<h3 id="goodput-the-metric-you-actually-care-about" class="prose-h prose-h3"><a class="prose-h__anchor" href="#goodput-the-metric-you-actually-care-about" aria-label="Link to this section">#</a>Goodput — the metric you actually care about</h3>
+<p><code class="inline-code">goodput = fraction of requests meeting (TTFT &lt;= a) AND (TPOT &lt;= b) AND (E2E &lt;= c)</code></p>
+<p>The SLO is a multi-constraint. A request is &quot;good&quot; only if every constraint held. Goodput is the share. High throughput at 60% goodput is failure. Lower throughput at 99% goodput is the target.</p>
+<p>In 2026, goodput is the metric used in MLPerf Inference v6.0 submissions and in internal SLA tracking at AI platform providers.</p>
+<h3 id="why-mean-is-the-wrong-statistic" class="prose-h prose-h3"><a class="prose-h__anchor" href="#why-mean-is-the-wrong-statistic" aria-label="Link to this section">#</a>Why mean is the wrong statistic</h3>
+<p>LLM latency distributions are right-skewed. A decode batch with one long-prefill neighbor can ship 500 tokens with TPOT ~7 ms and 20 tokens with TPOT ~60 ms. Mean TPOT is 9 ms. P99 TPOT is 65 ms. Users hit the P99 regularly — that is why they leave.</p>
+<p>Always report the triple (P50, P90, P99). For user experience, P99 is the one you optimize.</p>
+<h3 id="reference-numbers-llama-3-1-8b-instruct-on-trt-llm-2026" class="prose-h prose-h3"><a class="prose-h__anchor" href="#reference-numbers-llama-3-1-8b-instruct-on-trt-llm-2026" aria-label="Link to this section">#</a>Reference numbers — Llama-3.1-8B-Instruct on TRT-LLM, 2026</h3>
+<ul>
+<li>mean TTFT: 162 ms</li>
+<li>mean TPOT: 7.33 ms</li>
+<li>mean E2E: 1,093 ms</li>
+<li>P99 TPOT: varies 10-25 ms depending on chunked-prefill configuration.</li>
+</ul>
+<p>These are the published NVIDIA reference points. They change with model size (70B would show 3-5x), hardware (H100 vs B200 ~3x), and load.</p>
+<h3 id="the-measurement-trap" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-measurement-trap" aria-label="Link to this section">#</a>The measurement trap</h3>
+<p>Two of the most-used 2026 benchmark tools disagree on TPOT for the same run:</p>
+<ul>
+<li><strong>NVIDIA GenAI-Perf</strong>: excludes TTFT from the ITL calculation. ITL starts from token 2.</li>
+<li><strong>LLMPerf</strong>: includes TTFT. ITL starts from token 1.</li>
+</ul>
+<p>For a request with TTFT 500 ms and 100 output tokens in 700 ms total decode, GenAI-Perf reports <code class="inline-code">ITL = 700/99 = 7.07 ms</code>, LLMPerf reports <code class="inline-code">ITL = 1200/100 = 12.00 ms</code>. Tool choice changes the number.</p>
+<p>Always state which tool. Always publish the definition.</p>
+<h3 id="constructing-an-slo" class="prose-h prose-h3"><a class="prose-h__anchor" href="#constructing-an-slo" aria-label="Link to this section">#</a>Constructing an SLO</h3>
+<p>A reasonable consumer-facing SLO for a 70B chat model in 2026:</p>
+<ul>
+<li>TTFT P99 &lt;= 800 ms.</li>
+<li>TPOT P99 &lt;= 25 ms.</li>
+<li>E2E P99 &lt;= 3 s for &lt;300-token outputs.</li>
+<li>Goodput target &gt;= 99%.</li>
+</ul>
+<p>Enterprise SLOs tighten TTFT (200-400 ms) and loosen E2E. The point is to write them down, measure all three, and track goodput as a single composite.</p>
+<h3 id="how-to-measure" class="prose-h prose-h3"><a class="prose-h__anchor" href="#how-to-measure" aria-label="Link to this section">#</a>How to measure</h3>
+<ul>
+<li>Run real traffic or realistic synthetic (LLMPerf with <code class="inline-code">--mean-input-tokens 800 --stddev-input-tokens 300 --mean-output-tokens 150</code>).</li>
+<li>Target 2x peak concurrency for the benchmark run.</li>
+<li>Run 30-50 iterations, take percentiles of the combined sample.</li>
+<li>Publish with tool name, tool version, model, hardware, concurrency, prompt distribution.</li>
+</ul>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="throughput-latency"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">throughput-latency</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> throughput latency</figcaption>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p><code class="inline-code">code/main.py</code> is a toy goodput calculator. Generate a synthetic latency distribution, apply an SLO, and compute goodput. Also shows the GenAI-Perf vs LLMPerf TPOT difference on the same trace.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces <code class="inline-code">outputs/skill-slo-goodput-gate.md</code>. Given a workload and SLO, it produces a CI/CD-ready benchmark recipe that gates deploys on goodput rather than throughput.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li>Run <code class="inline-code">code/main.py</code>. Generate a distribution with 1% tail spike. How does goodput change when you tighten P99 TPOT from 30 ms to 15 ms?</li>
+<li>A vendor quotes &quot;15,000 tok/s on Llama 3.3 70B H100&quot;. Name three questions to ask before trusting it.</li>
+<li>Why does chunked prefill protect P99 TPOT but not mean TPOT?</li>
+<li>Construct a consumer SLO for a voice assistant (first token is heard, not read). Which metric is most user-visible?</li>
+<li>Read the LLMPerf README and the GenAI-Perf docs. Identify three other metrics where the tools disagree.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>TTFT</td>
+<td>&quot;time to first token&quot;</td>
+<td>Queue + network + prefill; dominated by prefill at long prompts</td>
+</tr>
+<tr>
+<td>TPOT</td>
+<td>&quot;time per output token&quot;</td>
+<td>Memory-bound decode cost per token after first</td>
+</tr>
+<tr>
+<td>ITL</td>
+<td>&quot;inter-token latency&quot;</td>
+<td>Same as TPOT in most tools (not all — see GenAI-Perf)</td>
+</tr>
+<tr>
+<td>E2E</td>
+<td>&quot;end to end&quot;</td>
+<td>TTFT + TPOT * output_len; response-side network on top</td>
+</tr>
+<tr>
+<td>Throughput</td>
+<td>&quot;tok/s&quot;</td>
+<td>Fleet efficiency; useless without latency percentiles</td>
+</tr>
+<tr>
+<td>Goodput</td>
+<td>&quot;SLO-met rate&quot;</td>
+<td>Fraction of requests meeting every SLO constraint simultaneously</td>
+</tr>
+<tr>
+<td>P99</td>
+<td>&quot;tail&quot;</td>
+<td>1-in-100 worst-case latency; the user experience metric</td>
+</tr>
+<tr>
+<td>SLO multi-constraint</td>
+<td>&quot;the joint&quot;</td>
+<td>AND of all three latency bounds; a request fails if any one is violated</td>
+</tr>
+<tr>
+<td>GenAI-Perf vs LLMPerf</td>
+<td>&quot;the tool trap&quot;</td>
+<td>Tools disagree on whether ITL includes TTFT</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://docs.nvidia.com/nim/benchmarking/llm/latest/metrics.html" target="_blank" rel="noopener">NVIDIA NIM — LLM Benchmarking Metrics</a> — canonical definition of TTFT, ITL, TPOT.</li>
+<li><a href="https://docs.anyscale.com/llm/serving/benchmarking/metrics" target="_blank" rel="noopener">Anyscale — LLM Serving Benchmarking Metrics</a> — alternative definitions and measurement recipe.</li>
+<li><a href="https://bentoml.com/llm/inference-optimization/llm-inference-metrics" target="_blank" rel="noopener">BentoML — LLM Inference Metrics</a> — applied measurement on real deployments.</li>
+<li><a href="https://github.com/ray-project/llmperf" target="_blank" rel="noopener">LLMPerf</a> — Ray-based open-source benchmark.</li>
+<li><a href="https://github.com/triton-inference-server/perf_analyzer/blob/main/genai-perf/README.md" target="_blank" rel="noopener">GenAI-Perf</a> — NVIDIA&#39;s benchmark tool.</li>
+<li><a href="https://mlcommons.org/benchmarks/inference-datacenter/" target="_blank" rel="noopener">MLPerf Inference</a> — the industry-accepted goodput-based benchmark.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="07-tensorrt-llm-blackwell.html">
+  <span class="label">← Previous</span>
+  <b>Hardware-Specialized Inference Compilation — FP8 and NVFP4 on Blackwell</b>
+</a>
+      <a class="pager__item pager__item--next" href="09-production-quantization.html">
+  <span class="label">Next →</span>
+  <b>Production Quantization — AWQ, GPTQ, GGUF K-quants, FP8, MXFP4/NVFP4</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>2 minutes</b> of Infrastructure &amp; Production behind you.</p>
+      <a class="btn btn--solid" href="09-production-quantization.html">Continue to Production Quantization — AWQ, GPTQ, GGUF K-quants, FP8, MXFP4/NVFP4 →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#ttft-time-to-first-token">TTFT — time to first token</a></li><li class="mini__item mini__item--d3"><a href="#tpot-itl-inter-token-latency">TPOT / ITL — inter-token latency</a></li><li class="mini__item mini__item--d3"><a href="#e2e-latency">E2E latency</a></li><li class="mini__item mini__item--d3"><a href="#throughput">Throughput</a></li><li class="mini__item mini__item--d3"><a href="#goodput-the-metric-you-actually-care-about">Goodput — the metric you actually care about</a></li><li class="mini__item mini__item--d3"><a href="#why-mean-is-the-wrong-statistic">Why mean is the wrong statistic</a></li><li class="mini__item mini__item--d3"><a href="#reference-numbers-llama-3-1-8b-instruct-on-trt-llm-2026">Reference numbers — Llama-3.1-8B-Instruct on TRT-LLM, 2026</a></li><li class="mini__item mini__item--d3"><a href="#the-measurement-trap">The measurement trap</a></li><li class="mini__item mini__item--d3"><a href="#constructing-an-slo">Constructing an SLO</a></li><li class="mini__item mini__item--d3"><a href="#how-to-measure">How to measure</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

@@ -1,0 +1,747 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Engineering — AI Engineering from Scratch</title>
+<meta name="description" content="The agent loop, memory, planning, tool design, evaluation — and the failure modes that quietly break agents in production.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Agent Engineering — AI Engineering from Scratch">
+<meta property="og:description" content="The agent loop, memory, planning, tool design, evaluation — and the failure modes that quietly break agents in production.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+
+</head>
+<body class="is-module" style="--accent:#0091FF" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="modulepage">
+<section class="mhero" style="--accent:#0091FF;--accent-ink:#FFFFFF">
+  <div class="mhero__inner">
+    <div class="mhero__text">
+      <p class="label"><a href="../index.html#modules">Phases</a> / Phase 14</p>
+      <h1 class="mhero__title">Agent Engineering</h1>
+      <p class="mhero__sub">The core of modern AI engineering. Build agents from first principles.</p>
+      <p class="mhero__blurb">The agent loop, memory, planning, tool design, evaluation — and the failure modes that quietly break agents in production.</p>
+      <ul class="chiprow">
+        <li class="chip">54 pages</li>
+        <li class="chip">232 min total</li>
+        <li class="chip">50,990 words</li>
+      </ul>
+      <div class="mhero__cta">
+        <a class="btn btn--lg btn--solid" href="01-the-agent-loop.html">Start reading <b>→</b></a>
+        <a class="btn btn--lg" href="#contents">Contents</a>
+      </div>
+      <div class="mhero__progress" data-module-progress="agent-engineering" data-total="54">
+        <div class="pbar"><span class="pbar__fill" style="width:0%"></span></div>
+        <span class="pbar__text">0 / 54 read</span>
+      </div>
+    </div>
+    <div class="mhero__art" data-tilt><div class="card3d card3d--lg" style="--accent:#0091FF;--accent-ink:#FFFFFF;--cover-title:10.2cqw" aria-hidden="true">
+  <div class="card3d__body">
+    <div class="card3d__spine"><span>AI · AGENT ENGINEERING</span></div>
+    <div class="card3d__cover">
+      <span class="card3d__eyebrow">AI Engineering<br>from Scratch</span>
+      <span class="card3d__title">Agent Engineering</span>
+      <span class="card3d__num">PHASE<br><b>14</b></span>
+      <span class="card3d__edition">3D Reading Edition</span>
+    </div>
+    <div class="card3d__pages"></div>
+  </div>
+</div></div>
+  </div>
+</section>
+<section class="section modulepage__about">
+  <div class="prose prose--narrow"><h2>What this module covers</h2>
+<p>The agent loop, memory, planning, tool design, evaluation — and the failure modes that quietly break agents in production.</p>
+
+<aside class="callout callout--tip" data-tag="SUPPORT THE AUTHOR"><p>This material is free to read. If it earns a place on your shelf, support the author: <a href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Star the repository</a> · <a href="https://aiengineeringfromscratch.com" target="_blank" rel="noopener">The author's own site</a>.</p></aside></div>
+</section>
+<section class="section" id="contents">
+  <header class="section__head">
+    <h2 class="section__title">Contents</h2>
+    <p class="section__note">Every page in this phase, in order. Times assume ~220 words a minute.</p>
+  </header>
+  <ol class="toc"><li class="toc__row" data-lesson="agent-engineering/01-the-agent-loop">
+  <a class="toc__link" href="01-the-agent-loop.html">
+    <span class="toc__n">01</span>
+    <span class="toc__body">
+      <span class="toc__title">The Agent Loop: Observe, Think, Act</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">6m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/02-rewoo-plan-and-execute">
+  <a class="toc__link" href="02-rewoo-plan-and-execute.html">
+    <span class="toc__n">02</span>
+    <span class="toc__body">
+      <span class="toc__title">ReWOO and Plan-and-Execute: Decoupled Planning</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">5m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/03-reflexion-verbal-rl">
+  <a class="toc__link" href="03-reflexion-verbal-rl.html">
+    <span class="toc__n">03</span>
+    <span class="toc__body">
+      <span class="toc__title">Reflexion: Verbal Reinforcement Learning</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">5m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/04-tree-of-thoughts-lats">
+  <a class="toc__link" href="04-tree-of-thoughts-lats.html">
+    <span class="toc__n">04</span>
+    <span class="toc__body">
+      <span class="toc__title">Tree of Thoughts and LATS: Deliberate Search</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">5m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/05-self-refine-and-critic">
+  <a class="toc__link" href="05-self-refine-and-critic.html">
+    <span class="toc__n">05</span>
+    <span class="toc__body">
+      <span class="toc__title">Self-Refine and CRITIC: Iterative Output Improvement</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">5m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/06-tool-use-and-function-calling">
+  <a class="toc__link" href="06-tool-use-and-function-calling.html">
+    <span class="toc__n">06</span>
+    <span class="toc__body">
+      <span class="toc__title">Tool Use and Function Calling</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">5m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/07-memory-virtual-context-memgpt">
+  <a class="toc__link" href="07-memory-virtual-context-memgpt.html">
+    <span class="toc__n">07</span>
+    <span class="toc__body">
+      <span class="toc__title">Agent Memory — Virtual Context and Memory Paging</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">6m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/08-memory-blocks-sleep-time-compute">
+  <a class="toc__link" href="08-memory-blocks-sleep-time-compute.html">
+    <span class="toc__n">08</span>
+    <span class="toc__body">
+      <span class="toc__title">Memory Blocks and Sleep-Time Compute</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">5m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/09-hybrid-memory-mem0">
+  <a class="toc__link" href="09-hybrid-memory-mem0.html">
+    <span class="toc__n">09</span>
+    <span class="toc__body">
+      <span class="toc__title">Hybrid Memory: Vector + Graph + KV</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">5m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/10-skill-libraries-voyager">
+  <a class="toc__link" href="10-skill-libraries-voyager.html">
+    <span class="toc__n">10</span>
+    <span class="toc__body">
+      <span class="toc__title">Skill Libraries and Lifelong Learning (Voyager)</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">5m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/11-planning-htn-and-evolutionary">
+  <a class="toc__link" href="11-planning-htn-and-evolutionary.html">
+    <span class="toc__n">11</span>
+    <span class="toc__body">
+      <span class="toc__title">Planning with HTN and Evolutionary Search</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">5m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/12-anthropic-workflow-patterns">
+  <a class="toc__link" href="12-anthropic-workflow-patterns.html">
+    <span class="toc__n">12</span>
+    <span class="toc__body">
+      <span class="toc__title">Anthropic's Workflow Patterns: Simple Over Complex</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">4m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/13-langgraph-stateful-graphs">
+  <a class="toc__link" href="13-langgraph-stateful-graphs.html">
+    <span class="toc__n">13</span>
+    <span class="toc__body">
+      <span class="toc__title">Stateful Graph Orchestration — Durable Execution and Checkpoints</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">4m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/14-autogen-actor-model">
+  <a class="toc__link" href="14-autogen-actor-model.html">
+    <span class="toc__n">14</span>
+    <span class="toc__body">
+      <span class="toc__title">The Actor Model for Agents — Async Messages and Typed Runtimes</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">4m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/15-crewai-role-based-crews">
+  <a class="toc__link" href="15-crewai-role-based-crews.html">
+    <span class="toc__n">15</span>
+    <span class="toc__body">
+      <span class="toc__title">Role-Based Agent Teams — Roles, Tasks, Processes</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">10m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/16-openai-agents-sdk">
+  <a class="toc__link" href="16-openai-agents-sdk.html">
+    <span class="toc__n">16</span>
+    <span class="toc__body">
+      <span class="toc__title">OpenAI Agents SDK: Handoffs, Guardrails, Tracing</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">4m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/17-claude-agent-sdk">
+  <a class="toc__link" href="17-claude-agent-sdk.html">
+    <span class="toc__n">17</span>
+    <span class="toc__body">
+      <span class="toc__title">The Harness as a Library — Subagents and Session Store</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">4m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/18-agno-and-mastra-runtimes">
+  <a class="toc__link" href="18-agno-and-mastra-runtimes.html">
+    <span class="toc__n">18</span>
+    <span class="toc__body">
+      <span class="toc__title">Production Agent Runtimes — Fast Instantiation and Typed Workflows</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">3m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/19-benchmarks-swebench-gaia">
+  <a class="toc__link" href="19-benchmarks-swebench-gaia.html">
+    <span class="toc__n">19</span>
+    <span class="toc__body">
+      <span class="toc__title">Benchmarks: SWE-bench, GAIA, AgentBench</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">4m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/20-benchmarks-webarena-osworld">
+  <a class="toc__link" href="20-benchmarks-webarena-osworld.html">
+    <span class="toc__n">20</span>
+    <span class="toc__body">
+      <span class="toc__title">Benchmarks: WebArena and OSWorld</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">3m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/21-computer-use-agents">
+  <a class="toc__link" href="21-computer-use-agents.html">
+    <span class="toc__n">21</span>
+    <span class="toc__body">
+      <span class="toc__title">Computer Use: Claude, OpenAI CUA, Gemini</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">4m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/22-voice-agents-pipecat-livekit">
+  <a class="toc__link" href="22-voice-agents-pipecat-livekit.html">
+    <span class="toc__n">22</span>
+    <span class="toc__body">
+      <span class="toc__title">Voice Agents: Pipecat and LiveKit</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">3m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/23-otel-genai-conventions">
+  <a class="toc__link" href="23-otel-genai-conventions.html">
+    <span class="toc__n">23</span>
+    <span class="toc__body">
+      <span class="toc__title">OpenTelemetry GenAI Semantic Conventions</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">4m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/24-agent-observability-platforms">
+  <a class="toc__link" href="24-agent-observability-platforms.html">
+    <span class="toc__n">24</span>
+    <span class="toc__body">
+      <span class="toc__title">Agent Observability: Langfuse, Phoenix, Opik</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">3m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/25-multi-agent-debate">
+  <a class="toc__link" href="25-multi-agent-debate.html">
+    <span class="toc__n">25</span>
+    <span class="toc__body">
+      <span class="toc__title">Multi-Agent Debate and Collaboration</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">3m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/26-failure-modes-agentic">
+  <a class="toc__link" href="26-failure-modes-agentic.html">
+    <span class="toc__n">26</span>
+    <span class="toc__body">
+      <span class="toc__title">Failure Modes: Why Agents Break</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">4m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/27-prompt-injection-defense">
+  <a class="toc__link" href="27-prompt-injection-defense.html">
+    <span class="toc__n">27</span>
+    <span class="toc__body">
+      <span class="toc__title">Prompt Injection and the PVE Defense</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">4m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/28-orchestration-patterns">
+  <a class="toc__link" href="28-orchestration-patterns.html">
+    <span class="toc__n">28</span>
+    <span class="toc__body">
+      <span class="toc__title">Orchestration Patterns: Supervisor, Swarm, Hierarchical</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">4m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/29-production-runtimes">
+  <a class="toc__link" href="29-production-runtimes.html">
+    <span class="toc__n">29</span>
+    <span class="toc__body">
+      <span class="toc__title">Production Runtimes: Queue, Event, Cron</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">2m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/30-eval-driven-agent-development">
+  <a class="toc__link" href="30-eval-driven-agent-development.html">
+    <span class="toc__n">30</span>
+    <span class="toc__body">
+      <span class="toc__title">Eval-Driven Agent Development</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">4m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/31-agent-workbench-why-models-fail">
+  <a class="toc__link" href="31-agent-workbench-why-models-fail.html">
+    <span class="toc__n">31</span>
+    <span class="toc__body">
+      <span class="toc__title">Agent Workbench Engineering: Why Capable Models Still Fail</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Ship It</span>
+    </span>
+    <span class="toc__min">12m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/32-minimal-agent-workbench">
+  <a class="toc__link" href="32-minimal-agent-workbench.html">
+    <span class="toc__n">32</span>
+    <span class="toc__body">
+      <span class="toc__title">The Minimal Agent Workbench</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Use It · Production patterns in the wild</span>
+    </span>
+    <span class="toc__min">5m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/33-instructions-as-executable-constraints">
+  <a class="toc__link" href="33-instructions-as-executable-constraints.html">
+    <span class="toc__n">33</span>
+    <span class="toc__body">
+      <span class="toc__title">Agent Instructions as Executable Constraints</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Production patterns in the wild · Use It</span>
+    </span>
+    <span class="toc__min">6m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/34-repo-memory-and-state">
+  <a class="toc__link" href="34-repo-memory-and-state.html">
+    <span class="toc__n">34</span>
+    <span class="toc__body">
+      <span class="toc__title">Repo Memory and Durable State</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Production patterns in the wild · Use It</span>
+    </span>
+    <span class="toc__min">5m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/35-initialization-scripts">
+  <a class="toc__link" href="35-initialization-scripts.html">
+    <span class="toc__n">35</span>
+    <span class="toc__body">
+      <span class="toc__title">Initialization Scripts for Agents</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Production patterns in the wild · Use It</span>
+    </span>
+    <span class="toc__min">5m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/36-scope-contracts">
+  <a class="toc__link" href="36-scope-contracts.html">
+    <span class="toc__n">36</span>
+    <span class="toc__body">
+      <span class="toc__title">Scope Contracts and Task Boundaries</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Production patterns in the wild · Use It</span>
+    </span>
+    <span class="toc__min">7m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/37-runtime-feedback-loops">
+  <a class="toc__link" href="37-runtime-feedback-loops.html">
+    <span class="toc__n">37</span>
+    <span class="toc__body">
+      <span class="toc__title">Runtime Feedback Loops</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Production patterns in the wild · Use It</span>
+    </span>
+    <span class="toc__min">5m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/38-verification-gates">
+  <a class="toc__link" href="38-verification-gates.html">
+    <span class="toc__n">38</span>
+    <span class="toc__body">
+      <span class="toc__title">Verification Gates</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Production patterns in the wild · Use It</span>
+    </span>
+    <span class="toc__min">5m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/39-reviewer-agent">
+  <a class="toc__link" href="39-reviewer-agent.html">
+    <span class="toc__n">39</span>
+    <span class="toc__body">
+      <span class="toc__title">Reviewer Agent: Separate Builder from Marker</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Production patterns in the wild · Use It</span>
+    </span>
+    <span class="toc__min">6m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/40-multi-session-handoff">
+  <a class="toc__link" href="40-multi-session-handoff.html">
+    <span class="toc__n">40</span>
+    <span class="toc__body">
+      <span class="toc__title">Multi-Session Handoff</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Production patterns in the wild · Use It</span>
+    </span>
+    <span class="toc__min">7m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/41-workbench-for-real-repos">
+  <a class="toc__link" href="41-workbench-for-real-repos.html">
+    <span class="toc__n">41</span>
+    <span class="toc__body">
+      <span class="toc__title">The Workbench on a Real Repo</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Production patterns in the wild · Use It</span>
+    </span>
+    <span class="toc__min">5m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/42-agent-workbench-capstone">
+  <a class="toc__link" href="42-agent-workbench-capstone.html">
+    <span class="toc__n">42</span>
+    <span class="toc__body">
+      <span class="toc__title">Capstone: Ship a Reusable Agent Workbench Pack</span>
+      <span class="toc__sections">Learning Objectives · The Problem · The Concept · Build It · Production patterns in the wild · Use It</span>
+    </span>
+    <span class="toc__min">5m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/43-frame-the-task-before-code">
+  <a class="toc__link" href="43-frame-the-task-before-code.html">
+    <span class="toc__n">43</span>
+    <span class="toc__body">
+      <span class="toc__title">Frame the Task Before the Agent Writes Code</span>
+      <span class="toc__sections">Learning Objectives · The Expensive Failure · The Task Frame · Reconnaissance Is a Search for Constraints · Unknowns Are Not Failures · Acceptance Before Implementation</span>
+    </span>
+    <span class="toc__min">3m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/44-plan-from-evidence">
+  <a class="toc__link" href="44-plan-from-evidence.html">
+    <span class="toc__n">44</span>
+    <span class="toc__body">
+      <span class="toc__title">Build an Evidence-Backed Execution Plan</span>
+      <span class="toc__sections">Learning Objectives · Why Agent Plans Fail · Plan the Contract Before Its Implementations · Evidence Changes the Plan · Design for Interruption · Plan Validation</span>
+    </span>
+    <span class="toc__min">3m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/45-delegate-with-isolation">
+  <a class="toc__link" href="45-delegate-with-isolation.html">
+    <span class="toc__n">45</span>
+    <span class="toc__body">
+      <span class="toc__title">Delegate Agent Work with Isolation and Merge Contracts</span>
+      <span class="toc__sections">Learning Objectives · The Parallelism Test · A Work Unit Is a Contract · Isolation Has Three Layers · The Integrator Does Not Rebuild the Work · Human and Agent Roles</span>
+    </span>
+    <span class="toc__min">2m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/46-turn-feedback-into-system">
+  <a class="toc__link" href="46-turn-feedback-into-system.html">
+    <span class="toc__n">46</span>
+    <span class="toc__body">
+      <span class="toc__title">Turn Every Agent Correction into a System Improvement</span>
+      <span class="toc__sections">Learning Objectives · Corrections Are Evidence · Promote to the Earliest Effective Layer · The Ratchet Record · Separate Cause from Symptom · Controls Also Decay</span>
+    </span>
+    <span class="toc__min">3m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/47-outcomes-before-output">
+  <a class="toc__link" href="47-outcomes-before-output.html">
+    <span class="toc__n">47</span>
+    <span class="toc__body">
+      <span class="toc__title">Define the Outcome Before You Choose the Output</span>
+      <span class="toc__sections">Learning Objectives · Output Is Not Outcome · The Six-Part Frame · Find Solution Leakage · Constraints Protect the Outcome · Non-Goals Create a Boundary</span>
+    </span>
+    <span class="toc__min">2m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/48-discover-the-real-workflow">
+  <a class="toc__link" href="48-discover-the-real-workflow.html">
+    <span class="toc__n">48</span>
+    <span class="toc__body">
+      <span class="toc__title">Discover the Workflow People Actually Perform</span>
+      <span class="toc__sections">Learning Objectives · Start with the Current System · Evidence Has Strength · Search for Four Things · Do Not Average Away Disagreement · Build It</span>
+    </span>
+    <span class="toc__min">2m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/49-map-assumptions-and-risk">
+  <a class="toc__link" href="49-map-assumptions-and-risk.html">
+    <span class="toc__n">49</span>
+    <span class="toc__body">
+      <span class="toc__title">Map Assumptions and Resolve the Riskiest One First</span>
+      <span class="toc__sections">Learning Objectives · Every Build Contains Bets · Assumption Classes · Risk Is Not One Number · Design an Experiment, Not a Confirmation Ritual · Reversibility Changes Order</span>
+    </span>
+    <span class="toc__min">2m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/50-choose-the-smallest-testable-slice">
+  <a class="toc__link" href="50-choose-the-smallest-testable-slice.html">
+    <span class="toc__n">50</span>
+    <span class="toc__body">
+      <span class="toc__title">Choose the Smallest Slice That Can Change the Decision</span>
+      <span class="toc__sections">Learning Objectives · Vertical Means Evidence End to End · Define Required Proof First · Common False Minimums · Add a Stop Rule · Build It</span>
+    </span>
+    <span class="toc__min">2m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/51-write-specifications-that-preserve-judgment">
+  <a class="toc__link" href="51-write-specifications-that-preserve-judgment.html">
+    <span class="toc__n">51</span>
+    <span class="toc__body">
+      <span class="toc__title">Write Specifications That Preserve Judgment</span>
+      <span class="toc__sections">Learning Objectives · Two Bad Extremes · Three Decision Modes · Specify Behavior Through Examples · Proof Must Match the Claim · Preserve Unknowns Deliberately</span>
+    </span>
+    <span class="toc__min">2m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/52-design-success-metrics">
+  <a class="toc__link" href="52-design-success-metrics.html">
+    <span class="toc__n">52</span>
+    <span class="toc__body">
+      <span class="toc__title">Design Success Metrics Before the Result Exists</span>
+      <span class="toc__sections">Learning Objectives · Goal, Question, Metric · A Metric Needs a Contract · Outcome, Guardrail, and Counter-Metric · Offline and Online Evidence · Decide Before You Measure</span>
+    </span>
+    <span class="toc__min">2m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/53-prototype-pilot-or-production">
+  <a class="toc__link" href="53-prototype-pilot-or-production.html">
+    <span class="toc__n">53</span>
+    <span class="toc__body">
+      <span class="toc__title">Choose Prototype, Pilot, or Production Deliberately</span>
+      <span class="toc__sections">Learning Objectives · Three Different Questions · Prototype · Pilot · Production · Stage Drift</span>
+    </span>
+    <span class="toc__min">2m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li>
+<li class="toc__row" data-lesson="agent-engineering/54-build-the-feedback-ratchet">
+  <a class="toc__link" href="54-build-the-feedback-ratchet.html">
+    <span class="toc__n">54</span>
+    <span class="toc__body">
+      <span class="toc__title">Build a Feedback Ratchet with Ownership and Retirement</span>
+      <span class="toc__sections">Learning Objectives · Feedback Is Infrastructure · Route to the Owning Layer · Ownership Is Part of the Control · Retire Stale Controls · Connect Build and Coding-Agent Feedback</span>
+    </span>
+    <span class="toc__min">3m</span>
+    <span class="toc__tick" data-tick aria-hidden="true">✓</span>
+  </a>
+</li></ol>
+</section>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+
+
+</body>
+</html>

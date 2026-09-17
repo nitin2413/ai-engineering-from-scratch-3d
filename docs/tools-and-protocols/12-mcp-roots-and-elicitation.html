@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Explicit Scope and Stateless Elicitation — Tools &amp; Protocols — AIFS</title>
+<meta name="description" content="Tools &amp; Protocols: Explicit Scope and Stateless Elicitation. 8 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Explicit Scope and Stateless Elicitation — Tools &amp; Protocols — AIFS">
+<meta property="og:description" content="Tools &amp; Protocols: Explicit Scope and Stateless Elicitation. 8 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"t3-roots-boundary":["../assets/figures/figures-mcp.js","../assets/figures/figures-tools3.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-mcp.js","../assets/figures/figures-tools3.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#C6FF00" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#C6FF00;--accent-ink:#111111"
+  data-lesson-id="tools-and-protocols/12-mcp-roots-and-elicitation" data-module="tools-and-protocols"
+  data-prev="11-mcp-sampling.html" data-next="13-mcp-async-tasks.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#C6FF00">
+        <span class="label">Phase 13</span>
+        <b>Tools &amp; Protocols</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="tools-and-protocols/01-the-tool-interface"><a href="01-the-tool-interface.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">The Tool Interface — Why Agents Need Structured I/O</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/02-function-calling-deep-dive"><a href="02-function-calling-deep-dive.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Function Calling Deep Dive — OpenAI, Anthropic, Gemini</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/03-parallel-and-streaming-tool-calls"><a href="03-parallel-and-streaming-tool-calls.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Parallel Tool Calls and Streaming with Tools</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/04-structured-output"><a href="04-structured-output.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Structured Output — JSON Schema, Pydantic, Zod, Constrained Decoding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/05-tool-schema-design"><a href="05-tool-schema-design.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Tool Schema Design — Naming, Descriptions, Parameter Constraints</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/06-mcp-fundamentals"><a href="06-mcp-fundamentals.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">MCP Fundamentals: Stateless Requests and JSON-RPC</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/07-building-an-mcp-server"><a href="07-building-an-mcp-server.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Building an MCP Server: Stateless Python and TypeScript</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/08-building-an-mcp-client"><a href="08-building-an-mcp-client.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Building an MCP Client: Discovery, Routing, and Dual-Era Fallback</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/09-mcp-transports"><a href="09-mcp-transports.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">MCP Transports: stdio and Stateless Streamable HTTP</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/10-mcp-resources-and-prompts"><a href="10-mcp-resources-and-prompts.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">MCP Resources and Prompts: Addressable Context for Stateless Servers</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/11-mcp-sampling"><a href="11-mcp-sampling.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">MCP Model Input: Sampling Migration and Stateless MRTR</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/12-mcp-roots-and-elicitation"><a href="12-mcp-roots-and-elicitation.html" class="is-current">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Explicit Scope and Stateless Elicitation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/13-mcp-async-tasks"><a href="13-mcp-async-tasks.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">MCP Tasks Extension: Durable Work on a Stateless Core</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/14-mcp-apps"><a href="14-mcp-apps.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">MCP Apps on the Stateless Protocol</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/15-mcp-security-tool-poisoning"><a href="15-mcp-security-tool-poisoning.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">MCP Security: Poisoned Metadata, Routing, and MRTR State</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/16-mcp-security-oauth-2-1"><a href="16-mcp-security-oauth-2-1.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">MCP Authorization: CIMD, Issuer Binding, PKCE, and Step-Up</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/17-mcp-gateways-and-registries"><a href="17-mcp-gateways-and-registries.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Stateless MCP Gateways and Registry Admission</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/18-mcp-auth-production"><a href="18-mcp-auth-production.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">MCP Auth in Production: Issuer-Bound Enrollment and Tokens</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/19-a2a-protocol"><a href="19-a2a-protocol.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">A2A — Agent-to-Agent Protocol</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/20-opentelemetry-genai"><a href="20-opentelemetry-genai.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">OpenTelemetry GenAI — Tracing Tool Calls End-to-End</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/21-llm-routing-layer"><a href="21-llm-routing-layer.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">LLM Routing Layer — LiteLLM, OpenRouter, Portkey</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/22-skills-and-agent-sdks"><a href="22-skills-and-agent-sdks.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Agent Skills: Portable Contract and Runtime Boundary</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/23-capstone-tool-ecosystem"><a href="23-capstone-tool-ecosystem.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Capstone: Stateless Tool Ecosystem</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/24-skill-discovery-and-progressive-disclosure"><a href="24-skill-discovery-and-progressive-disclosure.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Skill Discovery and Progressive Disclosure</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/25-skill-invocation-and-routing"><a href="25-skill-invocation-and-routing.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Skill Invocation and Routing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/26-skill-permissions-sandboxes-and-trust"><a href="26-skill-permissions-sandboxes-and-trust.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Skill Permissions, Sandboxes, and Trust</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/27-skill-evals-packaging-and-portability"><a href="27-skill-evals-packaging-and-portability.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">Skill Evals, Packaging, and Portability</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/28-mcp-tool-contracts-and-content"><a href="28-mcp-tool-contracts-and-content.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">MCP Tool Contracts and Content</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control"><a href="29-mcp-reliability-cancellation-and-flow-control.html" class="">
+  <span class="snav__n">29</span>
+  <span class="snav__t">MCP Reliability, Cancellation, and Flow Control</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/30-mcp-registry-supply-chain-and-drift"><a href="30-mcp-registry-supply-chain-and-drift.html" class="">
+  <span class="snav__n">30</span>
+  <span class="snav__t">MCP Registry Supply Chain: Admission, Drift, and Rollback</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/31-mcp-conformance-versioning-and-operations"><a href="31-mcp-conformance-versioning-and-operations.html" class="">
+  <span class="snav__n">31</span>
+  <span class="snav__t">MCP Conformance Engineering: Versioning, Evidence, and Operations</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Tools &amp; Protocols</a></p>
+      <h1 class="page__title">Explicit Scope and Stateless Elicitation</h1>
+      <p class="page__lede">Roots are deprecated in MCP 2026-07-28 and were never a security sandbox. Put scope in visible tool arguments or resource URIs, authorize it on the server, and use MRTR when a tool genuinely needs user input. The user sees the decision, the model sees the handle, and any server instance can process the retry.</p>
+      <div class="page__meta">
+        <span class="chip">8 min read</span>
+        <span class="chip">1,820 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 13 · 07 (MCP server), Phase 13 · 11 (stateless MRTR)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~60 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Replace deprecated Roots with explicit workspace parameters, resource URIs, or server configuration.</li>
+<li>Separate scope hints from authorization, path containment, and operating-system sandboxing.</li>
+<li>Deliver form-mode <code class="inline-code">elicitation/create</code> through an MRTR <code class="inline-code">input_required</code> result.</li>
+<li>Advertise elicitation support in per-request client capabilities and reject unsupported modes.</li>
+<li>Validate <code class="inline-code">accept</code>, <code class="inline-code">decline</code>, and <code class="inline-code">cancel</code> as distinct outcomes.</li>
+<li>Bind destructive confirmation to an authenticated principal, original arguments, candidate set, and expiry.</li>
+</ul>
+<h2 id="two-problems-that-look-similar" class="prose-h prose-h2"><a class="prose-h__anchor" href="#two-problems-that-look-similar" aria-label="Link to this section">#</a>Two Problems That Look Similar</h2>
+<p>A notes tool receives this request: &quot;Delete the old TPS report.&quot;</p>
+<p>The server must answer two different questions.</p>
+<ol>
+<li>Which workspace may this operation touch?</li>
+<li>Which of three matching notes did the user mean?</li>
+</ol>
+<p>The first is scope and authorization. The second is interactive disambiguation. Mixing them leads to dangerous designs, such as treating a client-provided folder as proof that the caller may delete everything inside it.</p>
+<h2 id="roots-are-a-migration-surface" class="prose-h prose-h2"><a class="prose-h__anchor" href="#roots-are-a-migration-surface" aria-label="Link to this section">#</a>Roots Are a Migration Surface</h2>
+<p>Earlier MCP revisions let a client advertise Roots and notify a server when the list changed. Roots were informational guidance. They did not constrain what the server process could read, did not authorize the caller, and did not create an operating-system sandbox.</p>
+<p>MCP 2026-07-28 deprecates <code class="inline-code">roots/list</code> and <code class="inline-code">notifications/roots/list_changed</code> for new designs. Prefer one of these explicit replacements:</p>
+<ul>
+<li>A <code class="inline-code">workspaceUri</code> or <code class="inline-code">directory</code> tool argument when scope varies per call.</li>
+<li>A resource URI when the operation already targets a resource.</li>
+<li>Server configuration when one deployment owns one fixed workspace.</li>
+<li>A process sandbox or jailed filesystem when code must be technically unable to escape.</li>
+</ul>
+<p>If an existing 2026-07-28 integration still needs <code class="inline-code">roots/list</code> during the deprecation window, the server embeds it in MRTR <code class="inline-code">inputRequests</code>. It must not send a live reverse request. That is a migration adapter; new handlers should accept explicit scope instead.</p>
+<p>The model can see and repeat an explicit handle. Hidden transport-session scope is harder to inspect, replay, audit, and route.</p>
+<h3 id="the-three-layer-rule" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-three-layer-rule" aria-label="Link to this section">#</a>The three-layer rule</h3>
+<p>An explicit URI still does not authorize itself. Enforce all three layers:</p>
+<ol>
+<li><strong>Authorization:</strong> Is this authenticated principal allowed to use this workspace?</li>
+<li><strong>Containment:</strong> Does the normalized target URI stay inside the authorized workspace boundary?</li>
+<li><strong>Sandbox:</strong> Can the operating system stop a compromised server from escaping anyway?</li>
+</ol>
+<p>The runnable server keeps an allowlist of authorized workspace URIs, normalizes percent-encoded paths, checks a real path-component boundary, and re-checks containment immediately before deletion.</p>
+<p>Naive string-prefix checks are wrong:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>allowed:   file:///work/notes
+attacker:  file:///work/notes-evil/secret.md
+traversal: file:///work/notes/%2e%2e/private.md</code></pre>
+</figure>
+<p>Both hostile paths start with a misleading string. Normalize first, then compare path components. A production filesystem server must also defend against symbolic-link races and platform-specific path semantics.</p>
+<h2 id="elicitation-still-exists-but-delivery-changed" class="prose-h prose-h2"><a class="prose-h__anchor" href="#elicitation-still-exists-but-delivery-changed" aria-label="Link to this section">#</a>Elicitation Still Exists, but Delivery Changed</h2>
+<p>Elicitation is the current client feature for collecting user input during <code class="inline-code">tools/call</code>, <code class="inline-code">prompts/get</code>, or <code class="inline-code">resources/read</code>. The method name remains <code class="inline-code">elicitation/create</code>. What changed is the direction of the wire flow.</p>
+<p>A 2026-07-28 server does not send a reverse JSON-RPC request. It returns an <code class="inline-code">InputRequiredResult</code>:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"jsonrpc"</span><span class="token operator">:</span> <span class="token string">"2.0"</span><span class="token punctuation">,</span>
+  <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+  <span class="token property">"result"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"resultType"</span><span class="token operator">:</span> <span class="token string">"input_required"</span><span class="token punctuation">,</span>
+    <span class="token property">"inputRequests"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"delete_choice"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token property">"method"</span><span class="token operator">:</span> <span class="token string">"elicitation/create"</span><span class="token punctuation">,</span>
+        <span class="token property">"params"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+          <span class="token property">"mode"</span><span class="token operator">:</span> <span class="token string">"form"</span><span class="token punctuation">,</span>
+          <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Choose one matching note and confirm deletion."</span><span class="token punctuation">,</span>
+          <span class="token property">"requestedSchema"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+            <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"object"</span><span class="token punctuation">,</span>
+            <span class="token property">"properties"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+              <span class="token property">"note_id"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+                <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+                <span class="token property">"enum"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"note-3"</span><span class="token punctuation">,</span> <span class="token string">"note-7"</span><span class="token punctuation">,</span> <span class="token string">"note-14"</span><span class="token punctuation">]</span>
+              <span class="token punctuation">}</span><span class="token punctuation">,</span>
+              <span class="token property">"confirm"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"boolean"</span><span class="token punctuation">}</span>
+            <span class="token punctuation">}</span><span class="token punctuation">,</span>
+            <span class="token property">"required"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"note_id"</span><span class="token punctuation">,</span> <span class="token string">"confirm"</span><span class="token punctuation">]</span>
+          <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token property">"requestState"</span><span class="token operator">:</span> <span class="token string">"integrity-protected-delete-state"</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<p>The host renders the form. The user can accept, explicitly decline, or dismiss it. The client then retries the original <code class="inline-code">tools/call</code> with a fresh id:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"jsonrpc"</span><span class="token operator">:</span> <span class="token string">"2.0"</span><span class="token punctuation">,</span>
+  <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
+  <span class="token property">"method"</span><span class="token operator">:</span> <span class="token string">"tools/call"</span><span class="token punctuation">,</span>
+  <span class="token property">"params"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"notes_delete"</span><span class="token punctuation">,</span>
+    <span class="token property">"arguments"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"workspaceUri"</span><span class="token operator">:</span> <span class="token string">"file:///Users/alice/Documents/Notes"</span><span class="token punctuation">,</span>
+      <span class="token property">"title"</span><span class="token operator">:</span> <span class="token string">"TPS report"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token property">"inputResponses"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"delete_choice"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token property">"action"</span><span class="token operator">:</span> <span class="token string">"accept"</span><span class="token punctuation">,</span>
+        <span class="token property">"content"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token property">"note_id"</span><span class="token operator">:</span> <span class="token string">"note-14"</span><span class="token punctuation">,</span> <span class="token property">"confirm"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token property">"requestState"</span><span class="token operator">:</span> <span class="token string">"integrity-protected-delete-state"</span><span class="token punctuation">,</span>
+    <span class="token property">"_meta"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"io.modelcontextprotocol/protocolVersion"</span><span class="token operator">:</span> <span class="token string">"2026-07-28"</span><span class="token punctuation">,</span>
+      <span class="token property">"io.modelcontextprotocol/clientCapabilities"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token property">"elicitation"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token property">"form"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<p>There is no protocol session between the two calls. The server verifies the echoed state, validates the response against the expected schema, checks that the selected note was in the signed candidate set, re-authorizes the workspace, re-checks containment, and then deletes.</p>
+<h2 id="capability-negotiation-is-per-request" class="prose-h prose-h2"><a class="prose-h__anchor" href="#capability-negotiation-is-per-request" aria-label="Link to this section">#</a>Capability Negotiation Is Per Request</h2>
+<p>A client that supports form-mode elicitation declares:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"io.modelcontextprotocol/clientCapabilities"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"elicitation"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token property">"form"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<p>An empty elicitation capability, <code class="inline-code">&quot;elicitation&quot;: {}</code>, remains equivalent to form-only support for compatibility. Explicit <code class="inline-code">&quot;elicitation&quot;: {&quot;form&quot;: {}}</code> also supports form mode. A URL-only declaration, <code class="inline-code">&quot;elicitation&quot;: {&quot;url&quot;: {}}</code>, does not. The server must not embed a mode absent from the current request&#39;s capabilities, even if an earlier request advertised it.</p>
+<p>Every request also carries <code class="inline-code">io.modelcontextprotocol/protocolVersion</code>. A missing or non-string version returns <code class="inline-code">-32602</code>. An unsupported string returns <code class="inline-code">-32022</code> with exact <code class="inline-code">supported</code> and <code class="inline-code">requested</code> data. Missing or URL-only elicitation support returns <code class="inline-code">-32021</code> with <code class="inline-code">data.requiredCapabilities</code> set to <code class="inline-code">{&quot;elicitation&quot;:{&quot;form&quot;:{}}}</code>.</p>
+<p>An envelope without a JSON-RPC <code class="inline-code">id</code> is a notification. Process it without emitting a JSON-RPC success or error response. On Streamable HTTP, an accepted notification receives <code class="inline-code">202 Accepted</code> with no body.</p>
+<p><code class="inline-code">clientInfo</code> should be included for diagnostics, but it is self-reported and cannot identify the user for authorization.</p>
+<p>The server implements <code class="inline-code">server/discover</code> and returns <code class="inline-code">supportedVersions</code>, capabilities, <code class="inline-code">ttlMs</code>, and <code class="inline-code">cacheScope</code> with <code class="inline-code">resultType: &quot;complete&quot;</code>. It does not advertise Roots for this modern design. Because it advertises tools, it also implements mandatory <code class="inline-code">tools/list</code>. That result returns the deterministic <code class="inline-code">notes_delete</code> descriptor, a valid object <code class="inline-code">inputSchema</code>, server identity metadata, and public cache hints.</p>
+<h2 id="form-mode" class="prose-h prose-h2"><a class="prose-h__anchor" href="#form-mode" aria-label="Link to this section">#</a>Form Mode</h2>
+<p>Form mode uses a restricted JSON Schema designed for usable dialogs. The root is an object and its properties are flat primitive fields or supported enum arrays. Deeply nested objects and general-purpose document schemas do not belong in a confirmation dialog.</p>
+<p>Use form mode for:</p>
+<ul>
+<li>choosing one of several candidates;</li>
+<li>confirming a destructive operation;</li>
+<li>collecting non-sensitive preferences;</li>
+<li>gathering a small number of values the user, not the model, must decide.</li>
+</ul>
+<p>Do not use form mode for passwords, API keys, access tokens, or payment credentials. Those secrets would pass through the MCP client and could reach logs or model context.</p>
+<p>The server validates the returned content again. Client-side form validation improves UX but does not create trust.</p>
+<h2 id="url-mode" class="prose-h prose-h2"><a class="prose-h__anchor" href="#url-mode" aria-label="Link to this section">#</a>URL Mode</h2>
+<p>URL mode sends a secure web URL for an out-of-band interaction:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"method"</span><span class="token operator">:</span> <span class="token string">"elicitation/create"</span><span class="token punctuation">,</span>
+  <span class="token property">"params"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"mode"</span><span class="token operator">:</span> <span class="token string">"url"</span><span class="token punctuation">,</span>
+    <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Connect the report service to continue."</span><span class="token punctuation">,</span>
+    <span class="token property">"url"</span><span class="token operator">:</span> <span class="token string">"https://mcp.example.com/connect/report-service"</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<p>Use it when sensitive information must go directly to a server-controlled web flow, such as third-party authorization. The client shows the full destination and obtains consent before opening it. It must not prefetch the URL.</p>
+<p>An <code class="inline-code">accept</code> response means the user agreed to open the URL. It does not prove the external flow completed. On retry, the server checks its own state and either completes or returns another <code class="inline-code">input_required</code> result.</p>
+<p>URL elicitation is not a replacement for authorization between the MCP client and MCP server. It is for an external interaction the MCP server needs to perform on the user&#39;s behalf. The server must bind the browser user to the same authenticated principal that began the MCP operation.</p>
+<h2 id="response-branches" class="prose-h prose-h2"><a class="prose-h__anchor" href="#response-branches" aria-label="Link to this section">#</a>Response Branches</h2>
+<p>Treat the actions as product decisions, not aliases:</p>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Meaning</th>
+<th>Safe server behavior</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code class="inline-code">accept</code></td>
+<td>User submitted the interaction</td>
+<td>Validate content and continue</td>
+</tr>
+<tr>
+<td><code class="inline-code">decline</code></td>
+<td>User explicitly refused</td>
+<td>Return a complete, non-error refusal outcome</td>
+</tr>
+<tr>
+<td><code class="inline-code">cancel</code></td>
+<td>User dismissed or could not finish</td>
+<td>Stop safely and allow a later retry</td>
+</tr>
+</tbody></table>
+<p>Never interpret missing content as consent. Never convert decline into a repeated prompt loop.</p>
+<h2 id="protecting-destructive-mrtr-state" class="prose-h prose-h2"><a class="prose-h__anchor" href="#protecting-destructive-mrtr-state" aria-label="Link to this section">#</a>Protecting Destructive MRTR State</h2>
+<p>The candidate list cannot live only in a prompt or unsigned Base64 value. A client controls everything it sends back.</p>
+<p>The lesson signs a state payload containing:</p>
+<ul>
+<li>authenticated principal;</li>
+<li>originating method;</li>
+<li>digest of <code class="inline-code">workspaceUri</code> and <code class="inline-code">title</code>;</li>
+<li>allowed note ids shown in the form;</li>
+<li>operation phase;</li>
+<li>short expiry.</li>
+</ul>
+<p>Before mutation, the server also checks the live note record. This catches deletion races and a target moved outside the workspace after the form was shown.</p>
+<p>For a one-time financial or irreversible action, HMAC alone does not prevent a valid state from being replayed within its expiry. Store and consume a nonce exactly once in a replay store shared by every handler instance. The lesson injects a bounded, TTL-pruned store and holds its atomic claim while performing the in-memory deletion. A production database should couple the nonce claim and mutation in one transaction or equivalent conditional-write boundary.</p>
+<p>Validate the interaction before claiming the nonce. A malformed response or <code class="inline-code">cancel</code> performs no mutation and leaves the state retryable until expiry. An explicit <code class="inline-code">decline</code> is terminal, so the lesson consumes the nonce without deleting anything.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="t3-roots-boundary"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">t3-roots-boundary</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> t3 roots boundary</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<p><code class="inline-code">code/main.py</code> demonstrates a modern <code class="inline-code">notes_delete</code> tool:</p>
+<ul>
+<li><code class="inline-code">tools/list</code> returns a deterministic, cacheable descriptor with the required workspace and title schema.</li>
+<li>Scope is an explicit <code class="inline-code">workspaceUri</code> argument.</li>
+<li>Server configuration authorizes that workspace for the lesson principal.</li>
+<li>URI normalization rejects prefix confusion and encoded traversal.</li>
+<li>Every destructive deletion requires form-mode elicitation.</li>
+<li>The elicitation travels inside <code class="inline-code">resultType: &quot;input_required&quot;</code>.</li>
+<li>Signed <code class="inline-code">requestState</code> binds the exact candidate list and original arguments.</li>
+<li>An injected replay store rejects the same accepted or declined state across server instances.</li>
+<li>The retry uses a fresh request id and returns <code class="inline-code">resultType: &quot;complete&quot;</code>.</li>
+</ul>
+<p>The data store is in memory so the protocol behavior is easy to inspect. The security rules remain the same with a database.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>From the repository root:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">bash</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-bash"><span class="token builtin class-name">cd</span> phases/13-tools-and-protocols/12-mcp-roots-and-elicitation/code
+python3 main.py
+python3 <span class="token parameter variable">-m</span> unittest discover tests <span class="token parameter variable">-v</span></code></pre>
+</figure>
+<p>Expected checkpoints:</p>
+<ul>
+<li>Discovery advertises tools without Roots.</li>
+<li>Tool discovery returns <code class="inline-code">notes_delete</code> with <code class="inline-code">resultType</code>, server identity, and cache hints.</li>
+<li>Request id <code class="inline-code">1</code> returns the form in <code class="inline-code">inputRequests.delete_choice</code>.</li>
+<li>Request id <code class="inline-code">2</code> echoes the signed state and completes the deletion.</li>
+<li>A prefix path and an encoded traversal path both fail containment.</li>
+<li>A changed title cannot reuse the original confirmation state.</li>
+<li>A decline leaves the note unchanged.</li>
+<li>Two server objects sharing note and replay state cannot both execute one confirmation.</li>
+<li>Empty and explicit form declarations work, while URL-only support returns exact <code class="inline-code">-32021</code> form requirements.</li>
+<li>Unsupported version failures use the exact <code class="inline-code">-32022</code> data shape.</li>
+<li>An id-less notification produces no JSON-RPC response.</li>
+</ul>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p><code class="inline-code">outputs/skill-elicitation-form-designer.md</code> designs the explicit scope, authorization checks, MRTR form, response branches, and state binding. It refuses to treat deprecated Roots as a sandbox or to collect secrets through form mode.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li>Replace the in-memory replay store with SQLite. Use one transaction to claim the nonce and delete the note, then prove two processes cannot both commit.</li>
+<li>Add <code class="inline-code">url</code> capability negotiation and an out-of-band setup flow. Keep third-party credentials out of <code class="inline-code">inputResponses</code>.</li>
+<li>Replace the in-memory note map with a temporary SQLite database. Re-check authorization and containment inside the mutation transaction.</li>
+<li>Add a symbolic-link policy for a real filesystem implementation. Explain why URI lexical containment alone cannot stop a symlink escape.</li>
+<li>Design a 2025-11-25 adapter that maps modern MRTR handler output to legacy server-initiated elicitation. Keep it isolated from the current handler.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning in 2026-07-28</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Roots</td>
+<td>Deprecated informational workspace hints, not authorization or sandboxing</td>
+</tr>
+<tr>
+<td>Explicit scope</td>
+<td>Workspace, directory, or resource handle visible in request arguments</td>
+</tr>
+<tr>
+<td>Containment</td>
+<td>Normalized path-component check that keeps a target inside a boundary</td>
+</tr>
+<tr>
+<td>Elicitation</td>
+<td>Client feature for obtaining user input during an MCP operation</td>
+</tr>
+<tr>
+<td>Form mode</td>
+<td>In-band structured user input using a restricted flat schema</td>
+</tr>
+<tr>
+<td>URL mode</td>
+<td>Out-of-band interaction for sensitive or external workflows</td>
+</tr>
+<tr>
+<td>MRTR</td>
+<td>Stateless input-required result followed by a fresh retry</td>
+</tr>
+<tr>
+<td><code class="inline-code">requestState</code></td>
+<td>Opaque state echoed exactly and integrity-checked by the server</td>
+</tr>
+<tr>
+<td>Decline</td>
+<td>Explicit user refusal</td>
+</tr>
+<tr>
+<td>Cancel</td>
+<td>Dismissal or incomplete interaction without approval</td>
+</tr>
+</tbody></table>
+<h2 id="legacy-compatibility" class="prose-h prose-h2"><a class="prose-h__anchor" href="#legacy-compatibility" aria-label="Link to this section">#</a>Legacy Compatibility</h2>
+<p>For a peer pinned to 2025-11-25, <code class="inline-code">roots/list</code>, <code class="inline-code">notifications/roots/list_changed</code>, and live server-initiated <code class="inline-code">elicitation/create</code> may still exist. Label that adapter legacy. Do not allow a legacy Root list to bypass server authorization, and do not carry protocol-session assumptions into the modern handler.</p>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/client/elicitation" target="_blank" rel="noopener">MCP 2026-07-28 Elicitation</a></li>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/mrtr" target="_blank" rel="noopener">MCP 2026-07-28 Multi Round-Trip Requests</a></li>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/client/roots" target="_blank" rel="noopener">MCP 2026-07-28 Roots deprecation</a></li>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/server/discover" target="_blank" rel="noopener">MCP 2026-07-28 server discovery</a></li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="11-mcp-sampling.html">
+  <span class="label">← Previous</span>
+  <b>MCP Model Input: Sampling Migration and Stateless MRTR</b>
+</a>
+      <a class="pager__item pager__item--next" href="13-mcp-async-tasks.html">
+  <span class="label">Next →</span>
+  <b>MCP Tasks Extension: Durable Work on a Stateless Core</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>8 minutes</b> of Tools &amp; Protocols behind you.</p>
+      <a class="btn btn--solid" href="13-mcp-async-tasks.html">Continue to MCP Tasks Extension: Durable Work on a Stateless Core →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#two-problems-that-look-similar">Two Problems That Look Similar</a></li><li class="mini__item mini__item--d2"><a href="#roots-are-a-migration-surface">Roots Are a Migration Surface</a></li><li class="mini__item mini__item--d3"><a href="#the-three-layer-rule">The three-layer rule</a></li><li class="mini__item mini__item--d2"><a href="#elicitation-still-exists-but-delivery-changed">Elicitation Still Exists, but Delivery Changed</a></li><li class="mini__item mini__item--d2"><a href="#capability-negotiation-is-per-request">Capability Negotiation Is Per Request</a></li><li class="mini__item mini__item--d2"><a href="#form-mode">Form Mode</a></li><li class="mini__item mini__item--d2"><a href="#url-mode">URL Mode</a></li><li class="mini__item mini__item--d2"><a href="#response-branches">Response Branches</a></li><li class="mini__item mini__item--d2"><a href="#protecting-destructive-mrtr-state">Protecting Destructive MRTR State</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#legacy-compatibility">Legacy Compatibility</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

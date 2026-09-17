@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenTelemetry GenAI — Tracing Tool Calls End-to-End — Tools &amp; Protocols — AIFS</title>
+<meta name="description" content="Tools &amp; Protocols: OpenTelemetry GenAI — Tracing Tool Calls End-to-End. 4 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="OpenTelemetry GenAI — Tracing Tool Calls End-to-End — Tools &amp; Protocols — AIFS">
+<meta property="og:description" content="Tools &amp; Protocols: OpenTelemetry GenAI — Tracing Tool Calls End-to-End. 4 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"t3-span-waterfall":["../assets/figures/figures-tools3.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-tools3.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#C6FF00" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#C6FF00;--accent-ink:#111111"
+  data-lesson-id="tools-and-protocols/20-opentelemetry-genai" data-module="tools-and-protocols"
+  data-prev="19-a2a-protocol.html" data-next="21-llm-routing-layer.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#C6FF00">
+        <span class="label">Phase 13</span>
+        <b>Tools &amp; Protocols</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="tools-and-protocols/01-the-tool-interface"><a href="01-the-tool-interface.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">The Tool Interface — Why Agents Need Structured I/O</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/02-function-calling-deep-dive"><a href="02-function-calling-deep-dive.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Function Calling Deep Dive — OpenAI, Anthropic, Gemini</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/03-parallel-and-streaming-tool-calls"><a href="03-parallel-and-streaming-tool-calls.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Parallel Tool Calls and Streaming with Tools</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/04-structured-output"><a href="04-structured-output.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Structured Output — JSON Schema, Pydantic, Zod, Constrained Decoding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/05-tool-schema-design"><a href="05-tool-schema-design.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Tool Schema Design — Naming, Descriptions, Parameter Constraints</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/06-mcp-fundamentals"><a href="06-mcp-fundamentals.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">MCP Fundamentals: Stateless Requests and JSON-RPC</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/07-building-an-mcp-server"><a href="07-building-an-mcp-server.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Building an MCP Server: Stateless Python and TypeScript</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/08-building-an-mcp-client"><a href="08-building-an-mcp-client.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Building an MCP Client: Discovery, Routing, and Dual-Era Fallback</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/09-mcp-transports"><a href="09-mcp-transports.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">MCP Transports: stdio and Stateless Streamable HTTP</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/10-mcp-resources-and-prompts"><a href="10-mcp-resources-and-prompts.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">MCP Resources and Prompts: Addressable Context for Stateless Servers</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/11-mcp-sampling"><a href="11-mcp-sampling.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">MCP Model Input: Sampling Migration and Stateless MRTR</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/12-mcp-roots-and-elicitation"><a href="12-mcp-roots-and-elicitation.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Explicit Scope and Stateless Elicitation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/13-mcp-async-tasks"><a href="13-mcp-async-tasks.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">MCP Tasks Extension: Durable Work on a Stateless Core</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/14-mcp-apps"><a href="14-mcp-apps.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">MCP Apps on the Stateless Protocol</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/15-mcp-security-tool-poisoning"><a href="15-mcp-security-tool-poisoning.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">MCP Security: Poisoned Metadata, Routing, and MRTR State</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/16-mcp-security-oauth-2-1"><a href="16-mcp-security-oauth-2-1.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">MCP Authorization: CIMD, Issuer Binding, PKCE, and Step-Up</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/17-mcp-gateways-and-registries"><a href="17-mcp-gateways-and-registries.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Stateless MCP Gateways and Registry Admission</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/18-mcp-auth-production"><a href="18-mcp-auth-production.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">MCP Auth in Production: Issuer-Bound Enrollment and Tokens</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/19-a2a-protocol"><a href="19-a2a-protocol.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">A2A — Agent-to-Agent Protocol</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/20-opentelemetry-genai"><a href="20-opentelemetry-genai.html" class="is-current">
+  <span class="snav__n">20</span>
+  <span class="snav__t">OpenTelemetry GenAI — Tracing Tool Calls End-to-End</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/21-llm-routing-layer"><a href="21-llm-routing-layer.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">LLM Routing Layer — LiteLLM, OpenRouter, Portkey</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/22-skills-and-agent-sdks"><a href="22-skills-and-agent-sdks.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Agent Skills: Portable Contract and Runtime Boundary</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/23-capstone-tool-ecosystem"><a href="23-capstone-tool-ecosystem.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Capstone: Stateless Tool Ecosystem</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/24-skill-discovery-and-progressive-disclosure"><a href="24-skill-discovery-and-progressive-disclosure.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Skill Discovery and Progressive Disclosure</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/25-skill-invocation-and-routing"><a href="25-skill-invocation-and-routing.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Skill Invocation and Routing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/26-skill-permissions-sandboxes-and-trust"><a href="26-skill-permissions-sandboxes-and-trust.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Skill Permissions, Sandboxes, and Trust</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/27-skill-evals-packaging-and-portability"><a href="27-skill-evals-packaging-and-portability.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">Skill Evals, Packaging, and Portability</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/28-mcp-tool-contracts-and-content"><a href="28-mcp-tool-contracts-and-content.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">MCP Tool Contracts and Content</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control"><a href="29-mcp-reliability-cancellation-and-flow-control.html" class="">
+  <span class="snav__n">29</span>
+  <span class="snav__t">MCP Reliability, Cancellation, and Flow Control</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/30-mcp-registry-supply-chain-and-drift"><a href="30-mcp-registry-supply-chain-and-drift.html" class="">
+  <span class="snav__n">30</span>
+  <span class="snav__t">MCP Registry Supply Chain: Admission, Drift, and Rollback</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/31-mcp-conformance-versioning-and-operations"><a href="31-mcp-conformance-versioning-and-operations.html" class="">
+  <span class="snav__n">31</span>
+  <span class="snav__t">MCP Conformance Engineering: Versioning, Evidence, and Operations</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Tools &amp; Protocols</a></p>
+      <h1 class="page__title">OpenTelemetry GenAI — Tracing Tool Calls End-to-End</h1>
+      <p class="page__lede">An agent calls five tools, three MCP servers, and two sub-agents. You need one trace across all of it. The OpenTelemetry GenAI semantic conventions (stable attributes in v1.37 and up) are the 2026 standard, natively supported by Datadog, Langfuse, Arize Phoenix, OpenLLMetry, and AgentOps. This lesson names the required attributes, walks the span hierarchy (agent → LLM → tool), and ships a stdlib span emitter you can plug into any OTel exporter.</p>
+      <div class="page__meta">
+        <span class="chip">4 min read</span>
+        <span class="chip">972 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (stdlib, OTel span emitter)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 13 · 07 (MCP server), Phase 13 · 08 (MCP client)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Name the required OTel GenAI attributes for an LLM span and a tool-execution span.</li>
+<li>Build a trace hierarchy that covers agent loop, LLM call, tool call, and MCP client dispatch.</li>
+<li>Decide what content to capture (opt-in) vs redact (defaults).</li>
+<li>Emit spans to a local collector (Jaeger, Langfuse) without rewriting tool code.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>A debug from February 2026: user reports &quot;my agent sometimes takes 30 seconds to respond; other times 3 seconds.&quot; No traces. Logs show the LLM call, but not the tool dispatch, not the MCP server round-trip, not the sub-agent. You guess. Eventually you find: one MCP server occasionally hangs on a cold-start.</p>
+<p>Without end-to-end tracing, you cannot find this. OTel GenAI fixes it.</p>
+<p>The conventions settled in 2025-2026 under the OpenTelemetry semantic-conventions group. They define stable attribute names so Datadog, Langfuse, Phoenix, OpenLLMetry, and AgentOps all parse the same spans. Instrument once; ship to any backend.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="span-hierarchy" class="prose-h prose-h3"><a class="prose-h__anchor" href="#span-hierarchy" aria-label="Link to this section">#</a>Span hierarchy</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>agent.invoke_agent  (top, INTERNAL span)
+ ├── llm.chat       (CLIENT span)
+ ├── tool.execute   (INTERNAL)
+ │    └── mcp.call  (CLIENT span)
+ ├── llm.chat       (CLIENT span)
+ └── subagent.invoke (INTERNAL)</code></pre>
+</figure>
+<p>The whole thing nests under one trace id. Span ids link the parent-child relationships.</p>
+<h3 id="required-attributes" class="prose-h prose-h3"><a class="prose-h__anchor" href="#required-attributes" aria-label="Link to this section">#</a>Required attributes</h3>
+<p>Per the 2025-2026 semconv:</p>
+<ul>
+<li><code class="inline-code">gen_ai.operation.name</code> — <code class="inline-code">&quot;chat&quot;</code>, <code class="inline-code">&quot;text_completion&quot;</code>, <code class="inline-code">&quot;embeddings&quot;</code>, <code class="inline-code">&quot;execute_tool&quot;</code>, <code class="inline-code">&quot;invoke_agent&quot;</code>.</li>
+<li><code class="inline-code">gen_ai.provider.name</code> — <code class="inline-code">&quot;openai&quot;</code>, <code class="inline-code">&quot;anthropic&quot;</code>, <code class="inline-code">&quot;google&quot;</code>, <code class="inline-code">&quot;azure_openai&quot;</code>.</li>
+<li><code class="inline-code">gen_ai.request.model</code> — requested model string (e.g. <code class="inline-code">&quot;gpt-4o-2024-08-06&quot;</code>).</li>
+<li><code class="inline-code">gen_ai.response.model</code> — the model actually served.</li>
+<li><code class="inline-code">gen_ai.usage.input_tokens</code> / <code class="inline-code">gen_ai.usage.output_tokens</code>.</li>
+<li><code class="inline-code">gen_ai.response.id</code> — provider response id for correlation.</li>
+</ul>
+<p>For tool spans:</p>
+<ul>
+<li><code class="inline-code">gen_ai.tool.name</code> — tool identifier.</li>
+<li><code class="inline-code">gen_ai.tool.call.id</code> — the specific call id.</li>
+<li><code class="inline-code">gen_ai.tool.description</code> — tool description (optional).</li>
+</ul>
+<p>For agent spans:</p>
+<ul>
+<li><code class="inline-code">gen_ai.agent.name</code> / <code class="inline-code">gen_ai.agent.id</code> / <code class="inline-code">gen_ai.agent.description</code>.</li>
+</ul>
+<h3 id="span-kinds" class="prose-h prose-h3"><a class="prose-h__anchor" href="#span-kinds" aria-label="Link to this section">#</a>Span kinds</h3>
+<ul>
+<li><code class="inline-code">SpanKind.CLIENT</code> for calls crossing a process boundary (LLM provider, MCP server).</li>
+<li><code class="inline-code">SpanKind.INTERNAL</code> for the agent&#39;s own loop steps and tool execution.</li>
+</ul>
+<h3 id="opt-in-content-capture" class="prose-h prose-h3"><a class="prose-h__anchor" href="#opt-in-content-capture" aria-label="Link to this section">#</a>Opt-in content capture</h3>
+<p>By default, spans carry metrics and timing — not prompts or completions. Large payloads and PII are off by default. Set <code class="inline-code">OTEL_SEMCONV_STABILITY_OPT_IN=gen_ai_latest_experimental</code> and specific content-capture env vars to include content. Review carefully before enabling in prod.</p>
+<h3 id="events-on-spans" class="prose-h prose-h3"><a class="prose-h__anchor" href="#events-on-spans" aria-label="Link to this section">#</a>Events on spans</h3>
+<p>Token-level events can be added as span events:</p>
+<ul>
+<li><code class="inline-code">gen_ai.content.prompt</code> — input messages.</li>
+<li><code class="inline-code">gen_ai.content.completion</code> — output messages.</li>
+<li><code class="inline-code">gen_ai.content.tool_call</code> — tool call as recorded.</li>
+</ul>
+<p>Events time-order within a span for detailed replay.</p>
+<h3 id="exporters" class="prose-h prose-h3"><a class="prose-h__anchor" href="#exporters" aria-label="Link to this section">#</a>Exporters</h3>
+<p>OTel spans export to:</p>
+<ul>
+<li><strong>Jaeger / Tempo.</strong> OSS, on-prem.</li>
+<li><strong>Langfuse.</strong> LLM-observability-specific; visualizes token usage.</li>
+<li><strong>Arize Phoenix.</strong> Evals + tracing combined.</li>
+<li><strong>Datadog.</strong> Commercial; natively parses <code class="inline-code">gen_ai.*</code> attributes.</li>
+<li><strong>Honeycomb.</strong> Column-oriented; query-friendly.</li>
+</ul>
+<p>All speak OTLP, the wire format. Your code does not care.</p>
+<h3 id="propagation-across-mcp" class="prose-h prose-h3"><a class="prose-h__anchor" href="#propagation-across-mcp" aria-label="Link to this section">#</a>Propagation across MCP</h3>
+<p>When an MCP client calls a server, inject the W3C traceparent header into the request. Streamable HTTP supports standard headers. Stdio does not carry HTTP headers natively; the spec&#39;s 2026 roadmap discusses adding a <code class="inline-code">_meta.traceparent</code> field on JSON-RPC calls.</p>
+<p>Until that ships: include the traceparent in the <code class="inline-code">_meta</code> of every request manually. Server logs the trace id.</p>
+<h3 id="metrics" class="prose-h prose-h3"><a class="prose-h__anchor" href="#metrics" aria-label="Link to this section">#</a>Metrics</h3>
+<p>Alongside spans, the GenAI semconv defines metrics:</p>
+<ul>
+<li><code class="inline-code">gen_ai.client.token.usage</code> — histogram.</li>
+<li><code class="inline-code">gen_ai.client.operation.duration</code> — histogram.</li>
+<li><code class="inline-code">gen_ai.tool.execution.duration</code> — histogram.</li>
+</ul>
+<p>Use these for dashboards that do not need per-call detail.</p>
+<h3 id="agentops-layer" class="prose-h prose-h3"><a class="prose-h__anchor" href="#agentops-layer" aria-label="Link to this section">#</a>AgentOps layer</h3>
+<p>AgentOps (founded 2024) specializes in GenAI observability. It wraps popular frameworks (LangGraph, Pydantic AI, CrewAI) to emit OTel spans automatically. Useful if your stack uses a supported framework; use manual instrumentation otherwise.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="t3-span-waterfall"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">t3-span-waterfall</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> t3 span waterfall</figcaption>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p><code class="inline-code">code/main.py</code> emits OTel-shaped spans to stdout (in OTLP-JSON-like format) for an agent that calls an LLM, dispatches two tools, and makes one MCP round-trip. No real exporter — the lesson focuses on the span shape and attribute set. Paste the output into an OTLP-compatible viewer or just read it.</p>
+<p>What to look at:</p>
+<ul>
+<li>Trace id is shared across all spans.</li>
+<li>Parent-child links are encoded via <code class="inline-code">parentSpanId</code>.</li>
+<li>Required <code class="inline-code">gen_ai.*</code> attributes are populated.</li>
+<li>Content capture is off by default; one scenario turns it on via env var.</li>
+</ul>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces <code class="inline-code">outputs/skill-otel-genai-instrumentation.md</code>. Given an agent codebase, the skill produces an instrumentation plan: where to add spans, which attributes to populate, and which exporters to target.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p>Run <code class="inline-code">code/main.py</code>. Count the spans and identify which is CLIENT vs INTERNAL.</p>
+</li>
+<li><p>Turn on content capture (env var) and confirm <code class="inline-code">gen_ai.content.prompt</code> and <code class="inline-code">gen_ai.content.completion</code> events appear. Note the implications for PII.</p>
+</li>
+<li><p>Add the tool-execution metric <code class="inline-code">gen_ai.tool.execution.duration</code> and emit it as a histogram sample per call.</p>
+</li>
+<li><p>Propagate a traceparent from a parent agent span into an MCP request&#39;s <code class="inline-code">_meta.traceparent</code> field. Verify the MCP server would see the same trace id.</p>
+</li>
+<li><p>Read the OTel GenAI semconv spec. Identify one attribute listed in the semconv that this lesson&#39;s code does NOT emit. Add it.</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>OTel</td>
+<td>&quot;OpenTelemetry&quot;</td>
+<td>Open standard for traces, metrics, logs</td>
+</tr>
+<tr>
+<td>GenAI semconv</td>
+<td>&quot;GenAI semantic conventions&quot;</td>
+<td>Stable attribute names for LLM / tool / agent spans</td>
+</tr>
+<tr>
+<td><code class="inline-code">gen_ai.*</code></td>
+<td>&quot;The attribute namespace&quot;</td>
+<td>All GenAI attributes share this prefix</td>
+</tr>
+<tr>
+<td>Span</td>
+<td>&quot;Timed operation&quot;</td>
+<td>A unit of work with a start, end, and attributes</td>
+</tr>
+<tr>
+<td>Trace</td>
+<td>&quot;Cross-span ancestry&quot;</td>
+<td>Tree of spans sharing a trace id</td>
+</tr>
+<tr>
+<td>SpanKind</td>
+<td>&quot;CLIENT / SERVER / INTERNAL&quot;</td>
+<td>Hints about span direction</td>
+</tr>
+<tr>
+<td>OTLP</td>
+<td>&quot;OpenTelemetry Line Protocol&quot;</td>
+<td>Wire format for exporters</td>
+</tr>
+<tr>
+<td>Opt-in content</td>
+<td>&quot;Prompt / completion capture&quot;</td>
+<td>Off by default; env var to enable</td>
+</tr>
+<tr>
+<td>traceparent</td>
+<td>&quot;W3C header&quot;</td>
+<td>Propagates trace context across services</td>
+</tr>
+<tr>
+<td>Exporter</td>
+<td>&quot;Backend-specific shipper&quot;</td>
+<td>Component that sends spans to Jaeger / Datadog / etc.</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://opentelemetry.io/docs/specs/semconv/gen-ai/" target="_blank" rel="noopener">OpenTelemetry — GenAI semconv</a> — canonical conventions for GenAI spans, metrics, and events</li>
+<li><a href="https://opentelemetry.io/docs/specs/semconv/gen-ai/gen-ai-spans/" target="_blank" rel="noopener">OpenTelemetry — GenAI spans</a> — LLM and tool-execution span attribute list</li>
+<li><a href="https://opentelemetry.io/docs/specs/semconv/gen-ai/gen-ai-agent-spans/" target="_blank" rel="noopener">OpenTelemetry — GenAI agent spans</a> — agent-level <code class="inline-code">invoke_agent</code> span</li>
+<li><a href="https://github.com/open-telemetry/semantic-conventions/blob/main/docs/gen-ai/gen-ai-spans.md" target="_blank" rel="noopener">open-telemetry/semantic-conventions — GenAI spans</a> — GitHub-hosted source of truth</li>
+<li><a href="https://www.datadoghq.com/blog/llm-otel-semantic-convention/" target="_blank" rel="noopener">Datadog — LLM OTel semantic convention</a> — production integration walkthrough</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="19-a2a-protocol.html">
+  <span class="label">← Previous</span>
+  <b>A2A — Agent-to-Agent Protocol</b>
+</a>
+      <a class="pager__item pager__item--next" href="21-llm-routing-layer.html">
+  <span class="label">Next →</span>
+  <b>LLM Routing Layer — LiteLLM, OpenRouter, Portkey</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>4 minutes</b> of Tools &amp; Protocols behind you.</p>
+      <a class="btn btn--solid" href="21-llm-routing-layer.html">Continue to LLM Routing Layer — LiteLLM, OpenRouter, Portkey →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#span-hierarchy">Span hierarchy</a></li><li class="mini__item mini__item--d3"><a href="#required-attributes">Required attributes</a></li><li class="mini__item mini__item--d3"><a href="#span-kinds">Span kinds</a></li><li class="mini__item mini__item--d3"><a href="#opt-in-content-capture">Opt-in content capture</a></li><li class="mini__item mini__item--d3"><a href="#events-on-spans">Events on spans</a></li><li class="mini__item mini__item--d3"><a href="#exporters">Exporters</a></li><li class="mini__item mini__item--d3"><a href="#propagation-across-mcp">Propagation across MCP</a></li><li class="mini__item mini__item--d3"><a href="#metrics">Metrics</a></li><li class="mini__item mini__item--d3"><a href="#agentops-layer">AgentOps layer</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

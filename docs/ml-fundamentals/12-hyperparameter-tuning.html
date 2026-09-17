@@ -1,0 +1,871 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hyperparameter Tuning — ML Fundamentals — AIFS</title>
+<meta name="description" content="ML Fundamentals: Hyperparameter Tuning. 11 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Hyperparameter Tuning — ML Fundamentals — AIFS">
+<meta property="og:description" content="ML Fundamentals: Hyperparameter Tuning. 11 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"k-fold-cv":["../assets/figures/figures-ml.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-ml.js"];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#00D4A0" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#00D4A0;--accent-ink:#111111"
+  data-lesson-id="ml-fundamentals/12-hyperparameter-tuning" data-module="ml-fundamentals"
+  data-prev="11-ensemble-methods.html" data-next="13-ml-pipelines.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#00D4A0">
+        <span class="label">Phase 02</span>
+        <b>ML Fundamentals</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="ml-fundamentals/01-what-is-machine-learning"><a href="01-what-is-machine-learning.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">What Is Machine Learning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/02-linear-regression"><a href="02-linear-regression.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Linear Regression</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/03-logistic-regression"><a href="03-logistic-regression.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Logistic Regression</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/04-decision-trees"><a href="04-decision-trees.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Decision Trees and Random Forests</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/05-support-vector-machines"><a href="05-support-vector-machines.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Support Vector Machines</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/06-knn-and-distances"><a href="06-knn-and-distances.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">K-Nearest Neighbors and Distances</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/07-unsupervised-learning"><a href="07-unsupervised-learning.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Unsupervised Learning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/08-feature-engineering"><a href="08-feature-engineering.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Feature Engineering &amp; Selection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/09-model-evaluation"><a href="09-model-evaluation.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Model Evaluation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/10-bias-variance"><a href="10-bias-variance.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Bias-Variance Tradeoff</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/11-ensemble-methods"><a href="11-ensemble-methods.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Ensemble Methods</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/12-hyperparameter-tuning"><a href="12-hyperparameter-tuning.html" class="is-current">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Hyperparameter Tuning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/13-ml-pipelines"><a href="13-ml-pipelines.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">ML Pipelines</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/14-naive-bayes"><a href="14-naive-bayes.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Naive Bayes</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/15-time-series"><a href="15-time-series.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Time Series Fundamentals</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/16-anomaly-detection"><a href="16-anomaly-detection.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Anomaly Detection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/17-imbalanced-data"><a href="17-imbalanced-data.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Handling Imbalanced Data</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/18-feature-selection"><a href="18-feature-selection.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Feature Selection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">ML Fundamentals</a></p>
+      <h1 class="page__title">Hyperparameter Tuning</h1>
+      <p class="page__lede">Hyperparameters are the knobs you turn before training starts. Turning them well is the difference between a mediocre model and a great one.</p>
+      <div class="page__meta">
+        <span class="chip">11 min read</span>
+        <span class="chip">2,372 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Language</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 2, Lesson 11 (Ensemble Methods)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~90 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Implement grid search, random search, and Bayesian optimization from scratch and compare their sample efficiency</li>
+<li>Explain why random search outperforms grid search when most hyperparameters have low effective dimensionality</li>
+<li>Build a Bayesian optimization loop using a surrogate model and acquisition function to guide the search</li>
+<li>Design a hyperparameter tuning strategy that avoids overfitting the validation set through proper cross-validation</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Your gradient boosting model has a learning rate, number of trees, max depth, min samples per leaf, subsample ratio, and column sample ratio. That is six hyperparameters. If each has 5 reasonable values, the grid has 5^6 = 15,625 combinations. Training each takes 10 seconds. That is 43 hours of compute to try them all.</p>
+<p>Grid search is the obvious approach and the worst one at scale. Random search does better with less compute. Bayesian optimization does even better by learning from past evaluations. Knowing which strategy to use, and which hyperparameters actually matter, saves days of wasted GPU time.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="parameters-vs-hyperparameters" class="prose-h prose-h3"><a class="prose-h__anchor" href="#parameters-vs-hyperparameters" aria-label="Link to this section">#</a>Parameters vs Hyperparameters</h3>
+<p>Parameters are learned during training (weights, biases, split thresholds). Hyperparameters are set before training starts and control how learning happens.</p>
+<table>
+<thead>
+<tr>
+<th>Hyperparameter</th>
+<th>What it controls</th>
+<th>Typical range</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Learning rate</td>
+<td>Step size per update</td>
+<td>0.001 to 1.0</td>
+</tr>
+<tr>
+<td>Number of trees/epochs</td>
+<td>How long to train</td>
+<td>10 to 10,000</td>
+</tr>
+<tr>
+<td>Max depth</td>
+<td>Model complexity</td>
+<td>1 to 30</td>
+</tr>
+<tr>
+<td>Regularization (lambda)</td>
+<td>Overfitting prevention</td>
+<td>0.0001 to 100</td>
+</tr>
+<tr>
+<td>Batch size</td>
+<td>Gradient estimation noise</td>
+<td>16 to 512</td>
+</tr>
+<tr>
+<td>Dropout rate</td>
+<td>Fraction of neurons dropped</td>
+<td>0.0 to 0.5</td>
+</tr>
+</tbody></table>
+<h3 id="grid-search" class="prose-h prose-h3"><a class="prose-h__anchor" href="#grid-search" aria-label="Link to this section">#</a>Grid Search</h3>
+<p>Grid search evaluates every combination of specified values. It is exhaustive and easy to understand, but scales exponentially with the number of hyperparameters.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>Grid for 2 hyperparameters:
+
+  learning_rate: [0.01, 0.1, 1.0]
+  max_depth:     [3, 5, 7]
+
+  Evaluations: 3 x 3 = 9 combinations
+
+  (0.01, 3)  (0.01, 5)  (0.01, 7)
+  (0.1,  3)  (0.1,  5)  (0.1,  7)
+  (1.0,  3)  (1.0,  5)  (1.0,  7)</code></pre>
+</figure>
+<p>Grid search has a fundamental flaw: if one hyperparameter matters and the other does not, most evaluations are wasted. You get only 3 unique values of the important parameter from 9 evaluations.</p>
+<h3 id="random-search" class="prose-h prose-h3"><a class="prose-h__anchor" href="#random-search" aria-label="Link to this section">#</a>Random Search</h3>
+<p>Random search samples hyperparameters from distributions instead of a grid. With the same budget of 9 evaluations, you get 9 unique values of each hyperparameter.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">flowchart LR
+    subgraph Grid Search
+        G1[3 unique learning rates]
+        G2[3 unique max depths]
+        G3[9 total evaluations]
+    end
+
+    subgraph Random Search
+        R1[9 unique learning rates]
+        R2[9 unique max depths]
+        R3[9 total evaluations]
+    end</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>Why random beats grid (Bergstra &amp; Bengio, 2012):</p>
+<ul>
+<li>Most hyperparameters have low effective dimensionality. Only 1-2 of 6 hyperparameters usually matter for a given problem.</li>
+<li>Grid search wastes evaluations on unimportant dimensions.</li>
+<li>Random search covers the important dimensions more densely for the same budget.</li>
+<li>At 60 random trials, you have a 95% chance of finding a point within 5% of the optimum (if one exists in the search space).</li>
+</ul>
+<h3 id="bayesian-optimization" class="prose-h prose-h3"><a class="prose-h__anchor" href="#bayesian-optimization" aria-label="Link to this section">#</a>Bayesian Optimization</h3>
+<p>Random search ignores results. It does not learn that high learning rates cause divergence or that depth 3 consistently outperforms depth 10. Bayesian optimization uses past evaluations to decide where to search next.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">flowchart TD
+    A[Define search space] --&gt; B[Evaluate initial random points]
+    B --&gt; C[Fit surrogate model to results]
+    C --&gt; D[Use acquisition function to pick next point]
+    D --&gt; E[Evaluate the model at that point]
+    E --&gt; F{Budget exhausted?}
+    F --&gt;|No| C
+    F --&gt;|Yes| G[Return best hyperparameters found]</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>The two key components:</p>
+<p><strong>Surrogate model:</strong> A cheap-to-evaluate model (usually a Gaussian process) that approximates the expensive objective function. It gives both a prediction and an uncertainty estimate at any point in the search space.</p>
+<p><strong>Acquisition function:</strong> Decides where to evaluate next by balancing exploitation (search near known good points) and exploration (search where uncertainty is high). Common choices:</p>
+<ul>
+<li><strong>Expected Improvement (EI):</strong> How much improvement over the current best do we expect at this point?</li>
+<li><strong>Upper Confidence Bound (UCB):</strong> Prediction plus a multiple of uncertainty. Higher UCB means either promising or unexplored.</li>
+<li><strong>Probability of Improvement (PI):</strong> What is the probability this point beats the current best?</li>
+</ul>
+<p>Bayesian optimization typically finds better hyperparameters than random search with 2-5x fewer evaluations. The overhead of fitting the surrogate model is negligible compared to training the actual model.</p>
+<h3 id="early-stopping" class="prose-h prose-h3"><a class="prose-h__anchor" href="#early-stopping" aria-label="Link to this section">#</a>Early Stopping</h3>
+<p>Not every training run needs to finish. If a configuration is clearly bad after 10 epochs, stop it and move on. This is early stopping in the context of hyperparameter search.</p>
+<p>Strategies:</p>
+<ul>
+<li><strong>Patience-based:</strong> Stop if validation loss has not improved for N consecutive epochs</li>
+<li><strong>Median pruning:</strong> Stop if the trial&#39;s intermediate result is worse than the median of completed trials at the same step</li>
+<li><strong>Hyperband:</strong> Allocate small budgets to many configurations, then progressively increase budget for the best ones</li>
+</ul>
+<p>Hyperband is particularly effective. It starts 81 configurations with 1 epoch each, keeps the top third, gives them 3 epochs, keeps the top third, and so on. This finds good configurations 10-50x faster than evaluating all configs for the full budget.</p>
+<h3 id="learning-rate-schedulers" class="prose-h prose-h3"><a class="prose-h__anchor" href="#learning-rate-schedulers" aria-label="Link to this section">#</a>Learning Rate Schedulers</h3>
+<p>The learning rate is almost always the most important hyperparameter. Rather than keeping it fixed, schedulers adjust it during training.</p>
+<table>
+<thead>
+<tr>
+<th>Scheduler</th>
+<th>Formula</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Step decay</td>
+<td>Multiply by 0.1 every N epochs</td>
+<td>Classic CNN training</td>
+</tr>
+<tr>
+<td>Cosine annealing</td>
+<td>lr * 0.5 * (1 + cos(pi * t / T))</td>
+<td>Modern default</td>
+</tr>
+<tr>
+<td>Warmup + decay</td>
+<td>Linear increase then cosine decay</td>
+<td>Transformers</td>
+</tr>
+<tr>
+<td>One-cycle</td>
+<td>Increase then decrease over one cycle</td>
+<td>Fast convergence</td>
+</tr>
+<tr>
+<td>Reduce on plateau</td>
+<td>Reduce by factor when metric stalls</td>
+<td>Safe default</td>
+</tr>
+</tbody></table>
+<h3 id="hyperparameter-importance" class="prose-h prose-h3"><a class="prose-h__anchor" href="#hyperparameter-importance" aria-label="Link to this section">#</a>Hyperparameter Importance</h3>
+<p>Not all hyperparameters matter equally. Research on random forests (Probst et al., 2019) and gradient boosting shows consistent patterns:</p>
+<p><strong>High importance:</strong></p>
+<ul>
+<li>Learning rate (always tune first)</li>
+<li>Number of estimators / epochs (use early stopping instead of tuning)</li>
+<li>Regularization strength</li>
+</ul>
+<p><strong>Medium importance:</strong></p>
+<ul>
+<li>Max depth / number of layers</li>
+<li>Min samples per leaf / weight decay</li>
+<li>Subsample ratio</li>
+</ul>
+<p><strong>Low importance:</strong></p>
+<ul>
+<li>Max features (for random forests)</li>
+<li>Specific activation function choice</li>
+<li>Batch size (within reasonable range)</li>
+</ul>
+<p>Tune the important ones first, leave the rest at defaults.</p>
+<h3 id="practical-strategy" class="prose-h prose-h3"><a class="prose-h__anchor" href="#practical-strategy" aria-label="Link to this section">#</a>Practical Strategy</h3>
+<figure class="mermaid-figure">
+  <pre class="mermaid">flowchart TD
+    A[Start with defaults] --&gt; B[Coarse random search: 20-50 trials]
+    B --&gt; C[Identify important hyperparameters]
+    C --&gt; D[Fine random or Bayesian search: 50-100 trials in narrowed space]
+    D --&gt; E[Final model with best hyperparameters]
+    E --&gt; F[Retrain on full training data]</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>The concrete workflow:</p>
+<ol>
+<li><strong>Start with library defaults.</strong> They are chosen by experienced practitioners and are often 80% of the way there.</li>
+<li><strong>Coarse random search.</strong> Wide ranges, 20-50 trials. Use early stopping to kill bad runs fast.</li>
+<li><strong>Analyze results.</strong> Which hyperparameters correlate with performance? Narrow the search space.</li>
+<li><strong>Fine search.</strong> Bayesian optimization or focused random search in the narrowed space. 50-100 trials.</li>
+<li><strong>Retrain on all training data</strong> with the best hyperparameters found.</li>
+</ol>
+<h3 id="cross-validation-integration" class="prose-h prose-h3"><a class="prose-h__anchor" href="#cross-validation-integration" aria-label="Link to this section">#</a>Cross-Validation Integration</h3>
+<p>Tuning hyperparameters on a single validation split is risky. The best hyperparameters might overfit to the specific validation fold. Nested cross-validation solves this by using two loops:</p>
+<ul>
+<li><strong>Outer loop</strong> (evaluation): splits data into train+val and test. Reports unbiased performance.</li>
+<li><strong>Inner loop</strong> (tuning): splits train+val into train and val. Finds best hyperparameters.</li>
+</ul>
+<figure class="mermaid-figure">
+  <pre class="mermaid">flowchart TD
+    D[Full Dataset] --&gt; O1[Outer Fold 1: Test]
+    D --&gt; O2[Outer Fold 2: Test]
+    D --&gt; O3[Outer Fold 3: Test]
+    D --&gt; O4[Outer Fold 4: Test]
+    D --&gt; O5[Outer Fold 5: Test]
+
+    O1 --&gt; I1[Inner 5-fold CV on remaining data]
+    I1 --&gt; T1[Best hyperparams for fold 1]
+    T1 --&gt; E1[Evaluate on outer test fold 1]
+
+    O2 --&gt; I2[Inner 5-fold CV on remaining data]
+    I2 --&gt; T2[Best hyperparams for fold 2]
+    T2 --&gt; E2[Evaluate on outer test fold 2]</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>Each outer fold finds its own best hyperparameters independently. The outer scores are an unbiased estimate of generalization performance.</p>
+<p>With sklearn:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>model_selection <span class="token keyword">import</span> cross_val_score<span class="token punctuation">,</span> GridSearchCV
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>ensemble <span class="token keyword">import</span> GradientBoostingRegressor
+
+inner_cv <span class="token operator">=</span> GridSearchCV<span class="token punctuation">(</span>
+    GradientBoostingRegressor<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    param_grid<span class="token operator">=</span><span class="token punctuation">{</span>
+        <span class="token string">"learning_rate"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token number">0.01</span><span class="token punctuation">,</span> <span class="token number">0.05</span><span class="token punctuation">,</span> <span class="token number">0.1</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+        <span class="token string">"max_depth"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+        <span class="token string">"n_estimators"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token number">50</span><span class="token punctuation">,</span> <span class="token number">100</span><span class="token punctuation">,</span> <span class="token number">200</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    cv<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">,</span>
+    scoring<span class="token operator">=</span><span class="token string">"neg_mean_squared_error"</span><span class="token punctuation">,</span>
+<span class="token punctuation">)</span>
+
+outer_scores <span class="token operator">=</span> cross_val_score<span class="token punctuation">(</span>
+    inner_cv<span class="token punctuation">,</span> X<span class="token punctuation">,</span> y<span class="token punctuation">,</span> cv<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">,</span> scoring<span class="token operator">=</span><span class="token string">"neg_mean_squared_error"</span>
+<span class="token punctuation">)</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Nested CV MSE: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token operator">-</span>outer_scores<span class="token punctuation">.</span>mean<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string"> +/- </span><span class="token interpolation"><span class="token punctuation">{</span>outer_scores<span class="token punctuation">.</span>std<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>This is expensive (5 outer folds x 5 inner folds x 27 grid points = 675 model fits), but it gives you a trustworthy performance estimate. Use it when reporting final results in papers or when the stake of the decision is high.</p>
+<h3 id="practical-tips" class="prose-h prose-h3"><a class="prose-h__anchor" href="#practical-tips" aria-label="Link to this section">#</a>Practical Tips</h3>
+<p><strong>Start with the learning rate.</strong> It is always the most important hyperparameter for gradient-based methods. A bad learning rate makes everything else irrelevant. Fix other hyperparameters at defaults and sweep learning rate first.</p>
+<p><strong>Use log-uniform distributions for learning rate and regularization.</strong> The difference between 0.001 and 0.01 matters as much as the difference between 0.1 and 1.0. Searching linearly wastes budget on the large end.</p>
+<p><strong>Use early stopping instead of tuning n_estimators.</strong> For boosting and neural networks, set n_estimators or epochs high and let early stopping decide when to stop. This removes one hyperparameter from the search.</p>
+<p><strong>Budget allocation.</strong> Spend 60% of your tuning budget on the top 2 most important hyperparameters. Spend the remaining 40% on everything else. The top 2 account for most of the performance variation.</p>
+<p><strong>Scale matters.</strong> Never search batch size on a log scale (16, 32, 64 are fine). Always search learning rate on a log scale. Match the search distribution to how the hyperparameter affects the model.</p>
+<table>
+<thead>
+<tr>
+<th>Model Type</th>
+<th>Top Hyperparameters</th>
+<th>Recommended Search</th>
+<th>Budget</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Random Forest</td>
+<td>n_estimators, max_depth, min_samples_leaf</td>
+<td>Random search, 50 trials</td>
+<td>Low (fast training)</td>
+</tr>
+<tr>
+<td>Gradient Boosting</td>
+<td>learning_rate, n_estimators, max_depth</td>
+<td>Bayesian, 100 trials + early stopping</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>Neural Network</td>
+<td>learning_rate, weight_decay, batch_size</td>
+<td>Bayesian or random, 100+ trials</td>
+<td>High (slow training)</td>
+</tr>
+<tr>
+<td>SVM</td>
+<td>C, gamma (RBF kernel)</td>
+<td>Grid on log scale, 25-50 trials</td>
+<td>Low (2 params)</td>
+</tr>
+<tr>
+<td>Lasso/Ridge</td>
+<td>alpha</td>
+<td>1D search on log scale, 20 trials</td>
+<td>Very low</td>
+</tr>
+<tr>
+<td>XGBoost</td>
+<td>learning_rate, max_depth, subsample, colsample</td>
+<td>Bayesian, 100-200 trials + early stopping</td>
+<td>Medium</td>
+</tr>
+</tbody></table>
+<p><strong>When in doubt:</strong> random search with 2x the number of hyperparameters as trials (e.g., 6 hyperparameters = 12+ trials minimum). You will be surprised how often random search with 50 trials beats carefully designed grid search.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="k-fold-cv"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">k-fold-cv</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> k fold cv</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-grid-search-from-scratch" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-grid-search-from-scratch" aria-label="Link to this section">#</a>Step 1: Grid Search from Scratch</h3>
+<p>The code in <code class="inline-code">code/tuning.py</code> implements grid search, random search, and a simple Bayesian optimizer from scratch.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">grid_search</span><span class="token punctuation">(</span>model_fn<span class="token punctuation">,</span> param_grid<span class="token punctuation">,</span> X_train<span class="token punctuation">,</span> y_train<span class="token punctuation">,</span> X_val<span class="token punctuation">,</span> y_val<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    keys <span class="token operator">=</span> <span class="token builtin">list</span><span class="token punctuation">(</span>param_grid<span class="token punctuation">.</span>keys<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    values <span class="token operator">=</span> <span class="token builtin">list</span><span class="token punctuation">(</span>param_grid<span class="token punctuation">.</span>values<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    best_score <span class="token operator">=</span> <span class="token operator">-</span><span class="token builtin">float</span><span class="token punctuation">(</span><span class="token string">"inf"</span><span class="token punctuation">)</span>
+    best_params <span class="token operator">=</span> <span class="token boolean">None</span>
+    n_evals <span class="token operator">=</span> <span class="token number">0</span>
+
+    <span class="token keyword">for</span> combo <span class="token keyword">in</span> itertools<span class="token punctuation">.</span>product<span class="token punctuation">(</span><span class="token operator">*</span>values<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        params <span class="token operator">=</span> <span class="token builtin">dict</span><span class="token punctuation">(</span><span class="token builtin">zip</span><span class="token punctuation">(</span>keys<span class="token punctuation">,</span> combo<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        model <span class="token operator">=</span> model_fn<span class="token punctuation">(</span><span class="token operator">**</span>params<span class="token punctuation">)</span>
+        model<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X_train<span class="token punctuation">,</span> y_train<span class="token punctuation">)</span>
+        score <span class="token operator">=</span> evaluate<span class="token punctuation">(</span>model<span class="token punctuation">,</span> X_val<span class="token punctuation">,</span> y_val<span class="token punctuation">)</span>
+        n_evals <span class="token operator">+=</span> <span class="token number">1</span>
+
+        <span class="token keyword">if</span> score <span class="token operator">></span> best_score<span class="token punctuation">:</span>
+            best_score <span class="token operator">=</span> score
+            best_params <span class="token operator">=</span> params
+
+    <span class="token keyword">return</span> best_params<span class="token punctuation">,</span> best_score<span class="token punctuation">,</span> n_evals</code></pre>
+</figure>
+<h3 id="step-2-random-search-from-scratch" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-random-search-from-scratch" aria-label="Link to this section">#</a>Step 2: Random Search from Scratch</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">random_search</span><span class="token punctuation">(</span>model_fn<span class="token punctuation">,</span> param_distributions<span class="token punctuation">,</span> X_train<span class="token punctuation">,</span> y_train<span class="token punctuation">,</span>
+                  X_val<span class="token punctuation">,</span> y_val<span class="token punctuation">,</span> n_iter<span class="token operator">=</span><span class="token number">50</span><span class="token punctuation">,</span> seed<span class="token operator">=</span><span class="token number">42</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    rng <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>RandomState<span class="token punctuation">(</span>seed<span class="token punctuation">)</span>
+    best_score <span class="token operator">=</span> <span class="token operator">-</span><span class="token builtin">float</span><span class="token punctuation">(</span><span class="token string">"inf"</span><span class="token punctuation">)</span>
+    best_params <span class="token operator">=</span> <span class="token boolean">None</span>
+
+    <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n_iter<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        params <span class="token operator">=</span> <span class="token punctuation">{</span>k<span class="token punctuation">:</span> sample<span class="token punctuation">(</span>v<span class="token punctuation">,</span> rng<span class="token punctuation">)</span> <span class="token keyword">for</span> k<span class="token punctuation">,</span> v <span class="token keyword">in</span> param_distributions<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span>
+        model <span class="token operator">=</span> model_fn<span class="token punctuation">(</span><span class="token operator">**</span>params<span class="token punctuation">)</span>
+        model<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X_train<span class="token punctuation">,</span> y_train<span class="token punctuation">)</span>
+        score <span class="token operator">=</span> evaluate<span class="token punctuation">(</span>model<span class="token punctuation">,</span> X_val<span class="token punctuation">,</span> y_val<span class="token punctuation">)</span>
+
+        <span class="token keyword">if</span> score <span class="token operator">></span> best_score<span class="token punctuation">:</span>
+            best_score <span class="token operator">=</span> score
+            best_params <span class="token operator">=</span> params
+
+    <span class="token keyword">return</span> best_params<span class="token punctuation">,</span> best_score<span class="token punctuation">,</span> n_iter</code></pre>
+</figure>
+<h3 id="step-3-bayesian-optimization-simplified" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-bayesian-optimization-simplified" aria-label="Link to this section">#</a>Step 3: Bayesian Optimization (Simplified)</h3>
+<p>The core idea: fit a Gaussian process to observed (hyperparameter, score) pairs, then use an acquisition function to decide where to look next.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">SimpleBayesianOptimizer</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> search_space<span class="token punctuation">,</span> n_initial<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>search_space <span class="token operator">=</span> search_space
+        self<span class="token punctuation">.</span>n_initial <span class="token operator">=</span> n_initial
+        self<span class="token punctuation">.</span>X_observed <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        self<span class="token punctuation">.</span>y_observed <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">def</span> <span class="token function">_kernel</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> x1<span class="token punctuation">,</span> x2<span class="token punctuation">,</span> length_scale<span class="token operator">=</span><span class="token number">1.0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        dists <span class="token operator">=</span> np<span class="token punctuation">.</span><span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token punctuation">(</span>x1<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token boolean">None</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">]</span> <span class="token operator">-</span> x2<span class="token punctuation">[</span><span class="token boolean">None</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">**</span> <span class="token number">2</span><span class="token punctuation">,</span> axis<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> np<span class="token punctuation">.</span>exp<span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">0.5</span> <span class="token operator">*</span> dists <span class="token operator">/</span> length_scale <span class="token operator">**</span> <span class="token number">2</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">_fit_gp</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> X_new<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        X_obs <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span>self<span class="token punctuation">.</span>X_observed<span class="token punctuation">)</span>
+        y_obs <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span>self<span class="token punctuation">.</span>y_observed<span class="token punctuation">)</span>
+        y_mean <span class="token operator">=</span> y_obs<span class="token punctuation">.</span>mean<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        y_centered <span class="token operator">=</span> y_obs <span class="token operator">-</span> y_mean
+
+        K <span class="token operator">=</span> self<span class="token punctuation">.</span>_kernel<span class="token punctuation">(</span>X_obs<span class="token punctuation">,</span> X_obs<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1e-4</span> <span class="token operator">*</span> np<span class="token punctuation">.</span>eye<span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>X_obs<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        K_star <span class="token operator">=</span> self<span class="token punctuation">.</span>_kernel<span class="token punctuation">(</span>X_new<span class="token punctuation">,</span> X_obs<span class="token punctuation">)</span>
+
+        L <span class="token operator">=</span> np<span class="token punctuation">.</span>linalg<span class="token punctuation">.</span>cholesky<span class="token punctuation">(</span>K<span class="token punctuation">)</span>
+        alpha <span class="token operator">=</span> np<span class="token punctuation">.</span>linalg<span class="token punctuation">.</span>solve<span class="token punctuation">(</span>L<span class="token punctuation">.</span>T<span class="token punctuation">,</span> np<span class="token punctuation">.</span>linalg<span class="token punctuation">.</span>solve<span class="token punctuation">(</span>L<span class="token punctuation">,</span> y_centered<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        mu <span class="token operator">=</span> K_star @ alpha <span class="token operator">+</span> y_mean
+
+        v <span class="token operator">=</span> np<span class="token punctuation">.</span>linalg<span class="token punctuation">.</span>solve<span class="token punctuation">(</span>L<span class="token punctuation">,</span> K_star<span class="token punctuation">.</span>T<span class="token punctuation">)</span>
+        var <span class="token operator">=</span> <span class="token number">1.0</span> <span class="token operator">-</span> np<span class="token punctuation">.</span><span class="token builtin">sum</span><span class="token punctuation">(</span>v <span class="token operator">**</span> <span class="token number">2</span><span class="token punctuation">,</span> axis<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span>
+        var <span class="token operator">=</span> np<span class="token punctuation">.</span>maximum<span class="token punctuation">(</span>var<span class="token punctuation">,</span> <span class="token number">1e-6</span><span class="token punctuation">)</span>
+
+        <span class="token keyword">return</span> mu<span class="token punctuation">,</span> var
+
+    <span class="token keyword">def</span> <span class="token function">_expected_improvement</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> mu<span class="token punctuation">,</span> var<span class="token punctuation">,</span> best_y<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        sigma <span class="token operator">=</span> np<span class="token punctuation">.</span>sqrt<span class="token punctuation">(</span>var<span class="token punctuation">)</span>
+        z <span class="token operator">=</span> <span class="token punctuation">(</span>mu <span class="token operator">-</span> best_y<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token punctuation">(</span>sigma <span class="token operator">+</span> <span class="token number">1e-10</span><span class="token punctuation">)</span>
+        ei <span class="token operator">=</span> sigma <span class="token operator">*</span> <span class="token punctuation">(</span>z <span class="token operator">*</span> norm_cdf<span class="token punctuation">(</span>z<span class="token punctuation">)</span> <span class="token operator">+</span> norm_pdf<span class="token punctuation">(</span>z<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> ei
+
+    <span class="token keyword">def</span> <span class="token function">suggest</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>X_observed<span class="token punctuation">)</span> <span class="token operator">&lt;</span> self<span class="token punctuation">.</span>n_initial<span class="token punctuation">:</span>
+            <span class="token keyword">return</span> sample_random<span class="token punctuation">(</span>self<span class="token punctuation">.</span>search_space<span class="token punctuation">)</span>
+
+        candidates <span class="token operator">=</span> <span class="token punctuation">[</span>sample_random<span class="token punctuation">(</span>self<span class="token punctuation">.</span>search_space<span class="token punctuation">)</span> <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">500</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+        X_cand <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span><span class="token punctuation">[</span>to_vector<span class="token punctuation">(</span>c<span class="token punctuation">)</span> <span class="token keyword">for</span> c <span class="token keyword">in</span> candidates<span class="token punctuation">]</span><span class="token punctuation">)</span>
+        mu<span class="token punctuation">,</span> var <span class="token operator">=</span> self<span class="token punctuation">.</span>_fit_gp<span class="token punctuation">(</span>X_cand<span class="token punctuation">)</span>
+        ei <span class="token operator">=</span> self<span class="token punctuation">.</span>_expected_improvement<span class="token punctuation">(</span>mu<span class="token punctuation">,</span> var<span class="token punctuation">,</span> <span class="token builtin">max</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>y_observed<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> candidates<span class="token punctuation">[</span>np<span class="token punctuation">.</span>argmax<span class="token punctuation">(</span>ei<span class="token punctuation">)</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">def</span> <span class="token function">observe</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> params<span class="token punctuation">,</span> score<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>X_observed<span class="token punctuation">.</span>append<span class="token punctuation">(</span>to_vector<span class="token punctuation">(</span>params<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>y_observed<span class="token punctuation">.</span>append<span class="token punctuation">(</span>score<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>The GP surrogate gives two things at each candidate point: a predicted score (mu) and an uncertainty (var). Expected Improvement balances these: it favors points where the model predicts high scores OR where uncertainty is high. Early on, most points have high uncertainty so the optimizer explores. Later, it focuses on the most promising region.</p>
+<h3 id="step-4-compare-all-methods" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-compare-all-methods" aria-label="Link to this section">#</a>Step 4: Compare All Methods</h3>
+<p>Run all three methods on the same synthetic objective and compare. This comparison uses a simplified wrapper that calls each optimizer with a direct objective function (no model training), so the API differs from the model-based implementations above:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">synthetic_objective</span><span class="token punctuation">(</span>params<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    lr <span class="token operator">=</span> params<span class="token punctuation">[</span><span class="token string">"learning_rate"</span><span class="token punctuation">]</span>
+    depth <span class="token operator">=</span> params<span class="token punctuation">[</span><span class="token string">"max_depth"</span><span class="token punctuation">]</span>
+    <span class="token keyword">return</span> <span class="token operator">-</span><span class="token punctuation">(</span>np<span class="token punctuation">.</span>log10<span class="token punctuation">(</span>lr<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token operator">**</span> <span class="token number">2</span> <span class="token operator">-</span> <span class="token punctuation">(</span>depth <span class="token operator">-</span> <span class="token number">4</span><span class="token punctuation">)</span> <span class="token operator">**</span> <span class="token number">2</span> <span class="token operator">+</span> <span class="token number">10</span>
+
+param_grid <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">"learning_rate"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token number">0.001</span><span class="token punctuation">,</span> <span class="token number">0.01</span><span class="token punctuation">,</span> <span class="token number">0.1</span><span class="token punctuation">,</span> <span class="token number">1.0</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token string">"max_depth"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">6</span><span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">,</span> <span class="token number">8</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span>
+
+grid_best <span class="token operator">=</span> <span class="token boolean">None</span>
+grid_score <span class="token operator">=</span> <span class="token operator">-</span><span class="token builtin">float</span><span class="token punctuation">(</span><span class="token string">"inf"</span><span class="token punctuation">)</span>
+grid_history <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+<span class="token keyword">for</span> combo <span class="token keyword">in</span> itertools<span class="token punctuation">.</span>product<span class="token punctuation">(</span><span class="token operator">*</span>param_grid<span class="token punctuation">.</span>values<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    params <span class="token operator">=</span> <span class="token builtin">dict</span><span class="token punctuation">(</span><span class="token builtin">zip</span><span class="token punctuation">(</span>param_grid<span class="token punctuation">.</span>keys<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> combo<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    score <span class="token operator">=</span> synthetic_objective<span class="token punctuation">(</span>params<span class="token punctuation">)</span>
+    grid_history<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">(</span>params<span class="token punctuation">,</span> score<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> score <span class="token operator">></span> grid_score<span class="token punctuation">:</span>
+        grid_score <span class="token operator">=</span> score
+        grid_best <span class="token operator">=</span> params
+
+param_dist <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">"learning_rate"</span><span class="token punctuation">:</span> <span class="token punctuation">(</span><span class="token string">"log_float"</span><span class="token punctuation">,</span> <span class="token number">0.001</span><span class="token punctuation">,</span> <span class="token number">1.0</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token string">"max_depth"</span><span class="token punctuation">:</span> <span class="token punctuation">(</span><span class="token string">"int"</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span>
+
+rand_best <span class="token operator">=</span> <span class="token boolean">None</span>
+rand_score <span class="token operator">=</span> <span class="token operator">-</span><span class="token builtin">float</span><span class="token punctuation">(</span><span class="token string">"inf"</span><span class="token punctuation">)</span>
+rand_history <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+rng <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>RandomState<span class="token punctuation">(</span><span class="token number">42</span><span class="token punctuation">)</span>
+<span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">28</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    params <span class="token operator">=</span> <span class="token punctuation">{</span>k<span class="token punctuation">:</span> sample<span class="token punctuation">(</span>v<span class="token punctuation">,</span> rng<span class="token punctuation">)</span> <span class="token keyword">for</span> k<span class="token punctuation">,</span> v <span class="token keyword">in</span> param_dist<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span>
+    score <span class="token operator">=</span> synthetic_objective<span class="token punctuation">(</span>params<span class="token punctuation">)</span>
+    rand_history<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">(</span>params<span class="token punctuation">,</span> score<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> score <span class="token operator">></span> rand_score<span class="token punctuation">:</span>
+        rand_score <span class="token operator">=</span> score
+        rand_best <span class="token operator">=</span> params
+
+optimizer <span class="token operator">=</span> SimpleBayesianOptimizer<span class="token punctuation">(</span>param_dist<span class="token punctuation">,</span> n_initial<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">)</span>
+bayes_history <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+<span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">28</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    params <span class="token operator">=</span> optimizer<span class="token punctuation">.</span>suggest<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    score <span class="token operator">=</span> synthetic_objective<span class="token punctuation">(</span>params<span class="token punctuation">)</span>
+    optimizer<span class="token punctuation">.</span>observe<span class="token punctuation">(</span>params<span class="token punctuation">,</span> score<span class="token punctuation">)</span>
+    bayes_history<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">(</span>params<span class="token punctuation">,</span> score<span class="token punctuation">)</span><span class="token punctuation">)</span>
+bayes_score <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span>s <span class="token keyword">for</span> _<span class="token punctuation">,</span> s <span class="token keyword">in</span> bayes_history<span class="token punctuation">)</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'Method'</span><span class="token punctuation">:</span><span class="token format-spec">&lt;20</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'Best Score'</span><span class="token punctuation">:</span><span class="token format-spec">>12</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'Evaluations'</span><span class="token punctuation">:</span><span class="token format-spec">>12</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"-"</span> <span class="token operator">*</span> <span class="token number">50</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'Grid Search'</span><span class="token punctuation">:</span><span class="token format-spec">&lt;20</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span>grid_score<span class="token punctuation">:</span><span class="token format-spec">>12.4f</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">len</span><span class="token punctuation">(</span>grid_history<span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">>12</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'Random Search'</span><span class="token punctuation">:</span><span class="token format-spec">&lt;20</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span>rand_score<span class="token punctuation">:</span><span class="token format-spec">>12.4f</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">len</span><span class="token punctuation">(</span>rand_history<span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">>12</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'Bayesian Opt'</span><span class="token punctuation">:</span><span class="token format-spec">&lt;20</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span>bayes_score<span class="token punctuation">:</span><span class="token format-spec">>12.4f</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">len</span><span class="token punctuation">(</span>bayes_history<span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">>12</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>With the same budget, Bayesian optimization usually finds the best score fastest because it does not waste evaluations in clearly bad regions. Random search covers more ground than grid search. Grid search only wins when you have very few hyperparameters and can afford to be exhaustive.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<h3 id="optuna-in-practice" class="prose-h prose-h3"><a class="prose-h__anchor" href="#optuna-in-practice" aria-label="Link to this section">#</a>Optuna in Practice</h3>
+<p>Optuna is the recommended library for serious hyperparameter tuning. It supports pruning, distributed search, and visualization out of the box.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> optuna
+
+<span class="token keyword">def</span> <span class="token function">objective</span><span class="token punctuation">(</span>trial<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    lr <span class="token operator">=</span> trial<span class="token punctuation">.</span>suggest_float<span class="token punctuation">(</span><span class="token string">"learning_rate"</span><span class="token punctuation">,</span> <span class="token number">1e-4</span><span class="token punctuation">,</span> <span class="token number">1e-1</span><span class="token punctuation">,</span> log<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+    n_est <span class="token operator">=</span> trial<span class="token punctuation">.</span>suggest_int<span class="token punctuation">(</span><span class="token string">"n_estimators"</span><span class="token punctuation">,</span> <span class="token number">50</span><span class="token punctuation">,</span> <span class="token number">500</span><span class="token punctuation">)</span>
+    max_depth <span class="token operator">=</span> trial<span class="token punctuation">.</span>suggest_int<span class="token punctuation">(</span><span class="token string">"max_depth"</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span>
+
+    model <span class="token operator">=</span> GradientBoostingRegressor<span class="token punctuation">(</span>
+        learning_rate<span class="token operator">=</span>lr<span class="token punctuation">,</span>
+        n_estimators<span class="token operator">=</span>n_est<span class="token punctuation">,</span>
+        max_depth<span class="token operator">=</span>max_depth<span class="token punctuation">,</span>
+    <span class="token punctuation">)</span>
+    model<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X_train<span class="token punctuation">,</span> y_train<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> mean_squared_error<span class="token punctuation">(</span>y_val<span class="token punctuation">,</span> model<span class="token punctuation">.</span>predict<span class="token punctuation">(</span>X_val<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+study <span class="token operator">=</span> optuna<span class="token punctuation">.</span>create_study<span class="token punctuation">(</span>direction<span class="token operator">=</span><span class="token string">"minimize"</span><span class="token punctuation">)</span>
+study<span class="token punctuation">.</span>optimize<span class="token punctuation">(</span>objective<span class="token punctuation">,</span> n_trials<span class="token operator">=</span><span class="token number">100</span><span class="token punctuation">)</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Best params: </span><span class="token interpolation"><span class="token punctuation">{</span>study<span class="token punctuation">.</span>best_params<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Best MSE: </span><span class="token interpolation"><span class="token punctuation">{</span>study<span class="token punctuation">.</span>best_value<span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Key Optuna features:</p>
+<ul>
+<li><code class="inline-code">suggest_float(..., log=True)</code> for parameters best searched on log scale (learning rate, regularization)</li>
+<li><code class="inline-code">suggest_int</code> for integer parameters</li>
+<li><code class="inline-code">suggest_categorical</code> for discrete choices</li>
+<li>Built-in MedianPruner for early stopping of bad trials</li>
+<li><code class="inline-code">study.trials_dataframe()</code> for analysis</li>
+</ul>
+<h3 id="optuna-with-pruning" class="prose-h prose-h3"><a class="prose-h__anchor" href="#optuna-with-pruning" aria-label="Link to this section">#</a>Optuna with Pruning</h3>
+<p>Pruning stops unpromising trials early, saving massive compute. Here is the pattern:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> optuna
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>model_selection <span class="token keyword">import</span> cross_val_score
+
+<span class="token keyword">def</span> <span class="token function">objective</span><span class="token punctuation">(</span>trial<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    params <span class="token operator">=</span> <span class="token punctuation">{</span>
+        <span class="token string">"learning_rate"</span><span class="token punctuation">:</span> trial<span class="token punctuation">.</span>suggest_float<span class="token punctuation">(</span><span class="token string">"lr"</span><span class="token punctuation">,</span> <span class="token number">1e-4</span><span class="token punctuation">,</span> <span class="token number">0.5</span><span class="token punctuation">,</span> log<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token string">"max_depth"</span><span class="token punctuation">:</span> trial<span class="token punctuation">.</span>suggest_int<span class="token punctuation">(</span><span class="token string">"max_depth"</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token string">"n_estimators"</span><span class="token punctuation">:</span> trial<span class="token punctuation">.</span>suggest_int<span class="token punctuation">(</span><span class="token string">"n_estimators"</span><span class="token punctuation">,</span> <span class="token number">50</span><span class="token punctuation">,</span> <span class="token number">500</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token string">"subsample"</span><span class="token punctuation">:</span> trial<span class="token punctuation">.</span>suggest_float<span class="token punctuation">(</span><span class="token string">"subsample"</span><span class="token punctuation">,</span> <span class="token number">0.5</span><span class="token punctuation">,</span> <span class="token number">1.0</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span>
+
+    model <span class="token operator">=</span> GradientBoostingRegressor<span class="token punctuation">(</span><span class="token operator">**</span>params<span class="token punctuation">)</span>
+    scores <span class="token operator">=</span> cross_val_score<span class="token punctuation">(</span>model<span class="token punctuation">,</span> X_train<span class="token punctuation">,</span> y_train<span class="token punctuation">,</span> cv<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">,</span>
+                             scoring<span class="token operator">=</span><span class="token string">"neg_mean_squared_error"</span><span class="token punctuation">)</span>
+    mean_score <span class="token operator">=</span> <span class="token operator">-</span>scores<span class="token punctuation">.</span>mean<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    trial<span class="token punctuation">.</span>report<span class="token punctuation">(</span>mean_score<span class="token punctuation">,</span> step<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> trial<span class="token punctuation">.</span>should_prune<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">raise</span> optuna<span class="token punctuation">.</span>TrialPruned<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> mean_score
+
+pruner <span class="token operator">=</span> optuna<span class="token punctuation">.</span>pruners<span class="token punctuation">.</span>MedianPruner<span class="token punctuation">(</span>n_startup_trials<span class="token operator">=</span><span class="token number">10</span><span class="token punctuation">,</span> n_warmup_steps<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">)</span>
+study <span class="token operator">=</span> optuna<span class="token punctuation">.</span>create_study<span class="token punctuation">(</span>direction<span class="token operator">=</span><span class="token string">"minimize"</span><span class="token punctuation">,</span> pruner<span class="token operator">=</span>pruner<span class="token punctuation">)</span>
+study<span class="token punctuation">.</span>optimize<span class="token punctuation">(</span>objective<span class="token punctuation">,</span> n_trials<span class="token operator">=</span><span class="token number">200</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>The <code class="inline-code">MedianPruner</code> stops a trial if its intermediate value is worse than the median of all completed trials at the same step. Pruning requires calling <code class="inline-code">trial.report()</code> to report intermediate metrics and <code class="inline-code">trial.should_prune()</code> to check whether the trial should be stopped. The <code class="inline-code">n_startup_trials=10</code> ensures at least 10 trials complete fully before pruning kicks in. This typically saves 40-60% of total compute.</p>
+<h3 id="sklearn-s-built-in-tuners" class="prose-h prose-h3"><a class="prose-h__anchor" href="#sklearn-s-built-in-tuners" aria-label="Link to this section">#</a>sklearn&#39;s Built-in Tuners</h3>
+<p>For quick experiments, sklearn provides <code class="inline-code">GridSearchCV</code>, <code class="inline-code">RandomizedSearchCV</code>, and <code class="inline-code">HalvingRandomSearchCV</code>:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>model_selection <span class="token keyword">import</span> RandomizedSearchCV
+<span class="token keyword">from</span> scipy<span class="token punctuation">.</span>stats <span class="token keyword">import</span> loguniform<span class="token punctuation">,</span> randint
+
+param_dist <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">"learning_rate"</span><span class="token punctuation">:</span> loguniform<span class="token punctuation">(</span><span class="token number">1e-4</span><span class="token punctuation">,</span> <span class="token number">0.5</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token string">"max_depth"</span><span class="token punctuation">:</span> randint<span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token string">"n_estimators"</span><span class="token punctuation">:</span> randint<span class="token punctuation">(</span><span class="token number">50</span><span class="token punctuation">,</span> <span class="token number">500</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span>
+
+search <span class="token operator">=</span> RandomizedSearchCV<span class="token punctuation">(</span>
+    GradientBoostingRegressor<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    param_dist<span class="token punctuation">,</span>
+    n_iter<span class="token operator">=</span><span class="token number">100</span><span class="token punctuation">,</span>
+    cv<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">,</span>
+    scoring<span class="token operator">=</span><span class="token string">"neg_mean_squared_error"</span><span class="token punctuation">,</span>
+    random_state<span class="token operator">=</span><span class="token number">42</span><span class="token punctuation">,</span>
+    n_jobs<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span>
+<span class="token punctuation">)</span>
+search<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X_train<span class="token punctuation">,</span> y_train<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Best params: </span><span class="token interpolation"><span class="token punctuation">{</span>search<span class="token punctuation">.</span>best_params_<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Best CV MSE: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token operator">-</span>search<span class="token punctuation">.</span>best_score_<span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Use <code class="inline-code">loguniform</code> from scipy for learning rate and regularization. Use <code class="inline-code">randint</code> for integer hyperparameters. The <code class="inline-code">n_jobs=-1</code> flag parallelizes across all CPU cores.</p>
+<h3 id="common-mistakes-in-hyperparameter-tuning" class="prose-h prose-h3"><a class="prose-h__anchor" href="#common-mistakes-in-hyperparameter-tuning" aria-label="Link to this section">#</a>Common Mistakes in Hyperparameter Tuning</h3>
+<p><strong>Data leakage through preprocessing.</strong> If you fit a scaler on the full dataset before cross-validation, information from the validation fold leaks into training. Always put preprocessing inside a <code class="inline-code">Pipeline</code> so it is fit only on the training fold.</p>
+<p><strong>Overfitting to the validation set.</strong> Running thousands of trials effectively trains on the validation set. Use nested cross-validation for final performance estimates, or hold out a separate test set that you never touch during tuning.</p>
+<p><strong>Searching too narrow a range.</strong> If your best value is at the boundary of your search space, you have not searched widely enough. The optimal value might be outside your range. Always check if the best parameters are at the edges.</p>
+<p><strong>Ignoring interaction effects.</strong> Learning rate and number of estimators interact strongly in boosting. A low learning rate needs more estimators. Tuning them independently gives worse results than tuning them together.</p>
+<p><strong>Not using early stopping for iterative models.</strong> For gradient boosting and neural networks, set n_estimators or epochs to a high value and use early stopping. This is strictly better than tuning the number of iterations as a hyperparameter.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p>Run grid search and random search with the same total budget (e.g., 50 evaluations). Compare the best scores found. Run the experiment 10 times with different seeds. How often does random search win?</p>
+</li>
+<li><p>Implement Hyperband from scratch. Start with 81 configurations, each trained for 1 epoch. Keep the top 1/3 at each round and triple their budget. Compare total compute (sum of all epochs across all configs) to running 81 configs for the full budget.</p>
+</li>
+<li><p>Add a learning rate scheduler (cosine annealing) to the gradient boosting implementation from Lesson 11. Does it help compared to a fixed learning rate?</p>
+</li>
+<li><p>Use Optuna to tune a RandomForestClassifier on a real dataset (e.g., sklearn&#39;s breast cancer dataset). Use <code class="inline-code">optuna.visualization.plot_param_importances(study)</code> to see which hyperparameters matter most. Does it match the importance ranking from this lesson?</p>
+</li>
+<li><p>Implement a simple acquisition function (Expected Improvement) and demonstrate exploration vs exploitation. Plot the surrogate model&#39;s mean and uncertainty, and show where EI chooses to evaluate next.</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Hyperparameter</td>
+<td>&quot;A setting you choose&quot;</td>
+<td>A value set before training that controls the learning process, not learned from data</td>
+</tr>
+<tr>
+<td>Grid search</td>
+<td>&quot;Try every combination&quot;</td>
+<td>Exhaustive search over a specified parameter grid. Exponential cost.</td>
+</tr>
+<tr>
+<td>Random search</td>
+<td>&quot;Just sample randomly&quot;</td>
+<td>Sample hyperparameters from distributions. Covers important dimensions better than grid search.</td>
+</tr>
+<tr>
+<td>Bayesian optimization</td>
+<td>&quot;Smart search&quot;</td>
+<td>Uses a surrogate model of the objective to decide where to evaluate next, balancing exploration and exploitation</td>
+</tr>
+<tr>
+<td>Surrogate model</td>
+<td>&quot;A cheap approximation&quot;</td>
+<td>A model (usually Gaussian process) that approximates the expensive objective function from observed evaluations</td>
+</tr>
+<tr>
+<td>Acquisition function</td>
+<td>&quot;Where to look next&quot;</td>
+<td>Scores candidate points by balancing expected improvement with uncertainty. EI and UCB are common choices.</td>
+</tr>
+<tr>
+<td>Early stopping</td>
+<td>&quot;Stop wasting time&quot;</td>
+<td>Terminate training early when validation performance stops improving</td>
+</tr>
+<tr>
+<td>Hyperband</td>
+<td>&quot;Tournament bracket for configs&quot;</td>
+<td>Adaptive resource allocation: start many configs with small budgets, keep the best and increase their budgets</td>
+</tr>
+<tr>
+<td>Learning rate scheduler</td>
+<td>&quot;Change lr during training&quot;</td>
+<td>A function that adjusts the learning rate over the course of training for better convergence</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://jmlr.org/papers/v13/bergstra12a.html" target="_blank" rel="noopener">Bergstra &amp; Bengio: Random Search for Hyper-Parameter Optimization (2012)</a> -- the paper that showed random beats grid</li>
+<li><a href="https://arxiv.org/abs/1206.2944" target="_blank" rel="noopener">Snoek et al., Practical Bayesian Optimization of Machine Learning Algorithms (2012)</a> -- Bayesian optimization for ML</li>
+<li><a href="https://jmlr.org/papers/v18/16-558.html" target="_blank" rel="noopener">Li et al., Hyperband: A Novel Bandit-Based Approach (2018)</a> -- the Hyperband paper</li>
+<li><a href="https://arxiv.org/abs/1907.10902" target="_blank" rel="noopener">Optuna: A Next-generation Hyperparameter Optimization Framework</a> -- the Optuna paper</li>
+<li><a href="https://jmlr.org/papers/v20/18-444.html" target="_blank" rel="noopener">Probst et al., Tunability: Importance of Hyperparameters (2019)</a> -- which hyperparameters matter</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="11-ensemble-methods.html">
+  <span class="label">← Previous</span>
+  <b>Ensemble Methods</b>
+</a>
+      <a class="pager__item pager__item--next" href="13-ml-pipelines.html">
+  <span class="label">Next →</span>
+  <b>ML Pipelines</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>11 minutes</b> of ML Fundamentals behind you.</p>
+      <a class="btn btn--solid" href="13-ml-pipelines.html">Continue to ML Pipelines →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#parameters-vs-hyperparameters">Parameters vs Hyperparameters</a></li><li class="mini__item mini__item--d3"><a href="#grid-search">Grid Search</a></li><li class="mini__item mini__item--d3"><a href="#random-search">Random Search</a></li><li class="mini__item mini__item--d3"><a href="#bayesian-optimization">Bayesian Optimization</a></li><li class="mini__item mini__item--d3"><a href="#early-stopping">Early Stopping</a></li><li class="mini__item mini__item--d3"><a href="#learning-rate-schedulers">Learning Rate Schedulers</a></li><li class="mini__item mini__item--d3"><a href="#hyperparameter-importance">Hyperparameter Importance</a></li><li class="mini__item mini__item--d3"><a href="#practical-strategy">Practical Strategy</a></li><li class="mini__item mini__item--d3"><a href="#cross-validation-integration">Cross-Validation Integration</a></li><li class="mini__item mini__item--d3"><a href="#practical-tips">Practical Tips</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-grid-search-from-scratch">Step 1: Grid Search from Scratch</a></li><li class="mini__item mini__item--d3"><a href="#step-2-random-search-from-scratch">Step 2: Random Search from Scratch</a></li><li class="mini__item mini__item--d3"><a href="#step-3-bayesian-optimization-simplified">Step 3: Bayesian Optimization (Simplified)</a></li><li class="mini__item mini__item--d3"><a href="#step-4-compare-all-methods">Step 4: Compare All Methods</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d3"><a href="#optuna-in-practice">Optuna in Practice</a></li><li class="mini__item mini__item--d3"><a href="#optuna-with-pruning">Optuna with Pruning</a></li><li class="mini__item mini__item--d3"><a href="#sklearn-s-built-in-tuners">sklearn's Built-in Tuners</a></li><li class="mini__item mini__item--d3"><a href="#common-mistakes-in-hyperparameter-tuning">Common Mistakes in Hyperparameter Tuning</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

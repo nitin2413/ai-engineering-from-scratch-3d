@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structured Output — JSON Schema, Pydantic, Zod, Constrained Decoding — Tools &amp; Protocols — AIFS</title>
+<meta name="description" content="Tools &amp; Protocols: Structured Output — JSON Schema, Pydantic, Zod, Constrained Decoding. 7 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Structured Output — JSON Schema, Pydantic, Zod, Constrained Decoding — Tools &amp; Protocols — AIFS">
+<meta property="og:description" content="Tools &amp; Protocols: Structured Output — JSON Schema, Pydantic, Zod, Constrained Decoding. 7 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"constrained-decoding":["../assets/figures/figures-llmeng.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-llmeng.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#C6FF00" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#C6FF00;--accent-ink:#111111"
+  data-lesson-id="tools-and-protocols/04-structured-output" data-module="tools-and-protocols"
+  data-prev="03-parallel-and-streaming-tool-calls.html" data-next="05-tool-schema-design.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#C6FF00">
+        <span class="label">Phase 13</span>
+        <b>Tools &amp; Protocols</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="tools-and-protocols/01-the-tool-interface"><a href="01-the-tool-interface.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">The Tool Interface — Why Agents Need Structured I/O</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/02-function-calling-deep-dive"><a href="02-function-calling-deep-dive.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Function Calling Deep Dive — OpenAI, Anthropic, Gemini</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/03-parallel-and-streaming-tool-calls"><a href="03-parallel-and-streaming-tool-calls.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Parallel Tool Calls and Streaming with Tools</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/04-structured-output"><a href="04-structured-output.html" class="is-current">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Structured Output — JSON Schema, Pydantic, Zod, Constrained Decoding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/05-tool-schema-design"><a href="05-tool-schema-design.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Tool Schema Design — Naming, Descriptions, Parameter Constraints</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/06-mcp-fundamentals"><a href="06-mcp-fundamentals.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">MCP Fundamentals: Stateless Requests and JSON-RPC</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/07-building-an-mcp-server"><a href="07-building-an-mcp-server.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Building an MCP Server: Stateless Python and TypeScript</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/08-building-an-mcp-client"><a href="08-building-an-mcp-client.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Building an MCP Client: Discovery, Routing, and Dual-Era Fallback</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/09-mcp-transports"><a href="09-mcp-transports.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">MCP Transports: stdio and Stateless Streamable HTTP</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/10-mcp-resources-and-prompts"><a href="10-mcp-resources-and-prompts.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">MCP Resources and Prompts: Addressable Context for Stateless Servers</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/11-mcp-sampling"><a href="11-mcp-sampling.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">MCP Model Input: Sampling Migration and Stateless MRTR</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/12-mcp-roots-and-elicitation"><a href="12-mcp-roots-and-elicitation.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Explicit Scope and Stateless Elicitation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/13-mcp-async-tasks"><a href="13-mcp-async-tasks.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">MCP Tasks Extension: Durable Work on a Stateless Core</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/14-mcp-apps"><a href="14-mcp-apps.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">MCP Apps on the Stateless Protocol</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/15-mcp-security-tool-poisoning"><a href="15-mcp-security-tool-poisoning.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">MCP Security: Poisoned Metadata, Routing, and MRTR State</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/16-mcp-security-oauth-2-1"><a href="16-mcp-security-oauth-2-1.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">MCP Authorization: CIMD, Issuer Binding, PKCE, and Step-Up</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/17-mcp-gateways-and-registries"><a href="17-mcp-gateways-and-registries.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Stateless MCP Gateways and Registry Admission</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/18-mcp-auth-production"><a href="18-mcp-auth-production.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">MCP Auth in Production: Issuer-Bound Enrollment and Tokens</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/19-a2a-protocol"><a href="19-a2a-protocol.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">A2A — Agent-to-Agent Protocol</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/20-opentelemetry-genai"><a href="20-opentelemetry-genai.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">OpenTelemetry GenAI — Tracing Tool Calls End-to-End</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/21-llm-routing-layer"><a href="21-llm-routing-layer.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">LLM Routing Layer — LiteLLM, OpenRouter, Portkey</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/22-skills-and-agent-sdks"><a href="22-skills-and-agent-sdks.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Agent Skills: Portable Contract and Runtime Boundary</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/23-capstone-tool-ecosystem"><a href="23-capstone-tool-ecosystem.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Capstone: Stateless Tool Ecosystem</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/24-skill-discovery-and-progressive-disclosure"><a href="24-skill-discovery-and-progressive-disclosure.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Skill Discovery and Progressive Disclosure</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/25-skill-invocation-and-routing"><a href="25-skill-invocation-and-routing.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Skill Invocation and Routing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/26-skill-permissions-sandboxes-and-trust"><a href="26-skill-permissions-sandboxes-and-trust.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Skill Permissions, Sandboxes, and Trust</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/27-skill-evals-packaging-and-portability"><a href="27-skill-evals-packaging-and-portability.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">Skill Evals, Packaging, and Portability</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/28-mcp-tool-contracts-and-content"><a href="28-mcp-tool-contracts-and-content.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">MCP Tool Contracts and Content</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control"><a href="29-mcp-reliability-cancellation-and-flow-control.html" class="">
+  <span class="snav__n">29</span>
+  <span class="snav__t">MCP Reliability, Cancellation, and Flow Control</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/30-mcp-registry-supply-chain-and-drift"><a href="30-mcp-registry-supply-chain-and-drift.html" class="">
+  <span class="snav__n">30</span>
+  <span class="snav__t">MCP Registry Supply Chain: Admission, Drift, and Rollback</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/31-mcp-conformance-versioning-and-operations"><a href="31-mcp-conformance-versioning-and-operations.html" class="">
+  <span class="snav__n">31</span>
+  <span class="snav__t">MCP Conformance Engineering: Versioning, Evidence, and Operations</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Tools &amp; Protocols</a></p>
+      <h1 class="page__title">Structured Output — JSON Schema, Pydantic, Zod, Constrained Decoding</h1>
+      <p class="page__lede">&quot;Ask the model nicely to return JSON&quot; fails 5 to 15 percent of the time, even on frontier models. Structured outputs close that gap with constrained decoding: the model is literally prevented from emitting a token that would violate the schema. OpenAI's strict mode, Anthropic's schema-typed tool use, Gemini's <code class="inline-code">responseSchema</code>, Pydantic AI's <code class="inline-code">output_type</code>, and Zod's <code class="inline-code">.parse</code> are five surface forms of the same idea. This lesson builds the schema validator and the strict-mode contract learners will use for every production extraction pipeline.</p>
+      <div class="page__meta">
+        <span class="chip">7 min read</span>
+        <span class="chip">1,431 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (stdlib, JSON Schema 2020-12 subset)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 13 · 02 (function calling deep dive)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Write a JSON Schema 2020-12 for an extraction target using the right constraints (enum, min/max, required, pattern).</li>
+<li>Explain why strict mode and constrained decoding give different guarantees from &quot;validate after generation&quot;.</li>
+<li>Distinguish the three failure modes: parse error, schema violation, model refusal.</li>
+<li>Ship an extraction pipeline with typed repair and typed refusal handling.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>An agent reading a purchase-order email needs to turn free text into <code class="inline-code">{customer, line_items, total_usd}</code>. Three approaches.</p>
+<p><strong>Approach one: prompt for JSON.</strong> &quot;Reply in JSON with fields customer, line_items, total_usd.&quot; Works 85 to 95 percent of the time on frontier models. Fails in six ways: missing brace, trailing comma, wrong types, hallucinated fields, truncated at token limit, leaked prose like &quot;Here is your JSON:&quot;.</p>
+<p><strong>Approach two: validate after generation.</strong> Generate freely, parse, validate against schema, retry on failure. Reliable but expensive — you pay for every retry, and truncation bugs cost one extra turn per occurrence.</p>
+<p><strong>Approach three: constrained decoding.</strong> The provider enforces the schema at decode time. Invalid tokens are masked out of the sampling distribution. The output is guaranteed to parse and guaranteed to validate. Failure collapses to one mode: refusal (the model decides the input does not fit the schema).</p>
+<p>Every 2026 frontier provider ships some form of approach three.</p>
+<ul>
+<li><strong>OpenAI.</strong> <code class="inline-code">response_format: {type: &quot;json_schema&quot;, strict: true}</code> plus <code class="inline-code">refusal</code> in the response if the model declines.</li>
+<li><strong>Anthropic.</strong> Schema enforcement on <code class="inline-code">tool_use</code> inputs; <code class="inline-code">stop_reason: &quot;refusal&quot;</code> is not a thing, but <code class="inline-code">end_turn</code> with no tool call is the signal.</li>
+<li><strong>Gemini.</strong> <code class="inline-code">responseSchema</code> at request level; in 2026 Gemini ships token-level grammar constraints for selected types.</li>
+<li><strong>Pydantic AI.</strong> <code class="inline-code">output_type=InvoiceModel</code> emits a structured <code class="inline-code">RunResult</code> typed to <code class="inline-code">InvoiceModel</code>.</li>
+<li><strong>Zod (TypeScript).</strong> Runtime parser that validates provider output against a Zod schema; pairs with OpenAI&#39;s <code class="inline-code">beta.chat.completions.parse</code>.</li>
+</ul>
+<p>The common thread: declare the schema once, enforce it end to end.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="json-schema-2020-12-the-lingua-franca" class="prose-h prose-h3"><a class="prose-h__anchor" href="#json-schema-2020-12-the-lingua-franca" aria-label="Link to this section">#</a>JSON Schema 2020-12 — the lingua franca</h3>
+<p>Every provider accepts JSON Schema 2020-12. The constructs you use most:</p>
+<ul>
+<li><code class="inline-code">type</code>: one of <code class="inline-code">object</code>, <code class="inline-code">array</code>, <code class="inline-code">string</code>, <code class="inline-code">number</code>, <code class="inline-code">integer</code>, <code class="inline-code">boolean</code>, <code class="inline-code">null</code>.</li>
+<li><code class="inline-code">properties</code>: map of field name to subschema.</li>
+<li><code class="inline-code">required</code>: list of field names that must appear.</li>
+<li><code class="inline-code">enum</code>: closed set of allowed values.</li>
+<li><code class="inline-code">minimum</code> / <code class="inline-code">maximum</code> (numbers), <code class="inline-code">minLength</code> / <code class="inline-code">maxLength</code> / <code class="inline-code">pattern</code> (strings).</li>
+<li><code class="inline-code">items</code>: subschema applied to every array element.</li>
+<li><code class="inline-code">additionalProperties</code>: <code class="inline-code">false</code> forbids extra fields (default varies by mode).</li>
+</ul>
+<p>OpenAI strict mode adds three requirements: every property must be listed in <code class="inline-code">required</code>, <code class="inline-code">additionalProperties: false</code> everywhere, and no unresolved <code class="inline-code">$ref</code>. If you break these, the API returns 400 at request time.</p>
+<h3 id="pydantic-the-python-binding" class="prose-h prose-h3"><a class="prose-h__anchor" href="#pydantic-the-python-binding" aria-label="Link to this section">#</a>Pydantic, the Python binding</h3>
+<p>Pydantic v2 generates JSON Schema from dataclass-shaped models via <code class="inline-code">model_json_schema()</code>. Pydantic AI wraps this so you write:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">Invoice</span><span class="token punctuation">(</span>BaseModel<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    customer<span class="token punctuation">:</span> <span class="token builtin">str</span>
+    line_items<span class="token punctuation">:</span> <span class="token builtin">list</span><span class="token punctuation">[</span>LineItem<span class="token punctuation">]</span>
+    total_usd<span class="token punctuation">:</span> Decimal</code></pre>
+</figure>
+<p>and the agent framework translates the schema into OpenAI strict mode, Anthropic <code class="inline-code">input_schema</code>, or Gemini <code class="inline-code">responseSchema</code> at the edge. The model&#39;s output comes back as a typed <code class="inline-code">Invoice</code> instance. Validation errors raise <code class="inline-code">ValidationError</code> with typed error paths.</p>
+<h3 id="zod-the-typescript-binding" class="prose-h prose-h3"><a class="prose-h__anchor" href="#zod-the-typescript-binding" aria-label="Link to this section">#</a>Zod, the TypeScript binding</h3>
+<p>Zod (<code class="inline-code">z.object({customer: z.string(), ...})</code>) is the TS equivalent. OpenAI&#39;s Node SDK exposes <code class="inline-code">zodResponseFormat(Invoice)</code> which translates to the API&#39;s JSON Schema payload.</p>
+<h3 id="refusals" class="prose-h prose-h3"><a class="prose-h__anchor" href="#refusals" aria-label="Link to this section">#</a>Refusals</h3>
+<p>Strict mode cannot force the model to answer. If the input cannot fit the schema (&quot;the email was a poem, not an invoice&quot;), the model emits a <code class="inline-code">refusal</code> field containing the reason. Your code must handle this as a first-class outcome, not a failure. The refusal is also useful as a safety signal: a model asked to extract a credit card number from a protected-content email returns a refusal with the safety reason attached.</p>
+<h3 id="constrained-decoding-in-the-open" class="prose-h prose-h3"><a class="prose-h__anchor" href="#constrained-decoding-in-the-open" aria-label="Link to this section">#</a>Constrained decoding in the open</h3>
+<p>Open-weights implementations use three techniques.</p>
+<ol>
+<li><strong>Grammar-based decoding</strong> (<code class="inline-code">outlines</code>, <code class="inline-code">guidance</code>, <code class="inline-code">lm-format-enforcer</code>): build a deterministic finite automaton from the schema; at every step, mask the logits of tokens that would violate the FSM.</li>
+<li><strong>Logit masking with a JSON parser</strong>: run a streaming JSON parser in lockstep with the model; at every step, compute the valid-next-token set.</li>
+<li><strong>Speculative decoding with a verifier</strong>: cheap draft model proposes tokens, verifier enforces the schema.</li>
+</ol>
+<p>Commercial providers pick one of these behind the scenes. The 2026 state of the art is faster than plain generation for short structured outputs and roughly the same speed for long ones.</p>
+<h3 id="the-three-failure-modes" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-three-failure-modes" aria-label="Link to this section">#</a>The three failure modes</h3>
+<ol>
+<li><strong>Parse error.</strong> The output is not valid JSON. Cannot happen under strict mode. Can still happen on non-strict providers.</li>
+<li><strong>Schema violation.</strong> The output parses but violates the schema. Cannot happen under strict mode. Common outside it.</li>
+<li><strong>Refusal.</strong> The model declines. Must be handled as a typed outcome.</li>
+</ol>
+<h3 id="retry-strategy" class="prose-h prose-h3"><a class="prose-h__anchor" href="#retry-strategy" aria-label="Link to this section">#</a>Retry strategy</h3>
+<p>When you are outside strict mode (Anthropic tool use, non-strict OpenAI, older Gemini), the recovery pattern is:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>generate -&gt; parse -&gt; validate -&gt; if fail, inject error and retry, max 3x</code></pre>
+</figure>
+<p>One retry is usually enough. Three retries catches weak-model flakes. Beyond three is a sign of a bad schema: the model cannot satisfy it for some inputs, and the prompt or the schema needs fixing.</p>
+<h3 id="small-model-support" class="prose-h prose-h3"><a class="prose-h__anchor" href="#small-model-support" aria-label="Link to this section">#</a>Small-model support</h3>
+<p>Constrained decoding works on small models. A 3B-parameter open model with grammar enforcement out-performs a 70B-parameter model with raw prompting on structured tasks. This is the main reason structured outputs matter for production: it decouples reliability from model size.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="constrained-decoding"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">constrained-decoding</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> constrained decoding</figcaption>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p><code class="inline-code">code/main.py</code> ships a minimal JSON Schema 2020-12 validator in stdlib (types, required, enum, min/max, pattern, items, additionalProperties). It wraps an <code class="inline-code">Invoice</code> schema and runs a fake LLM output through the validator, demonstrating parse error, schema violation, and refusal paths. Swap the fake output for any provider&#39;s real response in production.</p>
+<p>What to look at:</p>
+<ul>
+<li>The validator returns a typed <code class="inline-code">[ValidationError]</code> list with path and message. That is the shape you want surfaced to the retry prompt.</li>
+<li>The refusal branch does NOT retry. It logs and returns a typed refusal. Phase 14 · 09 uses refusals as a safety signal.</li>
+<li>The <code class="inline-code">additionalProperties: false</code> check fires on the adversarial test input, showing why strict mode shuts the door on hallucinated fields.</li>
+</ul>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces <code class="inline-code">outputs/skill-structured-output-designer.md</code>. Given a free-text extraction target (invoices, support tickets, resumes, etc.), the skill produces a JSON Schema 2020-12 that is strict-mode-compatible and a Pydantic model that mirrors it, with typed refusal and retry handling stubbed in.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p>Run <code class="inline-code">code/main.py</code>. Add a fourth test case whose <code class="inline-code">total_usd</code> is a negative number. Confirm the validator rejects it with the <code class="inline-code">minimum</code> constraint path.</p>
+</li>
+<li><p>Extend the validator to support <code class="inline-code">oneOf</code> with a discriminator. The common case: <code class="inline-code">line_item</code> is either a product or a service, tagged by <code class="inline-code">kind</code>. Strict mode has subtle rules here; check OpenAI&#39;s structured outputs guide.</p>
+</li>
+<li><p>Write the same Invoice schema as a Pydantic BaseModel and compare <code class="inline-code">model_json_schema()</code> output to your hand-rolled schema. Identify the one field Pydantic sets by default that the hand-rolled version omits.</p>
+</li>
+<li><p>Measure refusal rates. Construct ten inputs that should not be extractable (a song lyric, a math proof, a blank email) and run them through a real provider with strict mode. Count refusals vs hallucinated outputs. This is your ground truth for refusal-aware retries.</p>
+</li>
+<li><p>Read OpenAI&#39;s structured outputs guide top to bottom. Identify the one construct it explicitly forbids in strict mode that plain JSON Schema allows. Then design a schema that uses the forbidden construct non-essentially and refactor it to be strict-compatible.</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>JSON Schema 2020-12</td>
+<td>&quot;The schema spec&quot;</td>
+<td>IETF-draft schema dialect every modern provider speaks</td>
+</tr>
+<tr>
+<td>Strict mode</td>
+<td>&quot;Guaranteed schema&quot;</td>
+<td>OpenAI flag that enforces schema via constrained decoding</td>
+</tr>
+<tr>
+<td>Constrained decoding</td>
+<td>&quot;Logit masking&quot;</td>
+<td>Decode-time enforcement that masks invalid next-tokens</td>
+</tr>
+<tr>
+<td>Refusal</td>
+<td>&quot;Model declines&quot;</td>
+<td>Typed outcome when input cannot fit the schema</td>
+</tr>
+<tr>
+<td>Parse error</td>
+<td>&quot;Invalid JSON&quot;</td>
+<td>Output did not parse as JSON; impossible under strict</td>
+</tr>
+<tr>
+<td>Schema violation</td>
+<td>&quot;Wrong shape&quot;</td>
+<td>Parsed but violated types / required / enum / range</td>
+</tr>
+<tr>
+<td><code class="inline-code">additionalProperties: false</code></td>
+<td>&quot;No extras allowed&quot;</td>
+<td>Forbids unknown fields; required in OpenAI strict</td>
+</tr>
+<tr>
+<td>Pydantic BaseModel</td>
+<td>&quot;Typed output&quot;</td>
+<td>Python class that emits and validates JSON Schema</td>
+</tr>
+<tr>
+<td>Zod schema</td>
+<td>&quot;TypeScript output type&quot;</td>
+<td>TS runtime schema for provider output validation</td>
+</tr>
+<tr>
+<td>Grammar enforcement</td>
+<td>&quot;Open-weights constrained decode&quot;</td>
+<td>FSM-based logit masking, as in outlines / guidance</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://platform.openai.com/docs/guides/structured-outputs" target="_blank" rel="noopener">OpenAI — Structured outputs</a> — strict mode, refusals, and schema requirements</li>
+<li><a href="https://openai.com/index/introducing-structured-outputs-in-the-api/" target="_blank" rel="noopener">OpenAI — Introducing structured outputs</a> — August 2024 launch post explaining the decoding guarantee</li>
+<li><a href="https://ai.pydantic.dev/output/" target="_blank" rel="noopener">Pydantic AI — Output</a> — typed output_type bindings that serialize to each provider</li>
+<li><a href="https://json-schema.org/draft/2020-12/release-notes" target="_blank" rel="noopener">JSON Schema — 2020-12 release notes</a> — the canonical spec</li>
+<li><a href="https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/structured-outputs" target="_blank" rel="noopener">Microsoft — Structured outputs in Azure OpenAI</a> — enterprise deployment notes and strict-mode caveats</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="03-parallel-and-streaming-tool-calls.html">
+  <span class="label">← Previous</span>
+  <b>Parallel Tool Calls and Streaming with Tools</b>
+</a>
+      <a class="pager__item pager__item--next" href="05-tool-schema-design.html">
+  <span class="label">Next →</span>
+  <b>Tool Schema Design — Naming, Descriptions, Parameter Constraints</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>7 minutes</b> of Tools &amp; Protocols behind you.</p>
+      <a class="btn btn--solid" href="05-tool-schema-design.html">Continue to Tool Schema Design — Naming, Descriptions, Parameter Constraints →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#json-schema-2020-12-the-lingua-franca">JSON Schema 2020-12 — the lingua franca</a></li><li class="mini__item mini__item--d3"><a href="#pydantic-the-python-binding">Pydantic, the Python binding</a></li><li class="mini__item mini__item--d3"><a href="#zod-the-typescript-binding">Zod, the TypeScript binding</a></li><li class="mini__item mini__item--d3"><a href="#refusals">Refusals</a></li><li class="mini__item mini__item--d3"><a href="#constrained-decoding-in-the-open">Constrained decoding in the open</a></li><li class="mini__item mini__item--d3"><a href="#the-three-failure-modes">The three failure modes</a></li><li class="mini__item mini__item--d3"><a href="#retry-strategy">Retry strategy</a></li><li class="mini__item mini__item--d3"><a href="#small-model-support">Small-model support</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

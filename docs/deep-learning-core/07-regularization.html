@@ -1,0 +1,733 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Regularization — Deep Learning Core — AIFS</title>
+<meta name="description" content="Deep Learning Core: Regularization. 9 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Regularization — Deep Learning Core — AIFS">
+<meta property="og:description" content="Deep Learning Core: Regularization. 9 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={};window.AIFS_FIGURE_PROVIDER_ORDER=[];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#FF4FA3" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#FF4FA3;--accent-ink:#111111"
+  data-lesson-id="deep-learning-core/07-regularization" data-module="deep-learning-core"
+  data-prev="06-optimizers.html" data-next="08-weight-initialization.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#FF4FA3">
+        <span class="label">Phase 03</span>
+        <b>Deep Learning Core</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="deep-learning-core/01-the-perceptron"><a href="01-the-perceptron.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">The Perceptron</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/02-multi-layer-networks"><a href="02-multi-layer-networks.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Multi-Layer Networks and Forward Pass</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/03-backpropagation"><a href="03-backpropagation.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Backpropagation from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/04-activation-functions"><a href="04-activation-functions.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Activation Functions</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/05-loss-functions"><a href="05-loss-functions.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Loss Functions</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/06-optimizers"><a href="06-optimizers.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Optimizers</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/07-regularization"><a href="07-regularization.html" class="is-current">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Regularization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/08-weight-initialization"><a href="08-weight-initialization.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Weight Initialization and Training Stability</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/09-learning-rate-schedules"><a href="09-learning-rate-schedules.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Learning Rate Schedules and Warmup</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/10-mini-framework"><a href="10-mini-framework.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Build Your Own Mini Framework</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/11-intro-to-pytorch"><a href="11-intro-to-pytorch.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Introduction to PyTorch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/12-intro-to-jax"><a href="12-intro-to-jax.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Introduction to JAX</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/13-debugging-neural-networks"><a href="13-debugging-neural-networks.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Debugging Neural Networks</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Deep Learning Core</a></p>
+      <h1 class="page__title">Regularization</h1>
+      <p class="page__lede">Your model gets 99% on training data and 60% on test data. It memorized instead of learning. Regularization is the tax you impose on complexity to force generalization.</p>
+      <div class="page__meta">
+        <span class="chip">9 min read</span>
+        <span class="chip">1,897 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Lesson 03.06 (Optimizers)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Implement dropout with inverted scaling, L2 weight decay, batch normalization, layer normalization, and RMSNorm from scratch</li>
+<li>Measure the train-test accuracy gap and diagnose overfitting using regularization experiments</li>
+<li>Explain why transformers use LayerNorm instead of BatchNorm and why modern LLMs prefer RMSNorm</li>
+<li>Apply the correct combination of regularization techniques based on the severity of overfitting</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>A neural network with enough parameters can memorize any dataset. This is not a hypothetical -- Zhang et al. (2017) proved it by training standard networks on ImageNet with random labels. The networks reached near-zero training loss on completely random label assignments. They memorized a million random input-output pairs with no pattern to learn. Training loss was perfect. Test accuracy was zero.</p>
+<p>This is the overfitting problem, and it gets worse as models get larger. GPT-3 has 175 billion parameters. The training set has about 500 billion tokens. With that many parameters, the model has enough capacity to memorize significant chunks of the training data verbatim. Without regularization, it would just regurgitate training examples instead of learning generalizable patterns.</p>
+<p>The gap between training performance and test performance is the overfitting gap. Every technique in this lesson attacks that gap from a different angle. Dropout forces the network to not rely on any single neuron. Weight decay prevents any single weight from growing too large. Batch normalization smooths the loss landscape so the optimizer finds flatter, more generalizable minima. Layer normalization does the same thing but works where batch normalization fails (small batches, variable-length sequences). RMSNorm does it 10% faster by dropping the mean calculation. Each technique is simple. Together, they&#39;re the difference between a model that memorizes and one that generalizes.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="the-overfitting-spectrum" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-overfitting-spectrum" aria-label="Link to this section">#</a>The Overfitting Spectrum</h3>
+<p>Every model sits somewhere on a spectrum from underfitting (too simple to capture the pattern) to overfitting (so complex it captures noise). The sweet spot is in between, and regularization pushes models toward it from the overfit side.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph LR
+    Under[&quot;Underfitting&lt;br/&gt;Train: 60%&lt;br/&gt;Test: 58%&lt;br/&gt;Model too simple&quot;] --&gt; Good[&quot;Good Fit&lt;br/&gt;Train: 95%&lt;br/&gt;Test: 92%&lt;br/&gt;Generalizes well&quot;]
+    Good --&gt; Over[&quot;Overfitting&lt;br/&gt;Train: 99.9%&lt;br/&gt;Test: 65%&lt;br/&gt;Memorized noise&quot;]
+
+    Dropout[&quot;Dropout&quot;] --&gt;|&quot;Pushes left&quot;| Over
+    WD[&quot;Weight Decay&quot;] --&gt;|&quot;Pushes left&quot;| Over
+    BN[&quot;BatchNorm&quot;] --&gt;|&quot;Pushes left&quot;| Over
+    Aug[&quot;Data Augmentation&quot;] --&gt;|&quot;Pushes left&quot;| Over</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<h3 id="dropout" class="prose-h prose-h3"><a class="prose-h__anchor" href="#dropout" aria-label="Link to this section">#</a>Dropout</h3>
+<p>The simplest regularization technique with the most elegant interpretation. During training, randomly set each neuron&#39;s output to zero with probability p.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>output = activation(z) * mask    where mask[i] ~ Bernoulli(1 - p)</code></pre>
+</figure>
+<p>With p = 0.5, half the neurons are zeroed on every forward pass. The network must learn redundant representations because it can&#39;t predict which neurons will be available. This prevents co-adaptation -- neurons learning to rely on specific other neurons being present.</p>
+<p>The ensemble interpretation: a network with N neurons and dropout creates 2^N possible subnetworks (every combination of which neurons are on or off). Training with dropout approximately trains all 2^N subnetworks simultaneously, each on different mini-batches. At test time, you use all neurons (no dropout) and scale outputs by (1 - p) to match the expected value during training. This is equivalent to averaging the predictions of 2^N subnetworks -- a massive ensemble from a single model.</p>
+<p>In practice, the scaling is applied during training instead of testing (inverted dropout):</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>During training:  output = activation(z) * mask / (1 - p)
+During testing:   output = activation(z)   (no change needed)</code></pre>
+</figure>
+<p>This is cleaner because test code doesn&#39;t need to know about dropout at all.</p>
+<p>Default rates: p = 0.1 for transformers, p = 0.5 for MLPs, p = 0.2-0.3 for CNNs. Higher dropout = stronger regularization = more underfitting risk.</p>
+<h3 id="weight-decay-l2-regularization" class="prose-h prose-h3"><a class="prose-h__anchor" href="#weight-decay-l2-regularization" aria-label="Link to this section">#</a>Weight Decay (L2 Regularization)</h3>
+<p>Add the squared magnitude of all weights to the loss:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>total_loss = task_loss + (lambda / 2) * sum(w_i^2)</code></pre>
+</figure>
+<p>The gradient of the regularization term is lambda * w. This means at every step, each weight is shrunk toward zero by a fraction proportional to its magnitude. Large weights get penalized more. The model is pushed toward solutions where no single weight dominates.</p>
+<p>Why this helps generalization: overfit models tend to have large weights that amplify noise in the training data. Weight decay keeps weights small, which limits the model&#39;s effective capacity and forces it to rely on robust, generalizable features rather than memorized quirks.</p>
+<p>The lambda hyperparameter controls the strength. Typical values:</p>
+<ul>
+<li>0.01 for AdamW on transformers</li>
+<li>1e-4 for SGD on CNNs</li>
+<li>0.1 for heavily overfit models</li>
+</ul>
+<p>As discussed in lesson 06: weight decay and L2 regularization are equivalent in SGD but not in Adam. Always use AdamW (decoupled weight decay) when training with Adam.</p>
+<h3 id="batch-normalization" class="prose-h prose-h3"><a class="prose-h__anchor" href="#batch-normalization" aria-label="Link to this section">#</a>Batch Normalization</h3>
+<p>Normalize the output of each layer across the mini-batch before passing it to the next layer.</p>
+<p>For a mini-batch of activations at some layer:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>mu = (1/B) * sum(x_i)           (batch mean)
+sigma^2 = (1/B) * sum((x_i - mu)^2)   (batch variance)
+x_hat = (x_i - mu) / sqrt(sigma^2 + eps)   (normalize)
+y = gamma * x_hat + beta        (scale and shift)</code></pre>
+</figure>
+<p>Gamma and beta are learnable parameters that let the network undo the normalization if that&#39;s optimal. Without them, you&#39;d be forcing every layer&#39;s output to be zero-mean unit-variance, which might not be what the network wants.</p>
+<p><strong>Training vs inference split:</strong> During training, mu and sigma come from the current mini-batch. During inference, you use running averages accumulated during training (exponential moving average with momentum = 0.1, meaning 90% old + 10% new).</p>
+<p>Why BatchNorm works is still debated. The original paper claimed it reduces &quot;internal covariate shift&quot; (the distribution of layer inputs changing as earlier layers update). Santurkar et al. (2018) showed this explanation is wrong. The actual reason: BatchNorm makes the loss landscape smoother. The gradients are more predictive, the Lipschitz constants are smaller, and the optimizer can take larger steps safely. This is why BatchNorm lets you use higher learning rates and converge faster.</p>
+<p>BatchNorm has a fundamental limitation: it depends on batch statistics. With batch size 1, the mean and variance are meaningless. With small batches (&lt; 32), the statistics are noisy and hurt performance. This matters for tasks like object detection (where memory limits batch size) and language modeling (where sequence lengths vary).</p>
+<h3 id="layer-normalization" class="prose-h prose-h3"><a class="prose-h__anchor" href="#layer-normalization" aria-label="Link to this section">#</a>Layer Normalization</h3>
+<p>Normalize across features instead of across the batch. For a single sample:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>mu = (1/D) * sum(x_j)           (feature mean)
+sigma^2 = (1/D) * sum((x_j - mu)^2)   (feature variance)
+x_hat = (x_j - mu) / sqrt(sigma^2 + eps)
+y = gamma * x_hat + beta</code></pre>
+</figure>
+<p>D is the feature dimension. Each sample is normalized independently -- no dependence on batch size. This is why transformers use LayerNorm instead of BatchNorm. Sequences have variable lengths, batch sizes are often small (or 1 during generation), and the computation is identical between training and inference.</p>
+<p>LayerNorm in transformers is applied after each self-attention block and each feed-forward block (Post-LN), or before them (Pre-LN, which is more stable for training).</p>
+<h3 id="rmsnorm" class="prose-h prose-h3"><a class="prose-h__anchor" href="#rmsnorm" aria-label="Link to this section">#</a>RMSNorm</h3>
+<p>LayerNorm without the mean subtraction. Proposed by Zhang &amp; Sennrich (2019).</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>rms = sqrt((1/D) * sum(x_j^2))
+y = gamma * x / rms</code></pre>
+</figure>
+<p>That&#39;s it. No mean computation, no beta parameter. The observation: the re-centering (mean subtraction) in LayerNorm contributes very little to the model&#39;s performance, but costs computation. Removing it gives the same accuracy with about 10% less overhead.</p>
+<p>LLaMA, LLaMA 2, LLaMA 3, Mistral, and most modern LLMs use RMSNorm instead of LayerNorm. At the scale of billions of parameters and trillions of tokens, that 10% savings is significant.</p>
+<h3 id="normalization-comparison" class="prose-h prose-h3"><a class="prose-h__anchor" href="#normalization-comparison" aria-label="Link to this section">#</a>Normalization Comparison</h3>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph TD
+    subgraph &quot;Batch Normalization&quot;
+        BN_D[&quot;Normalize across BATCH&lt;br/&gt;for each feature&quot;]
+        BN_S[&quot;Batch: [x1, x2, x3, x4]&lt;br/&gt;Feature 1: normalize [x1f1, x2f1, x3f1, x4f1]&quot;]
+        BN_P[&quot;Needs batch &gt; 32&lt;br/&gt;Different train vs eval&lt;br/&gt;Used in CNNs&quot;]
+    end
+    subgraph &quot;Layer Normalization&quot;
+        LN_D[&quot;Normalize across FEATURES&lt;br/&gt;for each sample&quot;]
+        LN_S[&quot;Sample x1: normalize [f1, f2, f3, f4]&quot;]
+        LN_P[&quot;Batch-independent&lt;br/&gt;Same train vs eval&lt;br/&gt;Used in Transformers&quot;]
+    end
+    subgraph &quot;RMS Normalization&quot;
+        RN_D[&quot;Like LayerNorm&lt;br/&gt;but skip mean subtraction&quot;]
+        RN_S[&quot;Just divide by RMS&lt;br/&gt;No centering&quot;]
+        RN_P[&quot;10% faster than LayerNorm&lt;br/&gt;Same accuracy&lt;br/&gt;Used in LLaMA, Mistral&quot;]
+    end</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<h3 id="data-augmentation-as-regularization" class="prose-h prose-h3"><a class="prose-h__anchor" href="#data-augmentation-as-regularization" aria-label="Link to this section">#</a>Data Augmentation as Regularization</h3>
+<p>Not a model modification but a data modification. Transform training inputs while preserving labels:</p>
+<ul>
+<li>Images: random crop, flip, rotation, color jitter, cutout</li>
+<li>Text: synonym replacement, back-translation, random deletion</li>
+<li>Audio: time stretch, pitch shift, noise addition</li>
+</ul>
+<p>The effect is identical to regularization: it increases the effective size of the training set, making it harder for the model to memorize specific examples. A model that only sees each image once in its original form can memorize it. A model that sees 50 augmented versions of each image is forced to learn the invariant structure.</p>
+<h3 id="early-stopping" class="prose-h prose-h3"><a class="prose-h__anchor" href="#early-stopping" aria-label="Link to this section">#</a>Early Stopping</h3>
+<p>The simplest regularizer: stop training when validation loss starts increasing. The model hasn&#39;t overfit yet at that point. In practice, you track validation loss every epoch, save the best model, and continue training for a &quot;patience&quot; window (typically 5-20 epochs). If validation loss doesn&#39;t improve within the patience window, you stop and load the best saved model.</p>
+<h3 id="when-to-apply-what" class="prose-h prose-h3"><a class="prose-h__anchor" href="#when-to-apply-what" aria-label="Link to this section">#</a>When to Apply What</h3>
+<figure class="mermaid-figure">
+  <pre class="mermaid">flowchart TD
+    Gap{&quot;Train-test&lt;br/&gt;accuracy gap?&quot;} --&gt;|&quot;\&gt; 10%&quot;| Heavy[&quot;Heavy regularization&quot;]
+    Gap --&gt;|&quot;5-10%&quot;| Medium[&quot;Moderate regularization&quot;]
+    Gap --&gt;|&quot;&lt; 5%&quot;| Light[&quot;Light regularization&quot;]
+
+    Heavy --&gt; D5[&quot;Dropout p=0.3-0.5&quot;]
+    Heavy --&gt; WD2[&quot;Weight decay 0.01-0.1&quot;]
+    Heavy --&gt; Aug[&quot;Aggressive data augmentation&quot;]
+    Heavy --&gt; ES[&quot;Early stopping&quot;]
+
+    Medium --&gt; D3[&quot;Dropout p=0.1-0.2&quot;]
+    Medium --&gt; WD1[&quot;Weight decay 0.001-0.01&quot;]
+    Medium --&gt; Norm[&quot;BatchNorm or LayerNorm&quot;]
+
+    Light --&gt; D1[&quot;Dropout p=0.05-0.1&quot;]
+    Light --&gt; WD0[&quot;Weight decay 1e-4&quot;]</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="l2-regularization"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">l2-regularization</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> l2 regularization</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-dropout-train-and-eval-mode" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-dropout-train-and-eval-mode" aria-label="Link to this section">#</a>Step 1: Dropout (Train and Eval Mode)</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> random
+<span class="token keyword">import</span> math
+
+
+<span class="token keyword">class</span> <span class="token class-name">Dropout</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> p<span class="token operator">=</span><span class="token number">0.5</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>p <span class="token operator">=</span> p
+        self<span class="token punctuation">.</span>training <span class="token operator">=</span> <span class="token boolean">True</span>
+        self<span class="token punctuation">.</span>mask <span class="token operator">=</span> <span class="token boolean">None</span>
+
+    <span class="token keyword">def</span> <span class="token function">forward</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> <span class="token keyword">not</span> self<span class="token punctuation">.</span>training<span class="token punctuation">:</span>
+            <span class="token keyword">return</span> <span class="token builtin">list</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>mask <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        output <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">for</span> val <span class="token keyword">in</span> x<span class="token punctuation">:</span>
+            <span class="token keyword">if</span> random<span class="token punctuation">.</span>random<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&lt;</span> self<span class="token punctuation">.</span>p<span class="token punctuation">:</span>
+                self<span class="token punctuation">.</span>mask<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+                output<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token number">0.0</span><span class="token punctuation">)</span>
+            <span class="token keyword">else</span><span class="token punctuation">:</span>
+                self<span class="token punctuation">.</span>mask<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+                output<span class="token punctuation">.</span>append<span class="token punctuation">(</span>val <span class="token operator">/</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> self<span class="token punctuation">.</span>p<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> output
+
+    <span class="token keyword">def</span> <span class="token function">backward</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> grad_output<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        grads <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">for</span> g<span class="token punctuation">,</span> m <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>grad_output<span class="token punctuation">,</span> self<span class="token punctuation">.</span>mask<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> m <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+                grads<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token number">0.0</span><span class="token punctuation">)</span>
+            <span class="token keyword">else</span><span class="token punctuation">:</span>
+                grads<span class="token punctuation">.</span>append<span class="token punctuation">(</span>g <span class="token operator">/</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> self<span class="token punctuation">.</span>p<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> grads</code></pre>
+</figure>
+<h3 id="step-2-l2-weight-decay" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-l2-weight-decay" aria-label="Link to this section">#</a>Step 2: L2 Weight Decay</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">l2_regularization</span><span class="token punctuation">(</span>weights<span class="token punctuation">,</span> lambda_reg<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    penalty <span class="token operator">=</span> <span class="token number">0.0</span>
+    <span class="token keyword">for</span> w <span class="token keyword">in</span> weights<span class="token punctuation">:</span>
+        penalty <span class="token operator">+=</span> w <span class="token operator">*</span> w
+    <span class="token keyword">return</span> lambda_reg <span class="token operator">*</span> <span class="token number">0.5</span> <span class="token operator">*</span> penalty
+
+<span class="token keyword">def</span> <span class="token function">l2_gradient</span><span class="token punctuation">(</span>weights<span class="token punctuation">,</span> lambda_reg<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token punctuation">[</span>lambda_reg <span class="token operator">*</span> w <span class="token keyword">for</span> w <span class="token keyword">in</span> weights<span class="token punctuation">]</span></code></pre>
+</figure>
+<h3 id="step-3-batch-normalization" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-batch-normalization" aria-label="Link to this section">#</a>Step 3: Batch Normalization</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">BatchNorm</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> num_features<span class="token punctuation">,</span> momentum<span class="token operator">=</span><span class="token number">0.1</span><span class="token punctuation">,</span> eps<span class="token operator">=</span><span class="token number">1e-5</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>gamma <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">1.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> num_features
+        self<span class="token punctuation">.</span>beta <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> num_features
+        self<span class="token punctuation">.</span>eps <span class="token operator">=</span> eps
+        self<span class="token punctuation">.</span>momentum <span class="token operator">=</span> momentum
+        self<span class="token punctuation">.</span>running_mean <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> num_features
+        self<span class="token punctuation">.</span>running_var <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">1.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> num_features
+        self<span class="token punctuation">.</span>training <span class="token operator">=</span> <span class="token boolean">True</span>
+        self<span class="token punctuation">.</span>num_features <span class="token operator">=</span> num_features
+
+    <span class="token keyword">def</span> <span class="token function">forward</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> batch<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        batch_size <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>batch<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> self<span class="token punctuation">.</span>training<span class="token punctuation">:</span>
+            mean <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> self<span class="token punctuation">.</span>num_features
+            <span class="token keyword">for</span> sample <span class="token keyword">in</span> batch<span class="token punctuation">:</span>
+                <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>num_features<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                    mean<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">+=</span> sample<span class="token punctuation">[</span>j<span class="token punctuation">]</span>
+            mean <span class="token operator">=</span> <span class="token punctuation">[</span>m <span class="token operator">/</span> batch_size <span class="token keyword">for</span> m <span class="token keyword">in</span> mean<span class="token punctuation">]</span>
+
+            var <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> self<span class="token punctuation">.</span>num_features
+            <span class="token keyword">for</span> sample <span class="token keyword">in</span> batch<span class="token punctuation">:</span>
+                <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>num_features<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                    var<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">+=</span> <span class="token punctuation">(</span>sample<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">-</span> mean<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">**</span> <span class="token number">2</span>
+            var <span class="token operator">=</span> <span class="token punctuation">[</span>v <span class="token operator">/</span> batch_size <span class="token keyword">for</span> v <span class="token keyword">in</span> var<span class="token punctuation">]</span>
+
+            <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>num_features<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                self<span class="token punctuation">.</span>running_mean<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> self<span class="token punctuation">.</span>momentum<span class="token punctuation">)</span> <span class="token operator">*</span> self<span class="token punctuation">.</span>running_mean<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">+</span> self<span class="token punctuation">.</span>momentum <span class="token operator">*</span> mean<span class="token punctuation">[</span>j<span class="token punctuation">]</span>
+                self<span class="token punctuation">.</span>running_var<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> self<span class="token punctuation">.</span>momentum<span class="token punctuation">)</span> <span class="token operator">*</span> self<span class="token punctuation">.</span>running_var<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">+</span> self<span class="token punctuation">.</span>momentum <span class="token operator">*</span> var<span class="token punctuation">[</span>j<span class="token punctuation">]</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            mean <span class="token operator">=</span> <span class="token builtin">list</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>running_mean<span class="token punctuation">)</span>
+            var <span class="token operator">=</span> <span class="token builtin">list</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>running_var<span class="token punctuation">)</span>
+
+        self<span class="token punctuation">.</span>x_hat <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        output <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">for</span> sample <span class="token keyword">in</span> batch<span class="token punctuation">:</span>
+            normalized <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+            out_sample <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+            <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>num_features<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                x_h <span class="token operator">=</span> <span class="token punctuation">(</span>sample<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">-</span> mean<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">/</span> math<span class="token punctuation">.</span>sqrt<span class="token punctuation">(</span>var<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">+</span> self<span class="token punctuation">.</span>eps<span class="token punctuation">)</span>
+                normalized<span class="token punctuation">.</span>append<span class="token punctuation">(</span>x_h<span class="token punctuation">)</span>
+                out_sample<span class="token punctuation">.</span>append<span class="token punctuation">(</span>self<span class="token punctuation">.</span>gamma<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">*</span> x_h <span class="token operator">+</span> self<span class="token punctuation">.</span>beta<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">)</span>
+            self<span class="token punctuation">.</span>x_hat<span class="token punctuation">.</span>append<span class="token punctuation">(</span>normalized<span class="token punctuation">)</span>
+            output<span class="token punctuation">.</span>append<span class="token punctuation">(</span>out_sample<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> output</code></pre>
+</figure>
+<h3 id="step-4-layer-normalization" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-layer-normalization" aria-label="Link to this section">#</a>Step 4: Layer Normalization</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">LayerNorm</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> num_features<span class="token punctuation">,</span> eps<span class="token operator">=</span><span class="token number">1e-5</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>gamma <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">1.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> num_features
+        self<span class="token punctuation">.</span>beta <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> num_features
+        self<span class="token punctuation">.</span>eps <span class="token operator">=</span> eps
+        self<span class="token punctuation">.</span>num_features <span class="token operator">=</span> num_features
+
+    <span class="token keyword">def</span> <span class="token function">forward</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        mean <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+        var <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token punctuation">(</span>xi <span class="token operator">-</span> mean<span class="token punctuation">)</span> <span class="token operator">**</span> <span class="token number">2</span> <span class="token keyword">for</span> xi <span class="token keyword">in</span> x<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+
+        self<span class="token punctuation">.</span>x_hat <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        output <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>num_features<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            x_h <span class="token operator">=</span> <span class="token punctuation">(</span>x<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">-</span> mean<span class="token punctuation">)</span> <span class="token operator">/</span> math<span class="token punctuation">.</span>sqrt<span class="token punctuation">(</span>var <span class="token operator">+</span> self<span class="token punctuation">.</span>eps<span class="token punctuation">)</span>
+            self<span class="token punctuation">.</span>x_hat<span class="token punctuation">.</span>append<span class="token punctuation">(</span>x_h<span class="token punctuation">)</span>
+            output<span class="token punctuation">.</span>append<span class="token punctuation">(</span>self<span class="token punctuation">.</span>gamma<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">*</span> x_h <span class="token operator">+</span> self<span class="token punctuation">.</span>beta<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> output</code></pre>
+</figure>
+<h3 id="step-5-rmsnorm" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-rmsnorm" aria-label="Link to this section">#</a>Step 5: RMSNorm</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">RMSNorm</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> num_features<span class="token punctuation">,</span> eps<span class="token operator">=</span><span class="token number">1e-6</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>gamma <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">1.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> num_features
+        self<span class="token punctuation">.</span>eps <span class="token operator">=</span> eps
+        self<span class="token punctuation">.</span>num_features <span class="token operator">=</span> num_features
+
+    <span class="token keyword">def</span> <span class="token function">forward</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        rms <span class="token operator">=</span> math<span class="token punctuation">.</span>sqrt<span class="token punctuation">(</span><span class="token builtin">sum</span><span class="token punctuation">(</span>xi <span class="token operator">*</span> xi <span class="token keyword">for</span> xi <span class="token keyword">in</span> x<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span> <span class="token operator">+</span> self<span class="token punctuation">.</span>eps<span class="token punctuation">)</span>
+        output <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>num_features<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            output<span class="token punctuation">.</span>append<span class="token punctuation">(</span>self<span class="token punctuation">.</span>gamma<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">*</span> x<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">/</span> rms<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> output</code></pre>
+</figure>
+<h3 id="step-6-training-with-and-without-regularization" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-6-training-with-and-without-regularization" aria-label="Link to this section">#</a>Step 6: Training With and Without Regularization</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">sigmoid</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    x <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">500</span><span class="token punctuation">,</span> <span class="token builtin">min</span><span class="token punctuation">(</span><span class="token number">500</span><span class="token punctuation">,</span> x<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token number">1.0</span> <span class="token operator">/</span> <span class="token punctuation">(</span><span class="token number">1.0</span> <span class="token operator">+</span> math<span class="token punctuation">.</span>exp<span class="token punctuation">(</span><span class="token operator">-</span>x<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+
+<span class="token keyword">def</span> <span class="token function">make_circle_data</span><span class="token punctuation">(</span>n<span class="token operator">=</span><span class="token number">200</span><span class="token punctuation">,</span> seed<span class="token operator">=</span><span class="token number">42</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    random<span class="token punctuation">.</span>seed<span class="token punctuation">(</span>seed<span class="token punctuation">)</span>
+    data <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        x <span class="token operator">=</span> random<span class="token punctuation">.</span>uniform<span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span>
+        y <span class="token operator">=</span> random<span class="token punctuation">.</span>uniform<span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span>
+        label <span class="token operator">=</span> <span class="token number">1.0</span> <span class="token keyword">if</span> x <span class="token operator">*</span> x <span class="token operator">+</span> y <span class="token operator">*</span> y <span class="token operator">&lt;</span> <span class="token number">1.5</span> <span class="token keyword">else</span> <span class="token number">0.0</span>
+        data<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">[</span>x<span class="token punctuation">,</span> y<span class="token punctuation">]</span><span class="token punctuation">,</span> label<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> data
+
+
+<span class="token keyword">class</span> <span class="token class-name">RegularizedNetwork</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> hidden_size<span class="token operator">=</span><span class="token number">16</span><span class="token punctuation">,</span> lr<span class="token operator">=</span><span class="token number">0.05</span><span class="token punctuation">,</span> dropout_p<span class="token operator">=</span><span class="token number">0.0</span><span class="token punctuation">,</span> weight_decay<span class="token operator">=</span><span class="token number">0.0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        random<span class="token punctuation">.</span>seed<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>hidden_size <span class="token operator">=</span> hidden_size
+        self<span class="token punctuation">.</span>lr <span class="token operator">=</span> lr
+        self<span class="token punctuation">.</span>dropout_p <span class="token operator">=</span> dropout_p
+        self<span class="token punctuation">.</span>weight_decay <span class="token operator">=</span> weight_decay
+        self<span class="token punctuation">.</span>dropout <span class="token operator">=</span> Dropout<span class="token punctuation">(</span>p<span class="token operator">=</span>dropout_p<span class="token punctuation">)</span> <span class="token keyword">if</span> dropout_p <span class="token operator">></span> <span class="token number">0</span> <span class="token keyword">else</span> <span class="token boolean">None</span>
+
+        self<span class="token punctuation">.</span>w1 <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">[</span>random<span class="token punctuation">.</span>gauss<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0.5</span><span class="token punctuation">)</span> <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>hidden_size<span class="token punctuation">)</span><span class="token punctuation">]</span>
+        self<span class="token punctuation">.</span>b1 <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> hidden_size
+        self<span class="token punctuation">.</span>w2 <span class="token operator">=</span> <span class="token punctuation">[</span>random<span class="token punctuation">.</span>gauss<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0.5</span><span class="token punctuation">)</span> <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>hidden_size<span class="token punctuation">)</span><span class="token punctuation">]</span>
+        self<span class="token punctuation">.</span>b2 <span class="token operator">=</span> <span class="token number">0.0</span>
+
+    <span class="token keyword">def</span> <span class="token function">forward</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> x<span class="token punctuation">,</span> training<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>x <span class="token operator">=</span> x
+        self<span class="token punctuation">.</span>z1 <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        self<span class="token punctuation">.</span>h <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>hidden_size<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            z <span class="token operator">=</span> self<span class="token punctuation">.</span>w1<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">*</span> x<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">+</span> self<span class="token punctuation">.</span>w1<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">*</span> x<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">+</span> self<span class="token punctuation">.</span>b1<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+            self<span class="token punctuation">.</span>z1<span class="token punctuation">.</span>append<span class="token punctuation">(</span>z<span class="token punctuation">)</span>
+            self<span class="token punctuation">.</span>h<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token builtin">max</span><span class="token punctuation">(</span><span class="token number">0.0</span><span class="token punctuation">,</span> z<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+        <span class="token keyword">if</span> self<span class="token punctuation">.</span>dropout <span class="token keyword">and</span> training<span class="token punctuation">:</span>
+            self<span class="token punctuation">.</span>dropout<span class="token punctuation">.</span>training <span class="token operator">=</span> <span class="token boolean">True</span>
+            self<span class="token punctuation">.</span>h <span class="token operator">=</span> self<span class="token punctuation">.</span>dropout<span class="token punctuation">.</span>forward<span class="token punctuation">(</span>self<span class="token punctuation">.</span>h<span class="token punctuation">)</span>
+        <span class="token keyword">elif</span> self<span class="token punctuation">.</span>dropout<span class="token punctuation">:</span>
+            self<span class="token punctuation">.</span>dropout<span class="token punctuation">.</span>training <span class="token operator">=</span> <span class="token boolean">False</span>
+            self<span class="token punctuation">.</span>h <span class="token operator">=</span> self<span class="token punctuation">.</span>dropout<span class="token punctuation">.</span>forward<span class="token punctuation">(</span>self<span class="token punctuation">.</span>h<span class="token punctuation">)</span>
+
+        self<span class="token punctuation">.</span>z2 <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>w2<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">*</span> self<span class="token punctuation">.</span>h<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>hidden_size<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">+</span> self<span class="token punctuation">.</span>b2
+        self<span class="token punctuation">.</span>out <span class="token operator">=</span> sigmoid<span class="token punctuation">(</span>self<span class="token punctuation">.</span>z2<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> self<span class="token punctuation">.</span>out
+
+    <span class="token keyword">def</span> <span class="token function">backward</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> target<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        eps <span class="token operator">=</span> <span class="token number">1e-15</span>
+        p <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span>eps<span class="token punctuation">,</span> <span class="token builtin">min</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> eps<span class="token punctuation">,</span> self<span class="token punctuation">.</span>out<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        d_loss <span class="token operator">=</span> <span class="token operator">-</span><span class="token punctuation">(</span>target <span class="token operator">/</span> p<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> target<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> p<span class="token punctuation">)</span>
+        d_sigmoid <span class="token operator">=</span> self<span class="token punctuation">.</span>out <span class="token operator">*</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> self<span class="token punctuation">.</span>out<span class="token punctuation">)</span>
+        d_out <span class="token operator">=</span> d_loss <span class="token operator">*</span> d_sigmoid
+
+        <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>hidden_size<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            d_relu <span class="token operator">=</span> <span class="token number">1.0</span> <span class="token keyword">if</span> self<span class="token punctuation">.</span>z1<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">></span> <span class="token number">0</span> <span class="token keyword">else</span> <span class="token number">0.0</span>
+            d_h <span class="token operator">=</span> d_out <span class="token operator">*</span> self<span class="token punctuation">.</span>w2<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">*</span> d_relu
+            self<span class="token punctuation">.</span>w2<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">-=</span> self<span class="token punctuation">.</span>lr <span class="token operator">*</span> <span class="token punctuation">(</span>d_out <span class="token operator">*</span> self<span class="token punctuation">.</span>h<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+</span> self<span class="token punctuation">.</span>weight_decay <span class="token operator">*</span> self<span class="token punctuation">.</span>w2<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span>
+            <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                self<span class="token punctuation">.</span>w1<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">-=</span> self<span class="token punctuation">.</span>lr <span class="token operator">*</span> <span class="token punctuation">(</span>d_h <span class="token operator">*</span> self<span class="token punctuation">.</span>x<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">+</span> self<span class="token punctuation">.</span>weight_decay <span class="token operator">*</span> self<span class="token punctuation">.</span>w1<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">)</span>
+            self<span class="token punctuation">.</span>b1<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">-=</span> self<span class="token punctuation">.</span>lr <span class="token operator">*</span> d_h
+        self<span class="token punctuation">.</span>b2 <span class="token operator">-=</span> self<span class="token punctuation">.</span>lr <span class="token operator">*</span> d_out
+
+    <span class="token keyword">def</span> <span class="token function">evaluate</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> data<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        correct <span class="token operator">=</span> <span class="token number">0</span>
+        total_loss <span class="token operator">=</span> <span class="token number">0.0</span>
+        <span class="token keyword">for</span> x<span class="token punctuation">,</span> y <span class="token keyword">in</span> data<span class="token punctuation">:</span>
+            pred <span class="token operator">=</span> self<span class="token punctuation">.</span>forward<span class="token punctuation">(</span>x<span class="token punctuation">,</span> training<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">)</span>
+            eps <span class="token operator">=</span> <span class="token number">1e-15</span>
+            p <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span>eps<span class="token punctuation">,</span> <span class="token builtin">min</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> eps<span class="token punctuation">,</span> pred<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            total_loss <span class="token operator">+=</span> <span class="token operator">-</span><span class="token punctuation">(</span>y <span class="token operator">*</span> math<span class="token punctuation">.</span>log<span class="token punctuation">(</span>p<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> y<span class="token punctuation">)</span> <span class="token operator">*</span> math<span class="token punctuation">.</span>log<span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> p<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>pred <span class="token operator">>=</span> <span class="token number">0.5</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token punctuation">(</span>y <span class="token operator">>=</span> <span class="token number">0.5</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                correct <span class="token operator">+=</span> <span class="token number">1</span>
+        <span class="token keyword">return</span> total_loss <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">,</span> correct <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">100</span>
+
+    <span class="token keyword">def</span> <span class="token function">train_model</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> train_data<span class="token punctuation">,</span> test_data<span class="token punctuation">,</span> epochs<span class="token operator">=</span><span class="token number">300</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        history <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">for</span> epoch <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>epochs<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            total_loss <span class="token operator">=</span> <span class="token number">0.0</span>
+            correct <span class="token operator">=</span> <span class="token number">0</span>
+            <span class="token keyword">for</span> x<span class="token punctuation">,</span> y <span class="token keyword">in</span> train_data<span class="token punctuation">:</span>
+                pred <span class="token operator">=</span> self<span class="token punctuation">.</span>forward<span class="token punctuation">(</span>x<span class="token punctuation">,</span> training<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+                self<span class="token punctuation">.</span>backward<span class="token punctuation">(</span>y<span class="token punctuation">)</span>
+                eps <span class="token operator">=</span> <span class="token number">1e-15</span>
+                p <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span>eps<span class="token punctuation">,</span> <span class="token builtin">min</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> eps<span class="token punctuation">,</span> pred<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                total_loss <span class="token operator">+=</span> <span class="token operator">-</span><span class="token punctuation">(</span>y <span class="token operator">*</span> math<span class="token punctuation">.</span>log<span class="token punctuation">(</span>p<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> y<span class="token punctuation">)</span> <span class="token operator">*</span> math<span class="token punctuation">.</span>log<span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> p<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>pred <span class="token operator">>=</span> <span class="token number">0.5</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token punctuation">(</span>y <span class="token operator">>=</span> <span class="token number">0.5</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                    correct <span class="token operator">+=</span> <span class="token number">1</span>
+            train_loss <span class="token operator">=</span> total_loss <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>train_data<span class="token punctuation">)</span>
+            train_acc <span class="token operator">=</span> correct <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>train_data<span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">100</span>
+            test_loss<span class="token punctuation">,</span> test_acc <span class="token operator">=</span> self<span class="token punctuation">.</span>evaluate<span class="token punctuation">(</span>test_data<span class="token punctuation">)</span>
+            history<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">(</span>train_loss<span class="token punctuation">,</span> train_acc<span class="token punctuation">,</span> test_loss<span class="token punctuation">,</span> test_acc<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token keyword">if</span> epoch <span class="token operator">%</span> <span class="token number">75</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token keyword">or</span> epoch <span class="token operator">==</span> epochs <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">:</span>
+                gap <span class="token operator">=</span> train_acc <span class="token operator">-</span> test_acc
+                <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"    Epoch </span><span class="token interpolation"><span class="token punctuation">{</span>epoch<span class="token punctuation">:</span><span class="token format-spec">3d</span><span class="token punctuation">}</span></span><span class="token string">: train_acc=</span><span class="token interpolation"><span class="token punctuation">{</span>train_acc<span class="token punctuation">:</span><span class="token format-spec">.1f</span><span class="token punctuation">}</span></span><span class="token string">%, test_acc=</span><span class="token interpolation"><span class="token punctuation">{</span>test_acc<span class="token punctuation">:</span><span class="token format-spec">.1f</span><span class="token punctuation">}</span></span><span class="token string">%, gap=</span><span class="token interpolation"><span class="token punctuation">{</span>gap<span class="token punctuation">:</span><span class="token format-spec">.1f</span><span class="token punctuation">}</span></span><span class="token string">%"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> history</code></pre>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>PyTorch provides all normalization and regularization as modules:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> torch
+<span class="token keyword">import</span> torch<span class="token punctuation">.</span>nn <span class="token keyword">as</span> nn
+
+model <span class="token operator">=</span> nn<span class="token punctuation">.</span>Sequential<span class="token punctuation">(</span>
+    nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">784</span><span class="token punctuation">,</span> <span class="token number">256</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    nn<span class="token punctuation">.</span>BatchNorm1d<span class="token punctuation">(</span><span class="token number">256</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    nn<span class="token punctuation">.</span>ReLU<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    nn<span class="token punctuation">.</span>Dropout<span class="token punctuation">(</span><span class="token number">0.3</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">256</span><span class="token punctuation">,</span> <span class="token number">128</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    nn<span class="token punctuation">.</span>BatchNorm1d<span class="token punctuation">(</span><span class="token number">128</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    nn<span class="token punctuation">.</span>ReLU<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    nn<span class="token punctuation">.</span>Dropout<span class="token punctuation">(</span><span class="token number">0.3</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">128</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">)</span>
+
+model<span class="token punctuation">.</span>train<span class="token punctuation">(</span><span class="token punctuation">)</span>
+out_train <span class="token operator">=</span> model<span class="token punctuation">(</span>torch<span class="token punctuation">.</span>randn<span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">,</span> <span class="token number">784</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+model<span class="token punctuation">.</span><span class="token builtin">eval</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+out_test <span class="token operator">=</span> model<span class="token punctuation">(</span>torch<span class="token punctuation">.</span>randn<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">784</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>The <code class="inline-code">model.train()</code> / <code class="inline-code">model.eval()</code> toggle is critical. It switches dropout on/off and tells BatchNorm to use batch statistics vs running statistics. Forgetting <code class="inline-code">model.eval()</code> before inference is one of the most common bugs in deep learning. Your test accuracy will fluctuate randomly because dropout is still active and BatchNorm is using mini-batch statistics.</p>
+<p>For transformers, the pattern is different:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">TransformerBlock</span><span class="token punctuation">(</span>nn<span class="token punctuation">.</span>Module<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> d_model<span class="token operator">=</span><span class="token number">512</span><span class="token punctuation">,</span> nhead<span class="token operator">=</span><span class="token number">8</span><span class="token punctuation">,</span> dropout<span class="token operator">=</span><span class="token number">0.1</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token builtin">super</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>__init__<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>attention <span class="token operator">=</span> nn<span class="token punctuation">.</span>MultiheadAttention<span class="token punctuation">(</span>d_model<span class="token punctuation">,</span> nhead<span class="token punctuation">,</span> dropout<span class="token operator">=</span>dropout<span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>norm1 <span class="token operator">=</span> nn<span class="token punctuation">.</span>LayerNorm<span class="token punctuation">(</span>d_model<span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>ff <span class="token operator">=</span> nn<span class="token punctuation">.</span>Sequential<span class="token punctuation">(</span>
+            nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span>d_model<span class="token punctuation">,</span> d_model <span class="token operator">*</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            nn<span class="token punctuation">.</span>GELU<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span>d_model <span class="token operator">*</span> <span class="token number">4</span><span class="token punctuation">,</span> d_model<span class="token punctuation">)</span><span class="token punctuation">,</span>
+            nn<span class="token punctuation">.</span>Dropout<span class="token punctuation">(</span>dropout<span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>norm2 <span class="token operator">=</span> nn<span class="token punctuation">.</span>LayerNorm<span class="token punctuation">(</span>d_model<span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>dropout <span class="token operator">=</span> nn<span class="token punctuation">.</span>Dropout<span class="token punctuation">(</span>dropout<span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">forward</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        attended<span class="token punctuation">,</span> _ <span class="token operator">=</span> self<span class="token punctuation">.</span>attention<span class="token punctuation">(</span>x<span class="token punctuation">,</span> x<span class="token punctuation">,</span> x<span class="token punctuation">)</span>
+        x <span class="token operator">=</span> self<span class="token punctuation">.</span>norm1<span class="token punctuation">(</span>x <span class="token operator">+</span> self<span class="token punctuation">.</span>dropout<span class="token punctuation">(</span>attended<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        x <span class="token operator">=</span> self<span class="token punctuation">.</span>norm2<span class="token punctuation">(</span>x <span class="token operator">+</span> self<span class="token punctuation">.</span>ff<span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> x</code></pre>
+</figure>
+<p>LayerNorm, not BatchNorm. Dropout p=0.1, not p=0.5. These are the transformer defaults.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces:</p>
+<ul>
+<li><code class="inline-code">outputs/prompt-regularization-advisor.md</code> -- a prompt that diagnoses overfitting and recommends the right regularization strategy</li>
+</ul>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p>Implement spatial dropout for 2D data: instead of dropping individual neurons, drop entire feature channels. Simulate this by treating groups of consecutive features as channels and dropping whole groups. Compare the train-test gap to standard dropout on the circle dataset with hidden_size=32.</p>
+</li>
+<li><p>Implement label smoothing from lesson 05 combined with dropout from this lesson. Train with four configurations: neither, dropout only, label smoothing only, both. Measure the final train-test accuracy gap for each. Which combination gives the smallest gap?</p>
+</li>
+<li><p>Add a BatchNorm layer between the hidden layer and the activation in your circle-dataset network. Train with and without BatchNorm at learning rates 0.01, 0.05, and 0.1. BatchNorm should allow stable training at higher learning rates where the vanilla network diverges.</p>
+</li>
+<li><p>Implement early stopping: track test loss each epoch, save the best weights, and stop if test loss hasn&#39;t improved for 20 epochs. Run the regularized network for 1000 epochs. Report which epoch had the best test accuracy and how many epochs of computation you saved.</p>
+</li>
+<li><p>Compare LayerNorm vs RMSNorm on a 4-layer network (not just 2). Initialize both with the same weights. Train for 200 epochs and compare final accuracy, training speed (time per epoch), and gradient magnitudes at the first layer. Verify that RMSNorm is faster with the same accuracy.</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Overfitting</td>
+<td>&quot;Model memorized the data&quot;</td>
+<td>When a model&#39;s training performance significantly exceeds its test performance, indicating it learned noise rather than signal</td>
+</tr>
+<tr>
+<td>Regularization</td>
+<td>&quot;Preventing overfitting&quot;</td>
+<td>Any technique that constrains model complexity to improve generalization: dropout, weight decay, normalization, augmentation</td>
+</tr>
+<tr>
+<td>Dropout</td>
+<td>&quot;Random neuron deletion&quot;</td>
+<td>Zeroing random neurons during training with probability p, forcing redundant representations; equivalent to training an ensemble</td>
+</tr>
+<tr>
+<td>Weight decay</td>
+<td>&quot;L2 penalty&quot;</td>
+<td>Shrinking all weights toward zero by subtracting lambda * w at each step; penalizes complexity through weight magnitude</td>
+</tr>
+<tr>
+<td>Batch normalization</td>
+<td>&quot;Normalize per batch&quot;</td>
+<td>Normalizing layer outputs across the batch dimension using batch statistics during training and running averages during inference</td>
+</tr>
+<tr>
+<td>Layer normalization</td>
+<td>&quot;Normalize per sample&quot;</td>
+<td>Normalizing across features within each sample; batch-independent, used in transformers where batch size varies</td>
+</tr>
+<tr>
+<td>RMSNorm</td>
+<td>&quot;LayerNorm without the mean&quot;</td>
+<td>Root mean square normalization; drops the mean subtraction from LayerNorm for 10% speedup with equal accuracy</td>
+</tr>
+<tr>
+<td>Early stopping</td>
+<td>&quot;Stop before overfit&quot;</td>
+<td>Halting training when validation loss stops improving; the simplest regularizer, often used alongside others</td>
+</tr>
+<tr>
+<td>Data augmentation</td>
+<td>&quot;More data from less&quot;</td>
+<td>Transforming training inputs (flip, crop, noise) to increase effective dataset size and force invariance learning</td>
+</tr>
+<tr>
+<td>Generalization gap</td>
+<td>&quot;Train-test split&quot;</td>
+<td>The difference between training and test performance; regularization aims to minimize this gap</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li>Srivastava et al., &quot;Dropout: A Simple Way to Prevent Neural Networks from Overfitting&quot; (2014) -- the original dropout paper with the ensemble interpretation and extensive experiments</li>
+<li>Ioffe &amp; Szegedy, &quot;Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift&quot; (2015) -- introduced BatchNorm and its training procedure, one of the most cited deep learning papers</li>
+<li>Zhang &amp; Sennrich, &quot;Root Mean Square Layer Normalization&quot; (2019) -- showed RMSNorm matches LayerNorm accuracy with reduced computation; adopted by LLaMA and Mistral</li>
+<li>Zhang et al., &quot;Understanding Deep Learning Requires Rethinking Generalization&quot; (2017) -- the landmark paper showing neural networks can memorize random labels, challenging traditional views of generalization</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="06-optimizers.html">
+  <span class="label">← Previous</span>
+  <b>Optimizers</b>
+</a>
+      <a class="pager__item pager__item--next" href="08-weight-initialization.html">
+  <span class="label">Next →</span>
+  <b>Weight Initialization and Training Stability</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>9 minutes</b> of Deep Learning Core behind you.</p>
+      <a class="btn btn--solid" href="08-weight-initialization.html">Continue to Weight Initialization and Training Stability →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#the-overfitting-spectrum">The Overfitting Spectrum</a></li><li class="mini__item mini__item--d3"><a href="#dropout">Dropout</a></li><li class="mini__item mini__item--d3"><a href="#weight-decay-l2-regularization">Weight Decay (L2 Regularization)</a></li><li class="mini__item mini__item--d3"><a href="#batch-normalization">Batch Normalization</a></li><li class="mini__item mini__item--d3"><a href="#layer-normalization">Layer Normalization</a></li><li class="mini__item mini__item--d3"><a href="#rmsnorm">RMSNorm</a></li><li class="mini__item mini__item--d3"><a href="#normalization-comparison">Normalization Comparison</a></li><li class="mini__item mini__item--d3"><a href="#data-augmentation-as-regularization">Data Augmentation as Regularization</a></li><li class="mini__item mini__item--d3"><a href="#early-stopping">Early Stopping</a></li><li class="mini__item mini__item--d3"><a href="#when-to-apply-what">When to Apply What</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-dropout-train-and-eval-mode">Step 1: Dropout (Train and Eval Mode)</a></li><li class="mini__item mini__item--d3"><a href="#step-2-l2-weight-decay">Step 2: L2 Weight Decay</a></li><li class="mini__item mini__item--d3"><a href="#step-3-batch-normalization">Step 3: Batch Normalization</a></li><li class="mini__item mini__item--d3"><a href="#step-4-layer-normalization">Step 4: Layer Normalization</a></li><li class="mini__item mini__item--d3"><a href="#step-5-rmsnorm">Step 5: RMSNorm</a></li><li class="mini__item mini__item--d3"><a href="#step-6-training-with-and-without-regularization">Step 6: Training With and Without Regularization</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

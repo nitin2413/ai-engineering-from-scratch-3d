@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Long-Context Evaluation — NIAH, RULER, LongBench, MRCR — NLP, Foundations to Advanced — AIFS</title>
+<meta name="description" content="NLP, Foundations to Advanced: Long-Context Evaluation — NIAH, RULER, LongBench, MRCR. 4 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Long-Context Evaluation — NIAH, RULER, LongBench, MRCR — NLP, Foundations to Advanced — AIFS">
+<meta property="og:description" content="NLP, Foundations to Advanced: Long-Context Evaluation — NIAH, RULER, LongBench, MRCR. 4 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"gx-niah-decay":["../assets/figures/figures-genai3.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-genai3.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#B8FF3C" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#B8FF3C;--accent-ink:#111111"
+  data-lesson-id="nlp-foundations-to-advanced/28-long-context-evaluation" data-module="nlp-foundations-to-advanced"
+  data-prev="27-llm-evaluation-frameworks.html" data-next="29-dialogue-state-tracking.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#B8FF3C">
+        <span class="label">Phase 05</span>
+        <b>NLP, Foundations to Advanced</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="nlp-foundations-to-advanced/01-text-processing"><a href="01-text-processing.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Text Processing — Tokenization, Stemming, Lemmatization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/02-bag-of-words-tfidf"><a href="02-bag-of-words-tfidf.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Bag of Words, TF-IDF, and Text Representation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/03-word-embeddings-word2vec"><a href="03-word-embeddings-word2vec.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Word Embeddings — Word2Vec from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/04-glove-fasttext-subword"><a href="04-glove-fasttext-subword.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">GloVe, FastText, and Subword Embeddings</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/05-sentiment-analysis"><a href="05-sentiment-analysis.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Sentiment Analysis</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/06-named-entity-recognition"><a href="06-named-entity-recognition.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Named Entity Recognition</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/07-pos-tagging-parsing"><a href="07-pos-tagging-parsing.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">POS Tagging and Syntactic Parsing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/08-cnns-rnns-for-text"><a href="08-cnns-rnns-for-text.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">CNNs and RNNs for Text</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/09-sequence-to-sequence"><a href="09-sequence-to-sequence.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Sequence-to-Sequence Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/10-attention-mechanism"><a href="10-attention-mechanism.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Attention Mechanism — The Breakthrough</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/11-machine-translation"><a href="11-machine-translation.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Machine Translation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/12-text-summarization"><a href="12-text-summarization.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Text Summarization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/13-question-answering"><a href="13-question-answering.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Question Answering Systems</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/14-information-retrieval-search"><a href="14-information-retrieval-search.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Information Retrieval and Search</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/15-topic-modeling"><a href="15-topic-modeling.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Topic Modeling — LDA and BERTopic</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/16-text-generation-pre-transformer"><a href="16-text-generation-pre-transformer.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Text Generation Before Transformers — N-gram Language Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/17-chatbots-rule-to-neural"><a href="17-chatbots-rule-to-neural.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Chatbots — Rule-Based to Neural to LLM Agents</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/18-multilingual-nlp"><a href="18-multilingual-nlp.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Multilingual NLP</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/19-subword-tokenization"><a href="19-subword-tokenization.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">Subword Tokenization — BPE, WordPiece, Unigram, SentencePiece</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/20-structured-outputs-constrained-decoding"><a href="20-structured-outputs-constrained-decoding.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Structured Outputs &amp; Constrained Decoding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/21-nli-textual-entailment"><a href="21-nli-textual-entailment.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Natural Language Inference — Textual Entailment</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/22-embedding-models-deep-dive"><a href="22-embedding-models-deep-dive.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Embedding Models — The 2026 Deep Dive</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/23-chunking-strategies-rag"><a href="23-chunking-strategies-rag.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Chunking Strategies for RAG</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/24-coreference-resolution"><a href="24-coreference-resolution.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Coreference Resolution</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/25-entity-linking"><a href="25-entity-linking.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Entity Linking &amp; Disambiguation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/26-relation-extraction-kg"><a href="26-relation-extraction-kg.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Relation Extraction &amp; Knowledge Graph Construction</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/27-llm-evaluation-frameworks"><a href="27-llm-evaluation-frameworks.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">LLM Evaluation — RAGAS, DeepEval, G-Eval</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/28-long-context-evaluation"><a href="28-long-context-evaluation.html" class="is-current">
+  <span class="snav__n">28</span>
+  <span class="snav__t">Long-Context Evaluation — NIAH, RULER, LongBench, MRCR</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/29-dialogue-state-tracking"><a href="29-dialogue-state-tracking.html" class="">
+  <span class="snav__n">29</span>
+  <span class="snav__t">Dialogue State Tracking</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">NLP, Foundations to Advanced</a></p>
+      <h1 class="page__title">Long-Context Evaluation — NIAH, RULER, LongBench, MRCR</h1>
+      <p class="page__lede">Gemini 3 Pro advertises 10M tokens of context. At 1M tokens, 8-needle MRCR drops to 26.3%. Advertised ≠ usable. Long-context evaluation tells you the actual capacity of the model you are shipping on.</p>
+      <div class="page__meta">
+        <span class="chip">4 min read</span>
+        <span class="chip">983 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Learn</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 5 · 13 (Question Answering), Phase 5 · 23 (Chunking Strategies)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~60 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>You have a 200-page contract. The model claims a 1M-token context. You paste the contract in and ask: &quot;What is the termination clause?&quot; The model answers — but answers from the cover page because the termination clause sits at 120k tokens deep, past where the model actually attends.</p>
+<p>This is the 2026 context-capacity gap. Spec sheets say 1M or 10M. Reality says 60-70% of that is usable, and &quot;usable&quot; depends on the task.</p>
+<ul>
+<li><strong>Retrieval (single needle in haystack):</strong> near-perfect up to the advertised max on frontier models.</li>
+<li><strong>Multi-hop / aggregation:</strong> degrades sharply past ~128k on most models.</li>
+<li><strong>Reasoning over dispersed facts:</strong> the first task to fail.</li>
+</ul>
+<p>Long-context evaluation measures these axes. This lesson names the benchmarks, what each actually measures, and how to build a custom needle test for your domain.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<p><img src="assets/28-long-context-evaluation/long-context-eval.svg" alt="NIAH baseline, RULER multi-task, LongBench holistic" loading="lazy"></p>
+<p><strong>Needle-in-a-Haystack (NIAH, 2023).</strong> Place a fact (&quot;the magic word is pineapple&quot;) at a controlled depth in a long context. Ask the model to retrieve it. Sweep depth × length. The original long-context benchmark. Frontier models now saturate this; it is a necessary but not sufficient baseline.</p>
+<p><strong>RULER (Nvidia, 2024).</strong> 13 task types across 4 categories: retrieval (single / multi-key / multi-value), multi-hop tracing (variable tracking), aggregation (common word frequency), QA. Configurable context length (4k to 128k+). Reveals models that saturate NIAH but fail on multi-hop. In the 2024 release, only half of 17 models claiming 32k+ context maintained quality at 32k.</p>
+<p><strong>LongBench v2 (2024).</strong> 503 multiple-choice questions, 8k-2M word contexts, six task categories: single-doc QA, multi-doc QA, long in-context learning, long dialogue, code repo, long structured data. The production benchmark for real-world long-context behavior.</p>
+<p><strong>MRCR (Multi-Round Coreference Resolution).</strong> Multi-turn coreference at scale. 8-needle, 24-needle, 100-needle variants. Exposes how many facts a model can juggle before attention degrades.</p>
+<p><strong>NoLiMa.</strong> &quot;Non-lexical needle.&quot; The needle and the query share no literal overlap; retrieval requires one step of semantic reasoning. Harder than NIAH.</p>
+<p><strong>HELMET.</strong> Concatenates many documents, asks a question from any one. Tests selective attention.</p>
+<p><strong>BABILong.</strong> Embeds bAbI reasoning chains inside irrelevant haystacks. Tests reasoning-in-a-haystack, not just retrieval.</p>
+<h3 id="what-to-actually-report" class="prose-h prose-h3"><a class="prose-h__anchor" href="#what-to-actually-report" aria-label="Link to this section">#</a>What to actually report</h3>
+<ul>
+<li><strong>Advertised context window.</strong> The spec-sheet number.</li>
+<li><strong>Effective retrieval length.</strong> NIAH pass at some threshold (e.g., 90%).</li>
+<li><strong>Effective reasoning length.</strong> Multi-hop or aggregation pass at that threshold.</li>
+<li><strong>Degradation curve.</strong> Accuracy vs context length, plotted per task type.</li>
+</ul>
+<p>Two numbers for your spec sheet: retrieval-effective and reasoning-effective. Usually the reasoning-effective is 25-50% of the advertised window.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="gx-niah-decay"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">gx-niah-decay</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> gx niah decay</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-a-custom-niah-for-your-domain" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-a-custom-niah-for-your-domain" aria-label="Link to this section">#</a>Step 1: a custom NIAH for your domain</h3>
+<p>See <code class="inline-code">code/main.py</code>. The skeleton:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">build_haystack</span><span class="token punctuation">(</span>filler_text<span class="token punctuation">,</span> needle<span class="token punctuation">,</span> depth_ratio<span class="token punctuation">,</span> total_tokens<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> <span class="token keyword">not</span> <span class="token punctuation">(</span><span class="token number">0.0</span> <span class="token operator">&lt;=</span> depth_ratio <span class="token operator">&lt;=</span> <span class="token number">1.0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">raise</span> ValueError<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"depth_ratio must be in [0, 1], got </span><span class="token interpolation"><span class="token punctuation">{</span>depth_ratio<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> total_tokens <span class="token operator">&lt;=</span> <span class="token number">0</span><span class="token punctuation">:</span>
+        <span class="token keyword">raise</span> ValueError<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"total_tokens must be positive, got </span><span class="token interpolation"><span class="token punctuation">{</span>total_tokens<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    filler_tokens <span class="token operator">=</span> tokenize<span class="token punctuation">(</span>filler_text<span class="token punctuation">)</span>
+    needle_tokens <span class="token operator">=</span> tokenize<span class="token punctuation">(</span>needle<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> <span class="token keyword">not</span> filler_tokens<span class="token punctuation">:</span>
+        <span class="token keyword">raise</span> ValueError<span class="token punctuation">(</span><span class="token string">"filler_text produced no tokens"</span><span class="token punctuation">)</span>
+
+    <span class="token comment"># Repeat filler until long enough to fill the haystack body.</span>
+    body_len <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span>total_tokens <span class="token operator">-</span> <span class="token builtin">len</span><span class="token punctuation">(</span>needle_tokens<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
+    <span class="token keyword">while</span> <span class="token builtin">len</span><span class="token punctuation">(</span>filler_tokens<span class="token punctuation">)</span> <span class="token operator">&lt;</span> body_len<span class="token punctuation">:</span>
+        filler_tokens <span class="token operator">=</span> filler_tokens <span class="token operator">+</span> filler_tokens
+    filler_tokens <span class="token operator">=</span> filler_tokens<span class="token punctuation">[</span><span class="token punctuation">:</span>body_len<span class="token punctuation">]</span>
+
+    insert_at <span class="token operator">=</span> <span class="token builtin">min</span><span class="token punctuation">(</span><span class="token builtin">int</span><span class="token punctuation">(</span>body_len <span class="token operator">*</span> depth_ratio<span class="token punctuation">)</span><span class="token punctuation">,</span> body_len<span class="token punctuation">)</span>
+    haystack <span class="token operator">=</span> filler_tokens<span class="token punctuation">[</span><span class="token punctuation">:</span>insert_at<span class="token punctuation">]</span> <span class="token operator">+</span> needle_tokens <span class="token operator">+</span> filler_tokens<span class="token punctuation">[</span>insert_at<span class="token punctuation">:</span><span class="token punctuation">]</span>
+    <span class="token keyword">return</span> <span class="token string">" "</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>haystack<span class="token punctuation">)</span>
+
+
+<span class="token keyword">def</span> <span class="token function">score_niah</span><span class="token punctuation">(</span>model<span class="token punctuation">,</span> haystack<span class="token punctuation">,</span> question<span class="token punctuation">,</span> expected<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    answer <span class="token operator">=</span> model<span class="token punctuation">.</span>complete<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Context: </span><span class="token interpolation"><span class="token punctuation">{</span>haystack<span class="token punctuation">}</span></span><span class="token string">\nQ: </span><span class="token interpolation"><span class="token punctuation">{</span>question<span class="token punctuation">}</span></span><span class="token string">\nA:"</span></span><span class="token punctuation">,</span> max_tokens<span class="token operator">=</span><span class="token number">50</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token number">1</span> <span class="token keyword">if</span> expected<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">in</span> answer<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">else</span> <span class="token number">0</span></code></pre>
+</figure>
+<p>Sweep <code class="inline-code">depth_ratio</code> ∈ {0, 0.25, 0.5, 0.75, 1.0} × <code class="inline-code">total_tokens</code> ∈ {1k, 4k, 16k, 64k}. Plot the heatmap. That is the NIAH card for your target model.</p>
+<h3 id="step-2-a-multi-needle-variant" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-a-multi-needle-variant" aria-label="Link to this section">#</a>Step 2: a multi-needle variant</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">build_multi_needle</span><span class="token punctuation">(</span>filler<span class="token punctuation">,</span> needles<span class="token punctuation">,</span> total_tokens<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    depths <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.1</span><span class="token punctuation">,</span> <span class="token number">0.4</span><span class="token punctuation">,</span> <span class="token number">0.7</span><span class="token punctuation">]</span>
+    chunks <span class="token operator">=</span> <span class="token punctuation">[</span>filler<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token builtin">int</span><span class="token punctuation">(</span>total_tokens <span class="token operator">*</span> <span class="token number">0.1</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> depth<span class="token punctuation">,</span> needle <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>depths<span class="token punctuation">,</span> needles<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        chunks<span class="token punctuation">.</span>append<span class="token punctuation">(</span>needle<span class="token punctuation">)</span>
+        next_chunk <span class="token operator">=</span> filler<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">(</span>total_tokens <span class="token operator">*</span> depth<span class="token punctuation">)</span><span class="token punctuation">:</span> <span class="token builtin">int</span><span class="token punctuation">(</span>total_tokens <span class="token operator">*</span> <span class="token punctuation">(</span>depth <span class="token operator">+</span> <span class="token number">0.3</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+        chunks<span class="token punctuation">.</span>append<span class="token punctuation">(</span>next_chunk<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token string">" "</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>chunks<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Questions like &quot;What are the three magic words?&quot; require retrieving all three. Single-needle success does not predict multi-needle success.</p>
+<h3 id="step-3-multi-hop-variable-tracing-ruler-style" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-multi-hop-variable-tracing-ruler-style" aria-label="Link to this section">#</a>Step 3: multi-hop variable tracing (RULER-style)</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python">haystack <span class="token operator">=</span> <span class="token triple-quoted-string string">"""X1 = 42. ... (filler) ... X2 = X1 + 10. ... (filler) ... X3 = X2 * 2."""</span>
+question <span class="token operator">=</span> <span class="token string">"What is X3?"</span></code></pre>
+</figure>
+<p>The answer requires chaining three assignments. Frontier models at 128k often drop to 50-70% accuracy here.</p>
+<h3 id="step-4-longbench-v2-on-your-stack" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-longbench-v2-on-your-stack" aria-label="Link to this section">#</a>Step 4: LongBench v2 on your stack</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> datasets <span class="token keyword">import</span> load_dataset
+longbench <span class="token operator">=</span> load_dataset<span class="token punctuation">(</span><span class="token string">"THUDM/LongBench-v2"</span><span class="token punctuation">)</span>
+
+<span class="token keyword">def</span> <span class="token function">eval_model_on_longbench</span><span class="token punctuation">(</span>model<span class="token punctuation">,</span> subset<span class="token operator">=</span><span class="token string">"single-doc-qa"</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    tasks <span class="token operator">=</span> <span class="token punctuation">[</span>x <span class="token keyword">for</span> x <span class="token keyword">in</span> longbench<span class="token punctuation">[</span><span class="token string">"test"</span><span class="token punctuation">]</span> <span class="token keyword">if</span> x<span class="token punctuation">[</span><span class="token string">"task"</span><span class="token punctuation">]</span> <span class="token operator">==</span> subset<span class="token punctuation">]</span>
+    correct <span class="token operator">=</span> <span class="token number">0</span>
+    <span class="token keyword">for</span> x <span class="token keyword">in</span> tasks<span class="token punctuation">:</span>
+        answer <span class="token operator">=</span> model<span class="token punctuation">.</span>complete<span class="token punctuation">(</span>x<span class="token punctuation">[</span><span class="token string">"context"</span><span class="token punctuation">]</span> <span class="token operator">+</span> <span class="token string">"\n\nQ: "</span> <span class="token operator">+</span> x<span class="token punctuation">[</span><span class="token string">"question"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> max_tokens<span class="token operator">=</span><span class="token number">20</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> normalize<span class="token punctuation">(</span>answer<span class="token punctuation">)</span> <span class="token operator">==</span> normalize<span class="token punctuation">(</span>x<span class="token punctuation">[</span><span class="token string">"answer"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            correct <span class="token operator">+=</span> <span class="token number">1</span>
+    <span class="token keyword">return</span> correct <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>tasks<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Report per-category accuracy. Aggregate scores hide big task-level differences.</p>
+<h2 id="pitfalls" class="prose-h prose-h2"><a class="prose-h__anchor" href="#pitfalls" aria-label="Link to this section">#</a>Pitfalls</h2>
+<ul>
+<li><strong>NIAH-only evaluation.</strong> Passing NIAH at 1M tokens says nothing about multi-hop. Always run RULER or a custom multi-hop test.</li>
+<li><strong>Uniform depth sampling.</strong> Many implementations only test depth=0.5. Test depth=0, 0.25, 0.5, 0.75, 1.0 — the &quot;lost in the middle&quot; effect is real.</li>
+<li><strong>Lexical overlap with filler.</strong> If the needle shares keywords with the filler, retrieval becomes trivial. Use NoLiMa-style non-overlapping needles.</li>
+<li><strong>Ignoring latency.</strong> 1M-token prompts take 30-120 seconds to prefill. Measure time-to-first-token alongside accuracy.</li>
+<li><strong>Vendor-self-reported numbers.</strong> OpenAI, Google, Anthropic all publish their own scores. Always re-run independently on your use case.</li>
+</ul>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>The 2026 stack:</p>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Benchmark</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Quick sanity check</td>
+<td>Custom NIAH at 3 depths × 3 lengths</td>
+</tr>
+<tr>
+<td>Model selection for production</td>
+<td>RULER (13 tasks) at your target length</td>
+</tr>
+<tr>
+<td>Real-world QA quality</td>
+<td>LongBench v2 single-doc-QA subset</td>
+</tr>
+<tr>
+<td>Multi-hop reasoning</td>
+<td>BABILong or custom variable-tracing</td>
+</tr>
+<tr>
+<td>Conversational / dialogue</td>
+<td>MRCR 8-needle at your target length</td>
+</tr>
+<tr>
+<td>Model upgrade regression</td>
+<td>Fixed in-house NIAH + RULER harness, run on every new model</td>
+</tr>
+</tbody></table>
+<p>Rule of thumb for production: never trust a context window until you have NIAH + 1 reasoning task at your intended length.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>Save as <code class="inline-code">outputs/skill-long-context-eval.md</code>:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">markdown</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-markdown"><span class="token front-matter-block"><span class="token punctuation">---</span>
+<span class="token front-matter yaml language-yaml"><span class="token key atrule">name</span><span class="token punctuation">:</span> long<span class="token punctuation">-</span>context<span class="token punctuation">-</span>eval
+<span class="token key atrule">description</span><span class="token punctuation">:</span> Design a long<span class="token punctuation">-</span>context evaluation battery for a given model and use case.
+<span class="token key atrule">version</span><span class="token punctuation">:</span> 1.0.0
+<span class="token key atrule">phase</span><span class="token punctuation">:</span> <span class="token number">5</span>
+<span class="token key atrule">lesson</span><span class="token punctuation">:</span> <span class="token number">28</span>
+<span class="token key atrule">tags</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>nlp<span class="token punctuation">,</span> long<span class="token punctuation">-</span>context<span class="token punctuation">,</span> evaluation<span class="token punctuation">]</span></span>
+<span class="token punctuation">---</span></span>
+
+Given a target model, target context length, and use case, output:
+
+<span class="token list punctuation">1.</span> Tests. NIAH depth × length grid; RULER multi-hop; custom domain task.
+<span class="token list punctuation">2.</span> Sampling. Depths 0, 0.25, 0.5, 0.75, 1.0 at each length.
+<span class="token list punctuation">3.</span> Metrics. Retrieval pass rate; reasoning pass rate; time-to-first-token; cost-per-query.
+<span class="token list punctuation">4.</span> Cutoff. Effective retrieval length (90% pass) and effective reasoning length (70% pass). Report both.
+<span class="token list punctuation">5.</span> Regression. Fixed harness, rerun on every model upgrade, surface deltas.
+
+Refuse to trust a context window from the model card alone. Refuse NIAH-only evaluation for any multi-hop workload. Refuse vendor self-reported long-context scores as independent evidence.</code></pre>
+</figure>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><strong>Easy.</strong> Build a NIAH with 3 depths (0.25, 0.5, 0.75) × 3 lengths (1k, 4k, 16k). Run on any model. Plot pass rate as a 3×3 heatmap.</li>
+<li><strong>Medium.</strong> Add a 3-needle variant. Measure retrieval of all 3 at each length. Compare to single-needle pass rate at the same length.</li>
+<li><strong>Hard.</strong> Construct a variable-tracing task (X1 → X2 → X3, with 3 hops) embedded in 64k of filler. Measure accuracy across 3 frontier models. Report effective reasoning length per model.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>NIAH</td>
+<td>Needle in haystack</td>
+<td>Plant a fact in filler, ask the model to retrieve it.</td>
+</tr>
+<tr>
+<td>RULER</td>
+<td>NIAH on steroids</td>
+<td>13 task types across retrieval / multi-hop / aggregation / QA.</td>
+</tr>
+<tr>
+<td>Effective context</td>
+<td>The real capacity</td>
+<td>Length at which accuracy still holds above threshold.</td>
+</tr>
+<tr>
+<td>Lost in the middle</td>
+<td>Depth bias</td>
+<td>Models under-attend to content in the middle of long inputs.</td>
+</tr>
+<tr>
+<td>Multi-needle</td>
+<td>Many facts at once</td>
+<td>Multiple plants; tests attention juggling, not retrieval alone.</td>
+</tr>
+<tr>
+<td>MRCR</td>
+<td>Multi-round coref</td>
+<td>8, 24, or 100-needle coreference; exposes attention saturation.</td>
+</tr>
+<tr>
+<td>NoLiMa</td>
+<td>Non-lexical needle</td>
+<td>Needle and query share no literal tokens; requires reasoning.</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://github.com/gkamradt/LLMTest_NeedleInAHaystack" target="_blank" rel="noopener">Kamradt (2023). Needle in a Haystack analysis</a> — the original NIAH repo.</li>
+<li><a href="https://arxiv.org/abs/2404.06654" target="_blank" rel="noopener">Hsieh et al. (2024). RULER: What&#39;s the Real Context Size of Your Long-Context LMs?</a> — the multi-task benchmark.</li>
+<li><a href="https://arxiv.org/abs/2412.15204" target="_blank" rel="noopener">Bai et al. (2024). LongBench v2</a> — real-world long-context eval.</li>
+<li><a href="https://arxiv.org/abs/2404.06666" target="_blank" rel="noopener">Modarressi et al. (2024). NoLiMa: Non-lexical needles</a> — harder needles.</li>
+<li><a href="https://arxiv.org/abs/2406.10149" target="_blank" rel="noopener">Kuratov et al. (2024). BABILong</a> — reasoning-in-haystack.</li>
+<li><a href="https://arxiv.org/abs/2307.03172" target="_blank" rel="noopener">Liu et al. (2024). Lost in the Middle: How Language Models Use Long Contexts</a> — the depth-bias paper.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="27-llm-evaluation-frameworks.html">
+  <span class="label">← Previous</span>
+  <b>LLM Evaluation — RAGAS, DeepEval, G-Eval</b>
+</a>
+      <a class="pager__item pager__item--next" href="29-dialogue-state-tracking.html">
+  <span class="label">Next →</span>
+  <b>Dialogue State Tracking</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>4 minutes</b> of NLP, Foundations to Advanced behind you.</p>
+      <a class="btn btn--solid" href="29-dialogue-state-tracking.html">Continue to Dialogue State Tracking →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#what-to-actually-report">What to actually report</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-a-custom-niah-for-your-domain">Step 1: a custom NIAH for your domain</a></li><li class="mini__item mini__item--d3"><a href="#step-2-a-multi-needle-variant">Step 2: a multi-needle variant</a></li><li class="mini__item mini__item--d3"><a href="#step-3-multi-hop-variable-tracing-ruler-style">Step 3: multi-hop variable tracing (RULER-style)</a></li><li class="mini__item mini__item--d3"><a href="#step-4-longbench-v2-on-your-stack">Step 4: LongBench v2 on your stack</a></li><li class="mini__item mini__item--d2"><a href="#pitfalls">Pitfalls</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

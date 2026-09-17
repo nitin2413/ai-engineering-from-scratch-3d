@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Multi-Object Tracking &amp; Video Memory — Computer Vision — AIFS</title>
+<meta name="description" content="Computer Vision: Multi-Object Tracking &amp; Video Memory. 6 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Multi-Object Tracking &amp; Video Memory — Computer Vision — AIFS">
+<meta property="og:description" content="Computer Vision: Multi-Object Tracking &amp; Video Memory. 6 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"cv3-track-assoc":["../assets/figures/figures-cv3.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-cv3.js"];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#FF6B1A" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#FF6B1A;--accent-ink:#111111"
+  data-lesson-id="computer-vision/27-multi-object-tracking" data-module="computer-vision"
+  data-prev="26-monocular-depth.html" data-next="28-world-models-video-diffusion.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#FF6B1A">
+        <span class="label">Phase 04</span>
+        <b>Computer Vision</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="computer-vision/01-image-fundamentals"><a href="01-image-fundamentals.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Image Fundamentals — Pixels, Channels, Color Spaces</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/02-convolutions-from-scratch"><a href="02-convolutions-from-scratch.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Convolutions from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/03-cnns-lenet-to-resnet"><a href="03-cnns-lenet-to-resnet.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">CNNs — LeNet to ResNet</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/04-image-classification"><a href="04-image-classification.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Image Classification</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/05-transfer-learning"><a href="05-transfer-learning.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Transfer Learning &amp; Fine-Tuning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/06-object-detection-yolo"><a href="06-object-detection-yolo.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Object Detection — YOLO from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/07-semantic-segmentation-unet"><a href="07-semantic-segmentation-unet.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Semantic Segmentation — U-Net</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/08-instance-segmentation-mask-rcnn"><a href="08-instance-segmentation-mask-rcnn.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Instance Segmentation — Mask R-CNN</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/09-image-generation-gans"><a href="09-image-generation-gans.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Image Generation — GANs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/10-image-generation-diffusion"><a href="10-image-generation-diffusion.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Image Generation — Diffusion Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/11-stable-diffusion"><a href="11-stable-diffusion.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Stable Diffusion — Architecture &amp; Fine-Tuning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/12-video-understanding"><a href="12-video-understanding.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Video Understanding — Temporal Modeling</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/13-3d-vision-nerf"><a href="13-3d-vision-nerf.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">3D Vision — Point Clouds &amp; NeRFs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/14-vision-transformers"><a href="14-vision-transformers.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Vision Transformers (ViT)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/15-real-time-edge"><a href="15-real-time-edge.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Real-Time Vision — Edge Deployment</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/16-vision-pipeline-capstone"><a href="16-vision-pipeline-capstone.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Build a Complete Vision Pipeline — Capstone</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/17-self-supervised-vision"><a href="17-self-supervised-vision.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Self-Supervised Vision — SimCLR, DINO, MAE</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/18-open-vocab-clip"><a href="18-open-vocab-clip.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Open-Vocabulary Vision — CLIP</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/19-ocr-document-understanding"><a href="19-ocr-document-understanding.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">OCR &amp; Document Understanding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/20-image-retrieval-metric"><a href="20-image-retrieval-metric.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Image Retrieval &amp; Metric Learning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/21-keypoint-pose"><a href="21-keypoint-pose.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Keypoint Detection &amp; Pose Estimation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/22-3d-gaussian-splatting"><a href="22-3d-gaussian-splatting.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">3D Gaussian Splatting from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/23-diffusion-transformers-rectified-flow"><a href="23-diffusion-transformers-rectified-flow.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Diffusion Transformers &amp; Rectified Flow</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/24-sam3-open-vocab-segmentation"><a href="24-sam3-open-vocab-segmentation.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">SAM 3 &amp; Open-Vocabulary Segmentation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/25-vision-language-models"><a href="25-vision-language-models.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Vision-Language Models — The ViT-MLP-LLM Pattern</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/26-monocular-depth"><a href="26-monocular-depth.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Monocular Depth &amp; Geometry Estimation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/27-multi-object-tracking"><a href="27-multi-object-tracking.html" class="is-current">
+  <span class="snav__n">27</span>
+  <span class="snav__t">Multi-Object Tracking &amp; Video Memory</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/28-world-models-video-diffusion"><a href="28-world-models-video-diffusion.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">World Models &amp; Video Diffusion</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Computer Vision</a></p>
+      <h1 class="page__title">Multi-Object Tracking &amp; Video Memory</h1>
+      <p class="page__lede">Tracking is detection plus association. Detect every frame. Match this frame's detections to last frame's tracks by ID.</p>
+      <div class="page__meta">
+        <span class="chip">6 min read</span>
+        <span class="chip">1,335 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 4 Lesson 06 (YOLO Detection), Phase 4 Lesson 08 (Mask R-CNN), Phase 4 Lesson 24 (SAM 3)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~60 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Distinguish tracking-by-detection from query-based tracking and name the algorithm families (SORT, DeepSORT, ByteTrack, BoT-SORT, SAM 2 memory tracker, SAM 3.1 Object Multiplex)</li>
+<li>Implement IoU + Hungarian assignment from scratch for classic tracking-by-detection</li>
+<li>Explain SAM 2&#39;s memory bank and why it handles occlusion better than IoU-based association</li>
+<li>Read the three tracking metrics (MOTA, IDF1, HOTA) and pick which one matters for a given use case</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>A detector tells you where the objects are in a single frame. A tracker tells you which detection in frame <code class="inline-code">t</code> is the same object as a detection in frame <code class="inline-code">t-1</code>. Without that, you cannot count objects crossing a line, follow a ball through an occlusion, or know &quot;car #4 has been in the lane for 8 seconds.&quot;</p>
+<p>Tracking is essential to every video-facing product: sports analytics, surveillance, autonomous driving, medical video analysis, wildlife monitoring, wordmark counting. The core building blocks are shared: a per-frame detector, a motion model (Kalman filter or something richer), an association step (Hungarian algorithm on IoU / cosine / learned features), and a track lifecycle (birth, update, death).</p>
+<p>2026 brought two new patterns: <strong>SAM 2 memory-based tracking</strong> (feature-memory instead of motion-model association) and <strong>SAM 3.1 Object Multiplex</strong> (shared memory for many instances of the same concept). This lesson walks the classical stack first, then the memory-based approach.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="tracking-by-detection" class="prose-h prose-h3"><a class="prose-h__anchor" href="#tracking-by-detection" aria-label="Link to this section">#</a>Tracking-by-detection</h3>
+<figure class="mermaid-figure">
+  <pre class="mermaid">flowchart LR
+    F1[&quot;Frame t&quot;] --&gt; DET[&quot;Detector&quot;] --&gt; D1[&quot;Detections at t&quot;]
+    PREV[&quot;Tracks up to t-1&quot;] --&gt; PREDICT[&quot;Motion predict&lt;br/&gt;(Kalman)&quot;]
+    PREDICT --&gt; PRED[&quot;Predicted tracks at t&quot;]
+    D1 --&gt; ASSOC[&quot;Hungarian assignment&lt;br/&gt;(IoU / cosine / motion)&quot;]
+    PRED --&gt; ASSOC
+    ASSOC --&gt; UPDATE[&quot;Update matched tracks&quot;]
+    ASSOC --&gt; NEW[&quot;Birth new tracks&quot;]
+    ASSOC --&gt; DEAD[&quot;Age unmatched tracks; delete after N&quot;]
+    UPDATE --&gt; NEXT[&quot;Tracks at t&quot;]
+    NEW --&gt; NEXT
+    DEAD --&gt; NEXT
+
+    style DET fill:#dbeafe,stroke:#2563eb
+    style ASSOC fill:#fef3c7,stroke:#d97706
+    style NEXT fill:#dcfce7,stroke:#16a34a</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>Every tracker you will encounter in 2026 is a variation on this loop. The differences:</p>
+<ul>
+<li><strong>SORT</strong> (2016): Kalman filter + IoU Hungarian. Simple, fast, no appearance model.</li>
+<li><strong>DeepSORT</strong> (2017): SORT + a CNN-based appearance feature per track (ReID embedding). Handles crossings better.</li>
+<li><strong>ByteTrack</strong> (2021): associates low-confidence detections as a second stage; no appearance features needed but top performer on MOT17.</li>
+<li><strong>BoT-SORT</strong> (2022): Byte + camera motion compensation + ReID.</li>
+<li><strong>StrongSORT / OC-SORT</strong> — ByteTrack descendants with better motion and appearance.</li>
+</ul>
+<h3 id="kalman-filter-in-one-paragraph" class="prose-h prose-h3"><a class="prose-h__anchor" href="#kalman-filter-in-one-paragraph" aria-label="Link to this section">#</a>Kalman filter in one paragraph</h3>
+<p>A Kalman filter maintains a per-track state <code class="inline-code">(x, y, w, h, dx, dy, dw, dh)</code> with a covariance. At each frame, <strong>predict</strong> the state using a constant-velocity model, then <strong>update</strong> with the matched detection. The update trusts the detection more when the predict uncertainty is high. This gives smooth trajectories and the ability to continue a track through a short occlusion (1-5 frames).</p>
+<p>Every classical tracker uses a Kalman filter in the motion-prediction step.</p>
+<h3 id="the-hungarian-algorithm" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-hungarian-algorithm" aria-label="Link to this section">#</a>The Hungarian algorithm</h3>
+<p>Given a <code class="inline-code">M x N</code> cost matrix (tracks x detections), find the one-to-one assignment that minimises total cost. Cost is usually <code class="inline-code">1 - IoU(track_bbox, detection_bbox)</code> or negative cosine similarity of appearance features. Runtime is O((M+N)^3); for M, N up to ~1000 it is fast enough in Python via <code class="inline-code">scipy.optimize.linear_sum_assignment</code>.</p>
+<h3 id="bytetrack-s-key-idea" class="prose-h prose-h3"><a class="prose-h__anchor" href="#bytetrack-s-key-idea" aria-label="Link to this section">#</a>ByteTrack&#39;s key idea</h3>
+<p>Standard trackers drop low-confidence detections (&lt; 0.5). ByteTrack keeps them around as <strong>second-stage candidates</strong>: after matching tracks to high-confidence detections, unmatched tracks try to match low-confidence detections with a slightly looser IoU threshold. Recovers short occlusions, ID switches near crowds.</p>
+<h3 id="sam-2-memory-based-tracking" class="prose-h prose-h3"><a class="prose-h__anchor" href="#sam-2-memory-based-tracking" aria-label="Link to this section">#</a>SAM 2 memory-based tracking</h3>
+<p>SAM 2 handles video by keeping a <strong>memory bank</strong> of per-instance spatio-temporal features. Given a prompt (click, box, text) on one frame, it encodes the instance into memory. On subsequent frames, the memory is cross-attended against the new frame&#39;s features, and the decoder produces a mask for the same instance in the new frame.</p>
+<p>No Kalman filter, no Hungarian assignment. The association is implicit in the memory-attention operation.</p>
+<p>Pros:</p>
+<ul>
+<li>Robust to large occlusions (memory carries instance identity across many frames).</li>
+<li>Open-vocabulary when combined with SAM 3&#39;s text prompts.</li>
+<li>Works without a separate motion model.</li>
+</ul>
+<p>Cons:</p>
+<ul>
+<li>Slower than ByteTrack for many-object tracking.</li>
+<li>Memory bank grows; limits the context window.</li>
+</ul>
+<h3 id="sam-3-1-object-multiplex" class="prose-h prose-h3"><a class="prose-h__anchor" href="#sam-3-1-object-multiplex" aria-label="Link to this section">#</a>SAM 3.1 Object Multiplex</h3>
+<p>Prior SAM 2 / SAM 3 tracking keeps a separate memory bank per instance. For 50 objects, 50 memory banks. Object Multiplex (March 2026) collapses them into one shared memory with <strong>per-instance query tokens</strong>. Cost scales sub-linearly in number of instances.</p>
+<p>Multiplex is the new default for crowd tracking in 2026: concert crowds, warehouse workers, traffic intersections.</p>
+<h3 id="three-metrics-to-know" class="prose-h prose-h3"><a class="prose-h__anchor" href="#three-metrics-to-know" aria-label="Link to this section">#</a>Three metrics to know</h3>
+<ul>
+<li><strong>MOTA (Multi-Object Tracking Accuracy)</strong> — 1 - (FN + FP + ID switches) / GT. Weighted by error type; a single metric that conflates detection and association failures.</li>
+<li><strong>IDF1 (ID F1)</strong> — harmonic mean of ID precision and recall. Focuses specifically on how well each ground-truth track keeps its ID over time. Better than MOTA for ID-switch-sensitive tasks.</li>
+<li><strong>HOTA (Higher Order Tracking Accuracy)</strong> — decomposes into detection accuracy (DetA) and association accuracy (AssA). The community standard since 2020; most comprehensive.</li>
+</ul>
+<p>For surveillance (who is who): IDF1 is what you report. For sports analytics (counting passes): HOTA. For general academic comparison: HOTA.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="cv3-track-assoc"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">cv3-track-assoc</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> cv3 track assoc</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-iou-based-cost-matrix" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-iou-based-cost-matrix" aria-label="Link to this section">#</a>Step 1: IoU-based cost matrix</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+
+
+<span class="token keyword">def</span> <span class="token function">bbox_iou</span><span class="token punctuation">(</span>a<span class="token punctuation">,</span> b<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""
+    a, b: (N, 4) arrays of [x1, y1, x2, y2].
+    Returns (N_a, N_b) IoU matrix.
+    """</span>
+    ax1<span class="token punctuation">,</span> ay1<span class="token punctuation">,</span> ax2<span class="token punctuation">,</span> ay2 <span class="token operator">=</span> a<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> a<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> a<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">,</span> a<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">]</span>
+    bx1<span class="token punctuation">,</span> by1<span class="token punctuation">,</span> bx2<span class="token punctuation">,</span> by2 <span class="token operator">=</span> b<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> b<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> b<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">,</span> b<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">]</span>
+    inter_x1 <span class="token operator">=</span> np<span class="token punctuation">.</span>maximum<span class="token punctuation">(</span>ax1<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token boolean">None</span><span class="token punctuation">]</span><span class="token punctuation">,</span> bx1<span class="token punctuation">[</span><span class="token boolean">None</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    inter_y1 <span class="token operator">=</span> np<span class="token punctuation">.</span>maximum<span class="token punctuation">(</span>ay1<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token boolean">None</span><span class="token punctuation">]</span><span class="token punctuation">,</span> by1<span class="token punctuation">[</span><span class="token boolean">None</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    inter_x2 <span class="token operator">=</span> np<span class="token punctuation">.</span>minimum<span class="token punctuation">(</span>ax2<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token boolean">None</span><span class="token punctuation">]</span><span class="token punctuation">,</span> bx2<span class="token punctuation">[</span><span class="token boolean">None</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    inter_y2 <span class="token operator">=</span> np<span class="token punctuation">.</span>minimum<span class="token punctuation">(</span>ay2<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token boolean">None</span><span class="token punctuation">]</span><span class="token punctuation">,</span> by2<span class="token punctuation">[</span><span class="token boolean">None</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    inter <span class="token operator">=</span> np<span class="token punctuation">.</span>clip<span class="token punctuation">(</span>inter_x2 <span class="token operator">-</span> inter_x1<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token boolean">None</span><span class="token punctuation">)</span> <span class="token operator">*</span> np<span class="token punctuation">.</span>clip<span class="token punctuation">(</span>inter_y2 <span class="token operator">-</span> inter_y1<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token boolean">None</span><span class="token punctuation">)</span>
+    area_a <span class="token operator">=</span> <span class="token punctuation">(</span>ax2 <span class="token operator">-</span> ax1<span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token punctuation">(</span>ay2 <span class="token operator">-</span> ay1<span class="token punctuation">)</span>
+    area_b <span class="token operator">=</span> <span class="token punctuation">(</span>bx2 <span class="token operator">-</span> bx1<span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token punctuation">(</span>by2 <span class="token operator">-</span> by1<span class="token punctuation">)</span>
+    union <span class="token operator">=</span> area_a<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token boolean">None</span><span class="token punctuation">]</span> <span class="token operator">+</span> area_b<span class="token punctuation">[</span><span class="token boolean">None</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">]</span> <span class="token operator">-</span> inter
+    <span class="token keyword">return</span> inter <span class="token operator">/</span> np<span class="token punctuation">.</span>clip<span class="token punctuation">(</span>union<span class="token punctuation">,</span> <span class="token number">1e-8</span><span class="token punctuation">,</span> <span class="token boolean">None</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h3 id="step-2-minimal-sort-style-tracker" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-minimal-sort-style-tracker" aria-label="Link to this section">#</a>Step 2: Minimal SORT-style tracker</h3>
+<p>Fixed constant-velocity Kalman omitted for brevity — we use a simple IoU association here; in production the Kalman predict is essential. The <code class="inline-code">sort</code> Python package provides the full version.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> scipy<span class="token punctuation">.</span>optimize <span class="token keyword">import</span> linear_sum_assignment
+
+
+<span class="token keyword">class</span> <span class="token class-name">Track</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> tid<span class="token punctuation">,</span> bbox<span class="token punctuation">,</span> frame<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span><span class="token builtin">id</span> <span class="token operator">=</span> tid
+        self<span class="token punctuation">.</span>bbox <span class="token operator">=</span> bbox
+        self<span class="token punctuation">.</span>last_frame <span class="token operator">=</span> frame
+        self<span class="token punctuation">.</span>hits <span class="token operator">=</span> <span class="token number">1</span>
+
+    <span class="token keyword">def</span> <span class="token function">update</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> bbox<span class="token punctuation">,</span> frame<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>bbox <span class="token operator">=</span> bbox
+        self<span class="token punctuation">.</span>last_frame <span class="token operator">=</span> frame
+        self<span class="token punctuation">.</span>hits <span class="token operator">+=</span> <span class="token number">1</span>
+
+
+<span class="token keyword">class</span> <span class="token class-name">SimpleTracker</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> iou_threshold<span class="token operator">=</span><span class="token number">0.3</span><span class="token punctuation">,</span> max_age<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>tracks <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        self<span class="token punctuation">.</span>next_id <span class="token operator">=</span> <span class="token number">1</span>
+        self<span class="token punctuation">.</span>iou_threshold <span class="token operator">=</span> iou_threshold
+        self<span class="token punctuation">.</span>max_age <span class="token operator">=</span> max_age
+
+    <span class="token keyword">def</span> <span class="token function">step</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> detections<span class="token punctuation">,</span> frame<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> <span class="token keyword">not</span> self<span class="token punctuation">.</span>tracks<span class="token punctuation">:</span>
+            <span class="token keyword">for</span> d <span class="token keyword">in</span> detections<span class="token punctuation">:</span>
+                self<span class="token punctuation">.</span>tracks<span class="token punctuation">.</span>append<span class="token punctuation">(</span>Track<span class="token punctuation">(</span>self<span class="token punctuation">.</span>next_id<span class="token punctuation">,</span> d<span class="token punctuation">,</span> frame<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                self<span class="token punctuation">.</span>next_id <span class="token operator">+=</span> <span class="token number">1</span>
+            <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token punctuation">(</span>t<span class="token punctuation">.</span><span class="token builtin">id</span><span class="token punctuation">,</span> t<span class="token punctuation">.</span>bbox<span class="token punctuation">)</span> <span class="token keyword">for</span> t <span class="token keyword">in</span> self<span class="token punctuation">.</span>tracks<span class="token punctuation">]</span>
+
+        track_boxes <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span><span class="token punctuation">[</span>t<span class="token punctuation">.</span>bbox <span class="token keyword">for</span> t <span class="token keyword">in</span> self<span class="token punctuation">.</span>tracks<span class="token punctuation">]</span><span class="token punctuation">)</span>
+        det_boxes <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span>detections<span class="token punctuation">)</span> <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>detections<span class="token punctuation">)</span> <span class="token keyword">else</span> np<span class="token punctuation">.</span>empty<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+        iou <span class="token operator">=</span> bbox_iou<span class="token punctuation">(</span>track_boxes<span class="token punctuation">,</span> det_boxes<span class="token punctuation">)</span> <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>det_boxes<span class="token punctuation">)</span> <span class="token keyword">else</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>track_boxes<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        cost <span class="token operator">=</span> <span class="token number">1</span> <span class="token operator">-</span> iou
+        cost<span class="token punctuation">[</span>iou <span class="token operator">&lt;</span> self<span class="token punctuation">.</span>iou_threshold<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">1e6</span>
+
+        matched_track <span class="token operator">=</span> <span class="token builtin">set</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        matched_det <span class="token operator">=</span> <span class="token builtin">set</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> cost<span class="token punctuation">.</span>size <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">:</span>
+            row<span class="token punctuation">,</span> col <span class="token operator">=</span> linear_sum_assignment<span class="token punctuation">(</span>cost<span class="token punctuation">)</span>
+            <span class="token keyword">for</span> r<span class="token punctuation">,</span> c <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>row<span class="token punctuation">,</span> col<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                <span class="token keyword">if</span> cost<span class="token punctuation">[</span>r<span class="token punctuation">,</span> c<span class="token punctuation">]</span> <span class="token operator">&lt;</span> <span class="token number">1.0</span><span class="token punctuation">:</span>
+                    self<span class="token punctuation">.</span>tracks<span class="token punctuation">[</span>r<span class="token punctuation">]</span><span class="token punctuation">.</span>update<span class="token punctuation">(</span>det_boxes<span class="token punctuation">[</span>c<span class="token punctuation">]</span><span class="token punctuation">,</span> frame<span class="token punctuation">)</span>
+                    matched_track<span class="token punctuation">.</span>add<span class="token punctuation">(</span>r<span class="token punctuation">)</span><span class="token punctuation">;</span> matched_det<span class="token punctuation">.</span>add<span class="token punctuation">(</span>c<span class="token punctuation">)</span>
+
+        <span class="token keyword">for</span> i<span class="token punctuation">,</span> d <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>det_boxes<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> i <span class="token keyword">not</span> <span class="token keyword">in</span> matched_det<span class="token punctuation">:</span>
+                self<span class="token punctuation">.</span>tracks<span class="token punctuation">.</span>append<span class="token punctuation">(</span>Track<span class="token punctuation">(</span>self<span class="token punctuation">.</span>next_id<span class="token punctuation">,</span> d<span class="token punctuation">,</span> frame<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                self<span class="token punctuation">.</span>next_id <span class="token operator">+=</span> <span class="token number">1</span>
+
+        self<span class="token punctuation">.</span>tracks <span class="token operator">=</span> <span class="token punctuation">[</span>t <span class="token keyword">for</span> t <span class="token keyword">in</span> self<span class="token punctuation">.</span>tracks <span class="token keyword">if</span> frame <span class="token operator">-</span> t<span class="token punctuation">.</span>last_frame <span class="token operator">&lt;=</span> self<span class="token punctuation">.</span>max_age<span class="token punctuation">]</span>
+        <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token punctuation">(</span>t<span class="token punctuation">.</span><span class="token builtin">id</span><span class="token punctuation">,</span> t<span class="token punctuation">.</span>bbox<span class="token punctuation">)</span> <span class="token keyword">for</span> t <span class="token keyword">in</span> self<span class="token punctuation">.</span>tracks<span class="token punctuation">]</span></code></pre>
+</figure>
+<p>60 lines. Takes per-frame detections, returns per-frame track IDs. Real systems add the Kalman predict, ByteTrack&#39;s second-stage re-match, and appearance features.</p>
+<h3 id="step-3-synthetic-trajectory-test" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-synthetic-trajectory-test" aria-label="Link to this section">#</a>Step 3: Synthetic trajectory test</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">synthetic_frames</span><span class="token punctuation">(</span>num_frames<span class="token operator">=</span><span class="token number">20</span><span class="token punctuation">,</span> num_objects<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">,</span> H<span class="token operator">=</span><span class="token number">240</span><span class="token punctuation">,</span> W<span class="token operator">=</span><span class="token number">320</span><span class="token punctuation">,</span> seed<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    rng <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>default_rng<span class="token punctuation">(</span>seed<span class="token punctuation">)</span>
+    starts <span class="token operator">=</span> rng<span class="token punctuation">.</span>uniform<span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">,</span> <span class="token number">200</span><span class="token punctuation">,</span> size<span class="token operator">=</span><span class="token punctuation">(</span>num_objects<span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    velocities <span class="token operator">=</span> rng<span class="token punctuation">.</span>uniform<span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">,</span> size<span class="token operator">=</span><span class="token punctuation">(</span>num_objects<span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    frames <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> f <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>num_frames<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        dets <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>num_objects<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            cx<span class="token punctuation">,</span> cy <span class="token operator">=</span> starts<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+</span> f <span class="token operator">*</span> velocities<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+            dets<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">[</span>cx <span class="token operator">-</span> <span class="token number">10</span><span class="token punctuation">,</span> cy <span class="token operator">-</span> <span class="token number">10</span><span class="token punctuation">,</span> cx <span class="token operator">+</span> <span class="token number">10</span><span class="token punctuation">,</span> cy <span class="token operator">+</span> <span class="token number">10</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+        frames<span class="token punctuation">.</span>append<span class="token punctuation">(</span>dets<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> frames
+
+
+tracker <span class="token operator">=</span> SimpleTracker<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">for</span> f<span class="token punctuation">,</span> dets <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>synthetic_frames<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    tracks <span class="token operator">=</span> tracker<span class="token punctuation">.</span>step<span class="token punctuation">(</span>dets<span class="token punctuation">,</span> f<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Three objects moving in straight lines should keep their IDs across all 20 frames.</p>
+<h3 id="step-4-id-switch-metric" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-id-switch-metric" aria-label="Link to this section">#</a>Step 4: ID-switch metric</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">count_id_switches</span><span class="token punctuation">(</span>tracks_per_frame<span class="token punctuation">,</span> gt_per_frame<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""
+    tracks_per_frame:  list of list of (track_id, bbox)
+    gt_per_frame:      list of list of (gt_id, bbox)
+    Returns number of ID switches.
+    """</span>
+    prev_assignment <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+    switches <span class="token operator">=</span> <span class="token number">0</span>
+    <span class="token keyword">for</span> tracks<span class="token punctuation">,</span> gts <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>tracks_per_frame<span class="token punctuation">,</span> gt_per_frame<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> <span class="token keyword">not</span> tracks <span class="token keyword">or</span> <span class="token keyword">not</span> gts<span class="token punctuation">:</span>
+            <span class="token keyword">continue</span>
+        t_boxes <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span><span class="token punctuation">[</span>b <span class="token keyword">for</span> _<span class="token punctuation">,</span> b <span class="token keyword">in</span> tracks<span class="token punctuation">]</span><span class="token punctuation">)</span>
+        g_boxes <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span><span class="token punctuation">[</span>b <span class="token keyword">for</span> _<span class="token punctuation">,</span> b <span class="token keyword">in</span> gts<span class="token punctuation">]</span><span class="token punctuation">)</span>
+        iou <span class="token operator">=</span> bbox_iou<span class="token punctuation">(</span>g_boxes<span class="token punctuation">,</span> t_boxes<span class="token punctuation">)</span>
+        <span class="token keyword">for</span> g_idx<span class="token punctuation">,</span> <span class="token punctuation">(</span>gt_id<span class="token punctuation">,</span> _<span class="token punctuation">)</span> <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>gts<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            j <span class="token operator">=</span> iou<span class="token punctuation">[</span>g_idx<span class="token punctuation">]</span><span class="token punctuation">.</span>argmax<span class="token punctuation">(</span><span class="token punctuation">)</span>
+            <span class="token keyword">if</span> iou<span class="token punctuation">[</span>g_idx<span class="token punctuation">,</span> j<span class="token punctuation">]</span> <span class="token operator">></span> <span class="token number">0.5</span><span class="token punctuation">:</span>
+                t_id <span class="token operator">=</span> tracks<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+                <span class="token keyword">if</span> gt_id <span class="token keyword">in</span> prev_assignment <span class="token keyword">and</span> prev_assignment<span class="token punctuation">[</span>gt_id<span class="token punctuation">]</span> <span class="token operator">!=</span> t_id<span class="token punctuation">:</span>
+                    switches <span class="token operator">+=</span> <span class="token number">1</span>
+                prev_assignment<span class="token punctuation">[</span>gt_id<span class="token punctuation">]</span> <span class="token operator">=</span> t_id
+    <span class="token keyword">return</span> switches</code></pre>
+</figure>
+<p>This is a simplified IDF1-adjacent metric: count how many times a ground-truth object changes its assigned predicted track ID. Real MOTA / IDF1 / HOTA tooling lives in <code class="inline-code">py-motmetrics</code> and <code class="inline-code">TrackEval</code>.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>Production trackers in 2026:</p>
+<ul>
+<li><code class="inline-code">ultralytics</code> — YOLOv8 + ByteTrack / BoT-SORT built-in. <code class="inline-code">results = model.track(source, tracker=&quot;bytetrack.yaml&quot;)</code>. The default.</li>
+<li><code class="inline-code">supervision</code> (Roboflow) — ByteTrack wrappers plus annotation utilities.</li>
+<li>SAM 2 / SAM 3.1 — memory-based tracking via <code class="inline-code">processor.track()</code>.</li>
+<li>Custom stack: detector (YOLOv8 / RT-DETR) + <code class="inline-code">sort-tracker</code> / <code class="inline-code">OC-SORT</code> / <code class="inline-code">StrongSORT</code>.</li>
+</ul>
+<p>Picking:</p>
+<ul>
+<li>Pedestrians / cars / boxes at 30+ fps: <strong>ByteTrack with ultralytics</strong>.</li>
+<li>Many instances of one class in a crowd: <strong>SAM 3.1 Object Multiplex</strong>.</li>
+<li>Heavy occlusions with identifiable appearance: <strong>DeepSORT / StrongSORT</strong> (ReID features).</li>
+<li>Sports / complex interactions: <strong>BoT-SORT</strong> or learned trackers (MOTRv3).</li>
+</ul>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces:</p>
+<ul>
+<li><code class="inline-code">outputs/prompt-tracker-picker.md</code> — picks SORT / ByteTrack / BoT-SORT / SAM 2 / SAM 3.1 given scene type, occlusion patterns, and latency budget.</li>
+<li><code class="inline-code">outputs/skill-mot-evaluator.md</code> — writes a complete evaluation harness for MOTA / IDF1 / HOTA against ground-truth tracks.</li>
+</ul>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><strong>(Easy)</strong> Run the synthetic tracker above with 3, 10, and 30 objects. Report ID-switch count in each case. Identify where the simple IoU-only association starts to fail.</li>
+<li><strong>(Medium)</strong> Add a constant-velocity Kalman predict step before association. Show that short (2-3 frame) occlusions no longer cause ID switches.</li>
+<li><strong>(Hard)</strong> Integrate SAM 2&#39;s memory-based tracker (via <code class="inline-code">transformers</code>) as an alternative tracker backend. Run both SimpleTracker and SAM 2 on a 30-second clip of a crowd and compare ID-switch counts, manually labelling ground-truth IDs for 5 salient people.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Tracking-by-detection</td>
+<td>&quot;Detect then associate&quot;</td>
+<td>Per-frame detector + Hungarian assignment on IoU / appearance</td>
+</tr>
+<tr>
+<td>Kalman filter</td>
+<td>&quot;Motion predict&quot;</td>
+<td>Linear dynamics + covariance for smooth track predictions and occlusion handling</td>
+</tr>
+<tr>
+<td>Hungarian algorithm</td>
+<td>&quot;Optimal assignment&quot;</td>
+<td>Solves the minimum-cost bipartite matching problem; <code class="inline-code">scipy.optimize.linear_sum_assignment</code></td>
+</tr>
+<tr>
+<td>ByteTrack</td>
+<td>&quot;Low-confidence second pass&quot;</td>
+<td>Re-match unmatched tracks to low-confidence detections to recover short occlusions</td>
+</tr>
+<tr>
+<td>DeepSORT</td>
+<td>&quot;SORT + appearance&quot;</td>
+<td>Adds a ReID feature for cross-frame matching; better for ID preservation</td>
+</tr>
+<tr>
+<td>Memory bank</td>
+<td>&quot;SAM 2 trick&quot;</td>
+<td>Per-instance spatio-temporal features stored across frames; cross-attention replaces explicit association</td>
+</tr>
+<tr>
+<td>Object Multiplex</td>
+<td>&quot;SAM 3.1 shared memory&quot;</td>
+<td>Single shared memory with per-instance queries for fast many-object tracking</td>
+</tr>
+<tr>
+<td>HOTA</td>
+<td>&quot;Modern tracking metric&quot;</td>
+<td>Decomposes into detection and association accuracy; community standard</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/1602.00763" target="_blank" rel="noopener">SORT (Bewley et al., 2016)</a> — the minimal tracking-by-detection paper</li>
+<li><a href="https://arxiv.org/abs/1703.07402" target="_blank" rel="noopener">DeepSORT (Wojke et al., 2017)</a> — adds appearance feature</li>
+<li><a href="https://arxiv.org/abs/2110.06864" target="_blank" rel="noopener">ByteTrack (Zhang et al., 2022)</a> — low-confidence second pass</li>
+<li><a href="https://arxiv.org/abs/2206.14651" target="_blank" rel="noopener">BoT-SORT (Aharon et al., 2022)</a> — camera motion compensation</li>
+<li><a href="https://arxiv.org/abs/2009.07736" target="_blank" rel="noopener">HOTA (Luiten et al., 2020)</a> — decomposed tracking metric</li>
+<li><a href="https://ai.meta.com/sam2/" target="_blank" rel="noopener">SAM 2 video segmentation (Meta, 2024)</a> — memory-based tracker</li>
+<li><a href="https://ai.meta.com/blog/segment-anything-model-3/" target="_blank" rel="noopener">SAM 3.1 Object Multiplex (Meta, March 2026)</a></li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="26-monocular-depth.html">
+  <span class="label">← Previous</span>
+  <b>Monocular Depth &amp; Geometry Estimation</b>
+</a>
+      <a class="pager__item pager__item--next" href="28-world-models-video-diffusion.html">
+  <span class="label">Next →</span>
+  <b>World Models &amp; Video Diffusion</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>6 minutes</b> of Computer Vision behind you.</p>
+      <a class="btn btn--solid" href="28-world-models-video-diffusion.html">Continue to World Models &amp; Video Diffusion →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#tracking-by-detection">Tracking-by-detection</a></li><li class="mini__item mini__item--d3"><a href="#kalman-filter-in-one-paragraph">Kalman filter in one paragraph</a></li><li class="mini__item mini__item--d3"><a href="#the-hungarian-algorithm">The Hungarian algorithm</a></li><li class="mini__item mini__item--d3"><a href="#bytetrack-s-key-idea">ByteTrack's key idea</a></li><li class="mini__item mini__item--d3"><a href="#sam-2-memory-based-tracking">SAM 2 memory-based tracking</a></li><li class="mini__item mini__item--d3"><a href="#sam-3-1-object-multiplex">SAM 3.1 Object Multiplex</a></li><li class="mini__item mini__item--d3"><a href="#three-metrics-to-know">Three metrics to know</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-iou-based-cost-matrix">Step 1: IoU-based cost matrix</a></li><li class="mini__item mini__item--d3"><a href="#step-2-minimal-sort-style-tracker">Step 2: Minimal SORT-style tracker</a></li><li class="mini__item mini__item--d3"><a href="#step-3-synthetic-trajectory-test">Step 3: Synthetic trajectory test</a></li><li class="mini__item mini__item--d3"><a href="#step-4-id-switch-metric">Step 4: ID-switch metric</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

@@ -1,0 +1,867 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Embeddings &amp; Vector Representations — LLM Engineering — AIFS</title>
+<meta name="description" content="LLM Engineering: Embeddings &amp; Vector Representations. 11 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Embeddings &amp; Vector Representations — LLM Engineering — AIFS">
+<meta property="og:description" content="LLM Engineering: Embeddings &amp; Vector Representations. 11 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={};window.AIFS_FIGURE_PROVIDER_ORDER=[];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#00E0C6" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#00E0C6;--accent-ink:#111111"
+  data-lesson-id="llm-engineering/04-embeddings" data-module="llm-engineering"
+  data-prev="03-structured-outputs.html" data-next="05-context-engineering.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#00E0C6">
+        <span class="label">Phase 11</span>
+        <b>LLM Engineering</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="llm-engineering/01-prompt-engineering"><a href="01-prompt-engineering.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Prompt Engineering: Techniques &amp; Patterns</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/02-few-shot-cot"><a href="02-few-shot-cot.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Few-Shot, Chain-of-Thought, Tree-of-Thought</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/03-structured-outputs"><a href="03-structured-outputs.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Structured Outputs: JSON, Schema Validation, Constrained Decoding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/04-embeddings"><a href="04-embeddings.html" class="is-current">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Embeddings &amp; Vector Representations</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/05-context-engineering"><a href="05-context-engineering.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Context Engineering: Windows, Budgets, Memory, and Retrieval</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/06-rag"><a href="06-rag.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">RAG (Retrieval-Augmented Generation)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/07-advanced-rag"><a href="07-advanced-rag.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Advanced RAG (Chunking, Reranking, Hybrid Search)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/08-fine-tuning-lora"><a href="08-fine-tuning-lora.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Fine-Tuning with LoRA &amp; QLoRA</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/09-function-calling"><a href="09-function-calling.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Function Calling &amp; Tool Use</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/10-evaluation"><a href="10-evaluation.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Evaluation &amp; Testing LLM Applications</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/11-caching-cost"><a href="11-caching-cost.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Caching, Rate Limiting &amp; Cost Optimization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/12-guardrails"><a href="12-guardrails.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Guardrails, Safety &amp; Content Filtering</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/13-production-app"><a href="13-production-app.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Building a Production LLM Application</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/14-model-context-protocol"><a href="14-model-context-protocol.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Model Context Protocol (MCP)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/15-prompt-caching"><a href="15-prompt-caching.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Prompt Caching and Context Caching</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/16-langgraph-state-machines"><a href="16-langgraph-state-machines.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Agent State Machines — Graphs, Nodes, Checkpoints</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/17-agent-framework-tradeoffs"><a href="17-agent-framework-tradeoffs.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Agent Framework Tradeoffs — Graph, Role, and Actor Orchestration</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">LLM Engineering</a></p>
+      <h1 class="page__title">Embeddings &amp; Vector Representations</h1>
+      <p class="page__lede">Text is discrete. Math is continuous. Every time you ask an LLM to find &quot;similar&quot; documents, compare meanings, or search beyond keywords, you're relying on a bridge between these two worlds. That bridge is an embedding. If you don't understand embeddings, you don't understand modern AI. You just use it.</p>
+      <div class="page__meta">
+        <span class="chip">11 min read</span>
+        <span class="chip">2,444 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 11, Lesson 01 (Prompt Engineering)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div><div class="facts__pair"><dt class="label">Related</dt><dd>Phase 5 · 22 (Embedding Models Deep Dive) covers dense vs sparse vs multi-vector, Matryoshka truncation, and per-axis model selection. This lesson focuses on the production pipeline (vector DBs, HNSW, similarity math). Read Phase 5 · 22 before picking a model.</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Generate text embeddings using API providers and open-source models, and compute cosine similarity between them</li>
+<li>Explain why embeddings solve the vocabulary mismatch problem that keyword search cannot handle</li>
+<li>Build a semantic search index that retrieves documents by meaning rather than exact keyword match</li>
+<li>Evaluate embedding quality using retrieval benchmarks (precision@k, recall) and choose the right embedding model for your task</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>You have 10,000 support tickets. A customer writes &quot;my payment didn&#39;t go through.&quot; You need to find similar past tickets. Keyword search finds tickets containing &quot;payment&quot; and &quot;didn&#39;t go through.&quot; It misses &quot;transaction failed,&quot; &quot;charge was declined,&quot; and &quot;billing error.&quot; These tickets describe the exact same problem with completely different words.</p>
+<p>This is the vocabulary mismatch problem. Human language has dozens of ways to say the same thing. Keyword search treats each word as an independent symbol with no meaning. It cannot know that &quot;declined&quot; and &quot;didn&#39;t go through&quot; refer to the same concept.</p>
+<p>You need a representation of text where meaning, not spelling, determines similarity. You need a way to place &quot;my payment didn&#39;t go through&quot; and &quot;transaction was declined&quot; close together in some mathematical space, while pushing &quot;my payment arrived on time&quot; far away despite sharing the word &quot;payment.&quot;</p>
+<p>That representation is an embedding.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="what-is-an-embedding" class="prose-h prose-h3"><a class="prose-h__anchor" href="#what-is-an-embedding" aria-label="Link to this section">#</a>What Is an Embedding?</h3>
+<p>An embedding is a dense vector of floating-point numbers that represents the meaning of text. The word &quot;dense&quot; matters -- every dimension carries information, unlike sparse representations (bag-of-words, TF-IDF) where most dimensions are zero.</p>
+<p>&quot;The cat sat on the mat&quot; becomes something like <code class="inline-code">[0.023, -0.041, 0.087, ..., 0.012]</code> -- a list of 768 to 3072 numbers depending on the model. These numbers encode meaning. You never inspect them directly. You compare them.</p>
+<h3 id="the-word2vec-breakthrough" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-word2vec-breakthrough" aria-label="Link to this section">#</a>The Word2Vec Breakthrough</h3>
+<p>In 2013, Tomas Mikolov and colleagues at Google published Word2Vec. The core insight: train a neural network to predict a word from its neighbors (or neighbors from a word), and the hidden layer weights become meaningful vector representations.</p>
+<p>The famous result:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>king - man + woman = queen</code></pre>
+</figure>
+<p>Vector arithmetic on word embeddings captures semantic relationships. The direction from &quot;man&quot; to &quot;woman&quot; is roughly the same as the direction from &quot;king&quot; to &quot;queen.&quot; This was the moment the field realized that geometry could encode meaning.</p>
+<p>Word2Vec produced 300-dimensional vectors. Each word got one vector regardless of context. &quot;Bank&quot; in &quot;river bank&quot; and &quot;bank account&quot; had the same embedding. This limitation drove the next decade of research.</p>
+<h3 id="from-words-to-sentences" class="prose-h prose-h3"><a class="prose-h__anchor" href="#from-words-to-sentences" aria-label="Link to this section">#</a>From Words to Sentences</h3>
+<p>Word embeddings represent single tokens. Production systems need to embed entire sentences, paragraphs, or documents. Four approaches emerged:</p>
+<p><strong>Averaging</strong>: take the mean of all word vectors in the sentence. Cheap, lossy, surprisingly decent for short text. Loses word order entirely -- &quot;dog bites man&quot; and &quot;man bites dog&quot; get identical embeddings.</p>
+<p><strong>CLS token</strong>: transformer models (BERT, 2018) output a special [CLS] token embedding that represents the entire input. Better than averaging but the [CLS] token was trained for next-sentence prediction, not similarity.</p>
+<p><strong>Contrastive learning</strong>: train the model explicitly to push similar pairs together and dissimilar pairs apart. Sentence-BERT (Reimers &amp; Gurevych, 2019) used this approach and became the foundation for modern embedding models. Given &quot;How do I reset my password?&quot; and &quot;I need to change my password,&quot; the model learns these should have nearly identical vectors.</p>
+<p><strong>Instruction-tuned embeddings</strong>: the latest approach. Models like E5 and GTE accept a task prefix (&quot;search_query:&quot;, &quot;search_document:&quot;) that tells the model what kind of embedding to produce. This lets one model serve multiple tasks.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph LR
+    subgraph &quot;2013: Word2Vec&quot;
+        W1[&quot;king&quot;] --&gt; V1[&quot;[0.2, -0.1, ...]&quot;]
+        W2[&quot;queen&quot;] --&gt; V2[&quot;[0.3, -0.2, ...]&quot;]
+    end
+
+    subgraph &quot;2019: Sentence-BERT&quot;
+        S1[&quot;How do I reset my password?&quot;] --&gt; E1[&quot;[0.04, 0.12, ...]&quot;]
+        S2[&quot;I need to change my password&quot;] --&gt; E2[&quot;[0.05, 0.11, ...]&quot;]
+    end
+
+    subgraph &quot;2024: Instruction-Tuned&quot;
+        I1[&quot;search_query: password reset&quot;] --&gt; T1[&quot;[0.08, 0.09, ...]&quot;]
+        I2[&quot;search_document: To reset your password, click...&quot;] --&gt; T2[&quot;[0.07, 0.10, ...]&quot;]
+    end</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<h3 id="modern-embedding-models" class="prose-h prose-h3"><a class="prose-h__anchor" href="#modern-embedding-models" aria-label="Link to this section">#</a>Modern Embedding Models</h3>
+<p>The market has settled into a handful of production-grade options (MTEB scores as of early 2026, MTEB v2):</p>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Provider</th>
+<th>Dimensions</th>
+<th>MTEB</th>
+<th>Context</th>
+<th>Cost / 1M tokens</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Gemini Embedding 2</td>
+<td>Google</td>
+<td>3072 (Matryoshka)</td>
+<td>67.7 (retrieval)</td>
+<td>8192</td>
+<td>$0.15</td>
+</tr>
+<tr>
+<td>embed-v4</td>
+<td>Cohere</td>
+<td>1024 (Matryoshka)</td>
+<td>65.2</td>
+<td>128K</td>
+<td>$0.12</td>
+</tr>
+<tr>
+<td>voyage-4</td>
+<td>Voyage AI</td>
+<td>1024/2048 (Matryoshka)</td>
+<td>66.8</td>
+<td>32K</td>
+<td>$0.12</td>
+</tr>
+<tr>
+<td>text-embedding-3-large</td>
+<td>OpenAI</td>
+<td>3072 (Matryoshka)</td>
+<td>64.6</td>
+<td>8192</td>
+<td>$0.13</td>
+</tr>
+<tr>
+<td>text-embedding-3-small</td>
+<td>OpenAI</td>
+<td>1536 (Matryoshka)</td>
+<td>62.3</td>
+<td>8192</td>
+<td>$0.02</td>
+</tr>
+<tr>
+<td>BGE-M3</td>
+<td>BAAI</td>
+<td>1024 (dense+sparse+ColBERT)</td>
+<td>63.0 multilingual</td>
+<td>8192</td>
+<td>Open-weight</td>
+</tr>
+<tr>
+<td>Qwen3-Embedding</td>
+<td>Alibaba</td>
+<td>4096 (Matryoshka)</td>
+<td>66.9</td>
+<td>32K</td>
+<td>Open-weight</td>
+</tr>
+<tr>
+<td>Nomic-embed-v2</td>
+<td>Nomic</td>
+<td>768 (Matryoshka)</td>
+<td>63.1</td>
+<td>8192</td>
+<td>Open-weight</td>
+</tr>
+</tbody></table>
+<p>MTEB (Massive Text Embedding Benchmark) v2 covers 100+ tasks across retrieval, classification, clustering, reranking, and summarization. Higher is better. By 2026, open-weight models (Qwen3-Embedding, BGE-M3) match or beat closed hosted models on most axes. Gemini Embedding 2 leads pure retrieval; Voyage/Cohere lead specific domains (finance, law, code). Always benchmark on your own queries before committing.</p>
+<h3 id="similarity-metrics" class="prose-h prose-h3"><a class="prose-h__anchor" href="#similarity-metrics" aria-label="Link to this section">#</a>Similarity Metrics</h3>
+<p>Given two embedding vectors, three ways to measure how similar they are:</p>
+<p><strong>Cosine similarity</strong>: the cosine of the angle between two vectors. Ranges from -1 (opposite) to 1 (identical direction). Ignores magnitude -- a 10-word sentence and a 500-word document can score 1.0 if they point the same direction. This is the default for 90% of use cases.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>cosine_sim(a, b) = dot(a, b) / (||a|| * ||b||)</code></pre>
+</figure>
+<p><strong>Dot product</strong>: the raw inner product of two vectors. Identical to cosine similarity when vectors are normalized (unit length). Faster to compute. OpenAI&#39;s embeddings are normalized, so dot product and cosine give the same ranking.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>dot(a, b) = sum(a_i * b_i)</code></pre>
+</figure>
+<p><strong>Euclidean (L2) distance</strong>: straight-line distance in the vector space. Smaller = more similar. Sensitive to magnitude differences. Use when the absolute position in space matters, not just the direction.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>L2(a, b) = sqrt(sum((a_i - b_i)^2))</code></pre>
+</figure>
+<p>When to use which:</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Use when</th>
+<th>Avoid when</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Cosine similarity</td>
+<td>Comparing texts of different lengths; most retrieval tasks</td>
+<td>Magnitude carries information</td>
+</tr>
+<tr>
+<td>Dot product</td>
+<td>Embeddings are already normalized; maximum speed</td>
+<td>Vectors have varying magnitudes</td>
+</tr>
+<tr>
+<td>Euclidean distance</td>
+<td>Clustering; spatial nearest-neighbor problems</td>
+<td>Comparing documents of wildly different lengths</td>
+</tr>
+</tbody></table>
+<h3 id="vector-databases-and-hnsw" class="prose-h prose-h3"><a class="prose-h__anchor" href="#vector-databases-and-hnsw" aria-label="Link to this section">#</a>Vector Databases and HNSW</h3>
+<p>A brute-force similarity search compares the query against every stored vector. At 1 million vectors with 1536 dimensions, that is 1.5 billion multiply-add operations per query. Too slow.</p>
+<p>Vector databases solve this with Approximate Nearest Neighbor (ANN) algorithms. The dominant algorithm is HNSW (Hierarchical Navigable Small World):</p>
+<ol>
+<li>Build a multi-layer graph of vectors</li>
+<li>Top layers are sparse -- long-range connections between distant clusters</li>
+<li>Bottom layers are dense -- fine-grained connections between nearby vectors</li>
+<li>Search starts at the top layer, greedily descending to refine</li>
+<li>Returns approximate top-k results in O(log n) time instead of O(n)</li>
+</ol>
+<p>HNSW trades a small accuracy loss (typically 95-99% recall) for massive speed gains. At 10 million vectors, brute force takes seconds. HNSW takes milliseconds.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph TD
+    subgraph &quot;HNSW Layers&quot;
+        L2[&quot;Layer 2 (sparse)&quot;] --&gt;|&quot;long jumps&quot;| L1[&quot;Layer 1 (medium)&quot;]
+        L1 --&gt;|&quot;shorter jumps&quot;| L0[&quot;Layer 0 (dense, all vectors)&quot;]
+    end
+
+    Q[&quot;Query vector&quot;] --&gt;|&quot;enter at top&quot;| L2
+    L0 --&gt;|&quot;nearest neighbors&quot;| R[&quot;Top-k results&quot;]</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>Production options:</p>
+<table>
+<thead>
+<tr>
+<th>Database</th>
+<th>Type</th>
+<th>Best for</th>
+<th>Max scale</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Pinecone</td>
+<td>Managed SaaS</td>
+<td>Zero-ops production</td>
+<td>Billions</td>
+</tr>
+<tr>
+<td>Weaviate</td>
+<td>Open source</td>
+<td>Self-hosted, hybrid search</td>
+<td>100M+</td>
+</tr>
+<tr>
+<td>Qdrant</td>
+<td>Open source</td>
+<td>High performance, filtering</td>
+<td>100M+</td>
+</tr>
+<tr>
+<td>ChromaDB</td>
+<td>Embedded</td>
+<td>Prototyping, local dev</td>
+<td>1M</td>
+</tr>
+<tr>
+<td>pgvector</td>
+<td>Postgres extension</td>
+<td>Already using Postgres</td>
+<td>10M</td>
+</tr>
+<tr>
+<td>FAISS</td>
+<td>Library</td>
+<td>In-process, research</td>
+<td>1B+</td>
+</tr>
+</tbody></table>
+<h3 id="chunking-strategies" class="prose-h prose-h3"><a class="prose-h__anchor" href="#chunking-strategies" aria-label="Link to this section">#</a>Chunking Strategies</h3>
+<p>Documents are too long to embed as single vectors. A 50-page PDF covers dozens of topics -- its embedding becomes an average of everything, similar to nothing specific. You split documents into chunks and embed each one.</p>
+<p><strong>Fixed-size chunking</strong>: split every N tokens with M-token overlap. Simple and predictable. Works well when documents have no clear structure. A 512-token chunk with 50-token overlap: chunk 1 is tokens 0-511, chunk 2 is tokens 462-973.</p>
+<p><strong>Sentence-based chunking</strong>: split at sentence boundaries, grouping sentences until reaching the token limit. Each chunk is at least one complete sentence. Better than fixed-size because you never cut a thought in half.</p>
+<p><strong>Recursive chunking</strong>: try splitting at the largest boundary first (section headers). If still too large, try paragraph boundaries. Then sentence boundaries. Then character limits. This is LangChain&#39;s <code class="inline-code">RecursiveCharacterTextSplitter</code> and it works well for mixed-format corpora.</p>
+<p><strong>Semantic chunking</strong>: embed each sentence, then group consecutive sentences whose embeddings are similar. When the embedding similarity drops below a threshold, start a new chunk. Expensive (requires embedding every sentence individually) but produces the most coherent chunks.</p>
+<table>
+<thead>
+<tr>
+<th>Strategy</th>
+<th>Complexity</th>
+<th>Quality</th>
+<th>Best for</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Fixed-size</td>
+<td>Low</td>
+<td>Decent</td>
+<td>Unstructured text, logs</td>
+</tr>
+<tr>
+<td>Sentence-based</td>
+<td>Low</td>
+<td>Good</td>
+<td>Articles, emails</td>
+</tr>
+<tr>
+<td>Recursive</td>
+<td>Medium</td>
+<td>Good</td>
+<td>Markdown, HTML, mixed docs</td>
+</tr>
+<tr>
+<td>Semantic</td>
+<td>High</td>
+<td>Best</td>
+<td>Critical retrieval quality</td>
+</tr>
+</tbody></table>
+<p>The sweet spot for most systems: 256-512 token chunks with 50-token overlap.</p>
+<h3 id="bi-encoders-vs-cross-encoders" class="prose-h prose-h3"><a class="prose-h__anchor" href="#bi-encoders-vs-cross-encoders" aria-label="Link to this section">#</a>Bi-Encoders vs Cross-Encoders</h3>
+<p>A bi-encoder embeds the query and documents independently, then compares vectors. Fast -- you embed the query once and compare against pre-computed document embeddings. This is what you use for retrieval.</p>
+<p>A cross-encoder takes the query and a document as a single input and outputs a relevance score. Slow -- it processes each query-document pair through the full model. But far more accurate because it can attend across query and document tokens simultaneously.</p>
+<p>The production pattern: bi-encoder retrieves top-100 candidates, cross-encoder reranks them to top-10. This is the retrieve-then-rerank pipeline.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph LR
+    Q[&quot;Query&quot;] --&gt; BE[&quot;Bi-Encoder: embed query&quot;]
+    BE --&gt; VS[&quot;Vector search: top 100&quot;]
+    VS --&gt; CE[&quot;Cross-Encoder: rerank&quot;]
+    CE --&gt; R[&quot;Top 10 results&quot;]</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>Reranking models: Cohere Rerank 3.5 ($2 per 1000 queries), BGE-reranker-v2 (free, open source), Jina Reranker v2 (free, open source).</p>
+<h3 id="matryoshka-embeddings" class="prose-h prose-h3"><a class="prose-h__anchor" href="#matryoshka-embeddings" aria-label="Link to this section">#</a>Matryoshka Embeddings</h3>
+<p>Traditional embeddings are all-or-nothing. A 1536-dimensional vector uses 1536 floats. You cannot truncate to 256 dimensions without retraining.</p>
+<p>Matryoshka Representation Learning (Kusupati et al., 2022) fixes this. The model is trained so that the first N dimensions capture the most important information, like a Russian nesting doll. Truncating a 1536-d Matryoshka embedding to 256 dimensions loses some accuracy but remains functional.</p>
+<p>OpenAI&#39;s text-embedding-3-small and text-embedding-3-large support Matryoshka truncation via the <code class="inline-code">dimensions</code> parameter. Requesting 256 dimensions instead of 1536 cuts storage by 6x with roughly 3-5% accuracy loss on MTEB benchmarks.</p>
+<h3 id="binary-quantization" class="prose-h prose-h3"><a class="prose-h__anchor" href="#binary-quantization" aria-label="Link to this section">#</a>Binary Quantization</h3>
+<p>A 1536-dimensional embedding stored as float32 uses 6,144 bytes. Multiply by 10 million documents: 61 GB just for vectors.</p>
+<p>Binary quantization converts each float to a single bit: positive values become 1, negative values become 0. Storage drops from 6,144 bytes to 192 bytes -- a 32x reduction. Similarity is computed using Hamming distance (count differing bits), which CPUs can do in a single instruction.</p>
+<p>The accuracy hit is around 5-10% on retrieval recall. The common pattern: binary quantization for the first-pass search over millions of vectors, then rescore the top-1000 with full-precision vectors. This gets you 95%+ of full-precision accuracy at 32x less memory.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="cosine-similarity"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">cosine-similarity</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> cosine similarity</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<p>We build a semantic search engine from scratch. No vector database. No external embedding API. Pure Python with numpy for the math.</p>
+<h3 id="step-1-text-chunking" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-text-chunking" aria-label="Link to this section">#</a>Step 1: Text Chunking</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">chunk_text</span><span class="token punctuation">(</span>text<span class="token punctuation">,</span> chunk_size<span class="token operator">=</span><span class="token number">200</span><span class="token punctuation">,</span> overlap<span class="token operator">=</span><span class="token number">50</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    words <span class="token operator">=</span> text<span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    chunks <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    start <span class="token operator">=</span> <span class="token number">0</span>
+    <span class="token keyword">while</span> start <span class="token operator">&lt;</span> <span class="token builtin">len</span><span class="token punctuation">(</span>words<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        end <span class="token operator">=</span> start <span class="token operator">+</span> chunk_size
+        chunk <span class="token operator">=</span> <span class="token string">" "</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>words<span class="token punctuation">[</span>start<span class="token punctuation">:</span>end<span class="token punctuation">]</span><span class="token punctuation">)</span>
+        chunks<span class="token punctuation">.</span>append<span class="token punctuation">(</span>chunk<span class="token punctuation">)</span>
+        start <span class="token operator">+=</span> chunk_size <span class="token operator">-</span> overlap
+    <span class="token keyword">return</span> chunks
+
+
+<span class="token keyword">def</span> <span class="token function">chunk_by_sentences</span><span class="token punctuation">(</span>text<span class="token punctuation">,</span> max_chunk_tokens<span class="token operator">=</span><span class="token number">200</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    sentences <span class="token operator">=</span> text<span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">"\n"</span><span class="token punctuation">,</span> <span class="token string">" "</span><span class="token punctuation">)</span><span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token string">"."</span><span class="token punctuation">)</span>
+    sentences <span class="token operator">=</span> <span class="token punctuation">[</span>s<span class="token punctuation">.</span>strip<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"."</span> <span class="token keyword">for</span> s <span class="token keyword">in</span> sentences <span class="token keyword">if</span> s<span class="token punctuation">.</span>strip<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+    chunks <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    current_chunk <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    current_length <span class="token operator">=</span> <span class="token number">0</span>
+    <span class="token keyword">for</span> sentence <span class="token keyword">in</span> sentences<span class="token punctuation">:</span>
+        sentence_length <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>sentence<span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> current_length <span class="token operator">+</span> sentence_length <span class="token operator">></span> max_chunk_tokens <span class="token keyword">and</span> current_chunk<span class="token punctuation">:</span>
+            chunks<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string">" "</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>current_chunk<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            current_chunk <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+            current_length <span class="token operator">=</span> <span class="token number">0</span>
+        current_chunk<span class="token punctuation">.</span>append<span class="token punctuation">(</span>sentence<span class="token punctuation">)</span>
+        current_length <span class="token operator">+=</span> sentence_length
+    <span class="token keyword">if</span> current_chunk<span class="token punctuation">:</span>
+        chunks<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string">" "</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>current_chunk<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> chunks</code></pre>
+</figure>
+<h3 id="step-2-building-embeddings-from-scratch" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-building-embeddings-from-scratch" aria-label="Link to this section">#</a>Step 2: Building Embeddings from Scratch</h3>
+<p>We implement a simple dense embedding using TF-IDF with L2 normalization. This is not a neural embedding, but it follows the same contract: text in, fixed-size vector out, similar texts produce similar vectors.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> math
+<span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+<span class="token keyword">from</span> collections <span class="token keyword">import</span> Counter
+
+<span class="token keyword">class</span> <span class="token class-name">SimpleEmbedder</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>vocab <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        self<span class="token punctuation">.</span>idf <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        self<span class="token punctuation">.</span>word_to_idx <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+
+    <span class="token keyword">def</span> <span class="token function">fit</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> documents<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        vocab_set <span class="token operator">=</span> <span class="token builtin">set</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">for</span> doc <span class="token keyword">in</span> documents<span class="token punctuation">:</span>
+            vocab_set<span class="token punctuation">.</span>update<span class="token punctuation">(</span>doc<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>vocab <span class="token operator">=</span> <span class="token builtin">sorted</span><span class="token punctuation">(</span>vocab_set<span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>word_to_idx <span class="token operator">=</span> <span class="token punctuation">{</span>w<span class="token punctuation">:</span> i <span class="token keyword">for</span> i<span class="token punctuation">,</span> w <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>vocab<span class="token punctuation">)</span><span class="token punctuation">}</span>
+        n <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>documents<span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>idf <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>vocab<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">for</span> i<span class="token punctuation">,</span> word <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>vocab<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            doc_count <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token keyword">for</span> doc <span class="token keyword">in</span> documents <span class="token keyword">if</span> word <span class="token keyword">in</span> doc<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            self<span class="token punctuation">.</span>idf<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> math<span class="token punctuation">.</span>log<span class="token punctuation">(</span><span class="token punctuation">(</span>n <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token punctuation">(</span>doc_count <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span>
+
+    <span class="token keyword">def</span> <span class="token function">embed</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> text<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        words <span class="token operator">=</span> text<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        count <span class="token operator">=</span> Counter<span class="token punctuation">(</span>words<span class="token punctuation">)</span>
+        total <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>words<span class="token punctuation">)</span> <span class="token keyword">if</span> words <span class="token keyword">else</span> <span class="token number">1</span>
+        vec <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>vocab<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">for</span> word<span class="token punctuation">,</span> freq <span class="token keyword">in</span> count<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> word <span class="token keyword">in</span> self<span class="token punctuation">.</span>word_to_idx<span class="token punctuation">:</span>
+                tf <span class="token operator">=</span> freq <span class="token operator">/</span> total
+                vec<span class="token punctuation">[</span>self<span class="token punctuation">.</span>word_to_idx<span class="token punctuation">[</span>word<span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">=</span> tf <span class="token operator">*</span> self<span class="token punctuation">.</span>idf<span class="token punctuation">[</span>self<span class="token punctuation">.</span>word_to_idx<span class="token punctuation">[</span>word<span class="token punctuation">]</span><span class="token punctuation">]</span>
+        norm <span class="token operator">=</span> np<span class="token punctuation">.</span>linalg<span class="token punctuation">.</span>norm<span class="token punctuation">(</span>vec<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> norm <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">:</span>
+            vec <span class="token operator">=</span> vec <span class="token operator">/</span> norm
+        <span class="token keyword">return</span> vec</code></pre>
+</figure>
+<h3 id="step-3-similarity-functions" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-similarity-functions" aria-label="Link to this section">#</a>Step 3: Similarity Functions</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">cosine_similarity</span><span class="token punctuation">(</span>a<span class="token punctuation">,</span> b<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    dot <span class="token operator">=</span> np<span class="token punctuation">.</span>dot<span class="token punctuation">(</span>a<span class="token punctuation">,</span> b<span class="token punctuation">)</span>
+    norm_a <span class="token operator">=</span> np<span class="token punctuation">.</span>linalg<span class="token punctuation">.</span>norm<span class="token punctuation">(</span>a<span class="token punctuation">)</span>
+    norm_b <span class="token operator">=</span> np<span class="token punctuation">.</span>linalg<span class="token punctuation">.</span>norm<span class="token punctuation">(</span>b<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> norm_a <span class="token operator">==</span> <span class="token number">0</span> <span class="token keyword">or</span> norm_b <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token number">0.0</span>
+    <span class="token keyword">return</span> <span class="token builtin">float</span><span class="token punctuation">(</span>dot <span class="token operator">/</span> <span class="token punctuation">(</span>norm_a <span class="token operator">*</span> norm_b<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+
+<span class="token keyword">def</span> <span class="token function">dot_product</span><span class="token punctuation">(</span>a<span class="token punctuation">,</span> b<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token builtin">float</span><span class="token punctuation">(</span>np<span class="token punctuation">.</span>dot<span class="token punctuation">(</span>a<span class="token punctuation">,</span> b<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+
+<span class="token keyword">def</span> <span class="token function">euclidean_distance</span><span class="token punctuation">(</span>a<span class="token punctuation">,</span> b<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token builtin">float</span><span class="token punctuation">(</span>np<span class="token punctuation">.</span>linalg<span class="token punctuation">.</span>norm<span class="token punctuation">(</span>a <span class="token operator">-</span> b<span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h3 id="step-4-vector-index-with-brute-force-search" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-vector-index-with-brute-force-search" aria-label="Link to this section">#</a>Step 4: Vector Index with Brute-Force Search</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">VectorIndex</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>vectors <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        self<span class="token punctuation">.</span>texts <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        self<span class="token punctuation">.</span>metadata <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">def</span> <span class="token function">add</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> vector<span class="token punctuation">,</span> text<span class="token punctuation">,</span> meta<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>vectors<span class="token punctuation">.</span>append<span class="token punctuation">(</span>vector<span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>texts<span class="token punctuation">.</span>append<span class="token punctuation">(</span>text<span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>metadata<span class="token punctuation">.</span>append<span class="token punctuation">(</span>meta <span class="token keyword">or</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">search</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> query_vector<span class="token punctuation">,</span> top_k<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">,</span> metric<span class="token operator">=</span><span class="token string">"cosine"</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        scores <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">for</span> i<span class="token punctuation">,</span> vec <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>vectors<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> metric <span class="token operator">==</span> <span class="token string">"cosine"</span><span class="token punctuation">:</span>
+                score <span class="token operator">=</span> cosine_similarity<span class="token punctuation">(</span>query_vector<span class="token punctuation">,</span> vec<span class="token punctuation">)</span>
+            <span class="token keyword">elif</span> metric <span class="token operator">==</span> <span class="token string">"dot"</span><span class="token punctuation">:</span>
+                score <span class="token operator">=</span> dot_product<span class="token punctuation">(</span>query_vector<span class="token punctuation">,</span> vec<span class="token punctuation">)</span>
+            <span class="token keyword">elif</span> metric <span class="token operator">==</span> <span class="token string">"euclidean"</span><span class="token punctuation">:</span>
+                score <span class="token operator">=</span> <span class="token operator">-</span>euclidean_distance<span class="token punctuation">(</span>query_vector<span class="token punctuation">,</span> vec<span class="token punctuation">)</span>
+            <span class="token keyword">else</span><span class="token punctuation">:</span>
+                <span class="token keyword">raise</span> ValueError<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Unknown metric: </span><span class="token interpolation"><span class="token punctuation">{</span>metric<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+            scores<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> score<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        scores<span class="token punctuation">.</span>sort<span class="token punctuation">(</span>key<span class="token operator">=</span><span class="token keyword">lambda</span> x<span class="token punctuation">:</span> x<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> reverse<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+        results <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">for</span> idx<span class="token punctuation">,</span> score <span class="token keyword">in</span> scores<span class="token punctuation">[</span><span class="token punctuation">:</span>top_k<span class="token punctuation">]</span><span class="token punctuation">:</span>
+            results<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">{</span>
+                <span class="token string">"text"</span><span class="token punctuation">:</span> self<span class="token punctuation">.</span>texts<span class="token punctuation">[</span>idx<span class="token punctuation">]</span><span class="token punctuation">,</span>
+                <span class="token string">"score"</span><span class="token punctuation">:</span> score<span class="token punctuation">,</span>
+                <span class="token string">"metadata"</span><span class="token punctuation">:</span> self<span class="token punctuation">.</span>metadata<span class="token punctuation">[</span>idx<span class="token punctuation">]</span><span class="token punctuation">,</span>
+                <span class="token string">"index"</span><span class="token punctuation">:</span> idx
+            <span class="token punctuation">}</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> results
+
+    <span class="token keyword">def</span> <span class="token function">size</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token builtin">len</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>vectors<span class="token punctuation">)</span></code></pre>
+</figure>
+<h3 id="step-5-the-semantic-search-engine" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-the-semantic-search-engine" aria-label="Link to this section">#</a>Step 5: The Semantic Search Engine</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">SemanticSearchEngine</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> chunk_size<span class="token operator">=</span><span class="token number">200</span><span class="token punctuation">,</span> overlap<span class="token operator">=</span><span class="token number">50</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>embedder <span class="token operator">=</span> SimpleEmbedder<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>index <span class="token operator">=</span> VectorIndex<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>chunk_size <span class="token operator">=</span> chunk_size
+        self<span class="token punctuation">.</span>overlap <span class="token operator">=</span> overlap
+
+    <span class="token keyword">def</span> <span class="token function">index_documents</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> documents<span class="token punctuation">,</span> source_names<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        all_chunks <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        all_sources <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">for</span> i<span class="token punctuation">,</span> doc <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>documents<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            chunks <span class="token operator">=</span> chunk_text<span class="token punctuation">(</span>doc<span class="token punctuation">,</span> self<span class="token punctuation">.</span>chunk_size<span class="token punctuation">,</span> self<span class="token punctuation">.</span>overlap<span class="token punctuation">)</span>
+            all_chunks<span class="token punctuation">.</span>extend<span class="token punctuation">(</span>chunks<span class="token punctuation">)</span>
+            name <span class="token operator">=</span> source_names<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token keyword">if</span> source_names <span class="token keyword">else</span> <span class="token string-interpolation"><span class="token string">f"doc_</span><span class="token interpolation"><span class="token punctuation">{</span>i<span class="token punctuation">}</span></span><span class="token string">"</span></span>
+            all_sources<span class="token punctuation">.</span>extend<span class="token punctuation">(</span><span class="token punctuation">[</span>name<span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token builtin">len</span><span class="token punctuation">(</span>chunks<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>embedder<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>all_chunks<span class="token punctuation">)</span>
+        <span class="token keyword">for</span> chunk<span class="token punctuation">,</span> source <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>all_chunks<span class="token punctuation">,</span> all_sources<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            vec <span class="token operator">=</span> self<span class="token punctuation">.</span>embedder<span class="token punctuation">.</span>embed<span class="token punctuation">(</span>chunk<span class="token punctuation">)</span>
+            self<span class="token punctuation">.</span>index<span class="token punctuation">.</span>add<span class="token punctuation">(</span>vec<span class="token punctuation">,</span> chunk<span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token string">"source"</span><span class="token punctuation">:</span> source<span class="token punctuation">}</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token builtin">len</span><span class="token punctuation">(</span>all_chunks<span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">search</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> query<span class="token punctuation">,</span> top_k<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">,</span> metric<span class="token operator">=</span><span class="token string">"cosine"</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        query_vec <span class="token operator">=</span> self<span class="token punctuation">.</span>embedder<span class="token punctuation">.</span>embed<span class="token punctuation">(</span>query<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> self<span class="token punctuation">.</span>index<span class="token punctuation">.</span>search<span class="token punctuation">(</span>query_vec<span class="token punctuation">,</span> top_k<span class="token punctuation">,</span> metric<span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">search_with_scores</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> query<span class="token punctuation">,</span> top_k<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        results <span class="token operator">=</span> self<span class="token punctuation">.</span>search<span class="token punctuation">(</span>query<span class="token punctuation">,</span> top_k<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token punctuation">[</span>
+            <span class="token punctuation">{</span>
+                <span class="token string">"text"</span><span class="token punctuation">:</span> r<span class="token punctuation">[</span><span class="token string">"text"</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">200</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+                <span class="token string">"source"</span><span class="token punctuation">:</span> r<span class="token punctuation">[</span><span class="token string">"metadata"</span><span class="token punctuation">]</span><span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"source"</span><span class="token punctuation">,</span> <span class="token string">"unknown"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                <span class="token string">"score"</span><span class="token punctuation">:</span> <span class="token builtin">round</span><span class="token punctuation">(</span>r<span class="token punctuation">[</span><span class="token string">"score"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">for</span> r <span class="token keyword">in</span> results
+        <span class="token punctuation">]</span></code></pre>
+</figure>
+<h3 id="step-6-comparing-similarity-metrics" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-6-comparing-similarity-metrics" aria-label="Link to this section">#</a>Step 6: Comparing Similarity Metrics</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">compare_metrics</span><span class="token punctuation">(</span>engine<span class="token punctuation">,</span> query<span class="token punctuation">,</span> top_k<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    results <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+    <span class="token keyword">for</span> metric <span class="token keyword">in</span> <span class="token punctuation">[</span><span class="token string">"cosine"</span><span class="token punctuation">,</span> <span class="token string">"dot"</span><span class="token punctuation">,</span> <span class="token string">"euclidean"</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
+        hits <span class="token operator">=</span> engine<span class="token punctuation">.</span>search<span class="token punctuation">(</span>query<span class="token punctuation">,</span> top_k<span class="token operator">=</span>top_k<span class="token punctuation">,</span> metric<span class="token operator">=</span>metric<span class="token punctuation">)</span>
+        results<span class="token punctuation">[</span>metric<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">[</span>
+            <span class="token punctuation">{</span><span class="token string">"score"</span><span class="token punctuation">:</span> <span class="token builtin">round</span><span class="token punctuation">(</span>h<span class="token punctuation">[</span><span class="token string">"score"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">"preview"</span><span class="token punctuation">:</span> h<span class="token punctuation">[</span><span class="token string">"text"</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">80</span><span class="token punctuation">]</span><span class="token punctuation">}</span>
+            <span class="token keyword">for</span> h <span class="token keyword">in</span> hits
+        <span class="token punctuation">]</span>
+    <span class="token keyword">return</span> results</code></pre>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>With a production embedding API, the architecture stays identical. Only the embedder changes:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> openai <span class="token keyword">import</span> OpenAI
+
+client <span class="token operator">=</span> OpenAI<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token keyword">def</span> <span class="token function">openai_embed</span><span class="token punctuation">(</span>texts<span class="token punctuation">,</span> model<span class="token operator">=</span><span class="token string">"text-embedding-3-small"</span><span class="token punctuation">,</span> dimensions<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    kwargs <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"model"</span><span class="token punctuation">:</span> model<span class="token punctuation">,</span> <span class="token string">"input"</span><span class="token punctuation">:</span> texts<span class="token punctuation">}</span>
+    <span class="token keyword">if</span> dimensions<span class="token punctuation">:</span>
+        kwargs<span class="token punctuation">[</span><span class="token string">"dimensions"</span><span class="token punctuation">]</span> <span class="token operator">=</span> dimensions
+    response <span class="token operator">=</span> client<span class="token punctuation">.</span>embeddings<span class="token punctuation">.</span>create<span class="token punctuation">(</span><span class="token operator">**</span>kwargs<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token punctuation">[</span>item<span class="token punctuation">.</span>embedding <span class="token keyword">for</span> item <span class="token keyword">in</span> response<span class="token punctuation">.</span>data<span class="token punctuation">]</span></code></pre>
+</figure>
+<p>Matryoshka truncation with OpenAI -- same model, fewer dimensions, lower storage:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python">full <span class="token operator">=</span> openai_embed<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">"semantic search query"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> dimensions<span class="token operator">=</span><span class="token number">1536</span><span class="token punctuation">)</span>
+compact <span class="token operator">=</span> openai_embed<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">"semantic search query"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> dimensions<span class="token operator">=</span><span class="token number">256</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>The 256-d vector uses 6x less storage. For 10 million documents, that is 10 GB vs 61 GB. The accuracy loss is roughly 3-5% on standard benchmarks.</p>
+<p>For reranking with Cohere:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> cohere
+
+co <span class="token operator">=</span> cohere<span class="token punctuation">.</span>ClientV2<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+results <span class="token operator">=</span> co<span class="token punctuation">.</span>rerank<span class="token punctuation">(</span>
+    model<span class="token operator">=</span><span class="token string">"rerank-v3.5"</span><span class="token punctuation">,</span>
+    query<span class="token operator">=</span><span class="token string">"What is the refund policy?"</span><span class="token punctuation">,</span>
+    documents<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">"Full refund within 30 days..."</span><span class="token punctuation">,</span> <span class="token string">"No refunds after 90 days..."</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    top_n<span class="token operator">=</span><span class="token number">3</span>
+<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>For local embeddings with no API dependency:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> sentence_transformers <span class="token keyword">import</span> SentenceTransformer
+
+model <span class="token operator">=</span> SentenceTransformer<span class="token punctuation">(</span><span class="token string">"BAAI/bge-small-en-v1.5"</span><span class="token punctuation">)</span>
+embeddings <span class="token operator">=</span> model<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">"semantic search query"</span><span class="token punctuation">,</span> <span class="token string">"another document"</span><span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>The VectorIndex class from our build works with any of these. Swap the embedding function, keep the search logic.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces:</p>
+<ul>
+<li><code class="inline-code">outputs/prompt-embedding-advisor.md</code> -- a prompt for choosing embedding models and strategies for specific use cases</li>
+<li><code class="inline-code">outputs/skill-embedding-patterns.md</code> -- a skill that teaches agents how to use embeddings effectively in production</li>
+</ul>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p><strong>Metric comparison</strong>: run the same 5 queries against the sample documents using cosine similarity, dot product, and euclidean distance. Record the top-3 results for each. For which queries do the metrics disagree? Why?</p>
+</li>
+<li><p><strong>Chunk size experiment</strong>: index the sample documents with chunk sizes of 50, 100, 200, and 500 words. For each, run 5 queries and record the top-1 similarity score. Plot the relationship between chunk size and retrieval quality. Find the point where larger chunks start hurting.</p>
+</li>
+<li><p><strong>Matryoshka simulation</strong>: build a SimpleEmbedder that produces 500-d vectors. Truncate to 50, 100, 200, and 500 dimensions. Measure how retrieval recall degrades at each truncation. This simulates Matryoshka behavior without needing the real training trick.</p>
+</li>
+<li><p><strong>Binary quantization</strong>: take the embeddings from the search engine, convert them to binary (1 if positive, 0 if negative), and implement Hamming distance search. Compare the top-10 results against full-precision cosine similarity. Measure the overlap percentage.</p>
+</li>
+<li><p><strong>Sentence-based chunking</strong>: replace fixed-size chunking with <code class="inline-code">chunk_by_sentences</code>. Run the same queries and compare retrieval scores. Does respecting sentence boundaries improve the results?</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Embedding</td>
+<td>&quot;Text to numbers&quot;</td>
+<td>A dense vector where geometric proximity encodes semantic similarity</td>
+</tr>
+<tr>
+<td>Word2Vec</td>
+<td>&quot;The OG embedding&quot;</td>
+<td>2013 model that learned word vectors by predicting context words; proved vector arithmetic encodes meaning</td>
+</tr>
+<tr>
+<td>Cosine similarity</td>
+<td>&quot;How similar are two vectors&quot;</td>
+<td>Cosine of the angle between vectors; 1 = identical direction, 0 = orthogonal, -1 = opposite</td>
+</tr>
+<tr>
+<td>HNSW</td>
+<td>&quot;Fast vector search&quot;</td>
+<td>Hierarchical Navigable Small World graph -- multi-layer structure enabling O(log n) approximate nearest neighbor search</td>
+</tr>
+<tr>
+<td>Bi-encoder</td>
+<td>&quot;Embed separately, compare fast&quot;</td>
+<td>Encodes query and document independently into vectors; enables pre-computation and fast retrieval</td>
+</tr>
+<tr>
+<td>Cross-encoder</td>
+<td>&quot;Slow but accurate reranker&quot;</td>
+<td>Processes query-document pair jointly through the full model; higher accuracy, no pre-computation</td>
+</tr>
+<tr>
+<td>Matryoshka embeddings</td>
+<td>&quot;Truncatable vectors&quot;</td>
+<td>Embeddings trained so the first N dimensions capture the most important information, enabling variable-size storage</td>
+</tr>
+<tr>
+<td>Binary quantization</td>
+<td>&quot;1-bit embeddings&quot;</td>
+<td>Converting float vectors to binary (sign bit only) for 32x storage reduction with Hamming distance search</td>
+</tr>
+<tr>
+<td>Chunking</td>
+<td>&quot;Split docs for embedding&quot;</td>
+<td>Breaking documents into 256-512 token segments so each can be independently embedded and retrieved</td>
+</tr>
+<tr>
+<td>Vector database</td>
+<td>&quot;Search engine for embeddings&quot;</td>
+<td>Data store optimized for storing vectors and performing approximate nearest neighbor search at scale</td>
+</tr>
+<tr>
+<td>Contrastive learning</td>
+<td>&quot;Train by comparison&quot;</td>
+<td>Training approach that pushes similar pair embeddings together and dissimilar pair embeddings apart</td>
+</tr>
+<tr>
+<td>MTEB</td>
+<td>&quot;The embedding benchmark&quot;</td>
+<td>Massive Text Embedding Benchmark -- 56 datasets across 8 tasks; standard for comparing embedding models</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li>Mikolov et al., &quot;Efficient Estimation of Word Representations in Vector Space&quot; (2013) -- the Word2Vec paper that started the embedding revolution with the king-queen analogy</li>
+<li>Reimers &amp; Gurevych, &quot;Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks&quot; (2019) -- how to train bi-encoders for sentence-level similarity, foundation of modern embedding models</li>
+<li>Kusupati et al., &quot;Matryoshka Representation Learning&quot; (2022) -- the technique behind variable-dimension embeddings that OpenAI adopted for text-embedding-3</li>
+<li>Malkov &amp; Yashunin, &quot;Efficient and Robust Approximate Nearest Neighbor using Hierarchical Navigable Small World Graphs&quot; (2018) -- the HNSW paper, the algorithm behind most production vector search</li>
+<li>OpenAI Embeddings Guide (platform.openai.com/docs/guides/embeddings) -- practical reference for text-embedding-3 models including Matryoshka dimension reduction</li>
+<li>MTEB Leaderboard (huggingface.co/spaces/mteb/leaderboard) -- live benchmark comparing all embedding models across tasks and languages</li>
+<li><a href="https://arxiv.org/abs/2210.07316" target="_blank" rel="noopener">Muennighoff et al., &quot;MTEB: Massive Text Embedding Benchmark&quot; (EACL 2023)</a> -- the benchmark defining 8 task categories (classification, clustering, pair classification, reranking, retrieval, STS, summarization, bitext mining) that the leaderboard reports; read before trusting any single MTEB score.</li>
+<li><a href="https://www.sbert.net/" target="_blank" rel="noopener">Sentence Transformers documentation</a> -- canonical reference for bi-encoder vs cross-encoder, pooling strategies, and the ingest-split-embed-store RAG pipeline this lesson implements.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="03-structured-outputs.html">
+  <span class="label">← Previous</span>
+  <b>Structured Outputs: JSON, Schema Validation, Constrained Decoding</b>
+</a>
+      <a class="pager__item pager__item--next" href="05-context-engineering.html">
+  <span class="label">Next →</span>
+  <b>Context Engineering: Windows, Budgets, Memory, and Retrieval</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>11 minutes</b> of LLM Engineering behind you.</p>
+      <a class="btn btn--solid" href="05-context-engineering.html">Continue to Context Engineering: Windows, Budgets, Memory, and Retrieval →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#what-is-an-embedding">What Is an Embedding?</a></li><li class="mini__item mini__item--d3"><a href="#the-word2vec-breakthrough">The Word2Vec Breakthrough</a></li><li class="mini__item mini__item--d3"><a href="#from-words-to-sentences">From Words to Sentences</a></li><li class="mini__item mini__item--d3"><a href="#modern-embedding-models">Modern Embedding Models</a></li><li class="mini__item mini__item--d3"><a href="#similarity-metrics">Similarity Metrics</a></li><li class="mini__item mini__item--d3"><a href="#vector-databases-and-hnsw">Vector Databases and HNSW</a></li><li class="mini__item mini__item--d3"><a href="#chunking-strategies">Chunking Strategies</a></li><li class="mini__item mini__item--d3"><a href="#bi-encoders-vs-cross-encoders">Bi-Encoders vs Cross-Encoders</a></li><li class="mini__item mini__item--d3"><a href="#matryoshka-embeddings">Matryoshka Embeddings</a></li><li class="mini__item mini__item--d3"><a href="#binary-quantization">Binary Quantization</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-text-chunking">Step 1: Text Chunking</a></li><li class="mini__item mini__item--d3"><a href="#step-2-building-embeddings-from-scratch">Step 2: Building Embeddings from Scratch</a></li><li class="mini__item mini__item--d3"><a href="#step-3-similarity-functions">Step 3: Similarity Functions</a></li><li class="mini__item mini__item--d3"><a href="#step-4-vector-index-with-brute-force-search">Step 4: Vector Index with Brute-Force Search</a></li><li class="mini__item mini__item--d3"><a href="#step-5-the-semantic-search-engine">Step 5: The Semantic Search Engine</a></li><li class="mini__item mini__item--d3"><a href="#step-6-comparing-similarity-metrics">Step 6: Comparing Similarity Metrics</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

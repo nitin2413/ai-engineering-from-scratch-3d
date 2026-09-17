@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Production Quantization — AWQ, GPTQ, GGUF K-quants, FP8, MXFP4/NVFP4 — Infrastructure &amp; Production — AIFS</title>
+<meta name="description" content="Infrastructure &amp; Production: Production Quantization — AWQ, GPTQ, GGUF K-quants, FP8, MXFP4/NVFP4. 5 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Production Quantization — AWQ, GPTQ, GGUF K-quants, FP8, MXFP4/NVFP4 — Infrastructure &amp; Production — AIFS">
+<meta property="og:description" content="Infrastructure &amp; Production: Production Quantization — AWQ, GPTQ, GGUF K-quants, FP8, MXFP4/NVFP4. 5 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"gpu-memory-breakdown":["../assets/figures/figures-infra.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-infra.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#C79BFF" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#C79BFF;--accent-ink:#111111"
+  data-lesson-id="infrastructure-and-production/09-production-quantization" data-module="infrastructure-and-production"
+  data-prev="08-inference-metrics-goodput.html" data-next="10-cold-start-mitigation.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#C79BFF">
+        <span class="label">Phase 17</span>
+        <b>Infrastructure &amp; Production</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="infrastructure-and-production/01-managed-llm-platforms"><a href="01-managed-llm-platforms.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Managed LLM Platforms — Bedrock, Vertex AI, Azure OpenAI</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/02-inference-platform-economics"><a href="02-inference-platform-economics.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Inference Platform Economics — Fireworks, Together, Baseten, Modal, Replicate, Anyscale</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/03-gpu-autoscaling-kubernetes"><a href="03-gpu-autoscaling-kubernetes.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">GPU Autoscaling on Kubernetes — Karpenter, KAI Scheduler, Gang Scheduling</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/04-vllm-serving-internals"><a href="04-vllm-serving-internals.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Serving Engine Internals — PagedAttention, Continuous Batching, Chunked Prefill</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/05-eagle3-speculative-decoding"><a href="05-eagle3-speculative-decoding.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">EAGLE-3 Speculative Decoding in Production</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/06-sglang-radixattention"><a href="06-sglang-radixattention.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Prefix-Cache Serving — RadixAttention and KV Reuse</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/07-tensorrt-llm-blackwell"><a href="07-tensorrt-llm-blackwell.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Hardware-Specialized Inference Compilation — FP8 and NVFP4 on Blackwell</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/08-inference-metrics-goodput"><a href="08-inference-metrics-goodput.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Inference Metrics — TTFT, TPOT, ITL, Goodput, P99</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/09-production-quantization"><a href="09-production-quantization.html" class="is-current">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Production Quantization — AWQ, GPTQ, GGUF K-quants, FP8, MXFP4/NVFP4</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/10-cold-start-mitigation"><a href="10-cold-start-mitigation.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Cold Start Mitigation for Serverless LLMs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/11-multi-region-kv-locality"><a href="11-multi-region-kv-locality.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Multi-Region LLM Serving and KV Cache Locality</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/12-edge-inference"><a href="12-edge-inference.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Edge Inference — Apple Neural Engine, Qualcomm Hexagon, WebGPU/WebLLM, Jetson</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/13-llm-observability"><a href="13-llm-observability.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">LLM Observability Stack Selection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/14-prompt-semantic-caching"><a href="14-prompt-semantic-caching.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Prompt Caching and Semantic Caching Economics</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/15-batch-apis"><a href="15-batch-apis.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Batch APIs — the 50% Discount as Industry Standard</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/16-model-routing"><a href="16-model-routing.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Model Routing as a Cost-Reduction Primitive</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/17-disaggregated-prefill-decode"><a href="17-disaggregated-prefill-decode.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Disaggregated Prefill/Decode — NVIDIA Dynamo and llm-d</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/18-vllm-production-stack-lmcache"><a href="18-vllm-production-stack-lmcache.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Production Serving Stack — KV Offloading and Cache-Aware Routing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/19-ai-gateways"><a href="19-ai-gateways.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">AI Gateways — LiteLLM, Portkey, Kong AI Gateway, Bifrost</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/20-shadow-canary-progressive"><a href="20-shadow-canary-progressive.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Shadow Traffic, Canary Rollout, and Progressive Deployment for LLMs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/21-ab-testing-llm-features"><a href="21-ab-testing-llm-features.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">A/B Testing LLM Features — GrowthBook, Statsig, and the Vibes Problem</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/22-load-testing-llm-apis"><a href="22-load-testing-llm-apis.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Load Testing LLM APIs — Why k6 and Locust Lie</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/23-sre-for-ai"><a href="23-sre-for-ai.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">SRE for AI — Multi-Agent Incident Response, Runbooks, Predictive Detection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/24-chaos-engineering-llm"><a href="24-chaos-engineering-llm.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Chaos Engineering for LLM Production</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/25-security-secrets-audit"><a href="25-security-secrets-audit.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Security — Secrets, API Key Rotation, Audit Logs, Guardrails</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/26-compliance-frameworks"><a href="26-compliance-frameworks.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Compliance — SOC 2, HIPAA, GDPR, PCI-DSS, EU AI Act, ISO 42001</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/27-finops-llms"><a href="27-finops-llms.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">FinOps for LLMs — Unit Economics and Multi-Tenant Attribution</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="infrastructure-and-production/28-self-hosted-serving-selection"><a href="28-self-hosted-serving-selection.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">Self-Hosted Serving Selection — Matching Engine to Hardware and Scale</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Infrastructure &amp; Production</a></p>
+      <h1 class="page__title">Production Quantization — AWQ, GPTQ, GGUF K-quants, FP8, MXFP4/NVFP4</h1>
+      <p class="page__lede">Quantization format is not a universal choice — it is a function of hardware, serving engine, and workload. GGUF Q4_K_M or Q5_K_M owns CPU and edge, delivered through llama.cpp and Ollama. GPTQ wins inside vLLM when you need multi-LoRA on the same base. AWQ with Marlin-AWQ kernels delivers ~741 tok/s on a 7B class model with the best Pass@1 at INT4 — the 2026 default for datacenter production. FP8 stays the middle ground on Hopper, Ada, and Blackwell — near-lossless and widely supported. NVFP4 and MXFP4 (Blackwell microscaling) are aggressive and require per-block validation. Two traps bite teams: calibration dataset must match deployment domain, and KV cache is separate from weight quantization — the AWQ lesson &quot;my model is 4 GB now&quot; forgets the 10-30 GB KV cache at production batch sizes.</p>
+      <div class="page__meta">
+        <span class="chip">5 min read</span>
+        <span class="chip">1,178 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Learn</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (stdlib, toy memory and throughput comparison across formats)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 10 · 13 (Quantization foundations), Phase 17 · 04 (Serving Engine Internals)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Name the six production quantization formats and their sweet spots in 2026.</li>
+<li>Pick a format given hardware (CPU vs GPU, Hopper vs Blackwell), engine (vLLM, TRT-LLM, llama.cpp), and workload (routine chat, reasoning, multi-LoRA).</li>
+<li>Compute the weight memory saved and the KV cache left untouched for a chosen format.</li>
+<li>Name the calibration-dataset pitfall that degrades quantized models on domain traffic.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Quantization reduces memory and HBM bandwidth, which is exactly what decode needs. An FP16 70B model is 140 GB of weights. Quantize weights to INT4 (AWQ or GPTQ) and the model is 35 GB — fits in one H100 with room for KV cache, which matters because at 128 concurrent sequences with 2k context, KV cache alone is 20-30 GB.</p>
+<p>But quantization is not free. Aggressive quantization degrades quality, especially on reasoning-heavy tasks. Different formats work with different engines. Different hardware supports different precisions natively. The 2026 format zoo is real and you cannot copy someone else&#39;s choice — you have to pick based on your stack.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="the-six-formats" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-six-formats" aria-label="Link to this section">#</a>The six formats</h3>
+<table>
+<thead>
+<tr>
+<th>Format</th>
+<th>Bits</th>
+<th>Sweet spot</th>
+<th>Engines</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GGUF Q4_K_M / Q5_K_M</td>
+<td>4-5</td>
+<td>CPU, edge, laptops</td>
+<td>llama.cpp, Ollama</td>
+</tr>
+<tr>
+<td>GPTQ</td>
+<td>4-8</td>
+<td>Multi-LoRA on vLLM</td>
+<td>vLLM, TGI</td>
+</tr>
+<tr>
+<td>AWQ</td>
+<td>4</td>
+<td>Datacenter GPU production</td>
+<td>vLLM (Marlin-AWQ), TGI</td>
+</tr>
+<tr>
+<td>FP8</td>
+<td>8</td>
+<td>Hopper/Ada/Blackwell datacenter</td>
+<td>vLLM, TRT-LLM, SGLang</td>
+</tr>
+<tr>
+<td>MXFP4</td>
+<td>4</td>
+<td>Blackwell multi-user</td>
+<td>TRT-LLM</td>
+</tr>
+<tr>
+<td>NVFP4</td>
+<td>4</td>
+<td>Blackwell multi-user</td>
+<td>TRT-LLM</td>
+</tr>
+</tbody></table>
+<h3 id="gguf-the-cpu-edge-default" class="prose-h prose-h3"><a class="prose-h__anchor" href="#gguf-the-cpu-edge-default" aria-label="Link to this section">#</a>GGUF — the CPU/edge default</h3>
+<p>GGUF is a file format, not a quantization scheme per se — it bundles K-quant variants (Q2_K, Q3_K_M, Q4_K_M, Q5_K_M, Q6_K, Q8_0) in one container. Q4_K_M and Q5_K_M are the production defaults — near-BF16 quality at 4-5 bits. Best choice for CPU or edge serving because llama.cpp is by far the fastest CPU inference engine.</p>
+<p>Throughput penalty in vLLM: ~93 tok/s on 7B — the format is not optimized for GPU kernels. Use GGUF when the deployment target is CPU/edge. Not otherwise.</p>
+<h3 id="gptq-multi-lora-in-vllm" class="prose-h prose-h3"><a class="prose-h__anchor" href="#gptq-multi-lora-in-vllm" aria-label="Link to this section">#</a>GPTQ — multi-LoRA in vLLM</h3>
+<p>GPTQ is a post-training quantization algorithm with a calibration pass. Marlin kernels make it fast on GPU (2.6x speedup vs non-Marlin GPTQ). ~712 tok/s on 7B.</p>
+<p>The unique win: GPTQ-Int4 supports LoRA adapters in vLLM. If you are serving a base model plus 10-50 fine-tuned variants (each as a LoRA), GPTQ is your path. NVFP4 does not support LoRA yet as of early 2026.</p>
+<h3 id="awq-the-datacenter-gpu-default" class="prose-h prose-h3"><a class="prose-h__anchor" href="#awq-the-datacenter-gpu-default" aria-label="Link to this section">#</a>AWQ — the datacenter GPU default</h3>
+<p>Activation-aware Weight Quantization. Protects the ~1% most-salient weights during quantization. Marlin-AWQ kernels: 10.9x speedup vs naive. ~741 tok/s on 7B, best Pass@1 among INT4 formats.</p>
+<p>Pick AWQ for new GPU serving unless you need multi-LoRA (GPTQ) or aggressive Blackwell FP4 (NVFP4).</p>
+<h3 id="fp8-the-reliable-middle" class="prose-h prose-h3"><a class="prose-h__anchor" href="#fp8-the-reliable-middle" aria-label="Link to this section">#</a>FP8 — the reliable middle</h3>
+<p>8-bit floating point. Near-lossless. Widely supported. Hopper Tensor Cores accelerate FP8 natively. Blackwell inherits. FP8 is the safe 2026 default when quality is non-negotiable (reasoning, medical, code-gen). Memory savings are half of INT4 but quality risk is far lower.</p>
+<h3 id="mxfp4-nvfp4-blackwell-aggressive" class="prose-h prose-h3"><a class="prose-h__anchor" href="#mxfp4-nvfp4-blackwell-aggressive" aria-label="Link to this section">#</a>MXFP4 / NVFP4 — Blackwell aggressive</h3>
+<p>Microscaling FP4. Each block of weights has its own scale factor. Aggressive but hardware-accelerated on Blackwell Tensor Cores. Halve the bytes per token versus FP8 — the economic win in Phase 17 · 07.</p>
+<p>Caveats:</p>
+<ul>
+<li>No LoRA support yet (early 2026).</li>
+<li>Quality drop visible on reasoning-heavy workloads.</li>
+<li>Validate on your eval set per model.</li>
+</ul>
+<h3 id="the-calibration-trap" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-calibration-trap" aria-label="Link to this section">#</a>The calibration trap</h3>
+<p>AWQ and GPTQ require a calibration dataset — typically C4 or WikiText. For domain models (code, medical, legal), calibrating on generic web text lets the algorithm make wrong decisions about which weights to protect. Pass@1 on HumanEval can drop several points.</p>
+<p>The fix: calibrate on in-domain data. Hundreds of domain samples is usually enough. Test on the eval set before shipping.</p>
+<h3 id="the-kv-cache-trap" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-kv-cache-trap" aria-label="Link to this section">#</a>The KV cache trap</h3>
+<p>AWQ shrinks weights to 4 bits. KV cache is separate and stays at FP16/FP8. For a 70B model with AWQ:</p>
+<ul>
+<li>Weights: ~35 GB (INT4 from 140 GB).</li>
+<li>KV cache at 128 concurrent × 2k context: ~20 GB.</li>
+<li>Activations: ~5 GB.</li>
+<li>Total: ~60 GB — fits on H100 80GB.</li>
+</ul>
+<p>Naively &quot;I quantized my model to 4 GB&quot; forgets the other 30-50 GB. Budget HBM holistically.</p>
+<p>Separately, KV cache quantization (FP8 KV or INT8 KV) is a different choice with its own tradeoffs — it affects attention accuracy directly and is not a free win.</p>
+<h3 id="awq-int4-is-hazardous-for-reasoning" class="prose-h prose-h3"><a class="prose-h__anchor" href="#awq-int4-is-hazardous-for-reasoning" aria-label="Link to this section">#</a>AWQ INT4 is hazardous for reasoning</h3>
+<p>Chain-of-thought, math, code-gen with long context — these suffer visibly from aggressive quantization. AWQ INT4 loses ~3-5 points on MATH. For reasoning-heavy workloads, ship FP8 or BF16; accept the memory cost.</p>
+<h3 id="2026-picking-guide" class="prose-h prose-h3"><a class="prose-h__anchor" href="#2026-picking-guide" aria-label="Link to this section">#</a>2026 picking guide</h3>
+<ul>
+<li>CPU/edge serve: GGUF Q4_K_M. Done.</li>
+<li>GPU serve, routine chat, no LoRA: AWQ.</li>
+<li>GPU serve, multi-LoRA: GPTQ with Marlin.</li>
+<li>Reasoning workload: FP8.</li>
+<li>Blackwell datacenter, validated quality: NVFP4 + FP8 KV.</li>
+<li>Ambiguous: run a 1,000-sample eval on each candidate format.</li>
+</ul>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="gpu-memory-breakdown"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">gpu-memory-breakdown</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> gpu memory breakdown</figcaption>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p><code class="inline-code">code/main.py</code> computes memory footprint (weights + KV + activations) and relative throughput across the six formats for a range of model sizes. Shows where KV cache dominates, where weight compression pays, and where FP8 is the safe pick.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces <code class="inline-code">outputs/skill-quantization-picker.md</code>. Given hardware, model size, workload type, and quality tolerance, picks a format and produces a calibration/validation plan.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li>Run <code class="inline-code">code/main.py</code>. For a 70B model at 128 concurrent with 2k context, compute the total HBM for each format. Which format lets you fit on one H100 80GB?</li>
+<li>You have a 7B coding model. Pick a format and justify. If you were wrong about quality tolerance, what is the recovery path?</li>
+<li>Compute the calibration-dataset size needed to calibrate AWQ for a medical domain model. Why is more data not always better?</li>
+<li>Read the Marlin-AWQ kernel paper or release notes. Explain in three sentences why AWQ hits 741 tok/s on 7B while raw GPTQ hits ~712.</li>
+<li>When does it make sense to combine AWQ weights with FP8 KV cache vs keeping KV at BF16?</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GGUF</td>
+<td>&quot;llama.cpp format&quot;</td>
+<td>File format bundling K-quant variants; CPU/edge default</td>
+</tr>
+<tr>
+<td>Q4_K_M</td>
+<td>&quot;Q4 K M&quot;</td>
+<td>4-bit K-quant medium; the production GGUF default</td>
+</tr>
+<tr>
+<td>GPTQ</td>
+<td>&quot;gee pee tee q&quot;</td>
+<td>Post-train INT4 with calibration; supports LoRA in vLLM</td>
+</tr>
+<tr>
+<td>AWQ</td>
+<td>&quot;a w q&quot;</td>
+<td>Activation-aware INT4; Marlin kernels; best Pass@1 at INT4</td>
+</tr>
+<tr>
+<td>Marlin kernels</td>
+<td>&quot;fast INT4 kernels&quot;</td>
+<td>Custom CUDA kernels for INT4 on Hopper; 10x speedup</td>
+</tr>
+<tr>
+<td>FP8</td>
+<td>&quot;eight-bit float&quot;</td>
+<td>Safe precision default on Hopper/Ada/Blackwell</td>
+</tr>
+<tr>
+<td>MXFP4 / NVFP4</td>
+<td>&quot;microscaling four&quot;</td>
+<td>Blackwell 4-bit FP with per-block scale factors</td>
+</tr>
+<tr>
+<td>Calibration dataset</td>
+<td>&quot;cal data&quot;</td>
+<td>Input text used to pick quantization parameters; must match domain</td>
+</tr>
+<tr>
+<td>KV cache quantization</td>
+<td>&quot;KV INT8&quot;</td>
+<td>Separate choice from weights; affects attention accuracy</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://vrlatech.com/llm-quantization-explained-int4-int8-fp8-awq-and-gptq-in-2026/" target="_blank" rel="noopener">VRLA Tech — LLM Quantization 2026</a> — comparative benchmarks.</li>
+<li><a href="https://jarvislabs.ai/blog/vllm-quantization-complete-guide-benchmarks" target="_blank" rel="noopener">Jarvis Labs — vLLM Quantization Complete Guide</a> — throughput numbers by format.</li>
+<li><a href="https://blog.premai.io/llm-quantization-guide-gguf-vs-awq-vs-gptq-vs-bitsandbytes-compared-2026/" target="_blank" rel="noopener">PremAI — GGUF vs AWQ vs GPTQ vs bitsandbytes 2026</a> — format-by-format picking.</li>
+<li><a href="https://docs.vllm.ai/en/latest/features/quantization/index.html" target="_blank" rel="noopener">vLLM docs — Quantization</a> — supported formats and flags.</li>
+<li><a href="https://arxiv.org/abs/2306.00978" target="_blank" rel="noopener">AWQ paper (arXiv:2306.00978)</a> — original AWQ formulation.</li>
+<li><a href="https://arxiv.org/abs/2210.17323" target="_blank" rel="noopener">GPTQ paper (arXiv:2210.17323)</a> — original GPTQ formulation.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="08-inference-metrics-goodput.html">
+  <span class="label">← Previous</span>
+  <b>Inference Metrics — TTFT, TPOT, ITL, Goodput, P99</b>
+</a>
+      <a class="pager__item pager__item--next" href="10-cold-start-mitigation.html">
+  <span class="label">Next →</span>
+  <b>Cold Start Mitigation for Serverless LLMs</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>5 minutes</b> of Infrastructure &amp; Production behind you.</p>
+      <a class="btn btn--solid" href="10-cold-start-mitigation.html">Continue to Cold Start Mitigation for Serverless LLMs →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#the-six-formats">The six formats</a></li><li class="mini__item mini__item--d3"><a href="#gguf-the-cpu-edge-default">GGUF — the CPU/edge default</a></li><li class="mini__item mini__item--d3"><a href="#gptq-multi-lora-in-vllm">GPTQ — multi-LoRA in vLLM</a></li><li class="mini__item mini__item--d3"><a href="#awq-the-datacenter-gpu-default">AWQ — the datacenter GPU default</a></li><li class="mini__item mini__item--d3"><a href="#fp8-the-reliable-middle">FP8 — the reliable middle</a></li><li class="mini__item mini__item--d3"><a href="#mxfp4-nvfp4-blackwell-aggressive">MXFP4 / NVFP4 — Blackwell aggressive</a></li><li class="mini__item mini__item--d3"><a href="#the-calibration-trap">The calibration trap</a></li><li class="mini__item mini__item--d3"><a href="#the-kv-cache-trap">The KV cache trap</a></li><li class="mini__item mini__item--d3"><a href="#awq-int4-is-hazardous-for-reasoning">AWQ INT4 is hazardous for reasoning</a></li><li class="mini__item mini__item--d3"><a href="#2026-picking-guide">2026 picking guide</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

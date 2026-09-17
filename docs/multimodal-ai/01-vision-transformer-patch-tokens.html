@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vision Transformers and the Patch-Token Primitive — Multimodal AI — AIFS</title>
+<meta name="description" content="Multimodal AI: Vision Transformers and the Patch-Token Primitive. 8 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Vision Transformers and the Patch-Token Primitive — Multimodal AI — AIFS">
+<meta property="og:description" content="Multimodal AI: Vision Transformers and the Patch-Token Primitive. 8 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"image-patch-tokens":["../assets/figures/figures-llms-systems.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-llms-systems.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#FF8FB1" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#FF8FB1;--accent-ink:#111111"
+  data-lesson-id="multimodal-ai/01-vision-transformer-patch-tokens" data-module="multimodal-ai"
+  data-prev="" data-next="02-clip-contrastive-pretraining.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#FF8FB1">
+        <span class="label">Phase 12</span>
+        <b>Multimodal AI</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="multimodal-ai/01-vision-transformer-patch-tokens"><a href="01-vision-transformer-patch-tokens.html" class="is-current">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Vision Transformers and the Patch-Token Primitive</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/02-clip-contrastive-pretraining"><a href="02-clip-contrastive-pretraining.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">CLIP and Contrastive Vision-Language Pretraining</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/03-blip2-qformer-bridge"><a href="03-blip2-qformer-bridge.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">From CLIP to BLIP-2 — Q-Former as Modality Bridge</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/04-flamingo-gated-cross-attention"><a href="04-flamingo-gated-cross-attention.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Flamingo and Gated Cross-Attention for Few-Shot VLMs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/05-llava-visual-instruction-tuning"><a href="05-llava-visual-instruction-tuning.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">LLaVA and Visual Instruction Tuning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/06-any-resolution-patch-n-pack"><a href="06-any-resolution-patch-n-pack.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Any-Resolution Vision: Patch-n'-Pack and NaFlex</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/07-open-weight-vlm-recipes"><a href="07-open-weight-vlm-recipes.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Open-Weight VLM Recipes: What Actually Matters</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/08-llava-onevision-single-multi-video"><a href="08-llava-onevision-single-multi-video.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">LLaVA-OneVision: Single-Image, Multi-Image, Video in One Model</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/09-qwen-vl-family-dynamic-fps"><a href="09-qwen-vl-family-dynamic-fps.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Qwen-VL Family and Dynamic-FPS Video</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/10-internvl3-native-multimodal"><a href="10-internvl3-native-multimodal.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">InternVL3: Native Multimodal Pretraining</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/11-chameleon-early-fusion-tokens"><a href="11-chameleon-early-fusion-tokens.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Chameleon and Early-Fusion Token-Only Multimodal Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/12-emu3-next-token-for-generation"><a href="12-emu3-next-token-for-generation.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Emu3: Next-Token Prediction for Image and Video Generation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/13-transfusion-autoregressive-diffusion"><a href="13-transfusion-autoregressive-diffusion.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Transfusion: Autoregressive Text + Diffusion Image in One Transformer</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/14-show-o-discrete-diffusion-unified"><a href="14-show-o-discrete-diffusion-unified.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Show-o and Discrete-Diffusion Unified Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/15-janus-pro-decoupled-encoders"><a href="15-janus-pro-decoupled-encoders.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Janus-Pro: Decoupled Encoders for Unified Multimodal Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/16-mio-any-to-any-streaming"><a href="16-mio-any-to-any-streaming.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">MIO and Any-to-Any Streaming Multimodal Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/17-video-language-temporal-grounding"><a href="17-video-language-temporal-grounding.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Video-Language Models: Temporal Tokens and Grounding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/18-long-video-million-token"><a href="18-long-video-million-token.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Long-Video Understanding at Million-Token Context</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/19-audio-language-whisper-to-af3"><a href="19-audio-language-whisper-to-af3.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">Audio-Language Models: the Whisper to Audio Flamingo 3 Arc</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/20-omni-models-thinker-talker"><a href="20-omni-models-thinker-talker.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Omni Models: Qwen2.5-Omni and the Thinker-Talker Split</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/21-embodied-vlas-openvla-pi0-groot"><a href="21-embodied-vlas-openvla-pi0-groot.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Embodied VLAs: RT-2, OpenVLA, π0, GR00T</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/22-document-diagram-understanding"><a href="22-document-diagram-understanding.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Document and Diagram Understanding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/23-colpali-vision-native-rag"><a href="23-colpali-vision-native-rag.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">ColPali and Vision-Native Document RAG</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/24-multimodal-rag-cross-modal"><a href="24-multimodal-rag-cross-modal.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Multimodal RAG and Cross-Modal Retrieval</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/25-multimodal-agents-computer-use"><a href="25-multimodal-agents-computer-use.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Multimodal Agents and Computer-Use (Capstone)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Multimodal AI</a></p>
+      <h1 class="page__title">Vision Transformers and the Patch-Token Primitive</h1>
+      <p class="page__lede">Before anything multimodal, an image has to become a sequence of tokens a transformer can eat. The 2020 ViT paper answered this with 16x16 pixel patches, a linear projection, and a position embedding. Five years later every 2026 frontier model (Claude Opus 4.7 at 2576px native, Gemini 3.1 Pro, Qwen3.5-Omni) still begins this way — the encoder changed from ViT to DINOv2 to SigLIP 2, register tokens were added, the positional scheme became 2D-RoPE, but the primitive held. This lesson reads the patch-token pipeline end to end and builds it in stdlib Python so the rest of Phase 12 has a concrete mental model for &quot;visual tokens.&quot;</p>
+      <div class="page__meta">
+        <span class="chip">8 min read</span>
+        <span class="chip">1,680 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Learn</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (stdlib, patch tokenizer + geometry calculator)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 7 (Transformers), Phase 4 (Computer Vision)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~120 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Convert an HxWx3 image into a sequence of patch tokens with correct positional encoding.</li>
+<li>Compute sequence length, parameter count, and FLOPs for a ViT of a given (patch size, resolution, hidden dim, depth).</li>
+<li>Name the three upgrades that took ViT from 2020 research to 2026 production: self-supervised pretraining (DINO / MAE), register tokens, and native-resolution packing.</li>
+<li>Pick between CLS pooling, mean pooling, and register tokens for a downstream task.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Transformers operate on sequences of vectors. Text is already a sequence (bytes or tokens). An image is a 2D grid of pixels with three color channels — not a sequence. If you flatten every pixel, a 224x224 RGB image becomes 150,528 tokens, and self-attention at that length is a non-starter (quadratic in sequence length).</p>
+<p>Pre-2020 approaches bolted a CNN feature extractor onto the front: ResNet produces a 7x7 feature map of 2048-dim vectors, feed those 49 tokens to a transformer. This works but inherits the CNN&#39;s biases (translation equivariance, local receptive fields) and loses the transformer&#39;s appetite for scale.</p>
+<p>Dosovitskiy et al. (2020) asked the blunt question: what if we skip the CNN? Split the image into fixed-size patches (say 16x16 pixels), linearly project each patch into a vector, add a positional embedding, and feed the sequence to a vanilla transformer. At the time this was heresy — vision without convolutions. With enough data (JFT-300M, then LAION) it beat ResNet on ImageNet and kept improving.</p>
+<p>By 2026 the ViT primitive is the unquestioned foundation. Every open-weights VLM&#39;s vision tower is some descendant (DINOv2, SigLIP 2, CLIP, EVA, InternViT). The question is no longer &quot;should we use patches?&quot; but &quot;what patch size, what resolution schedule, what pretraining objective, what positional encoding.&quot;</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="patches-as-tokens" class="prose-h prose-h3"><a class="prose-h__anchor" href="#patches-as-tokens" aria-label="Link to this section">#</a>Patches as tokens</h3>
+<p>Given an image <code class="inline-code">x</code> of shape <code class="inline-code">(H, W, 3)</code> and a patch size <code class="inline-code">P</code>, you carve the image into a grid of <code class="inline-code">(H/P) x (W/P)</code> non-overlapping patches. Each patch is a <code class="inline-code">P x P x 3</code> cube of pixels. Flatten each cube to a <code class="inline-code">3 P^2</code> vector. Apply a shared linear projection <code class="inline-code">W_E</code> of shape <code class="inline-code">(3 P^2, D)</code> to map each patch into the model&#39;s hidden dimension <code class="inline-code">D</code>.</p>
+<p>For the ViT-B/16 canonical config:</p>
+<ul>
+<li>Resolution 224, patch size 16 → grid 14x14 → 196 patch tokens.</li>
+<li>Each patch is <code class="inline-code">16 x 16 x 3 = 768</code> pixel values, projected to <code class="inline-code">D = 768</code>.</li>
+<li>Add a learnable <code class="inline-code">[CLS]</code> token → sequence length 197.</li>
+</ul>
+<p>The patch projection is mathematically identical to a 2D convolution with kernel size <code class="inline-code">P</code>, stride <code class="inline-code">P</code>, and <code class="inline-code">D</code> output channels. That is how production code actually implements it — <code class="inline-code">nn.Conv2d(3, D, kernel_size=P, stride=P)</code>. The &quot;linear projection&quot; framing is conceptual; the kernel framing is efficient.</p>
+<h3 id="positional-embeddings" class="prose-h prose-h3"><a class="prose-h__anchor" href="#positional-embeddings" aria-label="Link to this section">#</a>Positional embeddings</h3>
+<p>Patches have no inherent order — the transformer sees them as a bag. Early ViTs added a learnable 1D positional embedding (one 768-dim vector per position, 197 of them). Works, but ties the model to the training resolution: at inference you have to interpolate the position table if you change the grid.</p>
+<p>Modern vision backbones use 2D-RoPE (Qwen2-VL&#39;s M-RoPE, SigLIP 2&#39;s default) or factorized 2D positions. 2D-RoPE rotates the query and key vectors based on the patch&#39;s (row, column) index, so the model infers relative 2D position from the rotation angle. No position table. The model handles arbitrary grid sizes at inference.</p>
+<h3 id="cls-token-pooled-output-and-register-tokens" class="prose-h prose-h3"><a class="prose-h__anchor" href="#cls-token-pooled-output-and-register-tokens" aria-label="Link to this section">#</a>CLS token, pooled output, and register tokens</h3>
+<p>What is the image-level representation? Three choices coexist:</p>
+<ol>
+<li><code class="inline-code">[CLS]</code> token. Prepend a learnable vector to the patch sequence. After all transformer blocks, the CLS token&#39;s hidden state is the image representation. Inherited from BERT. Used by original ViT, CLIP.</li>
+<li>Mean pool. Average the patch tokens&#39; output hidden states. Used by SigLIP, DINOv2, most modern VLMs.</li>
+<li>Register tokens. Darcet et al. (2023) observed that ViTs trained without an explicit sink token develop high-norm &quot;artifact&quot; patches that hijack self-attention. Adding 4–16 learnable register tokens absorbs this load and improves dense-prediction quality (segmentation, depth). DINOv2 and SigLIP 2 both ship with registers.</li>
+</ol>
+<p>The choice matters for downstream tasks. CLS is fine for classification. For VLMs that feed patch tokens into an LLM, you skip pooling entirely — every patch becomes an LLM input token. Registers get discarded before handoff (they are scaffolding, not content).</p>
+<h3 id="pretraining-supervised-contrastive-masked-self-distilled" class="prose-h prose-h3"><a class="prose-h__anchor" href="#pretraining-supervised-contrastive-masked-self-distilled" aria-label="Link to this section">#</a>Pretraining: supervised, contrastive, masked, self-distilled</h3>
+<p>The 2020 ViT was pretrained with supervised classification on JFT-300M. Quickly supplanted by:</p>
+<ul>
+<li>CLIP (2021): contrastive image-text on 400M pairs. Lesson 12.02.</li>
+<li>MAE (2021, He et al.): mask 75% of patches, reconstruct pixels. Self-supervised, works on pure images.</li>
+<li>DINO (2021) / DINOv2 (2023): self-distillation with student-teacher, no labels, no captions. The 2023 DINOv2 ViT-g/14 is the strongest purely-visual backbone and the default for &quot;dense features&quot; use cases.</li>
+<li>SigLIP / SigLIP 2 (2023, 2025): CLIP with a sigmoid loss and NaFlex for native aspect ratio. The dominant vision tower in 2026 open VLMs (Qwen, Idefics2, LLaVA-OneVision).</li>
+</ul>
+<p>Your choice of pretraining determines what the backbone is good for: CLIP/SigLIP for semantic matching with text, DINOv2 for dense visual features, MAE as a starting point for downstream finetuning.</p>
+<h3 id="scaling-laws" class="prose-h prose-h3"><a class="prose-h__anchor" href="#scaling-laws" aria-label="Link to this section">#</a>Scaling laws</h3>
+<p>ViT scaling (Zhai et al. 2022) established that a ViT&#39;s quality obeys predictable laws in model size, data size, and compute. At fixed compute:</p>
+<ul>
+<li>Bigger model + more data → better quality.</li>
+<li>Patch size is a lever on sequence length vs fidelity. Patch 14 (typical for DINOv2/SigLIP SO400m) gives more tokens per image than patch 16; better for OCR and dense tasks, worse for speed.</li>
+<li>Resolution is the other big lever. Going from 224 to 384 to 512 almost always helps, at quadratic cost in FLOPs.</li>
+</ul>
+<p>ViT-g/14 (1B params, patch 14, resolution 224 → 256 tokens) and SigLIP SO400m/14 (400M params, patch 14) are the two workhorse encoders for 2026 open VLMs.</p>
+<h3 id="parameter-count-for-a-vit" class="prose-h prose-h3"><a class="prose-h__anchor" href="#parameter-count-for-a-vit" aria-label="Link to this section">#</a>Parameter count for a ViT</h3>
+<p>The full calculation lives in <code class="inline-code">code/main.py</code>. For ViT-B/16 at 224:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>patch_embed = 3 * 16 * 16 * 768 + 768  =  591k
+cls + pos    = 768 + 197 * 768          =  152k
+block        = 4 * 768^2 (QKVO) + 2 * 4 * 768^2 (MLP) + 2 * 2*768 (LN)
+             = 12 * 768^2 + 3k          =  7.1M
+12 blocks    = 85M
+final LN    = 1.5k
+total       ≈ 86M</code></pre>
+</figure>
+<p>Ball-park every ViT this way before you load the checkpoint. The backbone size sets your VRAM floor in any downstream VLM.</p>
+<h3 id="2026-production-config" class="prose-h prose-h3"><a class="prose-h__anchor" href="#2026-production-config" aria-label="Link to this section">#</a>2026 production config</h3>
+<p>The encoder most open VLMs ship with in 2026 is SigLIP 2 SO400m/14 at native resolution (NaFlex). It has:</p>
+<ul>
+<li>400M parameters.</li>
+<li>Patch size 14, default resolution 384 → 729 patch tokens per image.</li>
+<li>Mean pool for image-level tasks; all 729 patches flow into the LLM for VQA.</li>
+<li>4 register tokens, discarded before LLM handoff.</li>
+<li>2D-RoPE with image-level scaling for native aspect ratio.</li>
+</ul>
+<p>Every decision in that config traces back to a paper you can read.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="image-patch-tokens"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">image-patch-tokens</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> image patch tokens</figcaption>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p><code class="inline-code">code/main.py</code> is a patch tokenizer and geometry calculator. It takes (image H, W, patch P, hidden D, depth L) and reports:</p>
+<ul>
+<li>Grid shape and sequence length after patching.</li>
+<li>Token sequence for a synthetic 8x8 pixel toy image (walk through the flatten + project path).</li>
+<li>Parameter count broken down by patch embed, position embed, transformer blocks, and head.</li>
+<li>FLOPs per forward pass at the target resolution.</li>
+<li>A comparison table across ViT-B/16 @ 224, ViT-L/14 @ 336, DINOv2 ViT-g/14 @ 224, SigLIP SO400m/14 @ 384.</li>
+</ul>
+<p>Run it. Match the parameter counts to the published numbers. Play with patch size and resolution to feel the token-count cost.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces <code class="inline-code">outputs/skill-patch-geometry-reader.md</code>. Given a ViT config (patch size, resolution, hidden dim, depth), it produces a token-count, parameter-count, and VRAM estimate with justifications. Use this skill whenever you pick a vision backbone for a VLM — it prevents &quot;the tokens exploded and my LLM context filled up&quot; surprises.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p>Compute the patch-token sequence length for Qwen2.5-VL at native 1280x720 input with patch size 14. How does that compare to a CLS-only representation?</p>
+</li>
+<li><p>A 1080p frame (1920x1080) at patch 14 produces how many tokens? At 30 FPS over a 5-minute video, how many total visual tokens? Which cost saves you most: pooling, frame sampling, or token merging?</p>
+</li>
+<li><p>Implement mean pooling over patch tokens in pure Python. Verify that mean-pool over 196 tokens of a DINOv2 output matches what the model&#39;s <code class="inline-code">forward</code> returns when you ask for a pooled embedding.</p>
+</li>
+<li><p>Read Section 3 of &quot;Vision Transformers Need Registers&quot; (arXiv:2309.16588). Describe in two sentences what artifact the registers absorb and why it matters for downstream dense prediction.</p>
+</li>
+<li><p>Modify <code class="inline-code">code/main.py</code> to support patch-n&#39;-pack: given a list of images of different resolutions, produce a single packed sequence and the block-diagonal attention mask. Verify against Lesson 12.06 when you reach it.</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Patch</td>
+<td>&quot;16x16 pixel square&quot;</td>
+<td>A fixed-size non-overlapping region of the input image; becomes one token</td>
+</tr>
+<tr>
+<td>Patch embedding</td>
+<td>&quot;Linear projection&quot;</td>
+<td>A shared learned matrix (or Conv2d with stride=P) mapping flattened patch pixels to D-dim vectors</td>
+</tr>
+<tr>
+<td>CLS token</td>
+<td>&quot;Class token&quot;</td>
+<td>Prepended learnable vector whose final hidden state represents the whole image; optional in 2026</td>
+</tr>
+<tr>
+<td>Register token</td>
+<td>&quot;Sink token&quot;</td>
+<td>Extra learnable tokens that absorb the high-norm attention artifacts ViTs develop during pretraining</td>
+</tr>
+<tr>
+<td>Position embedding</td>
+<td>&quot;Positional info&quot;</td>
+<td>Per-position vector or rotation making the sequence-order-aware; 2D-RoPE is the modern default</td>
+</tr>
+<tr>
+<td>Grid</td>
+<td>&quot;Patch grid&quot;</td>
+<td>The (H/P) x (W/P) 2D array of patches for a given resolution and patch size</td>
+</tr>
+<tr>
+<td>NaFlex</td>
+<td>&quot;Native flexible resolution&quot;</td>
+<td>SigLIP 2 feature: single model serves multiple aspect ratios and resolutions without retraining</td>
+</tr>
+<tr>
+<td>Backbone</td>
+<td>&quot;Vision tower&quot;</td>
+<td>The pretrained image encoder whose patch-token outputs feed the LLM in a VLM</td>
+</tr>
+<tr>
+<td>Pooling</td>
+<td>&quot;Image-level summary&quot;</td>
+<td>Strategy to turn patch tokens into one vector: CLS, mean, attention pool, or register-based</td>
+</tr>
+<tr>
+<td>Patch 14 vs 16</td>
+<td>&quot;Finer vs coarser grid&quot;</td>
+<td>Patch 14 produces more tokens per image, better fidelity for OCR, slower; patch 16 is the classic default</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2010.11929" target="_blank" rel="noopener">Dosovitskiy et al. — An Image is Worth 16x16 Words (arXiv:2010.11929)</a> — original ViT.</li>
+<li><a href="https://arxiv.org/abs/2111.06377" target="_blank" rel="noopener">He et al. — Masked Autoencoders Are Scalable Vision Learners (arXiv:2111.06377)</a> — MAE, self-supervised pretraining.</li>
+<li><a href="https://arxiv.org/abs/2304.07193" target="_blank" rel="noopener">Oquab et al. — DINOv2 (arXiv:2304.07193)</a> — self-distillation at scale, no labels.</li>
+<li><a href="https://arxiv.org/abs/2309.16588" target="_blank" rel="noopener">Darcet et al. — Vision Transformers Need Registers (arXiv:2309.16588)</a> — register tokens and artifact analysis.</li>
+<li><a href="https://arxiv.org/abs/2502.14786" target="_blank" rel="noopener">Tschannen et al. — SigLIP 2 (arXiv:2502.14786)</a> — the 2026 default vision tower.</li>
+<li><a href="https://arxiv.org/abs/2106.04560" target="_blank" rel="noopener">Zhai et al. — Scaling Vision Transformers (arXiv:2106.04560)</a> — empirical scaling laws.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <span class="pager__item pager__item--prev is-empty">
+  <span class="label">← Previous</span>
+  <b>Module start</b>
+</span>
+      <a class="pager__item pager__item--next" href="02-clip-contrastive-pretraining.html">
+  <span class="label">Next →</span>
+  <b>CLIP and Contrastive Vision-Language Pretraining</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>8 minutes</b> of Multimodal AI behind you.</p>
+      <a class="btn btn--solid" href="02-clip-contrastive-pretraining.html">Continue to CLIP and Contrastive Vision-Language Pretraining →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#patches-as-tokens">Patches as tokens</a></li><li class="mini__item mini__item--d3"><a href="#positional-embeddings">Positional embeddings</a></li><li class="mini__item mini__item--d3"><a href="#cls-token-pooled-output-and-register-tokens">CLS token, pooled output, and register tokens</a></li><li class="mini__item mini__item--d3"><a href="#pretraining-supervised-contrastive-masked-self-distilled">Pretraining: supervised, contrastive, masked, self-distilled</a></li><li class="mini__item mini__item--d3"><a href="#scaling-laws">Scaling laws</a></li><li class="mini__item mini__item--d3"><a href="#parameter-count-for-a-vit">Parameter count for a ViT</a></li><li class="mini__item mini__item--d3"><a href="#2026-production-config">2026 production config</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

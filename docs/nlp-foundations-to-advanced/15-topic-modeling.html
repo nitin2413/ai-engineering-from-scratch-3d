@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Topic Modeling — LDA and BERTopic — NLP, Foundations to Advanced — AIFS</title>
+<meta name="description" content="NLP, Foundations to Advanced: Topic Modeling — LDA and BERTopic. 4 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Topic Modeling — LDA and BERTopic — NLP, Foundations to Advanced — AIFS">
+<meta property="og:description" content="NLP, Foundations to Advanced: Topic Modeling — LDA and BERTopic. 4 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"topic-drift":["../assets/figures/figures-nlp3.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-nlp3.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#B8FF3C" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#B8FF3C;--accent-ink:#111111"
+  data-lesson-id="nlp-foundations-to-advanced/15-topic-modeling" data-module="nlp-foundations-to-advanced"
+  data-prev="14-information-retrieval-search.html" data-next="16-text-generation-pre-transformer.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#B8FF3C">
+        <span class="label">Phase 05</span>
+        <b>NLP, Foundations to Advanced</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="nlp-foundations-to-advanced/01-text-processing"><a href="01-text-processing.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Text Processing — Tokenization, Stemming, Lemmatization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/02-bag-of-words-tfidf"><a href="02-bag-of-words-tfidf.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Bag of Words, TF-IDF, and Text Representation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/03-word-embeddings-word2vec"><a href="03-word-embeddings-word2vec.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Word Embeddings — Word2Vec from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/04-glove-fasttext-subword"><a href="04-glove-fasttext-subword.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">GloVe, FastText, and Subword Embeddings</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/05-sentiment-analysis"><a href="05-sentiment-analysis.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Sentiment Analysis</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/06-named-entity-recognition"><a href="06-named-entity-recognition.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Named Entity Recognition</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/07-pos-tagging-parsing"><a href="07-pos-tagging-parsing.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">POS Tagging and Syntactic Parsing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/08-cnns-rnns-for-text"><a href="08-cnns-rnns-for-text.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">CNNs and RNNs for Text</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/09-sequence-to-sequence"><a href="09-sequence-to-sequence.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Sequence-to-Sequence Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/10-attention-mechanism"><a href="10-attention-mechanism.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Attention Mechanism — The Breakthrough</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/11-machine-translation"><a href="11-machine-translation.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Machine Translation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/12-text-summarization"><a href="12-text-summarization.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Text Summarization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/13-question-answering"><a href="13-question-answering.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Question Answering Systems</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/14-information-retrieval-search"><a href="14-information-retrieval-search.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Information Retrieval and Search</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/15-topic-modeling"><a href="15-topic-modeling.html" class="is-current">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Topic Modeling — LDA and BERTopic</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/16-text-generation-pre-transformer"><a href="16-text-generation-pre-transformer.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Text Generation Before Transformers — N-gram Language Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/17-chatbots-rule-to-neural"><a href="17-chatbots-rule-to-neural.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Chatbots — Rule-Based to Neural to LLM Agents</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/18-multilingual-nlp"><a href="18-multilingual-nlp.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Multilingual NLP</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/19-subword-tokenization"><a href="19-subword-tokenization.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">Subword Tokenization — BPE, WordPiece, Unigram, SentencePiece</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/20-structured-outputs-constrained-decoding"><a href="20-structured-outputs-constrained-decoding.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Structured Outputs &amp; Constrained Decoding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/21-nli-textual-entailment"><a href="21-nli-textual-entailment.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Natural Language Inference — Textual Entailment</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/22-embedding-models-deep-dive"><a href="22-embedding-models-deep-dive.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Embedding Models — The 2026 Deep Dive</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/23-chunking-strategies-rag"><a href="23-chunking-strategies-rag.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Chunking Strategies for RAG</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/24-coreference-resolution"><a href="24-coreference-resolution.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Coreference Resolution</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/25-entity-linking"><a href="25-entity-linking.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Entity Linking &amp; Disambiguation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/26-relation-extraction-kg"><a href="26-relation-extraction-kg.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Relation Extraction &amp; Knowledge Graph Construction</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/27-llm-evaluation-frameworks"><a href="27-llm-evaluation-frameworks.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">LLM Evaluation — RAGAS, DeepEval, G-Eval</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/28-long-context-evaluation"><a href="28-long-context-evaluation.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">Long-Context Evaluation — NIAH, RULER, LongBench, MRCR</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/29-dialogue-state-tracking"><a href="29-dialogue-state-tracking.html" class="">
+  <span class="snav__n">29</span>
+  <span class="snav__t">Dialogue State Tracking</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">NLP, Foundations to Advanced</a></p>
+      <h1 class="page__title">Topic Modeling — LDA and BERTopic</h1>
+      <p class="page__lede">LDA: documents are mixtures of topics, topics are distributions over words. BERTopic: documents cluster in embedding space, clusters are topics. Same goal, different decompositions.</p>
+      <div class="page__meta">
+        <span class="chip">4 min read</span>
+        <span class="chip">958 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Learn</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 5 · 02 (BoW + TF-IDF), Phase 5 · 03 (Word2Vec)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~45 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>You have 10,000 customer support tickets, 50,000 news articles, or 200,000 tweets. You need to know what the collection is about without reading it. You do not have labeled categories. You do not even know how many categories exist.</p>
+<p>Topic modeling answers that without supervision. Give it a corpus, get back a small set of coherent topics and, for each document, a distribution over those topics.</p>
+<p>Two algorithmic families dominate. LDA (2003) treats each document as a mixture of latent topics and each topic as a distribution over words. Inference is Bayesian. It still ships in production where you need mixed-membership topic assignments and explainable word-level probability distributions.</p>
+<p>BERTopic (2020) encodes documents with BERT, reduces dimensionality with UMAP, clusters with HDBSCAN, and extracts topic words via class-based TF-IDF. It wins on short text, social media, and anything where semantic similarity matters more than word overlap. One document gets one topic, which is a limitation for long-form content.</p>
+<p>This lesson builds intuition for both and names which one to pick for a given corpus.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<p><img src="assets/15-topic-modeling/topic-modeling.svg" alt="LDA mixture model vs BERTopic clustering" loading="lazy"></p>
+<p><strong>LDA generative story.</strong> Each topic is a distribution over words. Each document is a mixture of topics. To generate a word in a document, sample a topic from the document&#39;s mixture, then sample a word from that topic&#39;s distribution. Inference reverses this: given observed words, infer the topic distribution per document and the word distribution per topic. Collapsed Gibbs sampling or variational Bayes does the math.</p>
+<p>Key LDA output:</p>
+<ul>
+<li><code class="inline-code">doc_topic</code>: matrix <code class="inline-code">(n_docs, n_topics)</code>, each row sums to 1 (document&#39;s topic mixture).</li>
+<li><code class="inline-code">topic_word</code>: matrix <code class="inline-code">(n_topics, vocab_size)</code>, each row sums to 1 (topic&#39;s word distribution).</li>
+</ul>
+<p><strong>BERTopic pipeline.</strong></p>
+<ol>
+<li>Encode each document with a sentence transformer (e.g., <code class="inline-code">all-MiniLM-L6-v2</code>). 384-dim vectors.</li>
+<li>Reduce dimensionality with UMAP to ~5 dimensions. BERT embeddings are too high-dim for clustering.</li>
+<li>Cluster with HDBSCAN. Density-based, produces variable-size clusters and an &quot;outlier&quot; label.</li>
+<li>For each cluster, compute class-based TF-IDF over the cluster&#39;s documents to extract top words.</li>
+</ol>
+<p>Output is one topic per document (plus a -1 outlier label). Optionally, a soft membership via HDBSCAN&#39;s probability vector.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="topic-drift"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">topic-drift</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> topic drift</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-lda-via-scikit-learn" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-lda-via-scikit-learn" aria-label="Link to this section">#</a>Step 1: LDA via scikit-learn</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>feature_extraction<span class="token punctuation">.</span>text <span class="token keyword">import</span> CountVectorizer
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>decomposition <span class="token keyword">import</span> LatentDirichletAllocation
+<span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+
+
+<span class="token keyword">def</span> <span class="token function">fit_lda</span><span class="token punctuation">(</span>documents<span class="token punctuation">,</span> n_topics<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">,</span> max_features<span class="token operator">=</span><span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    cv <span class="token operator">=</span> CountVectorizer<span class="token punctuation">(</span>
+        max_features<span class="token operator">=</span>max_features<span class="token punctuation">,</span>
+        stop_words<span class="token operator">=</span><span class="token string">"english"</span><span class="token punctuation">,</span>
+        min_df<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">,</span>
+        max_df<span class="token operator">=</span><span class="token number">0.9</span><span class="token punctuation">,</span>
+    <span class="token punctuation">)</span>
+    X <span class="token operator">=</span> cv<span class="token punctuation">.</span>fit_transform<span class="token punctuation">(</span>documents<span class="token punctuation">)</span>
+    lda <span class="token operator">=</span> LatentDirichletAllocation<span class="token punctuation">(</span>
+        n_components<span class="token operator">=</span>n_topics<span class="token punctuation">,</span>
+        random_state<span class="token operator">=</span><span class="token number">42</span><span class="token punctuation">,</span>
+        max_iter<span class="token operator">=</span><span class="token number">50</span><span class="token punctuation">,</span>
+        learning_method<span class="token operator">=</span><span class="token string">"online"</span><span class="token punctuation">,</span>
+    <span class="token punctuation">)</span>
+    doc_topic <span class="token operator">=</span> lda<span class="token punctuation">.</span>fit_transform<span class="token punctuation">(</span>X<span class="token punctuation">)</span>
+    feature_names <span class="token operator">=</span> cv<span class="token punctuation">.</span>get_feature_names_out<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> lda<span class="token punctuation">,</span> cv<span class="token punctuation">,</span> doc_topic<span class="token punctuation">,</span> feature_names
+
+
+<span class="token keyword">def</span> <span class="token function">print_top_words</span><span class="token punctuation">(</span>lda<span class="token punctuation">,</span> feature_names<span class="token punctuation">,</span> n_top<span class="token operator">=</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">for</span> idx<span class="token punctuation">,</span> topic <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>lda<span class="token punctuation">.</span>components_<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        top_idx <span class="token operator">=</span> np<span class="token punctuation">.</span>argsort<span class="token punctuation">(</span><span class="token operator">-</span>topic<span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token punctuation">:</span>n_top<span class="token punctuation">]</span>
+        words <span class="token operator">=</span> <span class="token punctuation">[</span>feature_names<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token keyword">for</span> i <span class="token keyword">in</span> top_idx<span class="token punctuation">]</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"topic </span><span class="token interpolation"><span class="token punctuation">{</span>idx<span class="token punctuation">}</span></span><span class="token string">: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">' '</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>words<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Notice: stopwords removed, min_df and max_df filter rare and ubiquitous terms, CountVectorizer (not TfidfVectorizer) because LDA expects raw counts.</p>
+<h3 id="step-2-bertopic-production" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-bertopic-production" aria-label="Link to this section">#</a>Step 2: BERTopic (production)</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> bertopic <span class="token keyword">import</span> BERTopic
+
+topic_model <span class="token operator">=</span> BERTopic<span class="token punctuation">(</span>
+    embedding_model<span class="token operator">=</span><span class="token string">"sentence-transformers/all-MiniLM-L6-v2"</span><span class="token punctuation">,</span>
+    min_topic_size<span class="token operator">=</span><span class="token number">15</span><span class="token punctuation">,</span>
+    verbose<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">,</span>
+<span class="token punctuation">)</span>
+
+topics<span class="token punctuation">,</span> probs <span class="token operator">=</span> topic_model<span class="token punctuation">.</span>fit_transform<span class="token punctuation">(</span>documents<span class="token punctuation">)</span>
+info <span class="token operator">=</span> topic_model<span class="token punctuation">.</span>get_topic_info<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>info<span class="token punctuation">.</span>head<span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+valid_topics <span class="token operator">=</span> info<span class="token punctuation">[</span>info<span class="token punctuation">[</span><span class="token string">"Topic"</span><span class="token punctuation">]</span> <span class="token operator">!=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">"Topic"</span><span class="token punctuation">]</span><span class="token punctuation">.</span>tolist<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">for</span> topic_id <span class="token keyword">in</span> valid_topics<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">5</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"topic </span><span class="token interpolation"><span class="token punctuation">{</span>topic_id<span class="token punctuation">}</span></span><span class="token string">: </span><span class="token interpolation"><span class="token punctuation">{</span>topic_model<span class="token punctuation">.</span>get_topic<span class="token punctuation">(</span>topic_id<span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token format-spec">10]</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>The filter on <code class="inline-code">Topic != -1</code> drops BERTopic&#39;s outlier bucket (documents HDBSCAN could not cluster). <code class="inline-code">min_topic_size</code> controls HDBSCAN&#39;s minimum cluster size; BERTopic&#39;s library default is 10. This example sets it to 15 explicitly for the lesson&#39;s scale. For corpora over 10,000 documents, increase to 50 or 100.</p>
+<h3 id="step-3-evaluation" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-evaluation" aria-label="Link to this section">#</a>Step 3: evaluation</h3>
+<p>Both methods output topic words. The question is whether those words cohere.</p>
+<ul>
+<li><strong>Topic coherence (c_v).</strong> Combines NPMI (normalized pointwise mutual information) of top-word pairs over sliding-window contexts, aggregates the scores into topic vectors, and compares those vectors via cosine similarity. Higher is better. Use <code class="inline-code">gensim.models.CoherenceModel</code> with <code class="inline-code">coherence=&quot;c_v&quot;</code>.</li>
+<li><strong>Topic diversity.</strong> Fraction of unique words across all topics&#39; top words. Higher is better (topics do not overlap).</li>
+<li><strong>Qualitative inspection.</strong> Read the top words of each topic. Do they name a real thing? Human judgment is still the last line of defense.</li>
+</ul>
+<h2 id="when-to-pick-which" class="prose-h prose-h2"><a class="prose-h__anchor" href="#when-to-pick-which" aria-label="Link to this section">#</a>When to pick which</h2>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Pick</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Short text (tweets, reviews, headlines)</td>
+<td>BERTopic</td>
+</tr>
+<tr>
+<td>Long documents with topic mixtures</td>
+<td>LDA</td>
+</tr>
+<tr>
+<td>No GPU / limited compute</td>
+<td>LDA or NMF</td>
+</tr>
+<tr>
+<td>Need document-level multi-topic distributions</td>
+<td>LDA</td>
+</tr>
+<tr>
+<td>LLM integration for topic labeling</td>
+<td>BERTopic (direct support)</td>
+</tr>
+<tr>
+<td>Resource-constrained edge deployment</td>
+<td>LDA</td>
+</tr>
+<tr>
+<td>Max semantic coherence</td>
+<td>BERTopic</td>
+</tr>
+</tbody></table>
+<p>The biggest practical consideration is document length. BERT embeddings truncate; LDA counts work on whatever length. For documents longer than the embedding model&#39;s context, either chunk + aggregate or use LDA.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>The 2026 stack:</p>
+<ul>
+<li><strong>BERTopic.</strong> Default for short text and anything where semantics matter.</li>
+<li><strong><code class="inline-code">gensim.models.LdaModel</code>.</strong> Classic LDA for production, mature, battle-tested.</li>
+<li><strong><code class="inline-code">sklearn.decomposition.LatentDirichletAllocation</code>.</strong> Easy LDA for experiments.</li>
+<li><strong>NMF.</strong> Non-negative matrix factorization. Fast alternative to LDA, comparable quality on short text.</li>
+<li><strong>Top2Vec.</strong> Similar design to BERTopic. Smaller community but good on some benchmarks.</li>
+<li><strong>FASTopic.</strong> Newer, faster than BERTopic on very large corpora.</li>
+<li><strong>LLM-based labeling.</strong> Run any clustering, then prompt a model to name each cluster.</li>
+</ul>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>Save as <code class="inline-code">outputs/skill-topic-picker.md</code>:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">markdown</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-markdown"><span class="token front-matter-block"><span class="token punctuation">---</span>
+<span class="token front-matter yaml language-yaml"><span class="token key atrule">name</span><span class="token punctuation">:</span> topic<span class="token punctuation">-</span>picker
+<span class="token key atrule">description</span><span class="token punctuation">:</span> Pick LDA or BERTopic for a corpus. Specify library<span class="token punctuation">,</span> knobs<span class="token punctuation">,</span> evaluation.
+<span class="token key atrule">version</span><span class="token punctuation">:</span> 1.0.0
+<span class="token key atrule">phase</span><span class="token punctuation">:</span> <span class="token number">5</span>
+<span class="token key atrule">lesson</span><span class="token punctuation">:</span> <span class="token number">15</span>
+<span class="token key atrule">tags</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>nlp<span class="token punctuation">,</span> topic<span class="token punctuation">-</span>modeling<span class="token punctuation">]</span></span>
+<span class="token punctuation">---</span></span>
+
+Given a corpus description (document count, avg length, domain, language, compute budget), output:
+
+<span class="token list punctuation">1.</span> Algorithm. LDA / NMF / BERTopic / Top2Vec / FASTopic. One-sentence reason.
+<span class="token list punctuation">2.</span> Configuration. Number of topics: <span class="token code-snippet code keyword">`recommended = max(5, round(sqrt(n_docs)))`</span>, clamped to 200 for corpora under 40,000 docs; permit >200 only when the corpus is genuinely large (>40k) and note the increased compute cost. <span class="token code-snippet code keyword">`min_df`</span> / <span class="token code-snippet code keyword">`max_df`</span> filters and embedding model for neural approaches also belong here.
+<span class="token list punctuation">3.</span> Evaluation. Topic coherence (c_v) via <span class="token code-snippet code keyword">`gensim.models.CoherenceModel`</span>, topic diversity, and a 20-sample human read.
+<span class="token list punctuation">4.</span> Failure mode to probe. For LDA, "junk topics" absorbing stopwords and frequent terms. For BERTopic, the -1 outlier cluster swallowing ambiguous documents.
+
+Refuse BERTopic on documents longer than the embedding model's context window without a chunking strategy. Refuse LDA on very short text (tweets, reviews under 10 tokens) as coherence collapses. Flag any n_topics choice below 5 as likely wrong; flag >200 on corpora under 40k docs as likely over-splitting.</code></pre>
+</figure>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><strong>Easy.</strong> Fit LDA with 5 topics on the 20 Newsgroups dataset. Print top 10 words per topic. Label each topic by hand. Did the algorithm find the real categories?</li>
+<li><strong>Medium.</strong> Fit BERTopic on the same 20 Newsgroups subset. Compare the number of topics found, top words, and qualitative coherence against LDA. Which surfaces the real categories more cleanly?</li>
+<li><strong>Hard.</strong> Compute c_v coherence for both LDA and BERTopic on your corpus. Run each with 5, 10, 20, 50 topics. Plot coherence vs topic count. Report which method is more stable across topic counts.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Topic</td>
+<td>A thing the corpus is about</td>
+<td>A probability distribution over words (LDA) or a cluster of similar documents (BERTopic).</td>
+</tr>
+<tr>
+<td>Mixed membership</td>
+<td>Doc is multiple topics</td>
+<td>LDA assigns each document a distribution over all topics.</td>
+</tr>
+<tr>
+<td>UMAP</td>
+<td>Dimensionality reduction</td>
+<td>Manifold learning that preserves local structure; used in BERTopic.</td>
+</tr>
+<tr>
+<td>HDBSCAN</td>
+<td>Density clustering</td>
+<td>Finds variable-size clusters; produces &quot;noise&quot; label (-1) for outliers.</td>
+</tr>
+<tr>
+<td>c_v coherence</td>
+<td>Topic quality metric</td>
+<td>Average pointwise mutual information of top topic words within sliding windows.</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://www.jmlr.org/papers/volume3/blei03a/blei03a.pdf" target="_blank" rel="noopener">Blei, Ng, Jordan (2003). Latent Dirichlet Allocation</a> — the LDA paper.</li>
+<li><a href="https://arxiv.org/abs/2203.05794" target="_blank" rel="noopener">Grootendorst (2022). BERTopic: Neural topic modeling with a class-based TF-IDF procedure</a> — the BERTopic paper.</li>
+<li><a href="https://svn.aksw.org/papers/2015/WSDM_Topic_Evaluation/public.pdf" target="_blank" rel="noopener">Röder, Both, Hinneburg (2015). Exploring the Space of Topic Coherence Measures</a> — the paper that introduced c_v and friends.</li>
+<li><a href="https://maartengr.github.io/BERTopic/" target="_blank" rel="noopener">BERTopic documentation</a> — the production reference. Excellent examples.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="14-information-retrieval-search.html">
+  <span class="label">← Previous</span>
+  <b>Information Retrieval and Search</b>
+</a>
+      <a class="pager__item pager__item--next" href="16-text-generation-pre-transformer.html">
+  <span class="label">Next →</span>
+  <b>Text Generation Before Transformers — N-gram Language Models</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>4 minutes</b> of NLP, Foundations to Advanced behind you.</p>
+      <a class="btn btn--solid" href="16-text-generation-pre-transformer.html">Continue to Text Generation Before Transformers — N-gram Language Models →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-lda-via-scikit-learn">Step 1: LDA via scikit-learn</a></li><li class="mini__item mini__item--d3"><a href="#step-2-bertopic-production">Step 2: BERTopic (production)</a></li><li class="mini__item mini__item--d3"><a href="#step-3-evaluation">Step 3: evaluation</a></li><li class="mini__item mini__item--d2"><a href="#when-to-pick-which">When to pick which</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

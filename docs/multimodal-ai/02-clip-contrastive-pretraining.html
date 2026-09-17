@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CLIP and Contrastive Vision-Language Pretraining — Multimodal AI — AIFS</title>
+<meta name="description" content="Multimodal AI: CLIP and Contrastive Vision-Language Pretraining. 7 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="CLIP and Contrastive Vision-Language Pretraining — Multimodal AI — AIFS">
+<meta property="og:description" content="Multimodal AI: CLIP and Contrastive Vision-Language Pretraining. 7 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"multimodal-fusion":["../assets/figures/figures-llms-systems.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-llms-systems.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#FF8FB1" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#FF8FB1;--accent-ink:#111111"
+  data-lesson-id="multimodal-ai/02-clip-contrastive-pretraining" data-module="multimodal-ai"
+  data-prev="01-vision-transformer-patch-tokens.html" data-next="03-blip2-qformer-bridge.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#FF8FB1">
+        <span class="label">Phase 12</span>
+        <b>Multimodal AI</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="multimodal-ai/01-vision-transformer-patch-tokens"><a href="01-vision-transformer-patch-tokens.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Vision Transformers and the Patch-Token Primitive</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/02-clip-contrastive-pretraining"><a href="02-clip-contrastive-pretraining.html" class="is-current">
+  <span class="snav__n">02</span>
+  <span class="snav__t">CLIP and Contrastive Vision-Language Pretraining</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/03-blip2-qformer-bridge"><a href="03-blip2-qformer-bridge.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">From CLIP to BLIP-2 — Q-Former as Modality Bridge</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/04-flamingo-gated-cross-attention"><a href="04-flamingo-gated-cross-attention.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Flamingo and Gated Cross-Attention for Few-Shot VLMs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/05-llava-visual-instruction-tuning"><a href="05-llava-visual-instruction-tuning.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">LLaVA and Visual Instruction Tuning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/06-any-resolution-patch-n-pack"><a href="06-any-resolution-patch-n-pack.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Any-Resolution Vision: Patch-n'-Pack and NaFlex</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/07-open-weight-vlm-recipes"><a href="07-open-weight-vlm-recipes.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Open-Weight VLM Recipes: What Actually Matters</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/08-llava-onevision-single-multi-video"><a href="08-llava-onevision-single-multi-video.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">LLaVA-OneVision: Single-Image, Multi-Image, Video in One Model</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/09-qwen-vl-family-dynamic-fps"><a href="09-qwen-vl-family-dynamic-fps.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Qwen-VL Family and Dynamic-FPS Video</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/10-internvl3-native-multimodal"><a href="10-internvl3-native-multimodal.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">InternVL3: Native Multimodal Pretraining</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/11-chameleon-early-fusion-tokens"><a href="11-chameleon-early-fusion-tokens.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Chameleon and Early-Fusion Token-Only Multimodal Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/12-emu3-next-token-for-generation"><a href="12-emu3-next-token-for-generation.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Emu3: Next-Token Prediction for Image and Video Generation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/13-transfusion-autoregressive-diffusion"><a href="13-transfusion-autoregressive-diffusion.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Transfusion: Autoregressive Text + Diffusion Image in One Transformer</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/14-show-o-discrete-diffusion-unified"><a href="14-show-o-discrete-diffusion-unified.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Show-o and Discrete-Diffusion Unified Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/15-janus-pro-decoupled-encoders"><a href="15-janus-pro-decoupled-encoders.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Janus-Pro: Decoupled Encoders for Unified Multimodal Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/16-mio-any-to-any-streaming"><a href="16-mio-any-to-any-streaming.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">MIO and Any-to-Any Streaming Multimodal Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/17-video-language-temporal-grounding"><a href="17-video-language-temporal-grounding.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Video-Language Models: Temporal Tokens and Grounding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/18-long-video-million-token"><a href="18-long-video-million-token.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Long-Video Understanding at Million-Token Context</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/19-audio-language-whisper-to-af3"><a href="19-audio-language-whisper-to-af3.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">Audio-Language Models: the Whisper to Audio Flamingo 3 Arc</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/20-omni-models-thinker-talker"><a href="20-omni-models-thinker-talker.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Omni Models: Qwen2.5-Omni and the Thinker-Talker Split</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/21-embodied-vlas-openvla-pi0-groot"><a href="21-embodied-vlas-openvla-pi0-groot.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Embodied VLAs: RT-2, OpenVLA, π0, GR00T</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/22-document-diagram-understanding"><a href="22-document-diagram-understanding.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Document and Diagram Understanding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/23-colpali-vision-native-rag"><a href="23-colpali-vision-native-rag.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">ColPali and Vision-Native Document RAG</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/24-multimodal-rag-cross-modal"><a href="24-multimodal-rag-cross-modal.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Multimodal RAG and Cross-Modal Retrieval</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/25-multimodal-agents-computer-use"><a href="25-multimodal-agents-computer-use.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Multimodal Agents and Computer-Use (Capstone)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Multimodal AI</a></p>
+      <h1 class="page__title">CLIP and Contrastive Vision-Language Pretraining</h1>
+      <p class="page__lede">OpenAI's CLIP (2021) proved a single idea big enough to power the next five years: align an image encoder and a text encoder in the same vector space using only noisy web image-caption pairs and a contrastive loss. Zero supervised labels. 400M pairs. The resulting embedding space does zero-shot classification, image-text retrieval, and plugs into every 2026 VLM as its vision tower. SigLIP 2 (2025) replaced softmax with sigmoid and scaled past CLIP at lower cost. This lesson walks the math from InfoNCE to sigmoid pairwise loss and builds the training step in stdlib Python.</p>
+      <div class="page__meta">
+        <span class="chip">7 min read</span>
+        <span class="chip">1,434 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (stdlib, InfoNCE + sigmoid loss implementations)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 12 · 01 (ViT patches), Phase 7 (Transformers)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~180 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Derive InfoNCE loss from mutual information and implement a numerically-stable vectorized version.</li>
+<li>Explain why sigmoid pairwise loss (SigLIP) scales to batch 32768+ without the all-gather overhead softmax demands.</li>
+<li>Run zero-shot ImageNet classification by constructing text templates (<code class="inline-code">a photo of a {class}</code>) and taking argmax over cosine similarity.</li>
+<li>Name the four levers CLIP / SigLIP pretraining gives you: batch size, temperature, prompt template, data quality.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Pre-CLIP vision was supervised. Collect labeled datasets (ImageNet: 1.2M images, 1000 classes), train a CNN, ship it. Labels are expensive, labels bias to what labelers can agree on, and labels do not transfer to new tasks without finetuning.</p>
+<p>The image-caption web has one billion-plus loosely-labeled pairs for free. A picture of a golden retriever with alt text &quot;my dog Max in the park&quot; carries a supervisory signal — the text describes the image. The question: can you turn this into useful training?</p>
+<p>CLIP&#39;s answer: treat image-caption pairs as a matching task. Given a batch of N images and N captions, learn to match each image to its own caption against N-1 distractors. The supervision is &quot;these two things belong together; these N-1 do not.&quot; No class labels. No human annotation. Just a contrastive loss.</p>
+<p>The resulting embedding space does more than CLIP was trained for. ImageNet zero-shot works because &quot;a photo of a cat&quot; embeds near pictures of cats that were never explicitly labeled cats. This is the bet that spawned every 2026 VLM.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="the-dual-encoder" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-dual-encoder" aria-label="Link to this section">#</a>The dual encoder</h3>
+<p>CLIP has two towers:</p>
+<ul>
+<li>Image encoder <code class="inline-code">f</code>: ViT or ResNet, outputs a D-dim vector per image.</li>
+<li>Text encoder <code class="inline-code">g</code>: small transformer, outputs a D-dim vector per caption.</li>
+</ul>
+<p>Both towers normalize their outputs to unit length. Similarity is <code class="inline-code">cos(f(x), g(y)) = f(x)^T g(y)</code> since both are unit-norm.</p>
+<p>For a batch of N (image, caption) pairs, build the similarity matrix <code class="inline-code">S</code> of shape <code class="inline-code">(N, N)</code>:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>S[i, j] = cos(f(x_i), g(y_j)) / tau</code></pre>
+</figure>
+<p>where <code class="inline-code">tau</code> is a learned temperature (CLIP initializes to 0.07; learned in log-space).</p>
+<h3 id="infonce-loss" class="prose-h prose-h3"><a class="prose-h__anchor" href="#infonce-loss" aria-label="Link to this section">#</a>InfoNCE loss</h3>
+<p>CLIP uses a symmetric cross-entropy over rows and columns:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>loss_i2t = CE(S, labels=identity)     # each image's positive is its own caption
+loss_t2i = CE(S^T, labels=identity)   # each caption's positive is its own image
+loss = (loss_i2t + loss_t2i) / 2</code></pre>
+</figure>
+<p>This is InfoNCE. The softmax in CE forces each image to match its caption more than every other caption in the batch. The &quot;negatives&quot; are all other batch items. Bigger batches = more negatives = stronger signal. CLIP trained at batch 32k; scale matters.</p>
+<h3 id="temperature" class="prose-h prose-h3"><a class="prose-h__anchor" href="#temperature" aria-label="Link to this section">#</a>Temperature</h3>
+<p><code class="inline-code">tau</code> controls the sharpness of the softmax. Low tau → sharp distribution, hard negative mining effect. High tau → soft, all samples contribute. CLIP learns log(1/tau), clipped to prevent collapse. SigLIP 2 fixes the initial tau and uses a learned bias instead.</p>
+<h3 id="why-sigmoid-scales-better-siglip" class="prose-h prose-h3"><a class="prose-h__anchor" href="#why-sigmoid-scales-better-siglip" aria-label="Link to this section">#</a>Why sigmoid scales better (SigLIP)</h3>
+<p>Softmax needs the whole similarity matrix in sync. In distributed training you must all-gather every embedding to every replica, then do the softmax. This is quadratic in world size for communication.</p>
+<p>SigLIP replaces softmax with element-wise sigmoid: for each pair <code class="inline-code">(i, j)</code>, the loss is a binary classification of &quot;are these the matching pair?&quot; positive class labels are the diagonal, everything else is negative. The loss is:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>L = -1/N sum over (i, j) [ y_ij log sigmoid(S[i,j]) + (1-y_ij) log sigmoid(-S[i,j]) ]</code></pre>
+</figure>
+<p><code class="inline-code">y_ij = 1</code> if <code class="inline-code">i == j</code>, else 0. Each pair&#39;s loss is independent. No all-gather needed. Each GPU computes its local block and sums. SigLIP 2 scales to batch 32k-512k cheaply where CLIP would need proportionally more communication.</p>
+<h3 id="zero-shot-classification" class="prose-h prose-h3"><a class="prose-h__anchor" href="#zero-shot-classification" aria-label="Link to this section">#</a>Zero-shot classification</h3>
+<p>Given N class names, for each class build a text template:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>&quot;a photo of a {class}&quot;</code></pre>
+</figure>
+<p>Embed each template with the text encoder. Embed your image with the image encoder. Argmax cosine similarity = predicted class. No training on the target classes.</p>
+<p>Prompt templates matter. CLIP&#39;s original paper used 80 templates per class (plain, artistic, photo, painting, etc.) and averaged the embeddings. +3 ImageNet points. Modern usage typically picks one or two templates.</p>
+<h3 id="linear-probes-and-finetuning" class="prose-h prose-h3"><a class="prose-h__anchor" href="#linear-probes-and-finetuning" aria-label="Link to this section">#</a>Linear probes and finetuning</h3>
+<p>Zero-shot is a baseline. A linear probe (train one linear layer on top of frozen CLIP features for your target classes) beats zero-shot on in-domain tasks. Full finetuning beats linear probe on in-domain but can hurt zero-shot transfer. Three regimes with three trade-offs.</p>
+<h3 id="siglip-2-naflex-and-dense-features" class="prose-h prose-h3"><a class="prose-h__anchor" href="#siglip-2-naflex-and-dense-features" aria-label="Link to this section">#</a>SigLIP 2: NaFlex and dense features</h3>
+<p>SigLIP 2 (2025) adds:</p>
+<ul>
+<li>NaFlex: single model handles variable aspect ratios and resolutions.</li>
+<li>Better dense features for segmentation and depth estimation, targeting use as a frozen backbone in VLMs.</li>
+<li>Multilingual: trained on 100+ languages where CLIP was English-only.</li>
+<li>1B param scale where CLIP topped out at 400M.</li>
+</ul>
+<p>In 2026 open VLMs, SigLIP 2 SO400m/14 is the default vision tower. CLIP remains the default for pure image-text retrieval where the specific LAION-2B training distribution matches your query pattern.</p>
+<h3 id="align-basic-openclip-eva-clip" class="prose-h prose-h3"><a class="prose-h__anchor" href="#align-basic-openclip-eva-clip" aria-label="Link to this section">#</a>ALIGN, BASIC, OpenCLIP, EVA-CLIP</h3>
+<p>ALIGN (Google, 2021): same idea as CLIP, 1.8B pair scale, 90% noisy. Proved noisy data scales. OpenCLIP (LAION): open reproduction of CLIP on LAION-400M / 2B, multiple scales, the go-to open checkpoint. EVA-CLIP: initializes from masked image modeling; strong backbone for VLMs. BASIC: Google&#39;s CLIP+ALIGN hybrid. All the same family, different data and tuning.</p>
+<h3 id="the-zero-shot-ceiling" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-zero-shot-ceiling" aria-label="Link to this section">#</a>The zero-shot ceiling</h3>
+<p>CLIP-class models cap around 76% ImageNet zero-shot (CLIP-G, OpenCLIP-G). Beyond requires either much larger data (SigLIP 2 gets 80%+) or architecture changes (supervised heads, more parameters). The benchmark is saturating; the real value is the embedding space that downstream VLMs consume.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="multimodal-fusion"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">multimodal-fusion</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> multimodal fusion</figcaption>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p><code class="inline-code">code/main.py</code> implements:</p>
+<ol>
+<li>A toy dual encoder (hash-based image features, text char features) so you can see the InfoNCE shape without numpy.</li>
+<li>InfoNCE loss in pure Python (numerical stability via log-sum-exp).</li>
+<li>Sigmoid pairwise loss for comparison.</li>
+<li>A zero-shot classification routine: compute cosine similarity against a set of text prompts, argmax for prediction.</li>
+</ol>
+<p>Run it and watch the loss curve. The absolute numbers are toy; the shape matches what a real CLIP trainer emits.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces <code class="inline-code">outputs/skill-clip-zero-shot.md</code>. Given a set of images (via path) and a list of target classes, it builds text prompts with the CLIP template, embeds both sides with a stated checkpoint (e.g., <code class="inline-code">openai/clip-vit-large-patch14</code>), and returns top-1 / top-5 predictions with similarity scores. The skill refuses to make claims about classes not in the prompt list.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p>Implement InfoNCE for a batch of 4 pairs by hand. Construct the 4x4 similarity matrix, run softmax, pick out the diagonal, compute cross-entropy. Verify your Python implementation against this hand calculation.</p>
+</li>
+<li><p>SigLIP uses a bias parameter <code class="inline-code">b</code> in addition to temperature: <code class="inline-code">S'[i,j] = S[i,j]/tau + b</code>. What role does <code class="inline-code">b</code> play when the batch has a large class imbalance (many more negatives than positives per row)? Read SigLIP Section 3 (arXiv:2303.15343).</p>
+</li>
+<li><p>Build a zero-shot classifier for cats vs dogs. Try two prompt templates: <code class="inline-code">a photo of a {class}</code> and <code class="inline-code">a picture of a {class}</code>. Measure accuracy on 100 test images. Does the ensemble of templates beat single?</p>
+</li>
+<li><p>Compute the communication cost of softmax InfoNCE vs sigmoid pairwise for a 512-GPU run at batch 32k. Which scales as O(N), which as O(N^2)? Cite SigLIP Section 4.</p>
+</li>
+<li><p>Read the OpenCLIP scaling-laws paper (arXiv:2212.07143, Cherti et al.). Reproduce their conclusion for data scaling from the figures: at fixed model size, what is the log-linear relationship between ImageNet zero-shot accuracy and training data size?</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>InfoNCE</td>
+<td>&quot;Contrastive loss&quot;</td>
+<td>Cross-entropy over a batch&#39;s similarity matrix; each item&#39;s positive is its paired item, negatives are everything else</td>
+</tr>
+<tr>
+<td>Sigmoid loss</td>
+<td>&quot;SigLIP loss&quot;</td>
+<td>Per-pair binary cross-entropy; no softmax, no all-gather, scales cheaply in distributed training</td>
+</tr>
+<tr>
+<td>Temperature</td>
+<td>&quot;tau&quot;</td>
+<td>Scalar that scales logits before softmax/sigmoid; controls sharpness of the distribution</td>
+</tr>
+<tr>
+<td>Zero-shot</td>
+<td>&quot;no-finetune classification&quot;</td>
+<td>Use text prompts to construct class embeddings and classify by cosine similarity; no training on target classes</td>
+</tr>
+<tr>
+<td>Prompt template</td>
+<td>&quot;a photo of a ...&quot;</td>
+<td>Text scaffold around a class name; affects zero-shot accuracy by 1-5 points</td>
+</tr>
+<tr>
+<td>Dual encoder</td>
+<td>&quot;Two-tower&quot;</td>
+<td>One image encoder + one text encoder, outputs in shared D-dim space</td>
+</tr>
+<tr>
+<td>Hard negative</td>
+<td>&quot;Tough distractor&quot;</td>
+<td>A negative similar enough to the positive that the model has to work to separate them</td>
+</tr>
+<tr>
+<td>Linear probe</td>
+<td>&quot;Frozen + one layer&quot;</td>
+<td>Train only a linear classifier on top of frozen features; measures feature quality</td>
+</tr>
+<tr>
+<td>NaFlex</td>
+<td>&quot;Native flexible resolution&quot;</td>
+<td>SigLIP 2 capability to ingest images at any aspect ratio and resolution without resizing</td>
+</tr>
+<tr>
+<td>Temperature scaling</td>
+<td>&quot;log-parametrized tau&quot;</td>
+<td>CLIP parametrizes <code class="inline-code">log(1/tau)</code> so gradients behave; clips to prevent collapse to near-zero tau</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2103.00020" target="_blank" rel="noopener">Radford et al. — Learning Transferable Visual Models From Natural Language Supervision (arXiv:2103.00020)</a> — the CLIP paper.</li>
+<li><a href="https://arxiv.org/abs/2303.15343" target="_blank" rel="noopener">Zhai et al. — Sigmoid Loss for Language Image Pre-Training (arXiv:2303.15343)</a> — SigLIP.</li>
+<li><a href="https://arxiv.org/abs/2502.14786" target="_blank" rel="noopener">Tschannen et al. — SigLIP 2 (arXiv:2502.14786)</a> — multilingual + NaFlex.</li>
+<li><a href="https://arxiv.org/abs/2102.05918" target="_blank" rel="noopener">Jia et al. — ALIGN (arXiv:2102.05918)</a> — scale with noisy web data.</li>
+<li><a href="https://arxiv.org/abs/2212.07143" target="_blank" rel="noopener">Cherti et al. — Reproducible scaling laws for contrastive language-image learning (arXiv:2212.07143)</a> — OpenCLIP scaling laws.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="01-vision-transformer-patch-tokens.html">
+  <span class="label">← Previous</span>
+  <b>Vision Transformers and the Patch-Token Primitive</b>
+</a>
+      <a class="pager__item pager__item--next" href="03-blip2-qformer-bridge.html">
+  <span class="label">Next →</span>
+  <b>From CLIP to BLIP-2 — Q-Former as Modality Bridge</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>7 minutes</b> of Multimodal AI behind you.</p>
+      <a class="btn btn--solid" href="03-blip2-qformer-bridge.html">Continue to From CLIP to BLIP-2 — Q-Former as Modality Bridge →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#the-dual-encoder">The dual encoder</a></li><li class="mini__item mini__item--d3"><a href="#infonce-loss">InfoNCE loss</a></li><li class="mini__item mini__item--d3"><a href="#temperature">Temperature</a></li><li class="mini__item mini__item--d3"><a href="#why-sigmoid-scales-better-siglip">Why sigmoid scales better (SigLIP)</a></li><li class="mini__item mini__item--d3"><a href="#zero-shot-classification">Zero-shot classification</a></li><li class="mini__item mini__item--d3"><a href="#linear-probes-and-finetuning">Linear probes and finetuning</a></li><li class="mini__item mini__item--d3"><a href="#siglip-2-naflex-and-dense-features">SigLIP 2: NaFlex and dense features</a></li><li class="mini__item mini__item--d3"><a href="#align-basic-openclip-eva-clip">ALIGN, BASIC, OpenCLIP, EVA-CLIP</a></li><li class="mini__item mini__item--d3"><a href="#the-zero-shot-ceiling">The zero-shot ceiling</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

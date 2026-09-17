@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cosine LR with Linear Warmup — Capstone Projects — AIFS</title>
+<meta name="description" content="Capstone Projects: Cosine LR with Linear Warmup. 7 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Cosine LR with Linear Warmup — Capstone Projects — AIFS">
+<meta property="og:description" content="Capstone Projects: Cosine LR with Linear Warmup. 7 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"cap-cosine-warmup":["../assets/figures/figures-capstone-a.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-capstone-a.js"];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#00FF85" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#00FF85;--accent-ink:#111111"
+  data-lesson-id="capstone-projects/44-cosine-lr-warmup" data-module="capstone-projects"
+  data-prev="43-hdf5-tokenized-corpus.html" data-next="45-gradient-clipping-amp.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#00FF85">
+        <span class="label">Phase 19</span>
+        <b>Capstone Projects</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="capstone-projects/01-terminal-native-coding-agent"><a href="01-terminal-native-coding-agent.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Capstone 01 — Terminal-Native Coding Agent</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/02-rag-over-codebase"><a href="02-rag-over-codebase.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Capstone 02 — RAG over Codebase (Cross-Repo Semantic Search)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/03-realtime-voice-assistant"><a href="03-realtime-voice-assistant.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Capstone 03 — Real-Time Voice Assistant (ASR to LLM to TTS)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/04-multimodal-document-qa"><a href="04-multimodal-document-qa.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Capstone 04 — Multimodal Document QA (Vision-First PDF, Tables, Charts)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/05-autonomous-research-agent"><a href="05-autonomous-research-agent.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Capstone 05 — Autonomous Research Agent (AI-Scientist Class)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/06-devops-troubleshooting-agent"><a href="06-devops-troubleshooting-agent.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Capstone 06 — DevOps Troubleshooting Agent for Kubernetes</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/07-end-to-end-fine-tuning-pipeline"><a href="07-end-to-end-fine-tuning-pipeline.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Capstone 07 — End-to-End Fine-Tuning Pipeline (Data to SFT to DPO to Serve)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/08-production-rag-chatbot"><a href="08-production-rag-chatbot.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Capstone 08 — Production RAG Chatbot for a Regulated Vertical</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/09-code-migration-agent"><a href="09-code-migration-agent.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Capstone 09 — Code Migration Agent (Repo-Level Language / Runtime Upgrade)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/10-multi-agent-software-team"><a href="10-multi-agent-software-team.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Capstone 10 — Multi-Agent Software Engineering Team</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/11-llm-observability-dashboard"><a href="11-llm-observability-dashboard.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Capstone 11 — LLM Observability &amp; Eval Dashboard</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/12-video-understanding-pipeline"><a href="12-video-understanding-pipeline.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Capstone 12 — Video Understanding Pipeline (Scene, QA, Search)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/13-mcp-server-with-registry"><a href="13-mcp-server-with-registry.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Capstone 13: Stateless MCP Server with Registry and Governance</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/14-speculative-decoding-server"><a href="14-speculative-decoding-server.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Capstone 14 — Speculative-Decoding Inference Server</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/15-constitutional-safety-harness"><a href="15-constitutional-safety-harness.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Capstone 15 — Constitutional Safety Harness + Red-Team Range</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/16-github-issue-to-pr-agent"><a href="16-github-issue-to-pr-agent.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Capstone 16 — GitHub Issue-to-PR Autonomous Agent</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/17-personal-ai-tutor"><a href="17-personal-ai-tutor.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Capstone 17 — Personal AI Tutor (Adaptive, Multimodal, with Memory)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/20-agent-harness-loop-contract"><a href="20-agent-harness-loop-contract.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Agent Harness Loop Contract</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/21-tool-registry-schema-validation"><a href="21-tool-registry-schema-validation.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Tool Registry with Schema Validation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/22-jsonrpc-stdio-transport"><a href="22-jsonrpc-stdio-transport.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">JSON-RPC 2.0 Over Newline-Delimited Stdio</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/23-function-call-dispatcher"><a href="23-function-call-dispatcher.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Function Call Dispatcher</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/24-plan-execute-control-flow"><a href="24-plan-execute-control-flow.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Plan-Execute Control Flow</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/25-verification-gates-observation-budget"><a href="25-verification-gates-observation-budget.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Capstone Lesson 25: Verification Gates and the Observation Budget</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/26-sandbox-runner-denylist"><a href="26-sandbox-runner-denylist.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Capstone Lesson 26: Sandbox Runner with Denylist and Path Jail</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/27-eval-harness-fixture-tasks"><a href="27-eval-harness-fixture-tasks.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">Capstone Lesson 27: Eval Harness with Fixture Tasks</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/28-observability-otel-traces"><a href="28-observability-otel-traces.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">Capstone Lesson 28: Observability with OTel GenAI Spans and Prometheus Metrics</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/29-end-to-end-coding-task-demo"><a href="29-end-to-end-coding-task-demo.html" class="">
+  <span class="snav__n">29</span>
+  <span class="snav__t">Capstone Lesson 29: End-to-End Coding Agent on the Harness</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/30-bpe-tokenizer-from-scratch"><a href="30-bpe-tokenizer-from-scratch.html" class="">
+  <span class="snav__n">30</span>
+  <span class="snav__t">BPE Tokenizer From Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/31-tokenized-dataset-sliding-window"><a href="31-tokenized-dataset-sliding-window.html" class="">
+  <span class="snav__n">31</span>
+  <span class="snav__t">Tokenized Dataset with Sliding Window</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/32-token-positional-embeddings"><a href="32-token-positional-embeddings.html" class="">
+  <span class="snav__n">32</span>
+  <span class="snav__t">Token and Positional Embeddings</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/33-multihead-self-attention"><a href="33-multihead-self-attention.html" class="">
+  <span class="snav__n">33</span>
+  <span class="snav__t">Multi-Head Self-Attention</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/34-transformer-block"><a href="34-transformer-block.html" class="">
+  <span class="snav__n">34</span>
+  <span class="snav__t">Transformer Block from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/35-gpt-model-assembly"><a href="35-gpt-model-assembly.html" class="">
+  <span class="snav__n">35</span>
+  <span class="snav__t">GPT Model Assembly</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/36-training-loop-eval"><a href="36-training-loop-eval.html" class="">
+  <span class="snav__n">36</span>
+  <span class="snav__t">Training Loop and Evaluation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/37-loading-pretrained-weights"><a href="37-loading-pretrained-weights.html" class="">
+  <span class="snav__n">37</span>
+  <span class="snav__t">Loading Pretrained Weights</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/38-classifier-finetuning"><a href="38-classifier-finetuning.html" class="">
+  <span class="snav__n">38</span>
+  <span class="snav__t">Capstone Lesson 38: Classifier Fine-Tuning by Head Swap</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/39-instruction-tuning-sft"><a href="39-instruction-tuning-sft.html" class="">
+  <span class="snav__n">39</span>
+  <span class="snav__t">Capstone Lesson 39: Instruction Tuning by Supervised Fine-Tuning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/40-dpo-from-scratch"><a href="40-dpo-from-scratch.html" class="">
+  <span class="snav__n">40</span>
+  <span class="snav__t">Capstone Lesson 40: Direct Preference Optimization from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/41-eval-pipeline"><a href="41-eval-pipeline.html" class="">
+  <span class="snav__n">41</span>
+  <span class="snav__t">Capstone Lesson 41: Full Evaluation Pipeline</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/42-large-corpus-downloader"><a href="42-large-corpus-downloader.html" class="">
+  <span class="snav__n">42</span>
+  <span class="snav__t">Large Corpus Downloader</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/43-hdf5-tokenized-corpus"><a href="43-hdf5-tokenized-corpus.html" class="">
+  <span class="snav__n">43</span>
+  <span class="snav__t">HDF5 Tokenized Corpus</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/44-cosine-lr-warmup"><a href="44-cosine-lr-warmup.html" class="is-current">
+  <span class="snav__n">44</span>
+  <span class="snav__t">Cosine LR with Linear Warmup</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/45-gradient-clipping-amp"><a href="45-gradient-clipping-amp.html" class="">
+  <span class="snav__n">45</span>
+  <span class="snav__t">Gradient Clipping and Mixed Precision</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/46-gradient-accumulation"><a href="46-gradient-accumulation.html" class="">
+  <span class="snav__n">46</span>
+  <span class="snav__t">Gradient Accumulation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/47-checkpoint-save-resume"><a href="47-checkpoint-save-resume.html" class="">
+  <span class="snav__n">47</span>
+  <span class="snav__t">Checkpoint Save and Resume</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/48-distributed-fsdp-ddp"><a href="48-distributed-fsdp-ddp.html" class="">
+  <span class="snav__n">48</span>
+  <span class="snav__t">Distributed Data Parallel and FSDP from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/49-lm-eval-harness"><a href="49-lm-eval-harness.html" class="">
+  <span class="snav__n">49</span>
+  <span class="snav__t">Language Model Evaluation Harness</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/50-hypothesis-generator"><a href="50-hypothesis-generator.html" class="">
+  <span class="snav__n">50</span>
+  <span class="snav__t">Hypothesis Generator</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/51-literature-retrieval"><a href="51-literature-retrieval.html" class="">
+  <span class="snav__n">51</span>
+  <span class="snav__t">Literature Retrieval</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/52-experiment-runner"><a href="52-experiment-runner.html" class="">
+  <span class="snav__n">52</span>
+  <span class="snav__t">Experiment Runner</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/53-result-evaluator"><a href="53-result-evaluator.html" class="">
+  <span class="snav__n">53</span>
+  <span class="snav__t">Result Evaluator</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/54-paper-writer"><a href="54-paper-writer.html" class="">
+  <span class="snav__n">54</span>
+  <span class="snav__t">Paper Writer</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/55-critic-loop"><a href="55-critic-loop.html" class="">
+  <span class="snav__n">55</span>
+  <span class="snav__t">Critic Loop</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/56-iteration-scheduler"><a href="56-iteration-scheduler.html" class="">
+  <span class="snav__n">56</span>
+  <span class="snav__t">Iteration Scheduler</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/57-end-to-end-research-demo"><a href="57-end-to-end-research-demo.html" class="">
+  <span class="snav__n">57</span>
+  <span class="snav__t">End-to-End Research Demo</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/58-vision-encoder-patches"><a href="58-vision-encoder-patches.html" class="">
+  <span class="snav__n">58</span>
+  <span class="snav__t">Vision Encoder Patches</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/59-vit-transformer"><a href="59-vit-transformer.html" class="">
+  <span class="snav__n">59</span>
+  <span class="snav__t">Vision Transformer Encoder</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/60-projection-layer-modality-align"><a href="60-projection-layer-modality-align.html" class="">
+  <span class="snav__n">60</span>
+  <span class="snav__t">Projection Layer for Modality Alignment</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/61-cross-attention-fusion"><a href="61-cross-attention-fusion.html" class="">
+  <span class="snav__n">61</span>
+  <span class="snav__t">Cross-Attention Fusion</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/62-vision-language-pretraining"><a href="62-vision-language-pretraining.html" class="">
+  <span class="snav__n">62</span>
+  <span class="snav__t">Vision-Language Pretraining</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/63-multimodal-eval"><a href="63-multimodal-eval.html" class="">
+  <span class="snav__n">63</span>
+  <span class="snav__t">Multimodal Evaluation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/64-chunking-strategies-advanced"><a href="64-chunking-strategies-advanced.html" class="">
+  <span class="snav__n">64</span>
+  <span class="snav__t">Chunking Strategies, Compared</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/65-hybrid-retrieval-bm25-dense"><a href="65-hybrid-retrieval-bm25-dense.html" class="">
+  <span class="snav__n">65</span>
+  <span class="snav__t">Hybrid Retrieval with BM25 and Dense Embeddings</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/66-reranker-cross-encoder"><a href="66-reranker-cross-encoder.html" class="">
+  <span class="snav__n">66</span>
+  <span class="snav__t">Cross-Encoder Reranker</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/67-query-rewriting-hyde"><a href="67-query-rewriting-hyde.html" class="">
+  <span class="snav__n">67</span>
+  <span class="snav__t">Query Rewriting: HyDE, Multi-Query, and Decomposition</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/68-rag-eval-precision-recall"><a href="68-rag-eval-precision-recall.html" class="">
+  <span class="snav__n">68</span>
+  <span class="snav__t">RAG Evaluation: Precision, Recall, MRR, nDCG, Faithfulness, Answer Relevance</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/69-end-to-end-rag-system"><a href="69-end-to-end-rag-system.html" class="">
+  <span class="snav__n">69</span>
+  <span class="snav__t">End-to-End RAG System</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/70-task-spec-format"><a href="70-task-spec-format.html" class="">
+  <span class="snav__n">70</span>
+  <span class="snav__t">Task Spec Format</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/71-classical-metrics"><a href="71-classical-metrics.html" class="">
+  <span class="snav__n">71</span>
+  <span class="snav__t">Classical Metrics</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/72-code-exec-metric"><a href="72-code-exec-metric.html" class="">
+  <span class="snav__n">72</span>
+  <span class="snav__t">Code Exec Metric</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/73-perplexity-calibration"><a href="73-perplexity-calibration.html" class="">
+  <span class="snav__n">73</span>
+  <span class="snav__t">Perplexity and Calibration</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/74-leaderboard-aggregation"><a href="74-leaderboard-aggregation.html" class="">
+  <span class="snav__n">74</span>
+  <span class="snav__t">Leaderboard Aggregation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/75-end-to-end-eval-runner"><a href="75-end-to-end-eval-runner.html" class="">
+  <span class="snav__n">75</span>
+  <span class="snav__t">End-to-End Eval Runner</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/76-collective-ops-from-scratch"><a href="76-collective-ops-from-scratch.html" class="">
+  <span class="snav__n">76</span>
+  <span class="snav__t">Collective Ops From Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/77-data-parallel-ddp"><a href="77-data-parallel-ddp.html" class="">
+  <span class="snav__n">77</span>
+  <span class="snav__t">Data Parallel DDP From Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/78-zero-parameter-sharding"><a href="78-zero-parameter-sharding.html" class="">
+  <span class="snav__n">78</span>
+  <span class="snav__t">ZeRO Optimizer State Sharding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/79-pipeline-parallel"><a href="79-pipeline-parallel.html" class="">
+  <span class="snav__n">79</span>
+  <span class="snav__t">Pipeline Parallel and Bubble Analysis</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/80-checkpoint-sharded-resume"><a href="80-checkpoint-sharded-resume.html" class="">
+  <span class="snav__n">80</span>
+  <span class="snav__t">Sharded Checkpoint and Atomic Resume</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/81-end-to-end-distributed-train"><a href="81-end-to-end-distributed-train.html" class="">
+  <span class="snav__n">81</span>
+  <span class="snav__t">End-to-End Distributed Training</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/82-jailbreak-taxonomy"><a href="82-jailbreak-taxonomy.html" class="">
+  <span class="snav__n">82</span>
+  <span class="snav__t">Capstone 82 — Jailbreak Taxonomy</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/83-prompt-injection-detector"><a href="83-prompt-injection-detector.html" class="">
+  <span class="snav__n">83</span>
+  <span class="snav__t">Capstone 83 — Prompt Injection Detector</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/84-refusal-evaluation"><a href="84-refusal-evaluation.html" class="">
+  <span class="snav__n">84</span>
+  <span class="snav__t">Capstone 84 — Refusal Evaluation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/85-content-classifier-integration"><a href="85-content-classifier-integration.html" class="">
+  <span class="snav__n">85</span>
+  <span class="snav__t">Capstone 85 — Content Classifier Integration</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/86-constitutional-rules-engine"><a href="86-constitutional-rules-engine.html" class="">
+  <span class="snav__n">86</span>
+  <span class="snav__t">Capstone 86 — Constitutional Rules Engine</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/87-end-to-end-safety-gate"><a href="87-end-to-end-safety-gate.html" class="">
+  <span class="snav__n">87</span>
+  <span class="snav__t">Capstone 87 — End-to-End Safety Gate</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Capstone Projects</a></p>
+      <h1 class="page__title">Cosine LR with Linear Warmup</h1>
+      <p class="page__lede">The learning-rate schedule is the second most important decision after the loss function. AdamW with a cosine decay and a linear warmup is the modern default for language-model training because it lets the model see a small effective step size during the brittle first thousand updates, ramps up to a configured peak, and decays smoothly back toward zero. This lesson builds that schedule, plots the curve over training steps, logs gradient norms next to the schedule, and proves the schedule honors warmup, peak, and decay boundaries.</p>
+      <div class="page__meta">
+        <span class="chip">7 min read</span>
+        <span class="chip">1,465 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 19 lessons 30-37</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~90 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Implement an AdamW optimizer wired to a cosine learning-rate schedule with linear warmup.</li>
+<li>Compute the schedule&#39;s exact value at any step without floating-point drift across runs.</li>
+<li>Log gradient L2 norm side by side with the learning rate so training health is observable.</li>
+<li>Render the schedule to a text plot the eye can read and a CSV any tool can consume.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>The first thousand training updates are the loudest. The model&#39;s weights are still close to initialization. The optimizer&#39;s running second-moment estimate has not stabilised. The gradient norm is large and noisy. If the learning rate is at its peak during these updates the model either diverges outright or settles into a loss plateau it never escapes. The two well-known fixes are gradient clipping, which is the subject of Phase 19 lesson 45, and a learning-rate schedule that starts small and ramps up.</p>
+<p>The cosine-with-warmup schedule has three regions. From step zero to step <code class="inline-code">warmup_steps</code> the learning rate scales linearly from zero to the configured peak <code class="inline-code">lr_max</code>. From step <code class="inline-code">warmup_steps</code> to step <code class="inline-code">total_steps</code> the learning rate follows the upper half of a cosine curve, decaying from <code class="inline-code">lr_max</code> to <code class="inline-code">lr_min</code>. After <code class="inline-code">total_steps</code> the learning rate is pinned at <code class="inline-code">lr_min</code> so a misconfigured trainer that overshoots does not silently exit the schedule.</p>
+<p>The build problem is that schedules are easy to get wrong off by one. The off-by-one shows up six hours into a training run as a learning rate that is 1 percent too high or too low at the moment the model starts overfitting, which is invisible unless the schedule is exhaustively tested at boundaries.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<figure class="mermaid-figure">
+  <pre class="mermaid">flowchart TD
+  Step[Training step] --&gt; Branch{step state}
+  Branch -- step &lt;= warmup --&gt; Linear[Linear ramp from 0 to lr_max]
+  Branch -- warmup &lt; step &lt;= total --&gt; Cosine[Cosine decay from lr_max to lr_min]
+  Branch -- step &gt; total --&gt; Floor[Pin at lr_min]
+  Linear --&gt; Apply[AdamW.step]
+  Cosine --&gt; Apply
+  Floor --&gt; Apply
+  Apply --&gt; GradNorm[Compute gradient L2 norm]
+  GradNorm --&gt; Log[Step log row]
+  Log --&gt; Plot[Text plot + CSV]</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<h3 id="warmup-formula" class="prose-h prose-h3"><a class="prose-h__anchor" href="#warmup-formula" aria-label="Link to this section">#</a>Warmup formula</h3>
+<p>For <code class="inline-code">step</code> in <code class="inline-code">[0, warmup_steps]</code> with <code class="inline-code">warmup_steps &gt; 0</code>, the learning rate is <code class="inline-code">lr_max * step / warmup_steps</code>. The degenerate <code class="inline-code">warmup_steps = 0</code> case is treated as &quot;no warmup&quot;: the schedule starts directly at <code class="inline-code">lr_max</code> at step zero and immediately enters cosine decay. Some test harnesses pass <code class="inline-code">warmup_steps = 0</code> to check the schedule still produces a usable curve.</p>
+<h3 id="cosine-formula" class="prose-h prose-h3"><a class="prose-h__anchor" href="#cosine-formula" aria-label="Link to this section">#</a>Cosine formula</h3>
+<p>For <code class="inline-code">step</code> in <code class="inline-code">(warmup_steps, total_steps]</code> the learning rate is <code class="inline-code">lr_min + 0.5 * (lr_max - lr_min) * (1 + cos(pi * progress))</code> where <code class="inline-code">progress = (step - warmup_steps) / max(1, total_steps - warmup_steps)</code>. At <code class="inline-code">step = warmup_steps</code> the cosine evaluates to <code class="inline-code">cos(0) = 1</code>, which gives <code class="inline-code">lr_max</code>, matching the warmup endpoint exactly. At <code class="inline-code">step = total_steps</code> the cosine evaluates to <code class="inline-code">cos(pi) = -1</code>, which gives <code class="inline-code">lr_min</code>, matching the decay endpoint exactly.</p>
+<p>The continuity at both endpoints is not an accident. It is the reason the schedule is implemented as a single function over <code class="inline-code">step</code>, not as three different functions glued together. A glued schedule loses one boundary the first time <code class="inline-code">lr_max</code> is changed.</p>
+<h3 id="floor-after-total-steps" class="prose-h prose-h3"><a class="prose-h__anchor" href="#floor-after-total-steps" aria-label="Link to this section">#</a>Floor after total steps</h3>
+<p>For <code class="inline-code">step &gt; total_steps</code> the learning rate stays at <code class="inline-code">lr_min</code>. The contract is explicit: the schedule does not error out and does not extrapolate; it pins at the floor and lets the trainer log a warning. Trainers that need to extend training change the schedule&#39;s <code class="inline-code">total_steps</code>, not the loop.</p>
+<h3 id="gradient-norm-logging-alongside-the-rate" class="prose-h prose-h3"><a class="prose-h__anchor" href="#gradient-norm-logging-alongside-the-rate" aria-label="Link to this section">#</a>Gradient norm logging alongside the rate</h3>
+<p>The schedule is half of training health. The gradient norm is the other half. The training loop logs both per step. A divergent training run shows the gradient norm spike before the loss does; a well-tuned warmup keeps the norm rising linearly with the rate; a too-aggressive peak shows up as a norm that stays high after warmup. The dataset on disk is <code class="inline-code">step, lr, grad_l2_norm, loss</code>. The CSV is the only durable record.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="cap-cosine-warmup"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">cap-cosine-warmup</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> cap cosine warmup</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<p><code class="inline-code">code/main.py</code> implements:</p>
+<ul>
+<li><code class="inline-code">CosineWithWarmup</code> - a stateless function <code class="inline-code">lr(step) -&gt; float</code> over the configured schedule.</li>
+<li><code class="inline-code">TrainState</code> - wraps a model, an <code class="inline-code">AdamW</code> optimizer, and the schedule into a single step function.</li>
+<li><code class="inline-code">TrainState.step</code> - runs one forward pass, one backward pass, logs gradient L2 norm, and applies <code class="inline-code">lr(step)</code> to the optimizer.</li>
+<li><code class="inline-code">plot_schedule_ascii</code> - renders the schedule as a text plot the eye can read.</li>
+<li><code class="inline-code">write_schedule_csv</code> - emits one row per step with the learning rate.</li>
+</ul>
+<p>A demo at the bottom of the file builds a tiny <code class="inline-code">nn.Linear</code> model, trains for 20 steps over a fixed input batch, and prints the per-step learning rate, gradient norm, and loss. The schedule is also rendered as a text plot for the visual sanity check.</p>
+<p>Run it:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">bash</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-bash">python3 code/main.py</code></pre>
+</figure>
+<p>The script exits zero and prints a per-step training log plus the schedule plot.</p>
+<h2 id="production-patterns" class="prose-h prose-h2"><a class="prose-h__anchor" href="#production-patterns" aria-label="Link to this section">#</a>Production Patterns</h2>
+<p>Four patterns elevate the schedule to a production artifact.</p>
+<p><strong>Schedule lives in a config, not in code.</strong> The trainer reads <code class="inline-code">warmup_steps</code>, <code class="inline-code">total_steps</code>, <code class="inline-code">lr_max</code>, <code class="inline-code">lr_min</code> from a YAML or JSON config that is committed to git. The schedule is reproducible because the config is content-addressed; the schedule is auditable because the config is part of the PR diff.</p>
+<p><strong>Step counter is monotonic and decoupled from epochs.</strong> Some frameworks confuse step and epoch when the dataset is sharded or the dataloader restarts. The schedule reads <code class="inline-code">global_step</code> from the trainer&#39;s checkpoint, not from a local counter. A resumed run continues at the right schedule position because the step counter is the durable axis.</p>
+<p><strong>Schedule plot in the run directory.</strong> Every training run writes <code class="inline-code">outputs/lr_schedule.png</code> (or in this lesson a text plot) into its run directory. A reviewer who skims the directory can sanity-check the schedule without re-running anything. This catches the misconfigured-schedule class of bugs at PR time.</p>
+<p><strong>Log row schema is fixed.</strong> <code class="inline-code">step, lr, grad_l2_norm, loss</code> in that order. A downstream notebook or dashboard reads the schema; renaming a column without bumping a version invalidates every existing dashboard.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>Production patterns:</p>
+<ul>
+<li><strong>Sweep peak before sweeping anything else.</strong> <code class="inline-code">lr_max</code> is the most sensitive knob. Sweep it on a small model first; the optimal <code class="inline-code">lr_max</code> scales weakly with model size, so the small-model sweep is a strong prior.</li>
+<li><strong>Warmup is a fraction of total steps, not an absolute count.</strong> A 200-million-step run with 2,000 warmup steps starts at peak almost immediately; a 20,000-step run with the same number warms up for 10 percent. Configure warmup as a fraction (typical: 1-3 percent) so the schedule scales with training duration.</li>
+<li><strong><code class="inline-code">lr_min</code> is non-zero on purpose.</strong> A floor that is 10 percent of <code class="inline-code">lr_max</code> keeps the optimizer learning during the long tail. A <code class="inline-code">lr_min = 0</code> schedule produces a training curve that looks great on a plot and a model that has not actually finished training.</li>
+</ul>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p><code class="inline-code">outputs/skill-cosine-warmup.md</code> would, on a real project, describe which config carries the schedule, which trainer step the global counter is read from, and what <code class="inline-code">lr_max</code> sweep produced the deployed value. This lesson ships the engine.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li>Add an inverse-square-root variant of the schedule and compare it on a 200-step toy training run. Which curve produces the lower final loss?</li>
+<li>Add a <code class="inline-code">--restart</code> flag that adds a second warmup at <code class="inline-code">total_steps / 2</code>. Defend whether warm restarts improve or hurt on the toy run.</li>
+<li>Add a unit test that the schedule is continuous: for every step in <code class="inline-code">[0, total_steps]</code> the difference <code class="inline-code">|lr(step+1) - lr(step)|</code> is bounded by <code class="inline-code">lr_max / warmup_steps</code>.</li>
+<li>Wire the schedule into a <code class="inline-code">torch.optim.lr_scheduler.LambdaLR</code> so it composes with framework code. The lesson uses a plain step function; what does the wrapper change?</li>
+<li>Add a <code class="inline-code">--plot-png</code> flag that writes a real plot via <code class="inline-code">matplotlib</code>. Defend whether the lesson&#39;s text plot or the PNG is the better default for CI runs.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Warmup</td>
+<td>&quot;Slow start&quot;</td>
+<td>Linear ramp from zero to <code class="inline-code">lr_max</code> over the first <code class="inline-code">warmup_steps</code> updates</td>
+</tr>
+<tr>
+<td>Cosine decay</td>
+<td>&quot;Smooth drop&quot;</td>
+<td>Upper-half cosine curve from <code class="inline-code">lr_max</code> to <code class="inline-code">lr_min</code> over the remaining steps</td>
+</tr>
+<tr>
+<td>Floor</td>
+<td>&quot;After training&quot;</td>
+<td>The fixed <code class="inline-code">lr_min</code> value the schedule pins at past <code class="inline-code">total_steps</code></td>
+</tr>
+<tr>
+<td>Gradient norm</td>
+<td>&quot;L2 of grads&quot;</td>
+<td>The Euclidean norm of the concatenated gradient vector, logged each step</td>
+</tr>
+<tr>
+<td>Global step</td>
+<td>&quot;Schedule axis&quot;</td>
+<td>A monotonic step counter that survives restarts and drives the schedule</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/1608.03983" target="_blank" rel="noopener">Loshchilov and Hutter, SGDR: Stochastic Gradient Descent with Warm Restarts (arXiv 1608.03983)</a> - the cosine schedule&#39;s reference paper</li>
+<li><a href="https://arxiv.org/abs/1711.05101" target="_blank" rel="noopener">Loshchilov and Hutter, Decoupled Weight Decay Regularization (arXiv 1711.05101)</a> - AdamW&#39;s reference paper</li>
+<li><a href="https://docs.pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate" target="_blank" rel="noopener">PyTorch torch.optim.lr_scheduler</a> - how step functions compose with framework schedulers</li>
+<li>Phase 19 · 42 - the downloader whose corpus this schedule consumes</li>
+<li>Phase 19 · 43 - the dataloader the schedule co-evolves with</li>
+<li>Phase 19 · 45 - gradient clipping and AMP, the next layer in the loop</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="43-hdf5-tokenized-corpus.html">
+  <span class="label">← Previous</span>
+  <b>HDF5 Tokenized Corpus</b>
+</a>
+      <a class="pager__item pager__item--next" href="45-gradient-clipping-amp.html">
+  <span class="label">Next →</span>
+  <b>Gradient Clipping and Mixed Precision</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>7 minutes</b> of Capstone Projects behind you.</p>
+      <a class="btn btn--solid" href="45-gradient-clipping-amp.html">Continue to Gradient Clipping and Mixed Precision →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#warmup-formula">Warmup formula</a></li><li class="mini__item mini__item--d3"><a href="#cosine-formula">Cosine formula</a></li><li class="mini__item mini__item--d3"><a href="#floor-after-total-steps">Floor after total steps</a></li><li class="mini__item mini__item--d3"><a href="#gradient-norm-logging-alongside-the-rate">Gradient norm logging alongside the rate</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d2"><a href="#production-patterns">Production Patterns</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

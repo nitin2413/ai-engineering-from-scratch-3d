@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sequence-to-Sequence Models — NLP, Foundations to Advanced — AIFS</title>
+<meta name="description" content="NLP, Foundations to Advanced: Sequence-to-Sequence Models. 5 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Sequence-to-Sequence Models — NLP, Foundations to Advanced — AIFS">
+<meta property="og:description" content="NLP, Foundations to Advanced: Sequence-to-Sequence Models. 5 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"lstm-gates":["../assets/figures/figures-nlp2.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-nlp2.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#B8FF3C" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#B8FF3C;--accent-ink:#111111"
+  data-lesson-id="nlp-foundations-to-advanced/09-sequence-to-sequence" data-module="nlp-foundations-to-advanced"
+  data-prev="08-cnns-rnns-for-text.html" data-next="10-attention-mechanism.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#B8FF3C">
+        <span class="label">Phase 05</span>
+        <b>NLP, Foundations to Advanced</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="nlp-foundations-to-advanced/01-text-processing"><a href="01-text-processing.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Text Processing — Tokenization, Stemming, Lemmatization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/02-bag-of-words-tfidf"><a href="02-bag-of-words-tfidf.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Bag of Words, TF-IDF, and Text Representation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/03-word-embeddings-word2vec"><a href="03-word-embeddings-word2vec.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Word Embeddings — Word2Vec from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/04-glove-fasttext-subword"><a href="04-glove-fasttext-subword.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">GloVe, FastText, and Subword Embeddings</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/05-sentiment-analysis"><a href="05-sentiment-analysis.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Sentiment Analysis</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/06-named-entity-recognition"><a href="06-named-entity-recognition.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Named Entity Recognition</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/07-pos-tagging-parsing"><a href="07-pos-tagging-parsing.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">POS Tagging and Syntactic Parsing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/08-cnns-rnns-for-text"><a href="08-cnns-rnns-for-text.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">CNNs and RNNs for Text</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/09-sequence-to-sequence"><a href="09-sequence-to-sequence.html" class="is-current">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Sequence-to-Sequence Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/10-attention-mechanism"><a href="10-attention-mechanism.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Attention Mechanism — The Breakthrough</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/11-machine-translation"><a href="11-machine-translation.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Machine Translation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/12-text-summarization"><a href="12-text-summarization.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Text Summarization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/13-question-answering"><a href="13-question-answering.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Question Answering Systems</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/14-information-retrieval-search"><a href="14-information-retrieval-search.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Information Retrieval and Search</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/15-topic-modeling"><a href="15-topic-modeling.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Topic Modeling — LDA and BERTopic</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/16-text-generation-pre-transformer"><a href="16-text-generation-pre-transformer.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Text Generation Before Transformers — N-gram Language Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/17-chatbots-rule-to-neural"><a href="17-chatbots-rule-to-neural.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Chatbots — Rule-Based to Neural to LLM Agents</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/18-multilingual-nlp"><a href="18-multilingual-nlp.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Multilingual NLP</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/19-subword-tokenization"><a href="19-subword-tokenization.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">Subword Tokenization — BPE, WordPiece, Unigram, SentencePiece</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/20-structured-outputs-constrained-decoding"><a href="20-structured-outputs-constrained-decoding.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Structured Outputs &amp; Constrained Decoding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/21-nli-textual-entailment"><a href="21-nli-textual-entailment.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Natural Language Inference — Textual Entailment</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/22-embedding-models-deep-dive"><a href="22-embedding-models-deep-dive.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Embedding Models — The 2026 Deep Dive</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/23-chunking-strategies-rag"><a href="23-chunking-strategies-rag.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Chunking Strategies for RAG</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/24-coreference-resolution"><a href="24-coreference-resolution.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Coreference Resolution</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/25-entity-linking"><a href="25-entity-linking.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Entity Linking &amp; Disambiguation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/26-relation-extraction-kg"><a href="26-relation-extraction-kg.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Relation Extraction &amp; Knowledge Graph Construction</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/27-llm-evaluation-frameworks"><a href="27-llm-evaluation-frameworks.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">LLM Evaluation — RAGAS, DeepEval, G-Eval</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/28-long-context-evaluation"><a href="28-long-context-evaluation.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">Long-Context Evaluation — NIAH, RULER, LongBench, MRCR</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/29-dialogue-state-tracking"><a href="29-dialogue-state-tracking.html" class="">
+  <span class="snav__n">29</span>
+  <span class="snav__t">Dialogue State Tracking</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">NLP, Foundations to Advanced</a></p>
+      <h1 class="page__title">Sequence-to-Sequence Models</h1>
+      <p class="page__lede">Two RNNs pretending to be a translator. The bottleneck they hit is the reason attention exists.</p>
+      <div class="page__meta">
+        <span class="chip">5 min read</span>
+        <span class="chip">1,073 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 5 · 08 (CNNs + RNNs for Text), Phase 3 · 11 (PyTorch Intro)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Classification maps a variable-length sequence to a single label. Translation maps a variable-length sequence to another variable-length sequence. The input and output live in different vocabularies, possibly different languages, with no guarantee of length parity.</p>
+<p>The seq2seq architecture (Sutskever, Vinyals, Le, 2014) cracked this with a deliberately simple recipe. Two RNNs. One reads the source sentence and produces a fixed-size context vector. The other reads that vector and generates the target sentence token by token. Same code you wrote for lesson 08, glued together differently.</p>
+<p>This is worth studying for two reasons. First, the context-vector bottleneck is the most pedagogically useful failure in NLP. It motivates everything attention and transformers are good at. Second, the training recipe (teacher forcing, scheduled sampling, beam search at inference) still applies to every modern generation system including LLMs.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<p><strong>Encoder.</strong> An RNN that reads the source sentence. Its final hidden state is the <strong>context vector</strong> — a fixed-size summary of the entire input. Lose nothing but the source, supposedly.</p>
+<p><strong>Decoder.</strong> Another RNN initialized from the context vector. At each step it takes the previously generated token as input and produces a distribution over the target vocabulary. Sample or argmax to pick the next token. Feed it back in. Repeat until an <code class="inline-code">&lt;EOS&gt;</code> token is produced or max length is hit.</p>
+<p><strong>Training:</strong> Cross-entropy loss at each decoder step, summed over the sequence. Standard backprop through time through both networks.</p>
+<p><strong>Teacher forcing.</strong> During training, the decoder&#39;s input at step <code class="inline-code">t</code> is the <em>ground-truth</em> token at position <code class="inline-code">t-1</code>, not the decoder&#39;s own previous prediction. This stabilizes training; without it, early mistakes cascade and the model never learns. At inference, you have to use the model&#39;s own predictions, so there is always a train/inference distribution gap. That gap is called <strong>exposure bias</strong>.</p>
+<p><strong>The bottleneck.</strong> Everything the encoder learned about the source must be squeezed into that one context vector. Long sentences lose detail. Rare words get blurred. Reordering (chat noir vs. black cat) has to be memorized, not computed.</p>
+<p>Attention (lesson 10) fixes this by letting the decoder look at <em>every</em> encoder hidden state, not just the last one. That is the whole pitch.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="lstm-gates"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">lstm-gates</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> lstm gates</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-an-encoder" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-an-encoder" aria-label="Link to this section">#</a>Step 1: an encoder</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> torch
+<span class="token keyword">import</span> torch<span class="token punctuation">.</span>nn <span class="token keyword">as</span> nn
+
+
+<span class="token keyword">class</span> <span class="token class-name">Encoder</span><span class="token punctuation">(</span>nn<span class="token punctuation">.</span>Module<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> src_vocab_size<span class="token punctuation">,</span> embed_dim<span class="token punctuation">,</span> hidden_dim<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token builtin">super</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>__init__<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>embed <span class="token operator">=</span> nn<span class="token punctuation">.</span>Embedding<span class="token punctuation">(</span>src_vocab_size<span class="token punctuation">,</span> embed_dim<span class="token punctuation">,</span> padding_idx<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>gru <span class="token operator">=</span> nn<span class="token punctuation">.</span>GRU<span class="token punctuation">(</span>embed_dim<span class="token punctuation">,</span> hidden_dim<span class="token punctuation">,</span> batch_first<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">forward</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> src<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        e <span class="token operator">=</span> self<span class="token punctuation">.</span>embed<span class="token punctuation">(</span>src<span class="token punctuation">)</span>
+        outputs<span class="token punctuation">,</span> hidden <span class="token operator">=</span> self<span class="token punctuation">.</span>gru<span class="token punctuation">(</span>e<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> outputs<span class="token punctuation">,</span> hidden</code></pre>
+</figure>
+<p><code class="inline-code">outputs</code> has shape <code class="inline-code">[batch, seq_len, hidden_dim]</code> — one hidden state per input position. <code class="inline-code">hidden</code> has shape <code class="inline-code">[1, batch, hidden_dim]</code> — the final step. Lesson 08 said &quot;pool over outputs for classification.&quot; Here we keep the last hidden state as the context vector, and ignore the per-step outputs.</p>
+<h3 id="step-2-a-decoder" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-a-decoder" aria-label="Link to this section">#</a>Step 2: a decoder</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">Decoder</span><span class="token punctuation">(</span>nn<span class="token punctuation">.</span>Module<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> tgt_vocab_size<span class="token punctuation">,</span> embed_dim<span class="token punctuation">,</span> hidden_dim<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token builtin">super</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>__init__<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>embed <span class="token operator">=</span> nn<span class="token punctuation">.</span>Embedding<span class="token punctuation">(</span>tgt_vocab_size<span class="token punctuation">,</span> embed_dim<span class="token punctuation">,</span> padding_idx<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>gru <span class="token operator">=</span> nn<span class="token punctuation">.</span>GRU<span class="token punctuation">(</span>embed_dim<span class="token punctuation">,</span> hidden_dim<span class="token punctuation">,</span> batch_first<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>fc <span class="token operator">=</span> nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span>hidden_dim<span class="token punctuation">,</span> tgt_vocab_size<span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">forward</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> token<span class="token punctuation">,</span> hidden<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        e <span class="token operator">=</span> self<span class="token punctuation">.</span>embed<span class="token punctuation">(</span>token<span class="token punctuation">)</span>
+        out<span class="token punctuation">,</span> hidden <span class="token operator">=</span> self<span class="token punctuation">.</span>gru<span class="token punctuation">(</span>e<span class="token punctuation">,</span> hidden<span class="token punctuation">)</span>
+        logits <span class="token operator">=</span> self<span class="token punctuation">.</span>fc<span class="token punctuation">(</span>out<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> logits<span class="token punctuation">,</span> hidden</code></pre>
+</figure>
+<p>Decoder is called one step at a time. Input: a batch of single tokens and the current hidden state. Output: vocabulary logits for the next token and the updated hidden state.</p>
+<h3 id="step-3-training-loop-with-teacher-forcing" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-training-loop-with-teacher-forcing" aria-label="Link to this section">#</a>Step 3: training loop with teacher forcing</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">train_batch</span><span class="token punctuation">(</span>encoder<span class="token punctuation">,</span> decoder<span class="token punctuation">,</span> src<span class="token punctuation">,</span> tgt<span class="token punctuation">,</span> bos_id<span class="token punctuation">,</span> optimizer<span class="token punctuation">,</span> teacher_forcing_ratio<span class="token operator">=</span><span class="token number">0.9</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    optimizer<span class="token punctuation">.</span>zero_grad<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    _<span class="token punctuation">,</span> hidden <span class="token operator">=</span> encoder<span class="token punctuation">(</span>src<span class="token punctuation">)</span>
+    batch_size<span class="token punctuation">,</span> tgt_len <span class="token operator">=</span> tgt<span class="token punctuation">.</span>shape
+    input_token <span class="token operator">=</span> torch<span class="token punctuation">.</span>full<span class="token punctuation">(</span><span class="token punctuation">(</span>batch_size<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span> bos_id<span class="token punctuation">,</span> dtype<span class="token operator">=</span>torch<span class="token punctuation">.</span><span class="token builtin">long</span><span class="token punctuation">)</span>
+    loss <span class="token operator">=</span> <span class="token number">0.0</span>
+    loss_fn <span class="token operator">=</span> nn<span class="token punctuation">.</span>CrossEntropyLoss<span class="token punctuation">(</span>ignore_index<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">for</span> t <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>tgt_len<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        logits<span class="token punctuation">,</span> hidden <span class="token operator">=</span> decoder<span class="token punctuation">(</span>input_token<span class="token punctuation">,</span> hidden<span class="token punctuation">)</span>
+        step_loss <span class="token operator">=</span> loss_fn<span class="token punctuation">(</span>logits<span class="token punctuation">.</span>squeeze<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span> tgt<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> t<span class="token punctuation">]</span><span class="token punctuation">)</span>
+        loss <span class="token operator">+=</span> step_loss
+        use_teacher <span class="token operator">=</span> torch<span class="token punctuation">.</span>rand<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&lt;</span> teacher_forcing_ratio
+        <span class="token keyword">if</span> use_teacher<span class="token punctuation">:</span>
+            input_token <span class="token operator">=</span> tgt<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> t<span class="token punctuation">]</span><span class="token punctuation">.</span>unsqueeze<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            input_token <span class="token operator">=</span> logits<span class="token punctuation">.</span>argmax<span class="token punctuation">(</span>dim<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+
+    loss<span class="token punctuation">.</span>backward<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    optimizer<span class="token punctuation">.</span>step<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> loss<span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">/</span> tgt_len</code></pre>
+</figure>
+<p>Two knobs worth naming. <code class="inline-code">ignore_index=0</code> skips loss on padding tokens. <code class="inline-code">teacher_forcing_ratio</code> is the probability of using the true token vs. the model&#39;s prediction at each step. Start at 1.0 (full teacher forcing) and anneal down to ~0.5 over training to close the exposure-bias gap.</p>
+<h3 id="step-4-inference-loop-greedy" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-inference-loop-greedy" aria-label="Link to this section">#</a>Step 4: inference loop (greedy)</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token decorator annotation punctuation">@torch<span class="token punctuation">.</span>no_grad</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">greedy_decode</span><span class="token punctuation">(</span>encoder<span class="token punctuation">,</span> decoder<span class="token punctuation">,</span> src<span class="token punctuation">,</span> bos_id<span class="token punctuation">,</span> eos_id<span class="token punctuation">,</span> max_len<span class="token operator">=</span><span class="token number">50</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    _<span class="token punctuation">,</span> hidden <span class="token operator">=</span> encoder<span class="token punctuation">(</span>src<span class="token punctuation">)</span>
+    batch_size <span class="token operator">=</span> src<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+    input_token <span class="token operator">=</span> torch<span class="token punctuation">.</span>full<span class="token punctuation">(</span><span class="token punctuation">(</span>batch_size<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span> bos_id<span class="token punctuation">,</span> dtype<span class="token operator">=</span>torch<span class="token punctuation">.</span><span class="token builtin">long</span><span class="token punctuation">)</span>
+    output_ids <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>max_len<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        logits<span class="token punctuation">,</span> hidden <span class="token operator">=</span> decoder<span class="token punctuation">(</span>input_token<span class="token punctuation">,</span> hidden<span class="token punctuation">)</span>
+        next_token <span class="token operator">=</span> logits<span class="token punctuation">.</span>argmax<span class="token punctuation">(</span>dim<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+        output_ids<span class="token punctuation">.</span>append<span class="token punctuation">(</span>next_token<span class="token punctuation">)</span>
+        input_token <span class="token operator">=</span> next_token
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>next_token <span class="token operator">==</span> eos_id<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token builtin">all</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">break</span>
+    <span class="token keyword">return</span> torch<span class="token punctuation">.</span>cat<span class="token punctuation">(</span>output_ids<span class="token punctuation">,</span> dim<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Greedy decoding picks the highest-probability token at every step. It can wander off: once you commit to a token, you cannot unsay it. <strong>Beam search</strong> keeps the top-<code class="inline-code">k</code> partial sequences alive and picks the highest-scoring complete one at the end. Beam width 3-5 is standard.</p>
+<h3 id="step-5-the-bottleneck-demonstrated" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-the-bottleneck-demonstrated" aria-label="Link to this section">#</a>Step 5: the bottleneck, demonstrated</h3>
+<p>Train the model on a toy copy task: source <code class="inline-code">[a, b, c, d, e]</code>, target <code class="inline-code">[a, b, c, d, e]</code>. Increase sequence length. Observe accuracy.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>seq_len=5   copy accuracy: 98%
+seq_len=10  copy accuracy: 91%
+seq_len=20  copy accuracy: 62%
+seq_len=40  copy accuracy: 23%</code></pre>
+</figure>
+<p>A single GRU hidden state cannot losslessly memorize a 40-token input. The information is there at every encoder step, but the decoder only sees the last state. Attention fixes this directly.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>PyTorch has <code class="inline-code">nn.Transformer</code> and <code class="inline-code">nn.LSTM</code>-based seq2seq templates. Hugging Face&#39;s <code class="inline-code">transformers</code> library ships full encoder-decoder models (BART, T5, mBART, NLLB) trained on billions of tokens.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> transformers <span class="token keyword">import</span> AutoTokenizer<span class="token punctuation">,</span> AutoModelForSeq2SeqLM
+
+tok <span class="token operator">=</span> AutoTokenizer<span class="token punctuation">.</span>from_pretrained<span class="token punctuation">(</span><span class="token string">"facebook/bart-base"</span><span class="token punctuation">)</span>
+model <span class="token operator">=</span> AutoModelForSeq2SeqLM<span class="token punctuation">.</span>from_pretrained<span class="token punctuation">(</span><span class="token string">"facebook/bart-base"</span><span class="token punctuation">)</span>
+
+src <span class="token operator">=</span> tok<span class="token punctuation">(</span><span class="token string">"Translate this to French: Hello, how are you?"</span><span class="token punctuation">,</span> return_tensors<span class="token operator">=</span><span class="token string">"pt"</span><span class="token punctuation">)</span>
+out <span class="token operator">=</span> model<span class="token punctuation">.</span>generate<span class="token punctuation">(</span><span class="token operator">**</span>src<span class="token punctuation">,</span> max_new_tokens<span class="token operator">=</span><span class="token number">50</span><span class="token punctuation">,</span> num_beams<span class="token operator">=</span><span class="token number">4</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>tok<span class="token punctuation">.</span>decode<span class="token punctuation">(</span>out<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> skip_special_tokens<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Modern encoder-decoders dropped RNNs for transformers. The high-level shape (encoder, decoder, generate-token-by-token) is identical to the 2014 seq2seq paper. The mechanism inside each block is different.</p>
+<h3 id="when-to-still-reach-for-rnn-based-seq2seq" class="prose-h prose-h3"><a class="prose-h__anchor" href="#when-to-still-reach-for-rnn-based-seq2seq" aria-label="Link to this section">#</a>When to still reach for RNN-based seq2seq</h3>
+<p>Almost never, for new projects. Specific exceptions:</p>
+<ul>
+<li>Streaming translation where you consume input one token at a time with bounded memory.</li>
+<li>On-device text generation where transformer memory cost is prohibitive.</li>
+<li>Pedagogy. Understanding the encoder-decoder bottleneck is the fastest path to understanding why transformers won.</li>
+</ul>
+<h3 id="exposure-bias-and-its-mitigations" class="prose-h prose-h3"><a class="prose-h__anchor" href="#exposure-bias-and-its-mitigations" aria-label="Link to this section">#</a>Exposure bias and its mitigations</h3>
+<ul>
+<li><strong>Scheduled sampling.</strong> Anneal teacher forcing ratio during training so the model learns to recover from its own mistakes.</li>
+<li><strong>Minimum risk training.</strong> Train on sentence-level BLEU score instead of token-level cross-entropy. Closer to what you actually want.</li>
+<li><strong>Reinforcement learning fine-tuning.</strong> Reward the sequence generator with a metric. Used in modern LLM RLHF.</li>
+</ul>
+<p>All three still apply to transformer-based generation.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>Save as <code class="inline-code">outputs/prompt-seq2seq-design.md</code>:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">markdown</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-markdown"><span class="token front-matter-block"><span class="token punctuation">---</span>
+<span class="token front-matter yaml language-yaml"><span class="token key atrule">name</span><span class="token punctuation">:</span> seq2seq<span class="token punctuation">-</span>design
+<span class="token key atrule">description</span><span class="token punctuation">:</span> Design a sequence<span class="token punctuation">-</span>to<span class="token punctuation">-</span>sequence pipeline for a given task.
+<span class="token key atrule">phase</span><span class="token punctuation">:</span> <span class="token number">5</span>
+<span class="token key atrule">lesson</span><span class="token punctuation">:</span> <span class="token number">09</span></span>
+<span class="token punctuation">---</span></span>
+
+Given a task (translation, summarization, paraphrase, question rewrite), output:
+
+<span class="token list punctuation">1.</span> Architecture. Pretrained transformer encoder-decoder (BART, T5, mBART, NLLB) is the default. RNN-based seq2seq only for specific constraints.
+<span class="token list punctuation">2.</span> Starting checkpoint. Name it (<span class="token code-snippet code keyword">`facebook/bart-base`</span>, <span class="token code-snippet code keyword">`google/flan-t5-base`</span>, <span class="token code-snippet code keyword">`facebook/nllb-200-distilled-600M`</span>). Match the checkpoint to task and language coverage.
+<span class="token list punctuation">3.</span> Decoding strategy. Greedy for deterministic output, beam search (width 4-5) for quality, sampling with temperature for diversity. One sentence justification.
+<span class="token list punctuation">4.</span> One failure mode to verify before shipping. Exposure bias manifests as generation drift on longer outputs; sample 20 outputs at the 90th-percentile length and eyeball.
+
+Refuse to recommend training a seq2seq from scratch for under a million parallel examples. Flag any pipeline that uses greedy decoding for user-facing content as fragile (greedy repeats and loops).</code></pre>
+</figure>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><strong>Easy.</strong> Implement the toy copy task. Train a GRU seq2seq on input-output pairs where the target equals the source. Measure accuracy at lengths 5, 10, 20. Reproduce the bottleneck.</li>
+<li><strong>Medium.</strong> Add beam search decoding with beam width 3. Measure BLEU on a small parallel corpus against greedy. Document where beam search wins (usually last tokens) and where it makes no difference.</li>
+<li><strong>Hard.</strong> Fine-tune <code class="inline-code">facebook/bart-base</code> on a 10k-pair paraphrase dataset. Compare the fine-tuned model&#39;s beam-4 output to the base model&#39;s on held-out inputs. Report BLEU and pick 10 qualitative examples.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Encoder</td>
+<td>Input RNN</td>
+<td>Reads source. Produces per-step hidden states and a final context vector.</td>
+</tr>
+<tr>
+<td>Decoder</td>
+<td>Output RNN</td>
+<td>Initialized from context vector. Generates target tokens one at a time.</td>
+</tr>
+<tr>
+<td>Context vector</td>
+<td>The summary</td>
+<td>Final encoder hidden state. Fixed size. The bottleneck attention solves.</td>
+</tr>
+<tr>
+<td>Teacher forcing</td>
+<td>Use true tokens</td>
+<td>Feed the ground-truth previous token at training time. Stabilizes learning.</td>
+</tr>
+<tr>
+<td>Exposure bias</td>
+<td>Train/test gap</td>
+<td>Model trained on true tokens never practiced recovering from its own mistakes.</td>
+</tr>
+<tr>
+<td>Beam search</td>
+<td>Better decoding</td>
+<td>Keep top-k partial sequences alive at each step instead of committing greedily.</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/1409.3215" target="_blank" rel="noopener">Sutskever, Vinyals, Le (2014). Sequence to Sequence Learning with Neural Networks</a> — the original seq2seq paper. Four pages.</li>
+<li><a href="https://arxiv.org/abs/1406.1078" target="_blank" rel="noopener">Cho et al. (2014). Learning Phrase Representations using RNN Encoder-Decoder for Statistical Machine Translation</a> — introduced the GRU and the encoder-decoder framing.</li>
+<li><a href="https://arxiv.org/abs/1409.0473" target="_blank" rel="noopener">Bahdanau, Cho, Bengio (2014). Neural Machine Translation by Jointly Learning to Align and Translate</a> — the attention paper. Read immediately after this lesson.</li>
+<li><a href="https://pytorch.org/tutorials/intermediate/seq2seq_translation_tutorial.html" target="_blank" rel="noopener">PyTorch NLP from Scratch tutorial</a> — buildable seq2seq + attention code.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="08-cnns-rnns-for-text.html">
+  <span class="label">← Previous</span>
+  <b>CNNs and RNNs for Text</b>
+</a>
+      <a class="pager__item pager__item--next" href="10-attention-mechanism.html">
+  <span class="label">Next →</span>
+  <b>Attention Mechanism — The Breakthrough</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>5 minutes</b> of NLP, Foundations to Advanced behind you.</p>
+      <a class="btn btn--solid" href="10-attention-mechanism.html">Continue to Attention Mechanism — The Breakthrough →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-an-encoder">Step 1: an encoder</a></li><li class="mini__item mini__item--d3"><a href="#step-2-a-decoder">Step 2: a decoder</a></li><li class="mini__item mini__item--d3"><a href="#step-3-training-loop-with-teacher-forcing">Step 3: training loop with teacher forcing</a></li><li class="mini__item mini__item--d3"><a href="#step-4-inference-loop-greedy">Step 4: inference loop (greedy)</a></li><li class="mini__item mini__item--d3"><a href="#step-5-the-bottleneck-demonstrated">Step 5: the bottleneck, demonstrated</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d3"><a href="#when-to-still-reach-for-rnn-based-seq2seq">When to still reach for RNN-based seq2seq</a></li><li class="mini__item mini__item--d3"><a href="#exposure-bias-and-its-mitigations">Exposure bias and its mitigations</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

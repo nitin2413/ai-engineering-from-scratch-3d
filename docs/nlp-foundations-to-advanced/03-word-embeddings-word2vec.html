@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Word Embeddings — Word2Vec from Scratch — NLP, Foundations to Advanced — AIFS</title>
+<meta name="description" content="NLP, Foundations to Advanced: Word Embeddings — Word2Vec from Scratch. 5 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Word Embeddings — Word2Vec from Scratch — NLP, Foundations to Advanced — AIFS">
+<meta property="og:description" content="NLP, Foundations to Advanced: Word Embeddings — Word2Vec from Scratch. 5 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"word-vector-arithmetic":["../assets/figures/figures-transformers.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-transformers.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#B8FF3C" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#B8FF3C;--accent-ink:#111111"
+  data-lesson-id="nlp-foundations-to-advanced/03-word-embeddings-word2vec" data-module="nlp-foundations-to-advanced"
+  data-prev="02-bag-of-words-tfidf.html" data-next="04-glove-fasttext-subword.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#B8FF3C">
+        <span class="label">Phase 05</span>
+        <b>NLP, Foundations to Advanced</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="nlp-foundations-to-advanced/01-text-processing"><a href="01-text-processing.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Text Processing — Tokenization, Stemming, Lemmatization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/02-bag-of-words-tfidf"><a href="02-bag-of-words-tfidf.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Bag of Words, TF-IDF, and Text Representation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/03-word-embeddings-word2vec"><a href="03-word-embeddings-word2vec.html" class="is-current">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Word Embeddings — Word2Vec from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/04-glove-fasttext-subword"><a href="04-glove-fasttext-subword.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">GloVe, FastText, and Subword Embeddings</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/05-sentiment-analysis"><a href="05-sentiment-analysis.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Sentiment Analysis</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/06-named-entity-recognition"><a href="06-named-entity-recognition.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Named Entity Recognition</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/07-pos-tagging-parsing"><a href="07-pos-tagging-parsing.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">POS Tagging and Syntactic Parsing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/08-cnns-rnns-for-text"><a href="08-cnns-rnns-for-text.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">CNNs and RNNs for Text</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/09-sequence-to-sequence"><a href="09-sequence-to-sequence.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Sequence-to-Sequence Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/10-attention-mechanism"><a href="10-attention-mechanism.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Attention Mechanism — The Breakthrough</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/11-machine-translation"><a href="11-machine-translation.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Machine Translation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/12-text-summarization"><a href="12-text-summarization.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Text Summarization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/13-question-answering"><a href="13-question-answering.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Question Answering Systems</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/14-information-retrieval-search"><a href="14-information-retrieval-search.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Information Retrieval and Search</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/15-topic-modeling"><a href="15-topic-modeling.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Topic Modeling — LDA and BERTopic</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/16-text-generation-pre-transformer"><a href="16-text-generation-pre-transformer.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Text Generation Before Transformers — N-gram Language Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/17-chatbots-rule-to-neural"><a href="17-chatbots-rule-to-neural.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Chatbots — Rule-Based to Neural to LLM Agents</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/18-multilingual-nlp"><a href="18-multilingual-nlp.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Multilingual NLP</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/19-subword-tokenization"><a href="19-subword-tokenization.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">Subword Tokenization — BPE, WordPiece, Unigram, SentencePiece</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/20-structured-outputs-constrained-decoding"><a href="20-structured-outputs-constrained-decoding.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Structured Outputs &amp; Constrained Decoding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/21-nli-textual-entailment"><a href="21-nli-textual-entailment.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Natural Language Inference — Textual Entailment</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/22-embedding-models-deep-dive"><a href="22-embedding-models-deep-dive.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Embedding Models — The 2026 Deep Dive</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/23-chunking-strategies-rag"><a href="23-chunking-strategies-rag.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Chunking Strategies for RAG</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/24-coreference-resolution"><a href="24-coreference-resolution.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Coreference Resolution</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/25-entity-linking"><a href="25-entity-linking.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Entity Linking &amp; Disambiguation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/26-relation-extraction-kg"><a href="26-relation-extraction-kg.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Relation Extraction &amp; Knowledge Graph Construction</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/27-llm-evaluation-frameworks"><a href="27-llm-evaluation-frameworks.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">LLM Evaluation — RAGAS, DeepEval, G-Eval</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/28-long-context-evaluation"><a href="28-long-context-evaluation.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">Long-Context Evaluation — NIAH, RULER, LongBench, MRCR</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/29-dialogue-state-tracking"><a href="29-dialogue-state-tracking.html" class="">
+  <span class="snav__n">29</span>
+  <span class="snav__t">Dialogue State Tracking</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">NLP, Foundations to Advanced</a></p>
+      <h1 class="page__title">Word Embeddings — Word2Vec from Scratch</h1>
+      <p class="page__lede">A word is the company it keeps. Train a shallow net on that idea and geometry falls out.</p>
+      <div class="page__meta">
+        <span class="chip">5 min read</span>
+        <span class="chip">1,095 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 5 · 02 (BoW + TF-IDF), Phase 3 · 03 (Backpropagation from Scratch)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>TF-IDF knows <code class="inline-code">dog</code> and <code class="inline-code">puppy</code> are different words. It does not know they mean nearly the same thing. A classifier trained on <code class="inline-code">dog</code> cannot generalize to a review about <code class="inline-code">puppy</code>. You can paper over this by listing synonyms, but that fails on rare terms, domain jargon, and every language you did not anticipate.</p>
+<p>You want a representation where <code class="inline-code">dog</code> and <code class="inline-code">puppy</code> land close together in space. Where <code class="inline-code">king - man + woman</code> lands near <code class="inline-code">queen</code>. Where a model trained on <code class="inline-code">dog</code> transfers some signal to <code class="inline-code">puppy</code> for free.</p>
+<p>Word2Vec gave us that space. Two layer neural network, trillion-token training runs, published in 2013. The architecture is almost embarrassingly simple. The results reshaped NLP for a decade.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<p><strong>Distributional hypothesis</strong> (Firth, 1957): &quot;You shall know a word by the company it keeps.&quot; If two words appear in similar contexts, they probably mean similar things.</p>
+<p>Word2Vec comes in two flavors, both exploiting that idea.</p>
+<ul>
+<li><strong>Skip-gram.</strong> Given a center word, predict the surrounding words. <code class="inline-code">cat -&gt; (the, sat, on)</code> with window size 2.</li>
+<li><strong>CBOW (continuous bag of words).</strong> Given surrounding words, predict the center. <code class="inline-code">(the, sat, on) -&gt; cat</code>.</li>
+</ul>
+<p>Skip-gram is slower to train but handles rare words better. It became the default.</p>
+<p>The network has one hidden layer with no nonlinearity. Input is a one-hot vector over the vocabulary. Output is a softmax over the vocabulary. After training, you throw away the output layer. The hidden layer weights are the embeddings.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>one-hot(center) ── W ──▶ hidden (d-dim) ── W' ──▶ softmax(vocab)
+                          ^
+                          this is the embedding</code></pre>
+</figure>
+<p>The trick: softmax over 100k words is prohibitively expensive. Word2Vec uses <strong>negative sampling</strong> to turn it into a binary classification task. Predict &quot;did this context word appear near this center word, yes or no&quot;. Sample a handful of negative (non-co-occurring) words per training pair instead of computing softmax over the whole vocabulary.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="word-vector-arithmetic"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">word-vector-arithmetic</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> word vector arithmetic</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-training-pairs-from-a-corpus" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-training-pairs-from-a-corpus" aria-label="Link to this section">#</a>Step 1: training pairs from a corpus</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">skipgram_pairs</span><span class="token punctuation">(</span>docs<span class="token punctuation">,</span> window<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    pairs <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> doc <span class="token keyword">in</span> docs<span class="token punctuation">:</span>
+        <span class="token keyword">for</span> i<span class="token punctuation">,</span> center <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>doc<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">max</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> i <span class="token operator">-</span> window<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token builtin">min</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>doc<span class="token punctuation">)</span><span class="token punctuation">,</span> i <span class="token operator">+</span> window <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                <span class="token keyword">if</span> i <span class="token operator">==</span> j<span class="token punctuation">:</span>
+                    <span class="token keyword">continue</span>
+                pairs<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">(</span>center<span class="token punctuation">,</span> doc<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> pairs</code></pre>
+</figure>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token operator">>></span><span class="token operator">></span> skipgram_pairs<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token string">"the"</span><span class="token punctuation">,</span> <span class="token string">"cat"</span><span class="token punctuation">,</span> <span class="token string">"sat"</span><span class="token punctuation">,</span> <span class="token string">"on"</span><span class="token punctuation">,</span> <span class="token string">"mat"</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">,</span> window<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">)</span>
+<span class="token punctuation">[</span><span class="token punctuation">(</span><span class="token string">'the'</span><span class="token punctuation">,</span> <span class="token string">'cat'</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token string">'the'</span><span class="token punctuation">,</span> <span class="token string">'sat'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+ <span class="token punctuation">(</span><span class="token string">'cat'</span><span class="token punctuation">,</span> <span class="token string">'the'</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token string">'cat'</span><span class="token punctuation">,</span> <span class="token string">'sat'</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token string">'cat'</span><span class="token punctuation">,</span> <span class="token string">'on'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+ <span class="token punctuation">(</span><span class="token string">'sat'</span><span class="token punctuation">,</span> <span class="token string">'the'</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token string">'sat'</span><span class="token punctuation">,</span> <span class="token string">'cat'</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token string">'sat'</span><span class="token punctuation">,</span> <span class="token string">'on'</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token string">'sat'</span><span class="token punctuation">,</span> <span class="token string">'mat'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+ <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span></code></pre>
+</figure>
+<p>Every (center, context) pair in a window is a positive training example.</p>
+<h3 id="step-2-embedding-tables" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-embedding-tables" aria-label="Link to this section">#</a>Step 2: embedding tables</h3>
+<p>Two matrices. <code class="inline-code">W</code> is the center-word embedding table (the one you keep). <code class="inline-code">W'</code> is the context-word table (often discarded, sometimes averaged with <code class="inline-code">W</code>).</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+
+
+<span class="token keyword">def</span> <span class="token function">init_embeddings</span><span class="token punctuation">(</span>vocab_size<span class="token punctuation">,</span> dim<span class="token punctuation">,</span> seed<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    rng <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>default_rng<span class="token punctuation">(</span>seed<span class="token punctuation">)</span>
+    W <span class="token operator">=</span> rng<span class="token punctuation">.</span>normal<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0.1</span><span class="token punctuation">,</span> size<span class="token operator">=</span><span class="token punctuation">(</span>vocab_size<span class="token punctuation">,</span> dim<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    W_prime <span class="token operator">=</span> rng<span class="token punctuation">.</span>normal<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0.1</span><span class="token punctuation">,</span> size<span class="token operator">=</span><span class="token punctuation">(</span>vocab_size<span class="token punctuation">,</span> dim<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> W<span class="token punctuation">,</span> W_prime</code></pre>
+</figure>
+<p>Small random init. Vocab size 10k and dim 100 is realistic; for teaching, 50 vocab x 16 dim is enough to see the geometry.</p>
+<h3 id="step-3-negative-sampling-objective" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-negative-sampling-objective" aria-label="Link to this section">#</a>Step 3: negative sampling objective</h3>
+<p>For each positive pair <code class="inline-code">(center, context)</code>, sample <code class="inline-code">k</code> random words from the vocabulary as negatives. Train the model so the dot product <code class="inline-code">W[center] · W'[context]</code> is high for positives and low for negatives.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">sigmoid</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token number">1.0</span> <span class="token operator">/</span> <span class="token punctuation">(</span><span class="token number">1.0</span> <span class="token operator">+</span> np<span class="token punctuation">.</span>exp<span class="token punctuation">(</span><span class="token operator">-</span>np<span class="token punctuation">.</span>clip<span class="token punctuation">(</span>x<span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">20</span><span class="token punctuation">,</span> <span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+
+<span class="token keyword">def</span> <span class="token function">train_pair</span><span class="token punctuation">(</span>W<span class="token punctuation">,</span> W_prime<span class="token punctuation">,</span> center_idx<span class="token punctuation">,</span> context_idx<span class="token punctuation">,</span> negative_indices<span class="token punctuation">,</span> lr<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    v_c <span class="token operator">=</span> W<span class="token punctuation">[</span>center_idx<span class="token punctuation">]</span>
+    u_pos <span class="token operator">=</span> W_prime<span class="token punctuation">[</span>context_idx<span class="token punctuation">]</span>
+    u_negs <span class="token operator">=</span> W_prime<span class="token punctuation">[</span>negative_indices<span class="token punctuation">]</span>
+
+    pos_score <span class="token operator">=</span> sigmoid<span class="token punctuation">(</span>v_c @ u_pos<span class="token punctuation">)</span>
+    neg_scores <span class="token operator">=</span> sigmoid<span class="token punctuation">(</span>u_negs @ v_c<span class="token punctuation">)</span>
+
+    grad_center <span class="token operator">=</span> <span class="token punctuation">(</span>pos_score <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">*</span> u_pos
+    <span class="token keyword">for</span> i<span class="token punctuation">,</span> u <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>u_negs<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        grad_center <span class="token operator">+=</span> neg_scores<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">*</span> u
+
+    W<span class="token punctuation">[</span>context_idx<span class="token punctuation">]</span> <span class="token operator">=</span> W<span class="token punctuation">[</span>context_idx<span class="token punctuation">]</span>
+    W_prime<span class="token punctuation">[</span>context_idx<span class="token punctuation">]</span> <span class="token operator">-=</span> lr <span class="token operator">*</span> <span class="token punctuation">(</span>pos_score <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">*</span> v_c
+    <span class="token keyword">for</span> i<span class="token punctuation">,</span> neg_idx <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>negative_indices<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        W_prime<span class="token punctuation">[</span>neg_idx<span class="token punctuation">]</span> <span class="token operator">-=</span> lr <span class="token operator">*</span> neg_scores<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">*</span> v_c
+    W<span class="token punctuation">[</span>center_idx<span class="token punctuation">]</span> <span class="token operator">-=</span> lr <span class="token operator">*</span> grad_center</code></pre>
+</figure>
+<p>The magic formula: logistic loss on positive pair (want sigmoid near 1) plus logistic loss on negative pairs (want sigmoid near 0). Gradients flow to both tables. Full derivation is in the original paper; walk through it once with pencil and paper if you want it to stick.</p>
+<h3 id="step-4-train-on-a-toy-corpus" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-train-on-a-toy-corpus" aria-label="Link to this section">#</a>Step 4: train on a toy corpus</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">train</span><span class="token punctuation">(</span>docs<span class="token punctuation">,</span> dim<span class="token operator">=</span><span class="token number">16</span><span class="token punctuation">,</span> window<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">,</span> k_neg<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">,</span> epochs<span class="token operator">=</span><span class="token number">100</span><span class="token punctuation">,</span> lr<span class="token operator">=</span><span class="token number">0.05</span><span class="token punctuation">,</span> seed<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    vocab <span class="token operator">=</span> build_vocab<span class="token punctuation">(</span>docs<span class="token punctuation">)</span>
+    vocab_size <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>vocab<span class="token punctuation">)</span>
+    rng <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>default_rng<span class="token punctuation">(</span>seed<span class="token punctuation">)</span>
+    W<span class="token punctuation">,</span> W_prime <span class="token operator">=</span> init_embeddings<span class="token punctuation">(</span>vocab_size<span class="token punctuation">,</span> dim<span class="token punctuation">,</span> seed<span class="token operator">=</span>seed<span class="token punctuation">)</span>
+    pairs <span class="token operator">=</span> skipgram_pairs<span class="token punctuation">(</span>docs<span class="token punctuation">,</span> window<span class="token operator">=</span>window<span class="token punctuation">)</span>
+
+    <span class="token keyword">for</span> epoch <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>epochs<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        rng<span class="token punctuation">.</span>shuffle<span class="token punctuation">(</span>pairs<span class="token punctuation">)</span>
+        <span class="token keyword">for</span> center<span class="token punctuation">,</span> context <span class="token keyword">in</span> pairs<span class="token punctuation">:</span>
+            c_idx <span class="token operator">=</span> vocab<span class="token punctuation">[</span>center<span class="token punctuation">]</span>
+            ctx_idx <span class="token operator">=</span> vocab<span class="token punctuation">[</span>context<span class="token punctuation">]</span>
+            negs <span class="token operator">=</span> rng<span class="token punctuation">.</span>integers<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> vocab_size<span class="token punctuation">,</span> size<span class="token operator">=</span>k_neg<span class="token punctuation">)</span>
+            negs <span class="token operator">=</span> <span class="token punctuation">[</span>n <span class="token keyword">for</span> n <span class="token keyword">in</span> negs <span class="token keyword">if</span> n <span class="token operator">!=</span> ctx_idx <span class="token keyword">and</span> n <span class="token operator">!=</span> c_idx<span class="token punctuation">]</span>
+            train_pair<span class="token punctuation">(</span>W<span class="token punctuation">,</span> W_prime<span class="token punctuation">,</span> c_idx<span class="token punctuation">,</span> ctx_idx<span class="token punctuation">,</span> negs<span class="token punctuation">,</span> lr<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> vocab<span class="token punctuation">,</span> W</code></pre>
+</figure>
+<p>After enough epochs on a large corpus, words that share contexts have similar center embeddings. On a toy corpus, you see the effect faintly. On billions of tokens, you see it dramatically.</p>
+<h3 id="step-5-the-analogy-trick" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-the-analogy-trick" aria-label="Link to this section">#</a>Step 5: the analogy trick</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">nearest</span><span class="token punctuation">(</span>vocab<span class="token punctuation">,</span> W<span class="token punctuation">,</span> target_vec<span class="token punctuation">,</span> topk<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">,</span> exclude<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    exclude <span class="token operator">=</span> exclude <span class="token keyword">or</span> <span class="token builtin">set</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    inv_vocab <span class="token operator">=</span> <span class="token punctuation">{</span>i<span class="token punctuation">:</span> w <span class="token keyword">for</span> w<span class="token punctuation">,</span> i <span class="token keyword">in</span> vocab<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span>
+    norms <span class="token operator">=</span> np<span class="token punctuation">.</span>linalg<span class="token punctuation">.</span>norm<span class="token punctuation">(</span>W<span class="token punctuation">,</span> axis<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span> keepdims<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1e-9</span>
+    W_norm <span class="token operator">=</span> W <span class="token operator">/</span> norms
+    target <span class="token operator">=</span> target_vec <span class="token operator">/</span> <span class="token punctuation">(</span>np<span class="token punctuation">.</span>linalg<span class="token punctuation">.</span>norm<span class="token punctuation">(</span>target_vec<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1e-9</span><span class="token punctuation">)</span>
+    sims <span class="token operator">=</span> W_norm @ target
+    order <span class="token operator">=</span> np<span class="token punctuation">.</span>argsort<span class="token punctuation">(</span><span class="token operator">-</span>sims<span class="token punctuation">)</span>
+    out <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> order<span class="token punctuation">:</span>
+        <span class="token keyword">if</span> i <span class="token keyword">in</span> exclude<span class="token punctuation">:</span>
+            <span class="token keyword">continue</span>
+        out<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">(</span>inv_vocab<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token builtin">float</span><span class="token punctuation">(</span>sims<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>out<span class="token punctuation">)</span> <span class="token operator">==</span> topk<span class="token punctuation">:</span>
+            <span class="token keyword">break</span>
+    <span class="token keyword">return</span> out
+
+
+<span class="token keyword">def</span> <span class="token function">analogy</span><span class="token punctuation">(</span>vocab<span class="token punctuation">,</span> W<span class="token punctuation">,</span> a<span class="token punctuation">,</span> b<span class="token punctuation">,</span> c<span class="token punctuation">,</span> topk<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    v <span class="token operator">=</span> W<span class="token punctuation">[</span>vocab<span class="token punctuation">[</span>b<span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">-</span> W<span class="token punctuation">[</span>vocab<span class="token punctuation">[</span>a<span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">+</span> W<span class="token punctuation">[</span>vocab<span class="token punctuation">[</span>c<span class="token punctuation">]</span><span class="token punctuation">]</span>
+    <span class="token keyword">return</span> nearest<span class="token punctuation">(</span>vocab<span class="token punctuation">,</span> W<span class="token punctuation">,</span> v<span class="token punctuation">,</span> topk<span class="token operator">=</span>topk<span class="token punctuation">,</span> exclude<span class="token operator">=</span><span class="token punctuation">{</span>vocab<span class="token punctuation">[</span>a<span class="token punctuation">]</span><span class="token punctuation">,</span> vocab<span class="token punctuation">[</span>b<span class="token punctuation">]</span><span class="token punctuation">,</span> vocab<span class="token punctuation">[</span>c<span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>On pre-trained 300d Google News vectors:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token operator">>></span><span class="token operator">></span> analogy<span class="token punctuation">(</span>vocab<span class="token punctuation">,</span> W<span class="token punctuation">,</span> <span class="token string">"man"</span><span class="token punctuation">,</span> <span class="token string">"king"</span><span class="token punctuation">,</span> <span class="token string">"woman"</span><span class="token punctuation">)</span>
+<span class="token punctuation">[</span><span class="token punctuation">(</span><span class="token string">'queen'</span><span class="token punctuation">,</span> <span class="token number">0.71</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token string">'monarch'</span><span class="token punctuation">,</span> <span class="token number">0.62</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token string">'princess'</span><span class="token punctuation">,</span> <span class="token number">0.59</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span></code></pre>
+</figure>
+<p><code class="inline-code">king - man + woman = queen</code>. Not because the model knows what royalty is. Because the vector <code class="inline-code">(king - man)</code> captures something like &quot;royal&quot;, and adding it to <code class="inline-code">woman</code> lands near the royal-female region.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>Writing Word2Vec from scratch is teaching. Production NLP uses <code class="inline-code">gensim</code>.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> gensim<span class="token punctuation">.</span>models <span class="token keyword">import</span> Word2Vec
+
+sentences <span class="token operator">=</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">[</span><span class="token string">"the"</span><span class="token punctuation">,</span> <span class="token string">"cat"</span><span class="token punctuation">,</span> <span class="token string">"sat"</span><span class="token punctuation">,</span> <span class="token string">"on"</span><span class="token punctuation">,</span> <span class="token string">"the"</span><span class="token punctuation">,</span> <span class="token string">"mat"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token punctuation">[</span><span class="token string">"the"</span><span class="token punctuation">,</span> <span class="token string">"dog"</span><span class="token punctuation">,</span> <span class="token string">"ran"</span><span class="token punctuation">,</span> <span class="token string">"across"</span><span class="token punctuation">,</span> <span class="token string">"the"</span><span class="token punctuation">,</span> <span class="token string">"room"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">]</span>
+
+model <span class="token operator">=</span> Word2Vec<span class="token punctuation">(</span>
+    sentences<span class="token punctuation">,</span>
+    vector_size<span class="token operator">=</span><span class="token number">100</span><span class="token punctuation">,</span>
+    window<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">,</span>
+    min_count<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span>
+    sg<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span>
+    negative<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">,</span>
+    workers<span class="token operator">=</span><span class="token number">4</span><span class="token punctuation">,</span>
+    epochs<span class="token operator">=</span><span class="token number">30</span><span class="token punctuation">,</span>
+<span class="token punctuation">)</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span>model<span class="token punctuation">.</span>wv<span class="token punctuation">[</span><span class="token string">"cat"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>model<span class="token punctuation">.</span>wv<span class="token punctuation">.</span>most_similar<span class="token punctuation">(</span><span class="token string">"cat"</span><span class="token punctuation">,</span> topn<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>For real work, you almost never train Word2Vec yourself. You download pre-trained vectors.</p>
+<ul>
+<li><strong>GloVe</strong> — Stanford&#39;s co-occurrence-matrix factorization approach. 50d, 100d, 200d, 300d checkpoints. Good general coverage. Lesson 04 covers GloVe specifically.</li>
+<li><strong>fastText</strong> — Facebook&#39;s Word2Vec extension that embeds character n-grams. Handles out-of-vocabulary words by composing subwords. Lesson 04.</li>
+<li><strong>Pretrained Word2Vec on Google News</strong> — 300d, 3M word vocabulary, published 2013. Still downloaded daily.</li>
+</ul>
+<h3 id="when-word2vec-still-wins-in-2026" class="prose-h prose-h3"><a class="prose-h__anchor" href="#when-word2vec-still-wins-in-2026" aria-label="Link to this section">#</a>When Word2Vec still wins in 2026</h3>
+<ul>
+<li>Lightweight domain-specific retrieval. Train on medical abstracts in an hour on a laptop, get specialized vectors no general model captures.</li>
+<li>Analogy-style feature engineering. <code class="inline-code">gender_vector = mean(man - woman pairs)</code>. Subtract it from other words to get a gender-neutral axis. Still used in fairness research.</li>
+<li>Interpretability. 100d is small enough to plot via PCA or t-SNE and actually see clusters form.</li>
+<li>Anywhere inference has to run on-device with no GPU. Word2Vec lookup is a single row fetch.</li>
+</ul>
+<h3 id="where-word2vec-fails" class="prose-h prose-h3"><a class="prose-h__anchor" href="#where-word2vec-fails" aria-label="Link to this section">#</a>Where Word2Vec fails</h3>
+<p>The polysemy wall. <code class="inline-code">bank</code> has one vector. <code class="inline-code">river bank</code> and <code class="inline-code">financial bank</code> share it. <code class="inline-code">table</code> (spreadsheet vs. furniture) shares it. A classifier downstream cannot distinguish the senses from the vector.</p>
+<p>Contextual embeddings (ELMo, BERT, every transformer since) solved this by producing a different vector for each occurrence of the word based on surrounding context. That is the jump from Word2Vec to BERT: from static to contextual. Phase 7 covers the transformer half.</p>
+<p>The out-of-vocabulary problem is the other failure. Word2Vec has never seen <code class="inline-code">Zoomer-approved</code> if it was not in training data. No fallback. fastText fixes this with subword composition (lesson 04).</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>Save as <code class="inline-code">outputs/skill-embedding-probe.md</code>:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">markdown</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-markdown"><span class="token front-matter-block"><span class="token punctuation">---</span>
+<span class="token front-matter yaml language-yaml"><span class="token key atrule">name</span><span class="token punctuation">:</span> embedding<span class="token punctuation">-</span>probe
+<span class="token key atrule">description</span><span class="token punctuation">:</span> Inspect a word2vec model. Run analogies<span class="token punctuation">,</span> find neighbors<span class="token punctuation">,</span> diagnose quality.
+<span class="token key atrule">version</span><span class="token punctuation">:</span> 1.0.0
+<span class="token key atrule">phase</span><span class="token punctuation">:</span> <span class="token number">5</span>
+<span class="token key atrule">lesson</span><span class="token punctuation">:</span> <span class="token number">03</span>
+<span class="token key atrule">tags</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>nlp<span class="token punctuation">,</span> embeddings<span class="token punctuation">,</span> debugging<span class="token punctuation">]</span></span>
+<span class="token punctuation">---</span></span>
+
+You probe trained word embeddings to verify they are working. Given a <span class="token code-snippet code keyword">`gensim.models.KeyedVectors`</span> object and a vocabulary, you run:
+
+<span class="token list punctuation">1.</span> Three canonical analogy tests. <span class="token code-snippet code keyword">`king : man :: queen : woman`</span>. <span class="token code-snippet code keyword">`paris : france :: tokyo : japan`</span>. <span class="token code-snippet code keyword">`walking : walked :: swimming : ?`</span>. Report the top-1 result and its cosine.
+<span class="token list punctuation">2.</span> Five nearest-neighbor tests on domain-specific words the user supplies. Print top-5 neighbors with cosines.
+<span class="token list punctuation">3.</span> One symmetry check. <span class="token code-snippet code keyword">`similarity(a, b) == similarity(b, a)`</span> to within float precision.
+<span class="token list punctuation">4.</span> One degenerate check. If any embedding has a norm below 0.01 or above 100, the model has a training bug. Flag it.
+
+Refuse to declare a model good on analogy accuracy alone. Analogy benchmarks are gameable and do not transfer to downstream tasks. Recommend intrinsic + downstream evaluation together.</code></pre>
+</figure>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><strong>Easy.</strong> Run the training loop on a tiny corpus (20 sentences about cats and dogs). After 200 epochs, verify <code class="inline-code">nearest(vocab, W, W[vocab[&quot;cat&quot;]])</code> returns <code class="inline-code">dog</code> in its top 3. If not, increase epochs or vocabulary.</li>
+<li><strong>Medium.</strong> Add subsampling of frequent words. Words with frequency above <code class="inline-code">10^-5</code> are dropped from training pairs with probability proportional to their frequency. Measure the effect on rare-word similarity.</li>
+<li><strong>Hard.</strong> Train a model on the 20 Newsgroups corpus. Compute two bias axes: <code class="inline-code">he - she</code> and <code class="inline-code">doctor - nurse</code>. Project occupation words onto both axes. Report which occupations have the largest bias gap. This is the kind of probe fairness researchers use.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Word embedding</td>
+<td>Word as a vector</td>
+<td>A dense, low-dim (typically 100-300) representation learned from context.</td>
+</tr>
+<tr>
+<td>Skip-gram</td>
+<td>Word2Vec trick</td>
+<td>Predict context words from center word. Slower than CBOW, better for rare words.</td>
+</tr>
+<tr>
+<td>Negative sampling</td>
+<td>Training shortcut</td>
+<td>Replace softmax over full vocab with binary classification against <code class="inline-code">k</code> random words.</td>
+</tr>
+<tr>
+<td>Static embedding</td>
+<td>One vector per word</td>
+<td>Same vector regardless of context. Fails on polysemy.</td>
+</tr>
+<tr>
+<td>Contextual embedding</td>
+<td>Context-sensitive vector</td>
+<td>Different vector for each occurrence based on surrounding words. What transformers produce.</td>
+</tr>
+<tr>
+<td>OOV</td>
+<td>Out of vocabulary</td>
+<td>Word not seen in training. Word2Vec cannot produce a vector for these.</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/1310.4546" target="_blank" rel="noopener">Mikolov et al. (2013). Distributed Representations of Words and Phrases and their Compositionality</a> — the negative-sampling paper. Short and readable.</li>
+<li><a href="https://arxiv.org/abs/1411.2738" target="_blank" rel="noopener">Rong, X. (2014). word2vec Parameter Learning Explained</a> — the clearest derivation of the gradients, if the original paper&#39;s math feels dense.</li>
+<li><a href="https://radimrehurek.com/gensim/models/word2vec.html" target="_blank" rel="noopener">gensim Word2Vec tutorial</a> — production training settings that actually work.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="02-bag-of-words-tfidf.html">
+  <span class="label">← Previous</span>
+  <b>Bag of Words, TF-IDF, and Text Representation</b>
+</a>
+      <a class="pager__item pager__item--next" href="04-glove-fasttext-subword.html">
+  <span class="label">Next →</span>
+  <b>GloVe, FastText, and Subword Embeddings</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>5 minutes</b> of NLP, Foundations to Advanced behind you.</p>
+      <a class="btn btn--solid" href="04-glove-fasttext-subword.html">Continue to GloVe, FastText, and Subword Embeddings →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-training-pairs-from-a-corpus">Step 1: training pairs from a corpus</a></li><li class="mini__item mini__item--d3"><a href="#step-2-embedding-tables">Step 2: embedding tables</a></li><li class="mini__item mini__item--d3"><a href="#step-3-negative-sampling-objective">Step 3: negative sampling objective</a></li><li class="mini__item mini__item--d3"><a href="#step-4-train-on-a-toy-corpus">Step 4: train on a toy corpus</a></li><li class="mini__item mini__item--d3"><a href="#step-5-the-analogy-trick">Step 5: the analogy trick</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d3"><a href="#when-word2vec-still-wins-in-2026">When Word2Vec still wins in 2026</a></li><li class="mini__item mini__item--d3"><a href="#where-word2vec-fails">Where Word2Vec fails</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

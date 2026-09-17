@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reward Modeling &amp; RLHF — Reinforcement Learning — AIFS</title>
+<meta name="description" content="Reinforcement Learning: Reward Modeling &amp; RLHF. 7 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Reward Modeling &amp; RLHF — Reinforcement Learning — AIFS">
+<meta property="og:description" content="Reinforcement Learning: Reward Modeling &amp; RLHF. 7 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"reward-model":["../assets/figures/figures-alignment2.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-alignment2.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#FFB800" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#FFB800;--accent-ink:#111111"
+  data-lesson-id="reinforcement-learning/09-reward-modeling-rlhf" data-module="reinforcement-learning"
+  data-prev="08-ppo.html" data-next="10-multi-agent-rl.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#FFB800">
+        <span class="label">Phase 09</span>
+        <b>Reinforcement Learning</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="reinforcement-learning/01-mdps-states-actions-rewards"><a href="01-mdps-states-actions-rewards.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">MDPs, States, Actions &amp; Rewards</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/02-dynamic-programming"><a href="02-dynamic-programming.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Dynamic Programming — Policy Iteration &amp; Value Iteration</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/03-monte-carlo-methods"><a href="03-monte-carlo-methods.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Monte Carlo Methods — Learning from Complete Episodes</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/04-q-learning-sarsa"><a href="04-q-learning-sarsa.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Temporal Difference — Q-Learning &amp; SARSA</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/05-dqn"><a href="05-dqn.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Deep Q-Networks (DQN)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/06-policy-gradients-reinforce"><a href="06-policy-gradients-reinforce.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Policy Gradient — REINFORCE from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/07-actor-critic-a2c-a3c"><a href="07-actor-critic-a2c-a3c.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Actor-Critic — A2C and A3C</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/08-ppo"><a href="08-ppo.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Proximal Policy Optimization (PPO)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/09-reward-modeling-rlhf"><a href="09-reward-modeling-rlhf.html" class="is-current">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Reward Modeling &amp; RLHF</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/10-multi-agent-rl"><a href="10-multi-agent-rl.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Multi-Agent RL</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/11-sim-to-real-transfer"><a href="11-sim-to-real-transfer.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Sim-to-Real Transfer</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/12-rl-for-games"><a href="12-rl-for-games.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">RL for Games — AlphaZero, MuZero, and the LLM-Reasoning Era</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Reinforcement Learning</a></p>
+      <h1 class="page__title">Reward Modeling &amp; RLHF</h1>
+      <p class="page__lede">Humans cannot write a reward function for &quot;good assistant response,&quot; but they can compare two responses and pick the better one. Fit a reward model to those comparisons, then RL the language model against it. Christiano 2017. InstructGPT 2022. The recipe that turned GPT-3 into ChatGPT. In 2026 it is mostly being replaced by DPO — but the mental model stays.</p>
+      <div class="page__meta">
+        <span class="chip">7 min read</span>
+        <span class="chip">1,647 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 5 · 05 (Sentiment), Phase 9 · 08 (PPO)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~45 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>You trained a language model on the next-token-prediction objective. It writes grammatical English. It also lies, rambles, and refuses to refuse. You cannot fix this with more pretraining — web text is the problem, not the cure.</p>
+<p>You want a <em>scalar reward</em> that says &quot;response A is better than response B for instruction X.&quot; Writing that reward function by hand is impossible. &quot;Helpfulness&quot; is not a closed-form expression over tokens. But humans can compare two outputs and mark a preference. That is cheap to collect at scale.</p>
+<p>RLHF (Christiano et al. 2017; Ouyang et al. 2022) converts preferences into a reward model, then optimizes the LM via PPO against that reward. In three steps: SFT → RM → PPO. It is the recipe that shipped ChatGPT, Claude, Gemini, and every other aligned-LLM in 2023–2025.</p>
+<p>In 2026 the PPO step is mostly replaced by DPO (Phase 10 · 08) because it is cheaper and nearly as good for alignment tuning. But the <em>reward model</em> piece still underlies every Best-of-N sampler, every RL-from-verifiable-rewards pipeline, and every reasoning model using a process reward model. Understand RLHF and you understand the entire alignment stack.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<p><img src="assets/09-reward-modeling-rlhf/rlhf.svg" alt="Three-stage RLHF: SFT, RM training on pairwise prefs, PPO with KL penalty" loading="lazy"></p>
+<p><strong>Stage 1: Supervised Fine-Tuning (SFT).</strong> Start from a pretrained base model. Fine-tune on human-written demonstrations of the target behavior (instruction-following responses, helpful replies, etc.). Result: a model <code class="inline-code">π_SFT</code> that is <em>biased toward good behavior</em> but still has an unbounded action space.</p>
+<p><strong>Stage 2: Reward Model training.</strong></p>
+<ul>
+<li><p>Collect pairs of responses <code class="inline-code">(y_+, y_-)</code> to prompts <code class="inline-code">x</code>, labeled by humans as &quot;y_+ is preferred over y_-.&quot;</p>
+</li>
+<li><p>Train a reward model <code class="inline-code">R_φ(x, y)</code> to assign higher scores to <code class="inline-code">y_+</code>.</p>
+</li>
+<li><p>Loss: the <strong>Bradley-Terry pairwise logistic</strong>:</p>
+<p><code class="inline-code">L(φ) = -E[ log σ(R_φ(x, y_+) - R_φ(x, y_-)) ]</code></p>
+<p>σ is the sigmoid. The difference in reward implies a log-odds of preference. BT has been the standard since 1952 (Bradley-Terry) and is the dominant choice in modern RLHF.</p>
+</li>
+<li><p><code class="inline-code">R_φ</code> is usually initialized from the SFT model with a scalar head on top. Same transformer backbone; a single linear layer outputs the reward.</p>
+</li>
+</ul>
+<p><strong>Stage 3: PPO against the RM with KL penalty.</strong></p>
+<ul>
+<li><p>Initialize the trainable policy <code class="inline-code">π_θ</code> from <code class="inline-code">π_SFT</code>. Keep a frozen <em>reference</em> <code class="inline-code">π_ref = π_SFT</code>.</p>
+</li>
+<li><p>Reward at the end of a response <code class="inline-code">y</code>:</p>
+<p><code class="inline-code">r_total(x, y) = R_φ(x, y) - β · KL(π_θ(·|x) || π_ref(·|x))</code></p>
+<p>The KL penalty prevents <code class="inline-code">π_θ</code> from drifting arbitrarily from <code class="inline-code">π_SFT</code> — it is a <em>regularizer</em>, not a hard trust region. <code class="inline-code">β</code> typically <code class="inline-code">0.01</code>-<code class="inline-code">0.05</code>.</p>
+</li>
+<li><p>Run PPO (Lesson 08) with this reward. Advantages are computed on the token-level trajectory, but the RM scores only the full response.</p>
+</li>
+</ul>
+<p><strong>Why the KL?</strong> Without it, PPO will happily find reward-hacking strategies — the RM was only trained on in-distribution completions. An out-of-distribution response might score higher than any human-written one. The KL keeps <code class="inline-code">π_θ</code> near the manifold where the RM was trained. It is the single most important knob in RLHF.</p>
+<p><strong>2026 status:</strong></p>
+<ul>
+<li><strong>DPO</strong> (Rafailov 2023): closed-form algebra collapses Stage 2+3 into a single supervised loss over preference data. No RM, no PPO. Same quality on alignment benchmarks for a fraction of the compute. Covered in Phase 10 · 08.</li>
+<li><strong>GRPO</strong> (DeepSeek 2024–2025): PPO with a group-relative baseline instead of a critic, reward from a <em>verifier</em> (code runs / math answer matches) instead of a human-trained RM. Dominant for reasoning models. Covered in Phase 9 · 12.</li>
+<li><strong>Process reward models (PRMs):</strong> score partial solutions (each reasoning step), used in both RLHF and GRPO variants for reasoning.</li>
+<li><strong>Constitutional AI / RLAIF:</strong> use an aligned LLM to generate preferences instead of humans. Scales the preference budget.</li>
+</ul>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="reward-model"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">reward-model</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> reward model</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<p>This lesson uses tiny synthetic &quot;prompts&quot; and &quot;responses&quot; represented as strings. The RM is a linear scorer over a bag-of-tokens representation. No real LLM — the <em>shape</em> of the pipeline matters, not the scale. See <code class="inline-code">code/main.py</code>.</p>
+<h3 id="step-1-synthetic-preference-data" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-synthetic-preference-data" aria-label="Link to this section">#</a>Step 1: synthetic preference data</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python">PROMPTS <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">"help me"</span><span class="token punctuation">,</span> <span class="token string">"answer me"</span><span class="token punctuation">,</span> <span class="token string">"explain this"</span><span class="token punctuation">]</span>
+GOOD_WORDS <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"clear"</span><span class="token punctuation">,</span> <span class="token string">"specific"</span><span class="token punctuation">,</span> <span class="token string">"kind"</span><span class="token punctuation">,</span> <span class="token string">"thorough"</span><span class="token punctuation">}</span>
+BAD_WORDS <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"vague"</span><span class="token punctuation">,</span> <span class="token string">"rude"</span><span class="token punctuation">,</span> <span class="token string">"wrong"</span><span class="token punctuation">,</span> <span class="token string">"short"</span><span class="token punctuation">}</span>
+
+<span class="token keyword">def</span> <span class="token function">make_pair</span><span class="token punctuation">(</span>rng<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    x <span class="token operator">=</span> rng<span class="token punctuation">.</span>choice<span class="token punctuation">(</span>PROMPTS<span class="token punctuation">)</span>
+    y_good <span class="token operator">=</span> rng<span class="token punctuation">.</span>choice<span class="token punctuation">(</span><span class="token builtin">list</span><span class="token punctuation">(</span>GOOD_WORDS<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">" "</span> <span class="token operator">+</span> rng<span class="token punctuation">.</span>choice<span class="token punctuation">(</span><span class="token builtin">list</span><span class="token punctuation">(</span>GOOD_WORDS<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    y_bad <span class="token operator">=</span> rng<span class="token punctuation">.</span>choice<span class="token punctuation">(</span><span class="token builtin">list</span><span class="token punctuation">(</span>BAD_WORDS<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">" "</span> <span class="token operator">+</span> rng<span class="token punctuation">.</span>choice<span class="token punctuation">(</span><span class="token builtin">list</span><span class="token punctuation">(</span>BAD_WORDS<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span>x<span class="token punctuation">,</span> y_good<span class="token punctuation">,</span> y_bad<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>In real RLHF this is replaced by human labelers. The shape — <code class="inline-code">(prompt, preferred_response, rejected_response)</code> — is identical.</p>
+<h3 id="step-2-bradley-terry-reward-model" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-bradley-terry-reward-model" aria-label="Link to this section">#</a>Step 2: Bradley-Terry reward model</h3>
+<p>Linear score: <code class="inline-code">R(x, y) = w · bag(y)</code>. Train to minimize the BT pairwise log-loss:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">rm_train_step</span><span class="token punctuation">(</span>w<span class="token punctuation">,</span> x<span class="token punctuation">,</span> y_pos<span class="token punctuation">,</span> y_neg<span class="token punctuation">,</span> lr<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    r_pos <span class="token operator">=</span> dot<span class="token punctuation">(</span>w<span class="token punctuation">,</span> bag<span class="token punctuation">(</span>y_pos<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    r_neg <span class="token operator">=</span> dot<span class="token punctuation">(</span>w<span class="token punctuation">,</span> bag<span class="token punctuation">(</span>y_neg<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    p <span class="token operator">=</span> sigmoid<span class="token punctuation">(</span>r_pos <span class="token operator">-</span> r_neg<span class="token punctuation">)</span>
+    <span class="token keyword">for</span> tok<span class="token punctuation">,</span> cnt <span class="token keyword">in</span> bag<span class="token punctuation">(</span>y_pos<span class="token punctuation">)</span><span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        w<span class="token punctuation">[</span>tok<span class="token punctuation">]</span> <span class="token operator">+=</span> lr <span class="token operator">*</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> p<span class="token punctuation">)</span> <span class="token operator">*</span> cnt
+    <span class="token keyword">for</span> tok<span class="token punctuation">,</span> cnt <span class="token keyword">in</span> bag<span class="token punctuation">(</span>y_neg<span class="token punctuation">)</span><span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        w<span class="token punctuation">[</span>tok<span class="token punctuation">]</span> <span class="token operator">-=</span> lr <span class="token operator">*</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> p<span class="token punctuation">)</span> <span class="token operator">*</span> cnt</code></pre>
+</figure>
+<p>After a few hundred updates, <code class="inline-code">w</code> assigns positive weights to good-word tokens and negative to bad.</p>
+<h3 id="step-3-ppo-like-policy-on-top-of-rm" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-ppo-like-policy-on-top-of-rm" aria-label="Link to this section">#</a>Step 3: PPO-like policy on top of RM</h3>
+<p>Our toy policy produces a single token from a vocabulary. We score the token under the RM, compute <code class="inline-code">log π_θ(token | prompt)</code>, add a KL-to-reference penalty, and apply the clipped PPO surrogate.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">rlhf_step</span><span class="token punctuation">(</span>theta<span class="token punctuation">,</span> ref<span class="token punctuation">,</span> w<span class="token punctuation">,</span> prompt<span class="token punctuation">,</span> rng<span class="token punctuation">,</span> eps<span class="token operator">=</span><span class="token number">0.2</span><span class="token punctuation">,</span> beta<span class="token operator">=</span><span class="token number">0.1</span><span class="token punctuation">,</span> lr<span class="token operator">=</span><span class="token number">0.05</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    logits_theta <span class="token operator">=</span> policy_logits<span class="token punctuation">(</span>theta<span class="token punctuation">,</span> prompt<span class="token punctuation">)</span>
+    probs <span class="token operator">=</span> softmax<span class="token punctuation">(</span>logits_theta<span class="token punctuation">)</span>
+    token <span class="token operator">=</span> sample<span class="token punctuation">(</span>probs<span class="token punctuation">,</span> rng<span class="token punctuation">)</span>
+    logits_ref <span class="token operator">=</span> policy_logits<span class="token punctuation">(</span>ref<span class="token punctuation">,</span> prompt<span class="token punctuation">)</span>
+    probs_ref <span class="token operator">=</span> softmax<span class="token punctuation">(</span>logits_ref<span class="token punctuation">)</span>
+    reward <span class="token operator">=</span> dot<span class="token punctuation">(</span>w<span class="token punctuation">,</span> bag<span class="token punctuation">(</span><span class="token punctuation">[</span>token<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">-</span> beta <span class="token operator">*</span> kl<span class="token punctuation">(</span>probs<span class="token punctuation">,</span> probs_ref<span class="token punctuation">)</span>
+    <span class="token comment"># ppo-style update on theta, treating reward as the return</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span></code></pre>
+</figure>
+<h3 id="step-4-monitor-the-kl" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-monitor-the-kl" aria-label="Link to this section">#</a>Step 4: monitor the KL</h3>
+<p>Track mean <code class="inline-code">KL(π_θ || π_ref)</code> every update. If it creeps past <code class="inline-code">~5-10</code> the policy has drifted far from <code class="inline-code">π_SFT</code> — lower <code class="inline-code">β</code> is rising or reward hacking is starting. This is the top diagnostic in real RLHF.</p>
+<h3 id="step-5-the-production-recipe-with-trl" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-the-production-recipe-with-trl" aria-label="Link to this section">#</a>Step 5: the production recipe with TRL</h3>
+<p>Once you understand the toy pipeline, here is the same loop as a real library user writes it. Hugging Face&#39;s <a href="https://huggingface.co/docs/trl" target="_blank" rel="noopener">TRL</a> is the reference implementation — <code class="inline-code">RewardTrainer</code> for Stage 2 and <code class="inline-code">PPOTrainer</code> (with a KL-to-reference built in) for Stage 3.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token comment"># Stage 2: reward model from pairwise preferences</span>
+<span class="token keyword">from</span> trl <span class="token keyword">import</span> RewardTrainer<span class="token punctuation">,</span> RewardConfig
+<span class="token keyword">from</span> transformers <span class="token keyword">import</span> AutoModelForSequenceClassification<span class="token punctuation">,</span> AutoTokenizer
+
+tok <span class="token operator">=</span> AutoTokenizer<span class="token punctuation">.</span>from_pretrained<span class="token punctuation">(</span><span class="token string">"meta-llama/Llama-3.1-8B-Instruct"</span><span class="token punctuation">)</span>
+rm <span class="token operator">=</span> AutoModelForSequenceClassification<span class="token punctuation">.</span>from_pretrained<span class="token punctuation">(</span>
+    <span class="token string">"meta-llama/Llama-3.1-8B-Instruct"</span><span class="token punctuation">,</span> num_labels<span class="token operator">=</span><span class="token number">1</span>
+<span class="token punctuation">)</span>
+
+<span class="token comment"># dataset rows: {"prompt", "chosen", "rejected"} — Bradley-Terry format</span>
+trainer <span class="token operator">=</span> RewardTrainer<span class="token punctuation">(</span>
+    model<span class="token operator">=</span>rm<span class="token punctuation">,</span>
+    tokenizer<span class="token operator">=</span>tok<span class="token punctuation">,</span>
+    train_dataset<span class="token operator">=</span>preference_data<span class="token punctuation">,</span>
+    args<span class="token operator">=</span>RewardConfig<span class="token punctuation">(</span>output_dir<span class="token operator">=</span><span class="token string">"./rm"</span><span class="token punctuation">,</span> num_train_epochs<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span> learning_rate<span class="token operator">=</span><span class="token number">1e-5</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">)</span>
+trainer<span class="token punctuation">.</span>train<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token comment"># Stage 3: PPO against the RM with KL penalty to the SFT reference</span>
+<span class="token keyword">from</span> trl <span class="token keyword">import</span> PPOTrainer<span class="token punctuation">,</span> PPOConfig<span class="token punctuation">,</span> AutoModelForCausalLMWithValueHead
+
+policy <span class="token operator">=</span> AutoModelForCausalLMWithValueHead<span class="token punctuation">.</span>from_pretrained<span class="token punctuation">(</span><span class="token string">"./sft-checkpoint"</span><span class="token punctuation">)</span>
+ref    <span class="token operator">=</span> AutoModelForCausalLMWithValueHead<span class="token punctuation">.</span>from_pretrained<span class="token punctuation">(</span><span class="token string">"./sft-checkpoint"</span><span class="token punctuation">)</span>  <span class="token comment"># frozen</span>
+
+ppo <span class="token operator">=</span> PPOTrainer<span class="token punctuation">(</span>
+    config<span class="token operator">=</span>PPOConfig<span class="token punctuation">(</span>learning_rate<span class="token operator">=</span><span class="token number">1.41e-5</span><span class="token punctuation">,</span> batch_size<span class="token operator">=</span><span class="token number">64</span><span class="token punctuation">,</span> init_kl_coef<span class="token operator">=</span><span class="token number">0.05</span><span class="token punctuation">,</span>
+                     target_kl<span class="token operator">=</span><span class="token number">6.0</span><span class="token punctuation">,</span> adap_kl_ctrl<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    model<span class="token operator">=</span>policy<span class="token punctuation">,</span> ref_model<span class="token operator">=</span>ref<span class="token punctuation">,</span> tokenizer<span class="token operator">=</span>tok<span class="token punctuation">,</span>
+<span class="token punctuation">)</span>
+
+<span class="token keyword">for</span> batch <span class="token keyword">in</span> dataloader<span class="token punctuation">:</span>
+    responses <span class="token operator">=</span> ppo<span class="token punctuation">.</span>generate<span class="token punctuation">(</span>batch<span class="token punctuation">[</span><span class="token string">"query_ids"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> max_new_tokens<span class="token operator">=</span><span class="token number">128</span><span class="token punctuation">)</span>
+    rewards   <span class="token operator">=</span> rm<span class="token punctuation">(</span>torch<span class="token punctuation">.</span>cat<span class="token punctuation">(</span><span class="token punctuation">[</span>batch<span class="token punctuation">[</span><span class="token string">"query_ids"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> responses<span class="token punctuation">]</span><span class="token punctuation">,</span> dim<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span>logits<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">]</span>
+    stats     <span class="token operator">=</span> ppo<span class="token punctuation">.</span>step<span class="token punctuation">(</span>batch<span class="token punctuation">[</span><span class="token string">"query_ids"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> responses<span class="token punctuation">,</span> rewards<span class="token punctuation">)</span>
+    <span class="token comment"># stats includes: mean_kl, clip_frac, value_loss — the three PPO diagnostics</span></code></pre>
+</figure>
+<p>Three things the library does for you. <code class="inline-code">adap_kl_ctrl=True</code> implements the adaptive-β schedule: if observed KL exceeds <code class="inline-code">target_kl</code>, β doubles; if below half, β halves. The reference model is frozen by convention — you must not accidentally share parameters with <code class="inline-code">policy</code>. And the value head lives on the same backbone as the policy (<code class="inline-code">AutoModelForCausalLMWithValueHead</code> attaches a scalar MLP head), which is why TRL reports <code class="inline-code">policy/kl</code> and <code class="inline-code">value/loss</code> separately.</p>
+<h2 id="pitfalls" class="prose-h prose-h2"><a class="prose-h__anchor" href="#pitfalls" aria-label="Link to this section">#</a>Pitfalls</h2>
+<ul>
+<li><strong>Over-optimization / reward hacking.</strong> The RM is imperfect; <code class="inline-code">π_θ</code> finds adversarial completions that score high but are bad. Symptoms: reward climbs indefinitely while human eval score plateaus or drops. Fix: stop early, raise <code class="inline-code">β</code>, broaden RM training data.</li>
+<li><strong>Length hacking.</strong> RMs trained on helpful responses often implicitly reward length. The policy learns to pad responses. Remediation: length-normalized reward, or RLAIF with a length-aware RM.</li>
+<li><strong>Too-small RM.</strong> The RM needs to be at least as large as the policy. A tiny RM cannot faithfully score the policy&#39;s outputs.</li>
+<li><strong>KL tuning.</strong> Too low β → drift and reward hacking. Too high β → policy barely changes. The standard trick is an <em>adaptive</em> β that targets a fixed KL per step.</li>
+<li><strong>Preference-data noise.</strong> ~30% of human labels are noisy or ambiguous. Calibrate by training the RM on agreement-filtered data or use a temperature on BT.</li>
+<li><strong>Off-policy problems.</strong> PPO data is slightly off-policy after the first epoch. Monitor clip fraction as in Lesson 08.</li>
+</ul>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>RLHF in 2026 is layered:</p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Target</th>
+<th>Method</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Instruction following, helpfulness, harmlessness</td>
+<td>Alignment</td>
+<td>DPO (Phase 10 · 08) preferred over RLHF-PPO.</td>
+</tr>
+<tr>
+<td>Reasoning correctness (math, code)</td>
+<td>Capability</td>
+<td>GRPO with verifier reward (Phase 9 · 12).</td>
+</tr>
+<tr>
+<td>Long-horizon multi-step tasks</td>
+<td>Agentic</td>
+<td>PPO / GRPO with process reward models over steps.</td>
+</tr>
+<tr>
+<td>Safety / refusal behavior</td>
+<td>Safety</td>
+<td>RLHF-PPO with separate safety RM, or Constitutional AI.</td>
+</tr>
+<tr>
+<td>Best-of-N at inference</td>
+<td>Fast alignment</td>
+<td>Use RM at decode time; no policy training needed.</td>
+</tr>
+<tr>
+<td>Reward distillation</td>
+<td>Inference compute</td>
+<td>Train a small &quot;reward head&quot; on top of a frozen LM.</td>
+</tr>
+</tbody></table>
+<p>RLHF was <em>the</em> method in 2022–2024. In 2026, production alignment pipelines are DPO-first, PPO-only for the RM-intensive or safety-critical steps.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>Save as <code class="inline-code">outputs/skill-rlhf-architect.md</code>:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">markdown</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-markdown"><span class="token front-matter-block"><span class="token punctuation">---</span>
+<span class="token front-matter yaml language-yaml"><span class="token key atrule">name</span><span class="token punctuation">:</span> rlhf<span class="token punctuation">-</span>architect
+<span class="token key atrule">description</span><span class="token punctuation">:</span> Design an RLHF / DPO / GRPO alignment pipeline for a language model<span class="token punctuation">,</span> including RM<span class="token punctuation">,</span> KL<span class="token punctuation">,</span> and data strategy.
+<span class="token key atrule">version</span><span class="token punctuation">:</span> 1.0.0
+<span class="token key atrule">phase</span><span class="token punctuation">:</span> <span class="token number">9</span>
+<span class="token key atrule">lesson</span><span class="token punctuation">:</span> <span class="token number">9</span>
+<span class="token key atrule">tags</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>rl<span class="token punctuation">,</span> rlhf<span class="token punctuation">,</span> alignment<span class="token punctuation">,</span> llm<span class="token punctuation">]</span></span>
+<span class="token punctuation">---</span></span>
+
+Given a base LM, a target behavior (alignment / reasoning / refusal / agent), and a preference or verifier budget, output:
+
+<span class="token list punctuation">1.</span> Stage. SFT? RM? DPO? GRPO? With justification.
+<span class="token list punctuation">2.</span> Preference or verifier source. Humans, AI feedback, rule-based, unit-test-pass, or reward distillation.
+<span class="token list punctuation">3.</span> KL strategy. Fixed β, adaptive β, or DPO (implicit KL).
+<span class="token list punctuation">4.</span> Diagnostics. Mean KL, reward stability, over-optimization guard (holdout human eval).
+<span class="token list punctuation">5.</span> Safety gate. Red-team set, refusal rate, safety RM separate from helpfulness RM.
+
+Refuse to ship RLHF-PPO without a KL monitor. Refuse to use an RM smaller than the target policy. Refuse length-only rewards. Flag any pipeline that does not hold back a blind human-eval set as lacking over-optimization protection.</code></pre>
+</figure>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><strong>Easy.</strong> Train the Bradley-Terry reward model in <code class="inline-code">code/main.py</code> on 500 synthetic preference pairs. Measure pairwise accuracy on a held-out 100 pairs. Should exceed 90%.</li>
+<li><strong>Medium.</strong> Run the toy PPO-RLHF loop with <code class="inline-code">β ∈ {0.0, 0.1, 1.0}</code>. For each, plot RM score vs KL-to-reference over updates. Which runs reward-hack?</li>
+<li><strong>Hard.</strong> Implement DPO (closed-form preference-likelihood loss) on the same preference data and compare to the RLHF-PPO pipeline in compute used and final RM score achieved.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>RLHF</td>
+<td>&quot;Alignment RL&quot;</td>
+<td>Three-stage SFT + RM + PPO pipeline (Christiano 2017, Ouyang 2022).</td>
+</tr>
+<tr>
+<td>Reward Model (RM)</td>
+<td>&quot;The scoring net&quot;</td>
+<td>Learned scalar function fit to pairwise preferences via Bradley-Terry.</td>
+</tr>
+<tr>
+<td>Bradley-Terry</td>
+<td>&quot;Pairwise logistic loss&quot;</td>
+<td><code class="inline-code">P(y_+ ≻ y_-) = σ(R(y_+) - R(y_-))</code>; the standard RM objective.</td>
+</tr>
+<tr>
+<td>KL penalty</td>
+<td>&quot;Stay near the reference&quot;</td>
+<td><code class="inline-code">β · KL(π_θ || π_ref)</code> in the reward; the anti-reward-hacking regularizer.</td>
+</tr>
+<tr>
+<td>Reward hacking</td>
+<td>&quot;Goodhart&#39;s law&quot;</td>
+<td>Policy exploits RM flaws; symptoms: reward up, human eval flat.</td>
+</tr>
+<tr>
+<td>RLAIF</td>
+<td>&quot;AI-labeled preferences&quot;</td>
+<td>RLHF where labels come from another LM instead of humans.</td>
+</tr>
+<tr>
+<td>PRM</td>
+<td>&quot;Process Reward Model&quot;</td>
+<td>Scores partial reasoning steps; used in reasoning pipelines.</td>
+</tr>
+<tr>
+<td>Constitutional AI</td>
+<td>&quot;Anthropic&#39;s method&quot;</td>
+<td>AI-generated preferences guided by explicit rules.</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/1706.03741" target="_blank" rel="noopener">Christiano et al. (2017). Deep Reinforcement Learning from Human Preferences</a> — the paper that started RLHF.</li>
+<li><a href="https://arxiv.org/abs/2203.02155" target="_blank" rel="noopener">Ouyang et al. (2022). InstructGPT — Training language models to follow instructions with human feedback</a> — the recipe behind ChatGPT.</li>
+<li><a href="https://arxiv.org/abs/2009.01325" target="_blank" rel="noopener">Stiennon et al. (2020). Learning to summarize with human feedback</a> — earlier RLHF for summarization.</li>
+<li><a href="https://arxiv.org/abs/2305.18290" target="_blank" rel="noopener">Rafailov et al. (2023). Direct Preference Optimization</a> — DPO; the post-RLHF default in 2026.</li>
+<li><a href="https://arxiv.org/abs/2212.08073" target="_blank" rel="noopener">Bai et al. (2022). Constitutional AI: Harmlessness from AI Feedback</a> — RLAIF and self-critique loop.</li>
+<li><a href="https://arxiv.org/abs/2204.05862" target="_blank" rel="noopener">Anthropic RLHF paper (Bai et al. 2022). Training a Helpful and Harmless Assistant</a> — the HH paper.</li>
+<li><a href="https://huggingface.co/docs/trl" target="_blank" rel="noopener">Hugging Face TRL library</a> — production <code class="inline-code">RewardTrainer</code> and <code class="inline-code">PPOTrainer</code>. Read the trainer source for the adaptive-KL and value-head details.</li>
+<li><a href="https://huggingface.co/blog/rlhf" target="_blank" rel="noopener">Hugging Face — Illustrating Reinforcement Learning from Human Feedback</a> by Lambert, Castricato, von Werra, Havrilla — the canonical walk-through of the three-stage pipeline with diagrams.</li>
+<li><a href="https://github.com/huggingface/trl" target="_blank" rel="noopener">von Werra et al. (2020). TRL: Transformer Reinforcement Learning</a> — the library; <code class="inline-code">examples/</code> has end-to-end RLHF scripts for Llama, Mistral, and Qwen.</li>
+<li><a href="http://incompleteideas.net/book/RLbook2020.pdf" target="_blank" rel="noopener">Sutton &amp; Barto (2018). Ch. 17.4 — Designing Reward Signals</a> — the reward-hypothesis view; essential prerequisite for thinking about reward hacking.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="08-ppo.html">
+  <span class="label">← Previous</span>
+  <b>Proximal Policy Optimization (PPO)</b>
+</a>
+      <a class="pager__item pager__item--next" href="10-multi-agent-rl.html">
+  <span class="label">Next →</span>
+  <b>Multi-Agent RL</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>7 minutes</b> of Reinforcement Learning behind you.</p>
+      <a class="btn btn--solid" href="10-multi-agent-rl.html">Continue to Multi-Agent RL →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-synthetic-preference-data">Step 1: synthetic preference data</a></li><li class="mini__item mini__item--d3"><a href="#step-2-bradley-terry-reward-model">Step 2: Bradley-Terry reward model</a></li><li class="mini__item mini__item--d3"><a href="#step-3-ppo-like-policy-on-top-of-rm">Step 3: PPO-like policy on top of RM</a></li><li class="mini__item mini__item--d3"><a href="#step-4-monitor-the-kl">Step 4: monitor the KL</a></li><li class="mini__item mini__item--d3"><a href="#step-5-the-production-recipe-with-trl">Step 5: the production recipe with TRL</a></li><li class="mini__item mini__item--d2"><a href="#pitfalls">Pitfalls</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

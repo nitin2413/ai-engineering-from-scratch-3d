@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLM Routing Layer — LiteLLM, OpenRouter, Portkey — Tools &amp; Protocols — AIFS</title>
+<meta name="description" content="Tools &amp; Protocols: LLM Routing Layer — LiteLLM, OpenRouter, Portkey. 5 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="LLM Routing Layer — LiteLLM, OpenRouter, Portkey — Tools &amp; Protocols — AIFS">
+<meta property="og:description" content="Tools &amp; Protocols: LLM Routing Layer — LiteLLM, OpenRouter, Portkey. 5 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"tp-router-failover":["../assets/figures/figures-tools2.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-tools2.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#C6FF00" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#C6FF00;--accent-ink:#111111"
+  data-lesson-id="tools-and-protocols/21-llm-routing-layer" data-module="tools-and-protocols"
+  data-prev="20-opentelemetry-genai.html" data-next="22-skills-and-agent-sdks.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#C6FF00">
+        <span class="label">Phase 13</span>
+        <b>Tools &amp; Protocols</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="tools-and-protocols/01-the-tool-interface"><a href="01-the-tool-interface.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">The Tool Interface — Why Agents Need Structured I/O</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/02-function-calling-deep-dive"><a href="02-function-calling-deep-dive.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Function Calling Deep Dive — OpenAI, Anthropic, Gemini</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/03-parallel-and-streaming-tool-calls"><a href="03-parallel-and-streaming-tool-calls.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Parallel Tool Calls and Streaming with Tools</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/04-structured-output"><a href="04-structured-output.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Structured Output — JSON Schema, Pydantic, Zod, Constrained Decoding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/05-tool-schema-design"><a href="05-tool-schema-design.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Tool Schema Design — Naming, Descriptions, Parameter Constraints</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/06-mcp-fundamentals"><a href="06-mcp-fundamentals.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">MCP Fundamentals: Stateless Requests and JSON-RPC</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/07-building-an-mcp-server"><a href="07-building-an-mcp-server.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Building an MCP Server: Stateless Python and TypeScript</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/08-building-an-mcp-client"><a href="08-building-an-mcp-client.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Building an MCP Client: Discovery, Routing, and Dual-Era Fallback</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/09-mcp-transports"><a href="09-mcp-transports.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">MCP Transports: stdio and Stateless Streamable HTTP</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/10-mcp-resources-and-prompts"><a href="10-mcp-resources-and-prompts.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">MCP Resources and Prompts: Addressable Context for Stateless Servers</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/11-mcp-sampling"><a href="11-mcp-sampling.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">MCP Model Input: Sampling Migration and Stateless MRTR</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/12-mcp-roots-and-elicitation"><a href="12-mcp-roots-and-elicitation.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Explicit Scope and Stateless Elicitation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/13-mcp-async-tasks"><a href="13-mcp-async-tasks.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">MCP Tasks Extension: Durable Work on a Stateless Core</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/14-mcp-apps"><a href="14-mcp-apps.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">MCP Apps on the Stateless Protocol</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/15-mcp-security-tool-poisoning"><a href="15-mcp-security-tool-poisoning.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">MCP Security: Poisoned Metadata, Routing, and MRTR State</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/16-mcp-security-oauth-2-1"><a href="16-mcp-security-oauth-2-1.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">MCP Authorization: CIMD, Issuer Binding, PKCE, and Step-Up</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/17-mcp-gateways-and-registries"><a href="17-mcp-gateways-and-registries.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Stateless MCP Gateways and Registry Admission</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/18-mcp-auth-production"><a href="18-mcp-auth-production.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">MCP Auth in Production: Issuer-Bound Enrollment and Tokens</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/19-a2a-protocol"><a href="19-a2a-protocol.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">A2A — Agent-to-Agent Protocol</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/20-opentelemetry-genai"><a href="20-opentelemetry-genai.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">OpenTelemetry GenAI — Tracing Tool Calls End-to-End</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/21-llm-routing-layer"><a href="21-llm-routing-layer.html" class="is-current">
+  <span class="snav__n">21</span>
+  <span class="snav__t">LLM Routing Layer — LiteLLM, OpenRouter, Portkey</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/22-skills-and-agent-sdks"><a href="22-skills-and-agent-sdks.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Agent Skills: Portable Contract and Runtime Boundary</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/23-capstone-tool-ecosystem"><a href="23-capstone-tool-ecosystem.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Capstone: Stateless Tool Ecosystem</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/24-skill-discovery-and-progressive-disclosure"><a href="24-skill-discovery-and-progressive-disclosure.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Skill Discovery and Progressive Disclosure</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/25-skill-invocation-and-routing"><a href="25-skill-invocation-and-routing.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Skill Invocation and Routing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/26-skill-permissions-sandboxes-and-trust"><a href="26-skill-permissions-sandboxes-and-trust.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Skill Permissions, Sandboxes, and Trust</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/27-skill-evals-packaging-and-portability"><a href="27-skill-evals-packaging-and-portability.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">Skill Evals, Packaging, and Portability</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/28-mcp-tool-contracts-and-content"><a href="28-mcp-tool-contracts-and-content.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">MCP Tool Contracts and Content</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control"><a href="29-mcp-reliability-cancellation-and-flow-control.html" class="">
+  <span class="snav__n">29</span>
+  <span class="snav__t">MCP Reliability, Cancellation, and Flow Control</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/30-mcp-registry-supply-chain-and-drift"><a href="30-mcp-registry-supply-chain-and-drift.html" class="">
+  <span class="snav__n">30</span>
+  <span class="snav__t">MCP Registry Supply Chain: Admission, Drift, and Rollback</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/31-mcp-conformance-versioning-and-operations"><a href="31-mcp-conformance-versioning-and-operations.html" class="">
+  <span class="snav__n">31</span>
+  <span class="snav__t">MCP Conformance Engineering: Versioning, Evidence, and Operations</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Tools &amp; Protocols</a></p>
+      <h1 class="page__title">LLM Routing Layer — LiteLLM, OpenRouter, Portkey</h1>
+      <p class="page__lede">Provider lock-in is expensive. Different tool-calling workloads suit different models. Routing gateways give one API surface, retries, failover, cost tracking, and guardrails. Three archetypes dominate 2026: LiteLLM (open-source self-hosted), OpenRouter (managed SaaS), Portkey (production-grade, open-sourced in March 2026). This lesson names the decision criteria and walks a stdlib routing gateway.</p>
+      <div class="page__meta">
+        <span class="chip">5 min read</span>
+        <span class="chip">995 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Learn</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (stdlib, routing + failover + cost tracker)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 13 · 02 (function calling), Phase 13 · 17 (gateways)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~45 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Distinguish self-hosted, managed, and production-grade routing options.</li>
+<li>Implement a fallback chain that retries on provider failures in a defined priority order.</li>
+<li>Track per-request cost and token usage across providers.</li>
+<li>Decide between LiteLLM, OpenRouter, and Portkey for a given production constraint.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Scenarios where provider routing matters:</p>
+<ol>
+<li><p><strong>Cost.</strong> Claude Sonnet costs 3x what Haiku costs. For a triage task, Haiku is enough; for a synthesis task, Sonnet is worth it. Route per-request.</p>
+</li>
+<li><p><strong>Failover.</strong> OpenAI has a bad hour. Every request fails. You want automatic fallback to Anthropic without redeploying.</p>
+</li>
+<li><p><strong>Latency.</strong> A live chat UI needs fast time-to-first-token. A batch summarizer does not. Route by latency SLA.</p>
+</li>
+<li><p><strong>Compliance.</strong> EU users must stay in EU regions. Route by region.</p>
+</li>
+<li><p><strong>Experimentation.</strong> A/B two models on the same workload. Route by test bucket.</p>
+</li>
+</ol>
+<p>Hand-coding all of this per integration is repetitive. A routing gateway gives one OpenAI-compatible API and handles the rest.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="openai-compatible-proxy-shape" class="prose-h prose-h3"><a class="prose-h__anchor" href="#openai-compatible-proxy-shape" aria-label="Link to this section">#</a>OpenAI-compatible proxy shape</h3>
+<p>Everyone speaks OpenAI-shape. The routing gateway exposes <code class="inline-code">/v1/chat/completions</code>, accepts the OpenAI schema, and internally proxies to Anthropic / Gemini / Cohere / Ollama / anything. The client does not care.</p>
+<h3 id="model-aliases" class="prose-h prose-h3"><a class="prose-h__anchor" href="#model-aliases" aria-label="Link to this section">#</a>Model aliases</h3>
+<p>Instead of a pinned snapshot id, your code says <code class="inline-code">our_smart_model</code>. The gateway maps aliases to real models. When a provider ships a new generation, you change the alias server-side; your code does not touch a thing.</p>
+<h3 id="fallback-chains" class="prose-h prose-h3"><a class="prose-h__anchor" href="#fallback-chains" aria-label="Link to this section">#</a>Fallback chains</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>primary: openai/gpt-4o
+on 5xx: anthropic/claude-3-5-sonnet
+on 5xx: google/gemini-1.5-pro
+on 5xx: refuse</code></pre>
+</figure>
+<p>Gateways define this in a config. Retries count against a budget so fallback cascades do not explode cost.</p>
+<h3 id="semantic-caching" class="prose-h prose-h3"><a class="prose-h__anchor" href="#semantic-caching" aria-label="Link to this section">#</a>Semantic caching</h3>
+<p>Identical-or-near-identical prompts hit a cache instead of the provider. Savings on repeated agent loops can be 30 to 60 percent. Keys are embedding-based; near-identical prompts share a cache slot.</p>
+<h3 id="guardrails" class="prose-h prose-h3"><a class="prose-h__anchor" href="#guardrails" aria-label="Link to this section">#</a>Guardrails</h3>
+<p>Gateway-level:</p>
+<ul>
+<li><strong>PII redaction.</strong> Regex or ML-based pass before sending prompts.</li>
+<li><strong>Policy violations.</strong> Reject prompts with prohibited content.</li>
+<li><strong>Output filters.</strong> Scrub completions for leaks.</li>
+</ul>
+<p>Portkey and Kong both ship opinionated guardrails. LiteLLM leaves them optional.</p>
+<h3 id="per-key-rate-limits" class="prose-h prose-h3"><a class="prose-h__anchor" href="#per-key-rate-limits" aria-label="Link to this section">#</a>Per-key rate limits</h3>
+<p>One API key = one team. Per-key budgets prevent one team from consuming the shared quota. Most gateways support this.</p>
+<h3 id="self-hosted-vs-managed-trade-offs" class="prose-h prose-h3"><a class="prose-h__anchor" href="#self-hosted-vs-managed-trade-offs" aria-label="Link to this section">#</a>Self-hosted vs managed trade-offs</h3>
+<table>
+<thead>
+<tr>
+<th>Factor</th>
+<th>LiteLLM (self-hosted)</th>
+<th>OpenRouter (managed)</th>
+<th>Portkey (production)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Code</td>
+<td>Open source, Python</td>
+<td>Managed SaaS</td>
+<td>Open source (Mar 2026) + managed</td>
+</tr>
+<tr>
+<td>Setup</td>
+<td>Deploy a proxy</td>
+<td>Sign up</td>
+<td>Either</td>
+</tr>
+<tr>
+<td>Providers</td>
+<td>100+</td>
+<td>300+</td>
+<td>100+</td>
+</tr>
+<tr>
+<td>Billing</td>
+<td>Your own keys</td>
+<td>OpenRouter credits</td>
+<td>Your own keys</td>
+</tr>
+<tr>
+<td>Observability</td>
+<td>OpenTelemetry</td>
+<td>Dashboard</td>
+<td>Full OTel + PII redaction</td>
+</tr>
+<tr>
+<td>Best for</td>
+<td>Teams that want full control</td>
+<td>Rapid prototyping</td>
+<td>Production with compliance</td>
+</tr>
+</tbody></table>
+<p>LiteLLM wins when you have an SRE team and want data sovereignty. OpenRouter wins when you want a single subscription and no infra. Portkey wins when you need guardrails and compliance out of the box.</p>
+<h3 id="cost-tracking" class="prose-h prose-h3"><a class="prose-h__anchor" href="#cost-tracking" aria-label="Link to this section">#</a>Cost tracking</h3>
+<p>Every request carries <code class="inline-code">provider</code>, <code class="inline-code">model</code>, <code class="inline-code">input_tokens</code>, <code class="inline-code">output_tokens</code>. Multiply by per-model per-token prices (pulled from a pricing sheet the gateway maintains). Per-user / per-team / per-project aggregation.</p>
+<h3 id="mcp-plus-routing" class="prose-h prose-h3"><a class="prose-h__anchor" href="#mcp-plus-routing" aria-label="Link to this section">#</a>MCP plus routing</h3>
+<p>A gateway can route both LLM calls AND MCP sampling requests. When a sampling request&#39;s modelPreferences prefer a specific model, the gateway translates to the right backend. This is where Phase 13 · 17 (MCP gateway) and this lesson&#39;s routing gateway sometimes merge into one service.</p>
+<h3 id="routing-strategies" class="prose-h prose-h3"><a class="prose-h__anchor" href="#routing-strategies" aria-label="Link to this section">#</a>Routing strategies</h3>
+<ul>
+<li><strong>Static priority.</strong> First in list; fall back on error.</li>
+<li><strong>Load balancing.</strong> Round-robin or weighted.</li>
+<li><strong>Cost-aware.</strong> Pick the cheapest model meeting latency / quality.</li>
+<li><strong>Latency-aware.</strong> Pick the fastest model in the last N minutes.</li>
+<li><strong>Task-aware.</strong> Prompt classifier routes coding to one model, summarization to another.</li>
+</ul>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="tp-router-failover"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">tp-router-failover</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> tp router failover</figcaption>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p><code class="inline-code">code/main.py</code> implements a routing gateway in ~150 lines: accepts OpenAI-shaped requests, translates to per-provider stubs, runs a priority fallback chain, tracks per-request cost, and applies a PII redaction pass on inputs. Run it with three scenarios: normal request, primary-provider outage triggering fallback, PII leakage caught by redaction.</p>
+<p>What to look at:</p>
+<ul>
+<li><code class="inline-code">ROUTES</code> dict: alias -&gt; priority-ordered list of concrete providers.</li>
+<li>Fallback loop retries on 5xx.</li>
+<li>Cost tracker multiplies token usage by per-model rates.</li>
+<li>PII redactor scrubs SSN-shaped patterns before forwarding.</li>
+</ul>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces <code class="inline-code">outputs/skill-routing-config-designer.md</code>. Given a workload profile (latency, cost, compliance), the skill picks LiteLLM / OpenRouter / Portkey and produces a routing config.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p>Run <code class="inline-code">code/main.py</code>. Trigger the outage scenario; confirm fallback lands on the second provider and cost is attributed correctly.</p>
+</li>
+<li><p>Add semantic caching: SHA256 of the prompt is a lookup key; cache hits return instantly. Measure cost savings on a repeated call.</p>
+</li>
+<li><p>Add a prompt classifier that routes &quot;code ...&quot; prompts to an alias favoring intelligence and &quot;summarize ...&quot; prompts to an alias favoring speed.</p>
+</li>
+<li><p>Design per-team budgets: each team has a monthly spend cap; gateway refuses requests once cap is hit. Pick an enforcement granularity (per-request or windowed).</p>
+</li>
+<li><p>Read LiteLLM, OpenRouter, and Portkey docs side by side. Name the one feature each ships that the other two do not.</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Routing gateway</td>
+<td>&quot;LLM proxy&quot;</td>
+<td>One-API-surface layer in front of many providers</td>
+</tr>
+<tr>
+<td>OpenAI-compatible</td>
+<td>&quot;Speaks the OpenAI schema&quot;</td>
+<td>Accepts <code class="inline-code">/v1/chat/completions</code> shape, translates to any backend</td>
+</tr>
+<tr>
+<td>Model alias</td>
+<td>&quot;our_smart_model&quot;</td>
+<td>Name in your code that the gateway maps to a concrete model</td>
+</tr>
+<tr>
+<td>Fallback chain</td>
+<td>&quot;Retry list&quot;</td>
+<td>Ordered list of providers attempted on failure</td>
+</tr>
+<tr>
+<td>Semantic caching</td>
+<td>&quot;Prompt-embedding cache&quot;</td>
+<td>Key is embedding of the prompt; near-duplicates share a cache hit</td>
+</tr>
+<tr>
+<td>Guardrails</td>
+<td>&quot;Input/output filters&quot;</td>
+<td>Redact PII, reject policy violations</td>
+</tr>
+<tr>
+<td>Per-key rate limit</td>
+<td>&quot;Team budget&quot;</td>
+<td>Quota scoped to an API key</td>
+</tr>
+<tr>
+<td>Cost tracking</td>
+<td>&quot;Per-request spend&quot;</td>
+<td>Aggregate token usage x price per model</td>
+</tr>
+<tr>
+<td>LiteLLM</td>
+<td>&quot;The open proxy&quot;</td>
+<td>Self-hostable OSS routing gateway</td>
+</tr>
+<tr>
+<td>OpenRouter</td>
+<td>&quot;The managed SaaS&quot;</td>
+<td>Hosted gateway with credit-based billing</td>
+</tr>
+<tr>
+<td>Portkey</td>
+<td>&quot;The production option&quot;</td>
+<td>Open-source + managed with guardrails built in</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://docs.litellm.ai/" target="_blank" rel="noopener">LiteLLM — docs</a> — self-hosted routing gateway</li>
+<li><a href="https://openrouter.ai/docs/quickstart" target="_blank" rel="noopener">OpenRouter — quickstart</a> — managed routing SaaS</li>
+<li><a href="https://portkey.ai/docs" target="_blank" rel="noopener">Portkey — docs</a> — production routing with guardrails</li>
+<li><a href="https://www.truefoundry.com/blog/litellm-vs-openrouter" target="_blank" rel="noopener">TrueFoundry — LiteLLM vs OpenRouter</a> — decision guide</li>
+<li><a href="https://relayplane.com/blog/llm-gateway-comparison-2026" target="_blank" rel="noopener">Relayplane — LLM gateway comparison 2026</a> — vendor survey</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="20-opentelemetry-genai.html">
+  <span class="label">← Previous</span>
+  <b>OpenTelemetry GenAI — Tracing Tool Calls End-to-End</b>
+</a>
+      <a class="pager__item pager__item--next" href="22-skills-and-agent-sdks.html">
+  <span class="label">Next →</span>
+  <b>Agent Skills: Portable Contract and Runtime Boundary</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>5 minutes</b> of Tools &amp; Protocols behind you.</p>
+      <a class="btn btn--solid" href="22-skills-and-agent-sdks.html">Continue to Agent Skills: Portable Contract and Runtime Boundary →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#openai-compatible-proxy-shape">OpenAI-compatible proxy shape</a></li><li class="mini__item mini__item--d3"><a href="#model-aliases">Model aliases</a></li><li class="mini__item mini__item--d3"><a href="#fallback-chains">Fallback chains</a></li><li class="mini__item mini__item--d3"><a href="#semantic-caching">Semantic caching</a></li><li class="mini__item mini__item--d3"><a href="#guardrails">Guardrails</a></li><li class="mini__item mini__item--d3"><a href="#per-key-rate-limits">Per-key rate limits</a></li><li class="mini__item mini__item--d3"><a href="#self-hosted-vs-managed-trade-offs">Self-hosted vs managed trade-offs</a></li><li class="mini__item mini__item--d3"><a href="#cost-tracking">Cost tracking</a></li><li class="mini__item mini__item--d3"><a href="#mcp-plus-routing">MCP plus routing</a></li><li class="mini__item mini__item--d3"><a href="#routing-strategies">Routing strategies</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

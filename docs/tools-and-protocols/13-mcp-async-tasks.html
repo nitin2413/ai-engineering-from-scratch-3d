@@ -1,0 +1,732 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MCP Tasks Extension: Durable Work on a Stateless Core — Tools &amp; Protocols — AIFS</title>
+<meta name="description" content="Tools &amp; Protocols: MCP Tasks Extension: Durable Work on a Stateless Core. 10 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="MCP Tasks Extension: Durable Work on a Stateless Core — Tools &amp; Protocols — AIFS">
+<meta property="og:description" content="Tools &amp; Protocols: MCP Tasks Extension: Durable Work on a Stateless Core. 10 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"tp-task-lifecycle":["../assets/figures/figures-mcp.js","../assets/figures/figures-tools2.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-mcp.js","../assets/figures/figures-tools2.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#C6FF00" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#C6FF00;--accent-ink:#111111"
+  data-lesson-id="tools-and-protocols/13-mcp-async-tasks" data-module="tools-and-protocols"
+  data-prev="12-mcp-roots-and-elicitation.html" data-next="14-mcp-apps.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#C6FF00">
+        <span class="label">Phase 13</span>
+        <b>Tools &amp; Protocols</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="tools-and-protocols/01-the-tool-interface"><a href="01-the-tool-interface.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">The Tool Interface — Why Agents Need Structured I/O</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/02-function-calling-deep-dive"><a href="02-function-calling-deep-dive.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Function Calling Deep Dive — OpenAI, Anthropic, Gemini</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/03-parallel-and-streaming-tool-calls"><a href="03-parallel-and-streaming-tool-calls.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Parallel Tool Calls and Streaming with Tools</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/04-structured-output"><a href="04-structured-output.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Structured Output — JSON Schema, Pydantic, Zod, Constrained Decoding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/05-tool-schema-design"><a href="05-tool-schema-design.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Tool Schema Design — Naming, Descriptions, Parameter Constraints</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/06-mcp-fundamentals"><a href="06-mcp-fundamentals.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">MCP Fundamentals: Stateless Requests and JSON-RPC</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/07-building-an-mcp-server"><a href="07-building-an-mcp-server.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Building an MCP Server: Stateless Python and TypeScript</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/08-building-an-mcp-client"><a href="08-building-an-mcp-client.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Building an MCP Client: Discovery, Routing, and Dual-Era Fallback</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/09-mcp-transports"><a href="09-mcp-transports.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">MCP Transports: stdio and Stateless Streamable HTTP</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/10-mcp-resources-and-prompts"><a href="10-mcp-resources-and-prompts.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">MCP Resources and Prompts: Addressable Context for Stateless Servers</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/11-mcp-sampling"><a href="11-mcp-sampling.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">MCP Model Input: Sampling Migration and Stateless MRTR</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/12-mcp-roots-and-elicitation"><a href="12-mcp-roots-and-elicitation.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Explicit Scope and Stateless Elicitation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/13-mcp-async-tasks"><a href="13-mcp-async-tasks.html" class="is-current">
+  <span class="snav__n">13</span>
+  <span class="snav__t">MCP Tasks Extension: Durable Work on a Stateless Core</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/14-mcp-apps"><a href="14-mcp-apps.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">MCP Apps on the Stateless Protocol</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/15-mcp-security-tool-poisoning"><a href="15-mcp-security-tool-poisoning.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">MCP Security: Poisoned Metadata, Routing, and MRTR State</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/16-mcp-security-oauth-2-1"><a href="16-mcp-security-oauth-2-1.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">MCP Authorization: CIMD, Issuer Binding, PKCE, and Step-Up</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/17-mcp-gateways-and-registries"><a href="17-mcp-gateways-and-registries.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Stateless MCP Gateways and Registry Admission</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/18-mcp-auth-production"><a href="18-mcp-auth-production.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">MCP Auth in Production: Issuer-Bound Enrollment and Tokens</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/19-a2a-protocol"><a href="19-a2a-protocol.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">A2A — Agent-to-Agent Protocol</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/20-opentelemetry-genai"><a href="20-opentelemetry-genai.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">OpenTelemetry GenAI — Tracing Tool Calls End-to-End</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/21-llm-routing-layer"><a href="21-llm-routing-layer.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">LLM Routing Layer — LiteLLM, OpenRouter, Portkey</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/22-skills-and-agent-sdks"><a href="22-skills-and-agent-sdks.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Agent Skills: Portable Contract and Runtime Boundary</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/23-capstone-tool-ecosystem"><a href="23-capstone-tool-ecosystem.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Capstone: Stateless Tool Ecosystem</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/24-skill-discovery-and-progressive-disclosure"><a href="24-skill-discovery-and-progressive-disclosure.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Skill Discovery and Progressive Disclosure</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/25-skill-invocation-and-routing"><a href="25-skill-invocation-and-routing.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Skill Invocation and Routing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/26-skill-permissions-sandboxes-and-trust"><a href="26-skill-permissions-sandboxes-and-trust.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Skill Permissions, Sandboxes, and Trust</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/27-skill-evals-packaging-and-portability"><a href="27-skill-evals-packaging-and-portability.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">Skill Evals, Packaging, and Portability</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/28-mcp-tool-contracts-and-content"><a href="28-mcp-tool-contracts-and-content.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">MCP Tool Contracts and Content</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control"><a href="29-mcp-reliability-cancellation-and-flow-control.html" class="">
+  <span class="snav__n">29</span>
+  <span class="snav__t">MCP Reliability, Cancellation, and Flow Control</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/30-mcp-registry-supply-chain-and-drift"><a href="30-mcp-registry-supply-chain-and-drift.html" class="">
+  <span class="snav__n">30</span>
+  <span class="snav__t">MCP Registry Supply Chain: Admission, Drift, and Rollback</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/31-mcp-conformance-versioning-and-operations"><a href="31-mcp-conformance-versioning-and-operations.html" class="">
+  <span class="snav__n">31</span>
+  <span class="snav__t">MCP Conformance Engineering: Versioning, Evidence, and Operations</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Tools &amp; Protocols</a></p>
+      <h1 class="page__title">MCP Tasks Extension: Durable Work on a Stateless Core</h1>
+      <p class="page__lede">Stateless MCP does not mean every operation must finish in one request. The official Tasks extension gives long-running work an explicit durable handle. A server can return that handle from <code class="inline-code">tools/call</code>, any instance can answer <code class="inline-code">tasks/get</code>, and client input arrives through <code class="inline-code">tasks/update</code> without reviving protocol sessions.</p>
+      <div class="page__meta">
+        <span class="chip">10 min read</span>
+        <span class="chip">2,246 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 13 · 09 (transports), Phase 13 · 11 (stateless MRTR), Phase 13 · 12 (elicitation)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~90 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Distinguish stateless protocol transport from durable application task state.</li>
+<li>Negotiate the <code class="inline-code">io.modelcontextprotocol/tasks</code> extension in per-request capabilities and <code class="inline-code">server/discover</code>.</li>
+<li>Return a server-directed <code class="inline-code">CreateTaskResult</code> with <code class="inline-code">resultType: &quot;task&quot;</code> only after durable creation.</li>
+<li>Poll with <code class="inline-code">tasks/get</code>, fulfill task input with <code class="inline-code">tasks/update</code>, and request cooperative cancellation with <code class="inline-code">tasks/cancel</code>.</li>
+<li>Remove the older <code class="inline-code">tasks/status</code>, <code class="inline-code">tasks/result</code>, and <code class="inline-code">tasks/list</code> assumptions.</li>
+<li>Subscribe to optional task notifications through <code class="inline-code">subscriptions/listen</code> on a POST response SSE stream.</li>
+<li>Model task expiry, restart recovery, input-key deduplication, and execution errors correctly.</li>
+</ul>
+<h2 id="why-tasks-are-an-extension" class="prose-h prose-h2"><a class="prose-h__anchor" href="#why-tasks-are-an-extension" aria-label="Link to this section">#</a>Why Tasks Are an Extension</h2>
+<p>Tasks first appeared as an experimental core feature in 2025-11-25. The July 2026 redesign moves them into the official <code class="inline-code">io.modelcontextprotocol/tasks</code> extension so clients and servers can opt into the extra lifecycle without expanding the core protocol for everyone.</p>
+<p>The extension specification remains a draft surface even though it is the current official home for Tasks. Pin the extension version supported by your SDK, run conformance scenarios, and isolate wire adapters from your worker and storage domain.</p>
+<p>Use a task when the operation has one or more of these properties:</p>
+<ul>
+<li>It may outlive an ordinary request timeout.</li>
+<li>A worker queue or external job system already owns execution.</li>
+<li>The client needs to recover after its own restart.</li>
+<li>The operation pauses for user or model input during execution.</li>
+<li>Cancellation and durable result retrieval are product requirements.</li>
+</ul>
+<p>Do not create a task for a cheap deterministic lookup. A handle, persistence, polling, expiry, and cancellation are real complexity.</p>
+<h2 id="stateless-core-stateful-application" class="prose-h prose-h2"><a class="prose-h__anchor" href="#stateless-core-stateful-application" aria-label="Link to this section">#</a>Stateless Core, Stateful Application</h2>
+<p>MCP 2026-07-28 removes <code class="inline-code">initialize</code>, <code class="inline-code">notifications/initialized</code>, protocol sessions, and <code class="inline-code">Mcp-Session-Id</code>. That does not prohibit stateful products.</p>
+<p>A task id is explicit application state:</p>
+<ul>
+<li>The server persists it before returning it.</li>
+<li>The client can store it and poll again after restart.</li>
+<li>The id can route to any replica backed by the same durable store.</li>
+<li>Authorization is checked on every task method.</li>
+<li>Expiry and deletion are defined by task fields, not a transport lifetime.</li>
+</ul>
+<p>This is operationally different from hidden state attached to a connection.</p>
+<p>Keep four lifetimes separate:</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Lifetime</th>
+<th>Where it belongs</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Protocol metadata</td>
+<td>One request</td>
+<td><code class="inline-code">params._meta</code>, validated again on every call</td>
+</tr>
+<tr>
+<td>Transport work</td>
+<td>One stdio request or HTTP response</td>
+<td>In-flight coordinator with a bounded deadline</td>
+</tr>
+<tr>
+<td>MRTR continuation</td>
+<td>One retry sequence</td>
+<td>Integrity-protected <code class="inline-code">requestState</code>, plus replay controls when needed</td>
+</tr>
+<tr>
+<td>Durable task</td>
+<td>Across requests, replicas, restarts, and reconnects</td>
+<td>Shared application store keyed by an authorized <code class="inline-code">taskId</code></td>
+</tr>
+</tbody></table>
+<p>Moving a task record into process memory does not make MCP stateful. It makes the application unreliable. The protocol stays stateless, but a later <code class="inline-code">tasks/get</code> routed to another replica cannot recover the record. Persist before returning the handle, then make every task method resolve the same shared record under tenant and principal checks.</p>
+<h2 id="capability-negotiation" class="prose-h prose-h2"><a class="prose-h__anchor" href="#capability-negotiation" aria-label="Link to this section">#</a>Capability Negotiation</h2>
+<p>The client advertises support on every eligible request:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"_meta"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"io.modelcontextprotocol/protocolVersion"</span><span class="token operator">:</span> <span class="token string">"2026-07-28"</span><span class="token punctuation">,</span>
+    <span class="token property">"io.modelcontextprotocol/clientCapabilities"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"extensions"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token property">"io.modelcontextprotocol/tasks"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token property">"io.modelcontextprotocol/clientInfo"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"lesson-client"</span><span class="token punctuation">,</span>
+      <span class="token property">"version"</span><span class="token operator">:</span> <span class="token string">"1.0.0"</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<p>The server returns exact <code class="inline-code">supportedVersions</code>, capabilities, <code class="inline-code">ttlMs</code>, and <code class="inline-code">cacheScope</code> from <code class="inline-code">server/discover</code>, with the same extension under capabilities. Because it advertises tools, it also implements mandatory <code class="inline-code">tools/list</code>. That result returns a deterministic <code class="inline-code">generate_report</code> descriptor, valid object <code class="inline-code">inputSchema</code>, <code class="inline-code">resultType: &quot;complete&quot;</code>, server identity metadata, and public cache hints.</p>
+<p>A task method from a client that did not declare the extension returns <code class="inline-code">-32021</code>, Missing Required Client Capability, with <code class="inline-code">data.requiredCapabilities</code> set to <code class="inline-code">{&quot;extensions&quot;:{&quot;io.modelcontextprotocol/tasks&quot;:{}}}</code>. An unsupported protocol string returns <code class="inline-code">-32022</code> with exact <code class="inline-code">supported</code> and <code class="inline-code">requested</code> data; a missing or non-string version returns <code class="inline-code">-32602</code>.</p>
+<p>An envelope without a JSON-RPC <code class="inline-code">id</code> is a notification. The receiver may process it, but it emits no JSON-RPC result or error. A Streamable HTTP adapter returns <code class="inline-code">202 Accepted</code> with no body for an accepted notification.</p>
+<p>At present, only <code class="inline-code">tools/call</code> supports task-augmented execution. Design your internal abstraction so future request types do not require rewriting storage.</p>
+<h2 id="server-directed-task-creation" class="prose-h prose-h2"><a class="prose-h__anchor" href="#server-directed-task-creation" aria-label="Link to this section">#</a>Server-Directed Task Creation</h2>
+<p>The old client flag <code class="inline-code">params._meta.task.required</code> is gone. The client declares extension support, then the server decides whether a particular <code class="inline-code">tools/call</code> becomes a task.</p>
+<p>Request:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"jsonrpc"</span><span class="token operator">:</span> <span class="token string">"2.0"</span><span class="token punctuation">,</span>
+  <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+  <span class="token property">"method"</span><span class="token operator">:</span> <span class="token string">"tools/call"</span><span class="token punctuation">,</span>
+  <span class="token property">"params"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"generate_report"</span><span class="token punctuation">,</span>
+    <span class="token property">"arguments"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token property">"size"</span><span class="token operator">:</span> <span class="token string">"large"</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token property">"_meta"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"io.modelcontextprotocol/protocolVersion"</span><span class="token operator">:</span> <span class="token string">"2026-07-28"</span><span class="token punctuation">,</span>
+      <span class="token property">"io.modelcontextprotocol/clientCapabilities"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token property">"extensions"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+          <span class="token property">"io.modelcontextprotocol/tasks"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<p>Response:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"jsonrpc"</span><span class="token operator">:</span> <span class="token string">"2.0"</span><span class="token punctuation">,</span>
+  <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+  <span class="token property">"result"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"resultType"</span><span class="token operator">:</span> <span class="token string">"task"</span><span class="token punctuation">,</span>
+    <span class="token property">"taskId"</span><span class="token operator">:</span> <span class="token string">"tsk_786512e29e0d"</span><span class="token punctuation">,</span>
+    <span class="token property">"status"</span><span class="token operator">:</span> <span class="token string">"working"</span><span class="token punctuation">,</span>
+    <span class="token property">"statusMessage"</span><span class="token operator">:</span> <span class="token string">"Preparing report outline."</span><span class="token punctuation">,</span>
+    <span class="token property">"createdAt"</span><span class="token operator">:</span> <span class="token string">"2026-08-21T10:30:00Z"</span><span class="token punctuation">,</span>
+    <span class="token property">"lastUpdatedAt"</span><span class="token operator">:</span> <span class="token string">"2026-08-21T10:30:00Z"</span><span class="token punctuation">,</span>
+    <span class="token property">"ttlMs"</span><span class="token operator">:</span> <span class="token number">900000</span><span class="token punctuation">,</span>
+    <span class="token property">"pollIntervalMs"</span><span class="token operator">:</span> <span class="token number">1000</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<p>The server must not return this handle until a <code class="inline-code">tasks/get</code> for the id can resolve. In an eventually consistent store, wait for read visibility before answering. Otherwise a client can receive a valid-looking id and immediately get &quot;not found.&quot;</p>
+<p>A task response is unsolicited in the sense that the client does not request task mode. It is not unnegotiated: the current request still must advertise the extension.</p>
+<h2 id="the-task-shape" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-task-shape" aria-label="Link to this section">#</a>The Task Shape</h2>
+<p>Every task carries:</p>
+<ul>
+<li><code class="inline-code">taskId</code>: stable server-generated identifier;</li>
+<li><code class="inline-code">status</code>: <code class="inline-code">working</code>, <code class="inline-code">input_required</code>, <code class="inline-code">completed</code>, <code class="inline-code">cancelled</code>, or <code class="inline-code">failed</code>;</li>
+<li><code class="inline-code">createdAt</code> and <code class="inline-code">lastUpdatedAt</code>: ISO 8601 timestamps;</li>
+<li><code class="inline-code">ttlMs</code>: expiry duration from creation, or <code class="inline-code">null</code> for no advertised limit;</li>
+<li>optional <code class="inline-code">pollIntervalMs</code>: the server&#39;s current minimum suggested polling cadence;</li>
+<li>optional <code class="inline-code">statusMessage</code>: user-facing or model-facing context.</li>
+</ul>
+<p>Status-specific fields appear only when relevant:</p>
+<ul>
+<li><code class="inline-code">input_required</code> includes <code class="inline-code">inputRequests</code>.</li>
+<li><code class="inline-code">completed</code> includes the original request&#39;s <code class="inline-code">result</code> shape.</li>
+<li><code class="inline-code">failed</code> includes a JSON-RPC <code class="inline-code">error</code> object.</li>
+</ul>
+<p>The client should honor <code class="inline-code">pollIntervalMs</code>. A server may rate-limit more aggressive polling and may change the interval over the task lifetime.</p>
+<h2 id="poll-with-tasks-get" class="prose-h prose-h2"><a class="prose-h__anchor" href="#poll-with-tasks-get" aria-label="Link to this section">#</a>Poll with <code class="inline-code">tasks/get</code></h2>
+<p>The client asks for a current snapshot:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">http</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-http"><span class="token request-line"><span class="token method property">POST</span> <span class="token request-target url">/mcp</span> <span class="token http-version property">HTTP/1.1</span></span>
+<span class="token header"><span class="token header-name keyword">Content-Type</span><span class="token punctuation">:</span> <span class="token header-value">application/json</span></span>
+<span class="token header"><span class="token header-name keyword">MCP-Protocol-Version</span><span class="token punctuation">:</span> <span class="token header-value">2026-07-28</span></span>
+<span class="token header"><span class="token header-name keyword">Mcp-Method</span><span class="token punctuation">:</span> <span class="token header-value">tasks/get</span></span>
+<span class="token header"><span class="token header-name keyword">Mcp-Name</span><span class="token punctuation">:</span> <span class="token header-value">tsk_786512e29e0d</span></span></code></pre>
+</figure>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"jsonrpc"</span><span class="token operator">:</span> <span class="token string">"2.0"</span><span class="token punctuation">,</span>
+  <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
+  <span class="token property">"method"</span><span class="token operator">:</span> <span class="token string">"tasks/get"</span><span class="token punctuation">,</span>
+  <span class="token property">"params"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"taskId"</span><span class="token operator">:</span> <span class="token string">"tsk_786512e29e0d"</span><span class="token punctuation">,</span>
+    <span class="token property">"_meta"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"io.modelcontextprotocol/protocolVersion"</span><span class="token operator">:</span> <span class="token string">"2026-07-28"</span><span class="token punctuation">,</span>
+      <span class="token property">"io.modelcontextprotocol/clientCapabilities"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token property">"extensions"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+          <span class="token property">"io.modelcontextprotocol/tasks"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<p><code class="inline-code">tasks/get</code> itself completed, so its result always has <code class="inline-code">resultType: &quot;complete&quot;</code>. The nested task can still have <code class="inline-code">status: &quot;working&quot;</code> or <code class="inline-code">status: &quot;input_required&quot;</code>.</p>
+<p>This distinction prevents a common parser bug:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>result.resultType = complete    means the tasks/get RPC finished
+result.status = working        means the represented job is still running</code></pre>
+</figure>
+<p>There is no <code class="inline-code">tasks/result</code> call. When the task completes, the next <code class="inline-code">tasks/get</code> response inlines the original <code class="inline-code">CallToolResult</code> under <code class="inline-code">result</code>:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"resultType"</span><span class="token operator">:</span> <span class="token string">"complete"</span><span class="token punctuation">,</span>
+  <span class="token property">"taskId"</span><span class="token operator">:</span> <span class="token string">"tsk_786512e29e0d"</span><span class="token punctuation">,</span>
+  <span class="token property">"status"</span><span class="token operator">:</span> <span class="token string">"completed"</span><span class="token punctuation">,</span>
+  <span class="token property">"createdAt"</span><span class="token operator">:</span> <span class="token string">"2026-08-21T10:30:00Z"</span><span class="token punctuation">,</span>
+  <span class="token property">"lastUpdatedAt"</span><span class="token operator">:</span> <span class="token string">"2026-08-21T10:34:12Z"</span><span class="token punctuation">,</span>
+  <span class="token property">"ttlMs"</span><span class="token operator">:</span> <span class="token number">900000</span><span class="token punctuation">,</span>
+  <span class="token property">"result"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"resultType"</span><span class="token operator">:</span> <span class="token string">"complete"</span><span class="token punctuation">,</span>
+    <span class="token property">"content"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+      <span class="token punctuation">{</span><span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"text"</span><span class="token punctuation">,</span> <span class="token property">"text"</span><span class="token operator">:</span> <span class="token string">"Generated large report with approved outline."</span><span class="token punctuation">}</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token property">"structuredContent"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token property">"size"</span><span class="token operator">:</span> <span class="token string">"large"</span><span class="token punctuation">,</span> <span class="token property">"approved"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token property">"isError"</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+    <span class="token property">"_meta"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"io.modelcontextprotocol/serverInfo"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"tasks-demo"</span><span class="token punctuation">,</span>
+        <span class="token property">"version"</span><span class="token operator">:</span> <span class="token string">"1.0.0"</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">"_meta"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"io.modelcontextprotocol/serverInfo"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"tasks-demo"</span><span class="token punctuation">,</span>
+      <span class="token property">"version"</span><span class="token operator">:</span> <span class="token string">"1.0.0"</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<p>The outer <code class="inline-code">resultType</code> says the <code class="inline-code">tasks/get</code> RPC completed. The nested <code class="inline-code">result.resultType</code> says the original tool call completed. That nested discriminator is required. The nested <code class="inline-code">CallToolResult</code> SHOULD also carry its own <code class="inline-code">io.modelcontextprotocol/serverInfo</code>; this lesson includes it instead of storing an untyped payload.</p>
+<p>There is no <code class="inline-code">tasks/list</code>. Sessionless servers cannot safely infer which tasks belong in a connection-scoped list. Applications that need history should expose an authorized domain tool with explicit filters and ownership rules.</p>
+<h2 id="input-during-task-execution" class="prose-h prose-h2"><a class="prose-h__anchor" href="#input-during-task-execution" aria-label="Link to this section">#</a>Input During Task Execution</h2>
+<p>Task input and core MRTR look similar but use different continuations.</p>
+<h3 id="input-needed-before-task-creation" class="prose-h prose-h3"><a class="prose-h__anchor" href="#input-needed-before-task-creation" aria-label="Link to this section">#</a>Input needed before task creation</h3>
+<p>Return core <code class="inline-code">resultType: &quot;input_required&quot;</code> from the original <code class="inline-code">tools/call</code>. The client fulfills it and retries that original call. Only create the task after those synchronous MRTR rounds finish.</p>
+<h3 id="input-needed-after-task-creation" class="prose-h prose-h3"><a class="prose-h__anchor" href="#input-needed-after-task-creation" aria-label="Link to this section">#</a>Input needed after task creation</h3>
+<p>Set the task to <code class="inline-code">input_required</code>. <code class="inline-code">tasks/get</code> exposes the outstanding <code class="inline-code">inputRequests</code>, and the client sends responses through <code class="inline-code">tasks/update</code>. The client does not retry the original <code class="inline-code">tools/call</code>.</p>
+<p>Snapshot:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"resultType"</span><span class="token operator">:</span> <span class="token string">"complete"</span><span class="token punctuation">,</span>
+  <span class="token property">"taskId"</span><span class="token operator">:</span> <span class="token string">"tsk_786512e29e0d"</span><span class="token punctuation">,</span>
+  <span class="token property">"status"</span><span class="token operator">:</span> <span class="token string">"input_required"</span><span class="token punctuation">,</span>
+  <span class="token property">"createdAt"</span><span class="token operator">:</span> <span class="token string">"2026-08-21T10:30:00Z"</span><span class="token punctuation">,</span>
+  <span class="token property">"lastUpdatedAt"</span><span class="token operator">:</span> <span class="token string">"2026-08-21T10:31:00Z"</span><span class="token punctuation">,</span>
+  <span class="token property">"ttlMs"</span><span class="token operator">:</span> <span class="token number">900000</span><span class="token punctuation">,</span>
+  <span class="token property">"inputRequests"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"approve_outline"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"method"</span><span class="token operator">:</span> <span class="token string">"elicitation/create"</span><span class="token punctuation">,</span>
+      <span class="token property">"params"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token property">"mode"</span><span class="token operator">:</span> <span class="token string">"form"</span><span class="token punctuation">,</span>
+        <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"Approve the generated report outline?"</span><span class="token punctuation">,</span>
+        <span class="token property">"requestedSchema"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+          <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"object"</span><span class="token punctuation">,</span>
+          <span class="token property">"properties"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token property">"approved"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"boolean"</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+          <span class="token property">"required"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"approved"</span><span class="token punctuation">]</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<p>Update:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">http</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-http"><span class="token request-line"><span class="token method property">POST</span> <span class="token request-target url">/mcp</span> <span class="token http-version property">HTTP/1.1</span></span>
+<span class="token header"><span class="token header-name keyword">Content-Type</span><span class="token punctuation">:</span> <span class="token header-value">application/json</span></span>
+<span class="token header"><span class="token header-name keyword">MCP-Protocol-Version</span><span class="token punctuation">:</span> <span class="token header-value">2026-07-28</span></span>
+<span class="token header"><span class="token header-name keyword">Mcp-Method</span><span class="token punctuation">:</span> <span class="token header-value">tasks/update</span></span>
+<span class="token header"><span class="token header-name keyword">Mcp-Name</span><span class="token punctuation">:</span> <span class="token header-value">tsk_786512e29e0d</span></span></code></pre>
+</figure>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"jsonrpc"</span><span class="token operator">:</span> <span class="token string">"2.0"</span><span class="token punctuation">,</span>
+  <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">4</span><span class="token punctuation">,</span>
+  <span class="token property">"method"</span><span class="token operator">:</span> <span class="token string">"tasks/update"</span><span class="token punctuation">,</span>
+  <span class="token property">"params"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"taskId"</span><span class="token operator">:</span> <span class="token string">"tsk_786512e29e0d"</span><span class="token punctuation">,</span>
+    <span class="token property">"inputResponses"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"approve_outline"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token property">"action"</span><span class="token operator">:</span> <span class="token string">"accept"</span><span class="token punctuation">,</span>
+        <span class="token property">"content"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token property">"approved"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token property">"_meta"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"io.modelcontextprotocol/protocolVersion"</span><span class="token operator">:</span> <span class="token string">"2026-07-28"</span><span class="token punctuation">,</span>
+      <span class="token property">"io.modelcontextprotocol/clientCapabilities"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token property">"extensions"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+          <span class="token property">"io.modelcontextprotocol/tasks"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<p>The success response is an empty acknowledgement plus <code class="inline-code">resultType: &quot;complete&quot;</code>. The state change may be eventually consistent, so the client continues polling or listening.</p>
+<p>Each <code class="inline-code">inputRequests</code> key must be unique for the entire task lifetime. Repeated <code class="inline-code">tasks/get</code> snapshots may show the same outstanding key; clients deduplicate the UI and servers ignore responses for unknown, superseded, or already fulfilled keys. A partial update can leave the task in <code class="inline-code">input_required</code> until all required keys are answered.</p>
+<h2 id="cancellation-is-cooperative" class="prose-h prose-h2"><a class="prose-h__anchor" href="#cancellation-is-cooperative" aria-label="Link to this section">#</a>Cancellation Is Cooperative</h2>
+<p><code class="inline-code">tasks/cancel</code> signals intent and returns an empty complete acknowledgement. That acknowledgement does not guarantee the worker stopped. Work may finish first, ignore cancellation, or transition later.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">http</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-http"><span class="token request-line"><span class="token method property">POST</span> <span class="token request-target url">/mcp</span> <span class="token http-version property">HTTP/1.1</span></span>
+<span class="token header"><span class="token header-name keyword">Content-Type</span><span class="token punctuation">:</span> <span class="token header-value">application/json</span></span>
+<span class="token header"><span class="token header-name keyword">MCP-Protocol-Version</span><span class="token punctuation">:</span> <span class="token header-value">2026-07-28</span></span>
+<span class="token header"><span class="token header-name keyword">Mcp-Method</span><span class="token punctuation">:</span> <span class="token header-value">tasks/cancel</span></span>
+<span class="token header"><span class="token header-name keyword">Mcp-Name</span><span class="token punctuation">:</span> <span class="token header-value">tsk_786512e29e0d</span></span></code></pre>
+</figure>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"jsonrpc"</span><span class="token operator">:</span> <span class="token string">"2.0"</span><span class="token punctuation">,</span>
+  <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">5</span><span class="token punctuation">,</span>
+  <span class="token property">"method"</span><span class="token operator">:</span> <span class="token string">"tasks/cancel"</span><span class="token punctuation">,</span>
+  <span class="token property">"params"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"taskId"</span><span class="token operator">:</span> <span class="token string">"tsk_786512e29e0d"</span><span class="token punctuation">,</span>
+    <span class="token property">"_meta"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"io.modelcontextprotocol/protocolVersion"</span><span class="token operator">:</span> <span class="token string">"2026-07-28"</span><span class="token punctuation">,</span>
+      <span class="token property">"io.modelcontextprotocol/clientCapabilities"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token property">"extensions"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+          <span class="token property">"io.modelcontextprotocol/tasks"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<p>For all three task methods, <code class="inline-code">Mcp-Name</code> mirrors <code class="inline-code">params.taskId</code>. It does not repeat the JSON-RPC method name. <code class="inline-code">code/main.py</code> centralizes this rule in <code class="inline-code">make_http_request</code>.</p>
+<p>The lesson worker honors cancellation immediately, making repeated calls idempotent. A production client must still treat cancellation as cooperative rather than infer a final task status from the acknowledgement.</p>
+<p>Do not use <code class="inline-code">notifications/cancelled</code> to cancel a task. That notification belongs to request cancellation, not durable Tasks.</p>
+<p>The distinction matters at the routing boundary. Request cancellation targets one in-flight JSON-RPC operation or its request-scoped HTTP response. If <code class="inline-code">tools/call</code> has already returned <code class="inline-code">resultType: &quot;task&quot;</code>, that request is complete and closing its transport cannot name or stop the durable job. <code class="inline-code">tasks/cancel</code> is a new authorized RPC. It carries <code class="inline-code">params.taskId</code>, mirrors that id in <code class="inline-code">Mcp-Name</code>, resolves the task&#39;s owning backend, records cooperative cancellation intent, and returns an acknowledgement without claiming the worker has stopped.</p>
+<p>A gateway must therefore keep request coordinators and task routes in different tables. The request table can disappear when the response finishes. The task route must survive until terminal state and retention expiry. <a href="29-mcp-reliability-cancellation-and-flow-control.html">Lesson 29: MCP Reliability, Cancellation, and Flow Control</a> builds the race, timeout, idempotency, backpressure, and retry rules for both paths.</p>
+<h2 id="optional-notifications" class="prose-h prose-h2"><a class="prose-h__anchor" href="#optional-notifications" aria-label="Link to this section">#</a>Optional Notifications</h2>
+<p>Polling is the baseline. A client that wants push updates sends <code class="inline-code">subscriptions/listen</code> with task ids. For Streamable HTTP, this is a POST whose response is a request-scoped SSE stream. There is no standalone GET event stream and no protocol session to keep alive.</p>
+<p>The server acknowledges the accepted ids with <code class="inline-code">notifications/subscriptions/acknowledged</code> and can then send full snapshots through <code class="inline-code">notifications/tasks</code>. The acknowledgement and every task notification carry <code class="inline-code">io.modelcontextprotocol/subscriptionId</code> in <code class="inline-code">_meta</code>, equal to the <code class="inline-code">subscriptions/listen</code> request id. Each task notification is otherwise equivalent to what <code class="inline-code">tasks/get</code> would return at that moment.</p>
+<p>Clients must still declare the Tasks extension. They should reconnect and resume from durable task ids rather than depend on event replay or <code class="inline-code">Last-Event-ID</code>.</p>
+<h2 id="failure-semantics" class="prose-h prose-h2"><a class="prose-h__anchor" href="#failure-semantics" aria-label="Link to this section">#</a>Failure Semantics</h2>
+<p>Use the two error layers correctly.</p>
+<h3 id="protocol-error" class="prose-h prose-h3"><a class="prose-h__anchor" href="#protocol-error" aria-label="Link to this section">#</a>Protocol error</h3>
+<p>Invalid method parameters or an unknown task id return a JSON-RPC error, commonly <code class="inline-code">-32602</code>. Missing extension support returns <code class="inline-code">-32021</code> with the required capability object.</p>
+<h3 id="task-execution-outcome" class="prose-h prose-h3"><a class="prose-h__anchor" href="#task-execution-outcome" aria-label="Link to this section">#</a>Task execution outcome</h3>
+<ul>
+<li>A normal tool result with <code class="inline-code">isError: true</code> is still a <code class="inline-code">completed</code> task because the tool call produced its defined result.</li>
+<li>A JSON-RPC error during deferred execution makes the task <code class="inline-code">failed</code> and stores that JSON-RPC error under <code class="inline-code">error</code>.</li>
+<li>User refusal can produce <code class="inline-code">cancelled</code>, a completed refusal result, or another domain-specific safe outcome. Document the choice.</li>
+</ul>
+<h2 id="durability-expiry-and-ownership" class="prose-h prose-h2"><a class="prose-h__anchor" href="#durability-expiry-and-ownership" aria-label="Link to this section">#</a>Durability, Expiry, and Ownership</h2>
+<p>Persist at least the task id, status, timestamps, ttl, poll interval, original operation ownership, result or error, outstanding input requests, and all issued input keys.</p>
+<p>The storage key must include or resolve an authoritative tenant and principal. Knowing a task id must not grant access. Check ownership on every <code class="inline-code">tasks/get</code>, <code class="inline-code">tasks/update</code>, <code class="inline-code">tasks/cancel</code>, and subscription.</p>
+<p><code class="inline-code">ttlMs</code> is measured from creation and may change. A client can treat it as a backstop when a task has stopped producing observable updates. A server may fail and later delete an expired task. Do not describe it as a promise to retain a completed result for that many milliseconds after completion.</p>
+<p>Use atomic writes or transactions. The lesson writes a temporary file and atomically renames it. A multi-replica service should use a shared durable store and a worker lease or equivalent concurrency control.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="tp-task-lifecycle"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">tp-task-lifecycle</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> tp task lifecycle</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<p><code class="inline-code">code/main.py</code> implements a deterministic task service:</p>
+<ul>
+<li><code class="inline-code">server/discover</code> returns <code class="inline-code">supportedVersions</code>, cache hints, and the Tasks extension.</li>
+<li><code class="inline-code">tools/list</code> returns a deterministic, cacheable <code class="inline-code">generate_report</code> descriptor with a valid input schema.</li>
+<li><code class="inline-code">tools/call</code> creates and persists the task before returning <code class="inline-code">resultType: &quot;task&quot;</code>.</li>
+<li>A new service instance reloads the same task, demonstrating restart recovery.</li>
+<li><code class="inline-code">tasks/get</code> returns complete task snapshots.</li>
+<li>The worker moves from <code class="inline-code">working</code> to <code class="inline-code">input_required</code>.</li>
+<li><code class="inline-code">tasks/update</code> accepts a form response and returns an empty complete acknowledgement.</li>
+<li>The worker stores a nested <code class="inline-code">CallToolResult</code> with its own <code class="inline-code">resultType</code> and server identity, then transitions to <code class="inline-code">completed</code>.</li>
+<li><code class="inline-code">tasks/cancel</code> is idempotent in this implementation.</li>
+<li>The HTTP builder sets <code class="inline-code">Mcp-Name</code> to <code class="inline-code">params.taskId</code> for <code class="inline-code">tasks/get</code>, <code class="inline-code">tasks/update</code>, and <code class="inline-code">tasks/cancel</code>.</li>
+<li>Notification helpers use <code class="inline-code">notifications/subscriptions/acknowledged</code> and <code class="inline-code">notifications/tasks</code>, both tagged with the listen request id.</li>
+<li>Id-less notifications produce no JSON-RPC response.</li>
+</ul>
+<p>The worker advances explicitly instead of sleeping in a background thread. That makes every state transition deterministic and keeps the protocol example separate from queue mechanics.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>From the repository root:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">bash</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-bash"><span class="token builtin class-name">cd</span> phases/13-tools-and-protocols/13-mcp-async-tasks/code
+python3 main.py
+python3 <span class="token parameter variable">-m</span> unittest discover tests <span class="token parameter variable">-v</span></code></pre>
+</figure>
+<p>Expected result sequence:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>id=0 resultType=complete status=ack
+id=1 resultType=task status=working
+id=2 resultType=complete status=working
+id=3 resultType=complete status=input_required
+id=4 resultType=complete status=ack
+id=5 resultType=complete status=completed</code></pre>
+</figure>
+<p>Also verify that <code class="inline-code">tasks/status</code>, <code class="inline-code">tasks/result</code>, and <code class="inline-code">tasks/list</code> return method-not-found in the modern service.
+Verify that <code class="inline-code">tools/list</code> is deterministic and every current HTTP task method mirrors its task id through <code class="inline-code">Mcp-Name</code>.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p><code class="inline-code">outputs/skill-task-store-designer.md</code> now produces an extension-aware design: capability negotiation, durable-before-return creation, current methods, input update flow, ownership, expiry, cancellation, subscription, and migration from the removed experimental methods.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li>Add a second outstanding input key. Send a partial <code class="inline-code">tasks/update</code> and prove the task remains <code class="inline-code">input_required</code> until both keys are answered.</li>
+<li>Add tenant ownership to the store and reject a valid task id presented by the wrong authenticated principal.</li>
+<li>Add a worker lease with expiry. Demonstrate that two service instances cannot complete the same task concurrently.</li>
+<li>Implement a POST-response SSE adapter for <code class="inline-code">subscriptions/listen</code>. Do not add GET, <code class="inline-code">Last-Event-ID</code>, or a session header.</li>
+<li>Add expiry cleanup. Distinguish an expired task from a malformed task id without leaking cross-tenant existence.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning in the current extension</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Tasks extension</td>
+<td>Optional <code class="inline-code">io.modelcontextprotocol/tasks</code> capability for durable async work</td>
+</tr>
+<tr>
+<td><code class="inline-code">CreateTaskResult</code></td>
+<td>Server-directed <code class="inline-code">resultType: &quot;task&quot;</code> response to an eligible request</td>
+</tr>
+<tr>
+<td><code class="inline-code">tasks/get</code></td>
+<td>Poll a full current task snapshot, including terminal result or pending input</td>
+</tr>
+<tr>
+<td><code class="inline-code">tasks/update</code></td>
+<td>Submit responses to a task&#39;s outstanding <code class="inline-code">inputRequests</code></td>
+</tr>
+<tr>
+<td><code class="inline-code">tasks/cancel</code></td>
+<td>Acknowledge cooperative cancellation intent</td>
+</tr>
+<tr>
+<td><code class="inline-code">input_required</code></td>
+<td>Task status indicating client input is outstanding</td>
+</tr>
+<tr>
+<td><code class="inline-code">pollIntervalMs</code></td>
+<td>Server-suggested minimum delay before another poll</td>
+</tr>
+<tr>
+<td><code class="inline-code">ttlMs</code></td>
+<td>Expiry duration measured from task creation</td>
+</tr>
+<tr>
+<td>Durable-before-return</td>
+<td>Rule that the task id must resolve before its handle is sent</td>
+</tr>
+<tr>
+<td><code class="inline-code">notifications/tasks</code></td>
+<td>Optional full task snapshot delivered on a subscribed SSE response</td>
+</tr>
+</tbody></table>
+<h2 id="legacy-compatibility" class="prose-h prose-h2"><a class="prose-h__anchor" href="#legacy-compatibility" aria-label="Link to this section">#</a>Legacy Compatibility</h2>
+<p>The 2025-11-25 experimental surface used client-requested task augmentation, <code class="inline-code">tasks/status</code>, <code class="inline-code">tasks/result</code>, and optional <code class="inline-code">tasks/list</code>. Keep those names only inside a pinned legacy adapter. A current client uses the extension capability, accepts server-directed handles, polls <code class="inline-code">tasks/get</code>, supplies input with <code class="inline-code">tasks/update</code>, and reads the final result from the task snapshot.</p>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://tasks.extensions.modelcontextprotocol.io/specification/draft/tasks" target="_blank" rel="noopener">Official MCP Tasks extension</a></li>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/mrtr" target="_blank" rel="noopener">MCP 2026-07-28 Multi Round-Trip Requests</a></li>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http" target="_blank" rel="noopener">MCP 2026-07-28 Streamable HTTP</a></li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="12-mcp-roots-and-elicitation.html">
+  <span class="label">← Previous</span>
+  <b>Explicit Scope and Stateless Elicitation</b>
+</a>
+      <a class="pager__item pager__item--next" href="14-mcp-apps.html">
+  <span class="label">Next →</span>
+  <b>MCP Apps on the Stateless Protocol</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>10 minutes</b> of Tools &amp; Protocols behind you.</p>
+      <a class="btn btn--solid" href="14-mcp-apps.html">Continue to MCP Apps on the Stateless Protocol →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#why-tasks-are-an-extension">Why Tasks Are an Extension</a></li><li class="mini__item mini__item--d2"><a href="#stateless-core-stateful-application">Stateless Core, Stateful Application</a></li><li class="mini__item mini__item--d2"><a href="#capability-negotiation">Capability Negotiation</a></li><li class="mini__item mini__item--d2"><a href="#server-directed-task-creation">Server-Directed Task Creation</a></li><li class="mini__item mini__item--d2"><a href="#the-task-shape">The Task Shape</a></li><li class="mini__item mini__item--d2"><a href="#poll-with-tasks-get">Poll with tasks/get</a></li><li class="mini__item mini__item--d2"><a href="#input-during-task-execution">Input During Task Execution</a></li><li class="mini__item mini__item--d3"><a href="#input-needed-before-task-creation">Input needed before task creation</a></li><li class="mini__item mini__item--d3"><a href="#input-needed-after-task-creation">Input needed after task creation</a></li><li class="mini__item mini__item--d2"><a href="#cancellation-is-cooperative">Cancellation Is Cooperative</a></li><li class="mini__item mini__item--d2"><a href="#optional-notifications">Optional Notifications</a></li><li class="mini__item mini__item--d2"><a href="#failure-semantics">Failure Semantics</a></li><li class="mini__item mini__item--d3"><a href="#protocol-error">Protocol error</a></li><li class="mini__item mini__item--d3"><a href="#task-execution-outcome">Task execution outcome</a></li><li class="mini__item mini__item--d2"><a href="#durability-expiry-and-ownership">Durability, Expiry, and Ownership</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#legacy-compatibility">Legacy Compatibility</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

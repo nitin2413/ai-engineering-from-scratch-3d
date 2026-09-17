@@ -1,0 +1,763 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data Pipelines for Pre-Training — LLMs from Scratch — AIFS</title>
+<meta name="description" content="LLMs from Scratch: Data Pipelines for Pre-Training. 9 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Data Pipelines for Pre-Training — LLMs from Scratch — AIFS">
+<meta property="og:description" content="LLMs from Scratch: Data Pipelines for Pre-Training. 9 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"l5-data-pipeline":["../assets/figures/figures-llmstack5.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-llmstack5.js"];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#6C4DFF" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#6C4DFF;--accent-ink:#FFFFFF"
+  data-lesson-id="llms-from-scratch/03-data-pipelines" data-module="llms-from-scratch"
+  data-prev="02-building-a-tokenizer.html" data-next="04-pre-training-mini-gpt.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#6C4DFF">
+        <span class="label">Phase 10</span>
+        <b>LLMs from Scratch</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="llms-from-scratch/01-tokenizers"><a href="01-tokenizers.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Tokenizers: BPE, WordPiece, SentencePiece</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/02-building-a-tokenizer"><a href="02-building-a-tokenizer.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Building a Tokenizer from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/03-data-pipelines"><a href="03-data-pipelines.html" class="is-current">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Data Pipelines for Pre-Training</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/04-pre-training-mini-gpt"><a href="04-pre-training-mini-gpt.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Pre-Training a Mini GPT (124M Parameters)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/05-scaling-distributed"><a href="05-scaling-distributed.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Scaling: Distributed Training, FSDP, DeepSpeed</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/06-instruction-tuning-sft"><a href="06-instruction-tuning-sft.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Instruction Tuning (SFT)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/07-rlhf"><a href="07-rlhf.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">RLHF: Reward Model + PPO</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/08-dpo"><a href="08-dpo.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">DPO: Direct Preference Optimization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/09-constitutional-ai-self-improvement"><a href="09-constitutional-ai-self-improvement.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Constitutional AI and Self-Improvement</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/10-evaluation"><a href="10-evaluation.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Evaluation: Benchmarks, Evals, LM Harness</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/11-quantization"><a href="11-quantization.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Quantization: Making Models Fit</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/12-inference-optimization"><a href="12-inference-optimization.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Inference Optimization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/13-building-complete-llm-pipeline"><a href="13-building-complete-llm-pipeline.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Building a Complete LLM Pipeline</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/14-open-models-architecture-walkthroughs"><a href="14-open-models-architecture-walkthroughs.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Open Models: Architecture Walkthroughs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/15-speculative-decoding-eagle3"><a href="15-speculative-decoding-eagle3.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Speculative Decoding and EAGLE-3</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/16-differential-attention-v2"><a href="16-differential-attention-v2.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Differential Attention (V2)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/17-native-sparse-attention"><a href="17-native-sparse-attention.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Native Sparse Attention (DeepSeek NSA)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/18-multi-token-prediction"><a href="18-multi-token-prediction.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Multi-Token Prediction (MTP)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/19-dualpipe-parallelism"><a href="19-dualpipe-parallelism.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">DualPipe Parallelism</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/20-deepseek-v3-walkthrough"><a href="20-deepseek-v3-walkthrough.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">DeepSeek-V3 Architecture Walkthrough</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/21-jamba-hybrid-ssm-transformer"><a href="21-jamba-hybrid-ssm-transformer.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Jamba — Hybrid SSM-Transformer</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/22-async-hogwild-inference"><a href="22-async-hogwild-inference.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Async and Hogwild! Inference</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/25-speculative-decoding"><a href="25-speculative-decoding.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Speculative Decoding and EAGLE</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/34-gradient-checkpointing"><a href="34-gradient-checkpointing.html" class="">
+  <span class="snav__n">34</span>
+  <span class="snav__t">Gradient Checkpointing and Activation Recomputation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">LLMs from Scratch</a></p>
+      <h1 class="page__title">Data Pipelines for Pre-Training</h1>
+      <p class="page__lede">The model is a mirror. It reflects whatever data you feed it. Feed it garbage, it reflects garbage with perfect fluency.</p>
+      <div class="page__meta">
+        <span class="chip">9 min read</span>
+        <span class="chip">1,956 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 10, Lessons 01-02 (Tokenizers, Building a Tokenizer)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~90 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Build a streaming data pipeline that tokenizes, chunks, shuffles, and batches terabytes of text without loading it all into memory</li>
+<li>Implement data quality filters (deduplication, language detection, content filtering) used in real pre-training pipelines</li>
+<li>Create fixed-length training sequences with proper attention masks and document boundary handling</li>
+<li>Profile pipeline throughput to ensure the dataloader keeps up with GPU training speed</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>You have a tokenizer. Now you need data.</p>
+<p>Not a dataset. Not a CSV file. Terabytes of text -- cleaned, deduplicated, filtered for quality, tokenized into fixed-length sequences, and served in randomized batches fast enough that your 8-GPU cluster never waits for the next batch.</p>
+<p>Most people think training an LLM is about the model architecture. It is not. Llama 3 used 15.6 trillion tokens. GPT-3 used 300 billion. DeepSeek-V2 used 8.1 trillion. The architecture across all three is roughly the same: stacked transformer blocks with attention and feedforward layers. The difference in output quality comes overwhelmingly from the data.</p>
+<p>The Chinchilla paper from DeepMind made this precise. For a given compute budget, there is an optimal ratio of model parameters to training tokens. Chinchilla showed that most models in 2022 were dramatically undertrained -- they had too many parameters for the amount of data they saw. A 70B parameter model trained on 1.4 trillion tokens (Chinchilla-optimal) outperformed a 280B model trained on 300 billion tokens (Gopher).</p>
+<p>Your data pipeline determines whether your model learns language or learns noise.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="where-the-data-comes-from" class="prose-h prose-h3"><a class="prose-h__anchor" href="#where-the-data-comes-from" aria-label="Link to this section">#</a>Where the Data Comes From</h3>
+<p>Every large language model is trained on a mix of sources. The exact composition is a closely guarded secret for most labs, but we know enough to understand the categories.</p>
+<table>
+<thead>
+<tr>
+<th>Source</th>
+<th>Size</th>
+<th>Quality</th>
+<th>Used By</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Common Crawl</td>
+<td>~250 TB raw</td>
+<td>Low (needs heavy filtering)</td>
+<td>GPT-3, Llama, most open models</td>
+</tr>
+<tr>
+<td>Wikipedia</td>
+<td>~20 GB</td>
+<td>High</td>
+<td>Every major LLM</td>
+</tr>
+<tr>
+<td>GitHub code</td>
+<td>~1 TB+</td>
+<td>Medium (lots of duplicates, dead code)</td>
+<td>StarCoder, CodeLlama, DeepSeek-Coder</td>
+</tr>
+<tr>
+<td>Books (BookCorpus, Pile)</td>
+<td>~100 GB</td>
+<td>High</td>
+<td>GPT-2, GPT-3, early models</td>
+</tr>
+<tr>
+<td>Academic papers (arXiv, S2ORC)</td>
+<td>~100 GB</td>
+<td>High for STEM</td>
+<td>Llama, Galactica</td>
+</tr>
+<tr>
+<td>StackOverflow, Reddit</td>
+<td>~100 GB</td>
+<td>Medium</td>
+<td>Llama, Falcon</td>
+</tr>
+<tr>
+<td>Curated web (C4, RefinedWeb)</td>
+<td>~5 TB</td>
+<td>Medium-High (pre-filtered)</td>
+<td>T5, Falcon</td>
+</tr>
+</tbody></table>
+<p>Llama 3 disclosed its data mix: roughly 50% web data, 25% code, 13% books and academic papers, 8% math data, and 4% multilingual web data. The total was 15.6 trillion tokens from sources exceeding 5 TB of raw text.</p>
+<p>The ratio matters as much as the total size. Too much web data and the model becomes a Reddit parrot. Too little code and it cannot program. Too little math and it fails at reasoning. Getting this mix right is one of the hardest parts of training an LLM, and there is no formula -- it requires experimentation and evaluation.</p>
+<h3 id="data-cleaning" class="prose-h prose-h3"><a class="prose-h__anchor" href="#data-cleaning" aria-label="Link to this section">#</a>Data Cleaning</h3>
+<p>Raw web data is filthy. A typical Common Crawl dump contains:</p>
+<ul>
+<li>HTML tags and JavaScript</li>
+<li>Boilerplate headers, footers, navigation menus</li>
+<li>Duplicate pages (exact and near-duplicate)</li>
+<li>Machine-generated spam</li>
+<li>Personally identifiable information (PII)</li>
+<li>Low-quality text (lists of keywords, SEO spam)</li>
+<li>Non-text content encoded as text</li>
+</ul>
+<p>Cleaning this is not optional. It is the difference between a model that generates coherent paragraphs and one that outputs HTML tags mixed with product listings.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph TD
+    A[Raw Text] --&gt; B[HTML Strip]
+    B --&gt; C[Language Detection]
+    C --&gt; D[Quality Filter]
+    D --&gt; E[Deduplication]
+    E --&gt; F[PII Removal]
+    F --&gt; G[Clean Text]
+
+    style A fill:#1a1a2e,stroke:#e94560,color:#fff
+    style B fill:#1a1a2e,stroke:#e94560,color:#fff
+    style C fill:#1a1a2e,stroke:#e94560,color:#fff
+    style D fill:#1a1a2e,stroke:#e94560,color:#fff
+    style E fill:#1a1a2e,stroke:#e94560,color:#fff
+    style F fill:#1a1a2e,stroke:#e94560,color:#fff
+    style G fill:#1a1a2e,stroke:#e94560,color:#fff</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>Each step eliminates a category of noise:</p>
+<p><strong>HTML stripping:</strong> Remove all markup. Keep only the visible text content. Libraries like <code class="inline-code">trafilatura</code> or <code class="inline-code">readability</code> extract article content while discarding navigation, ads, and boilerplate.</p>
+<p><strong>Language detection:</strong> Use fastText&#39;s language identification model (lid.176.bin) to classify each document. Filter to your target languages. A document classified as English with less than 0.8 confidence probably is not clean English.</p>
+<p><strong>Quality filtering:</strong> This is where it gets interesting. RefinedWeb (the dataset behind Falcon) uses a perplexity-based filter: train a small language model on Wikipedia, then score each document. High perplexity means the document is unlike Wikipedia -- likely spam, keyword lists, or machine-generated content. Documents with perplexity above a threshold get removed.</p>
+<p><strong>Deduplication:</strong> The single most impactful cleaning step. Common Crawl contains enormous numbers of duplicated pages -- legal disclaimers, cookie notices, terms of service. Training on duplicates wastes compute and can cause the model to memorize and regurgitate specific passages verbatim.</p>
+<p><strong>PII removal:</strong> Names, email addresses, phone numbers, social security numbers. Regex-based detection for structured PII, NER models for names in context.</p>
+<h3 id="deduplication-with-minhash" class="prose-h prose-h3"><a class="prose-h__anchor" href="#deduplication-with-minhash" aria-label="Link to this section">#</a>Deduplication with MinHash</h3>
+<p>Exact deduplication is easy: hash each document, remove duplicates. But near-duplicates are the real problem. Two copies of the same news article with slightly different ads around it are near-duplicates. The content is 95% identical, but byte-for-byte they differ.</p>
+<p>MinHash + Locality-Sensitive Hashing (LSH) solves this efficiently.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph LR
+    A[Document] --&gt; B[Shingling]
+    B --&gt; C[MinHash Signature]
+    C --&gt; D[LSH Buckets]
+    D --&gt; E[Candidate Pairs]
+    E --&gt; F[Jaccard Similarity]
+    F --&gt; G[Deduplicated Set]
+
+    style A fill:#1a1a2e,stroke:#e94560,color:#fff
+    style B fill:#1a1a2e,stroke:#e94560,color:#fff
+    style C fill:#1a1a2e,stroke:#e94560,color:#fff
+    style D fill:#1a1a2e,stroke:#e94560,color:#fff
+    style E fill:#1a1a2e,stroke:#e94560,color:#fff
+    style F fill:#1a1a2e,stroke:#e94560,color:#fff
+    style G fill:#1a1a2e,stroke:#e94560,color:#fff</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>The idea:</p>
+<ol>
+<li><p><strong>Shingling:</strong> Convert each document into a set of n-grams (e.g., 5-grams of words or characters). &quot;the quick brown fox&quot; with 3-word shingles becomes {&quot;the quick brown&quot;, &quot;quick brown fox&quot;}.</p>
+</li>
+<li><p><strong>MinHash:</strong> For each document&#39;s shingle set, compute k hash values. Each hash value is the minimum hash across all shingles under a different hash function. This creates a fixed-size &quot;signature&quot; that approximates the Jaccard similarity between any two documents.</p>
+</li>
+<li><p><strong>LSH:</strong> Group documents into buckets based on bands of their MinHash signature. Documents in the same bucket are candidate near-duplicates. This avoids comparing every pair -- you only compare candidates.</p>
+</li>
+<li><p><strong>Verify:</strong> For each candidate pair, compute exact Jaccard similarity. Remove one copy if similarity exceeds a threshold (typically 0.8).</p>
+</li>
+</ol>
+<p>The Llama team reported removing approximately 38% of their web data through deduplication. That is not a small number. More than a third of Common Crawl is duplicate or near-duplicate content.</p>
+<h3 id="sequence-packing" class="prose-h prose-h3"><a class="prose-h__anchor" href="#sequence-packing" aria-label="Link to this section">#</a>Sequence Packing</h3>
+<p>Your model expects fixed-length input sequences. Your documents are variable length. Some are 50 tokens. Some are 50,000 tokens.</p>
+<p>Naive approach: pad every document to the maximum sequence length. This wastes enormous compute on padding tokens that contribute nothing to learning.</p>
+<p>Better approach: pack multiple documents into a single sequence, separated by end-of-sequence tokens. A 2048-token sequence might contain three short documents concatenated with [EOS] tokens between them.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph TD
+    subgraph Naive Packing
+        A1[&quot;Doc A (200 tokens)&quot;] --&gt; P1[&quot;[PAD] x 1848&quot;]
+        A2[&quot;Doc B (500 tokens)&quot;] --&gt; P2[&quot;[PAD] x 1548&quot;]
+        A3[&quot;Doc C (100 tokens)&quot;] --&gt; P3[&quot;[PAD] x 1948&quot;]
+    end
+
+    subgraph Efficient Packing
+        B1[&quot;Doc A (200) | Doc B (500) | Doc C (100) | Doc D (400) | Doc E (848)&quot;]
+    end
+
+    style A1 fill:#1a1a2e,stroke:#e94560,color:#fff
+    style A2 fill:#1a1a2e,stroke:#e94560,color:#fff
+    style A3 fill:#1a1a2e,stroke:#e94560,color:#fff
+    style P1 fill:#333,stroke:#666,color:#999
+    style P2 fill:#333,stroke:#666,color:#999
+    style P3 fill:#333,stroke:#666,color:#999
+    style B1 fill:#1a1a2e,stroke:#16c784,color:#fff</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>The attention mask must be set correctly. Tokens from Document A should not attend to tokens from Document B within the same packed sequence. This requires a block-diagonal attention mask.</p>
+<p>Long documents get truncated or split into chunks at sequence boundaries. The split point matters: splitting mid-sentence forces the model to see incomplete thoughts. Some pipelines align splits to paragraph or sentence boundaries when possible.</p>
+<h3 id="the-chinchilla-scaling-law" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-chinchilla-scaling-law" aria-label="Link to this section">#</a>The Chinchilla Scaling Law</h3>
+<p>For a fixed compute budget C (measured in FLOPs), the optimal model size N and dataset size D follow:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>N_opt ~ C^0.5
+D_opt ~ C^0.5</code></pre>
+</figure>
+<p>In practice, this means you should scale model size and dataset size roughly equally. A model with 10x more parameters needs roughly 10x more training tokens to reach the same loss.</p>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Parameters</th>
+<th>Training Tokens</th>
+<th>Chinchilla-Optimal?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GPT-3</td>
+<td>175B</td>
+<td>300B</td>
+<td>No (undertrained 3-4x)</td>
+</tr>
+<tr>
+<td>Chinchilla</td>
+<td>70B</td>
+<td>1.4T</td>
+<td>Yes (by design)</td>
+</tr>
+<tr>
+<td>Llama 2</td>
+<td>70B</td>
+<td>2T</td>
+<td>Overtrained (intentionally)</td>
+</tr>
+<tr>
+<td>Llama 3</td>
+<td>70B</td>
+<td>15T</td>
+<td>Heavily overtrained</td>
+</tr>
+</tbody></table>
+<p>Llama 3 deliberately violates the Chinchilla law. Meta found that overtraining on more data -- far beyond the compute-optimal ratio -- produces better models for inference. The extra training cost is paid once, but the smaller model is cheaper to serve forever. This is sometimes called the &quot;inference-optimal&quot; scaling approach, and it has become the industry standard since 2024.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="l5-data-pipeline"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">l5-data-pipeline</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> l5 data pipeline</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-text-cleaning" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-text-cleaning" aria-label="Link to this section">#</a>Step 1: Text Cleaning</h3>
+<p>Strip HTML, normalize whitespace, remove non-text content. We will use a public domain text (Project Gutenberg) as our small corpus.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> re
+
+<span class="token keyword">def</span> <span class="token function">clean_text</span><span class="token punctuation">(</span>text<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    text <span class="token operator">=</span> re<span class="token punctuation">.</span>sub<span class="token punctuation">(</span><span class="token string">r"&lt;[^>]+>"</span><span class="token punctuation">,</span> <span class="token string">""</span><span class="token punctuation">,</span> text<span class="token punctuation">)</span>
+    text <span class="token operator">=</span> re<span class="token punctuation">.</span>sub<span class="token punctuation">(</span><span class="token string">r"http\S+"</span><span class="token punctuation">,</span> <span class="token string">""</span><span class="token punctuation">,</span> text<span class="token punctuation">)</span>
+    text <span class="token operator">=</span> re<span class="token punctuation">.</span>sub<span class="token punctuation">(</span><span class="token string">r"[^\x20-\x7E\n]"</span><span class="token punctuation">,</span> <span class="token string">""</span><span class="token punctuation">,</span> text<span class="token punctuation">)</span>
+    text <span class="token operator">=</span> re<span class="token punctuation">.</span>sub<span class="token punctuation">(</span><span class="token string">r"\n{3,}"</span><span class="token punctuation">,</span> <span class="token string">"\n\n"</span><span class="token punctuation">,</span> text<span class="token punctuation">)</span>
+    text <span class="token operator">=</span> re<span class="token punctuation">.</span>sub<span class="token punctuation">(</span><span class="token string">r" {2,}"</span><span class="token punctuation">,</span> <span class="token string">" "</span><span class="token punctuation">,</span> text<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> text<span class="token punctuation">.</span>strip<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token keyword">def</span> <span class="token function">quality_filter</span><span class="token punctuation">(</span>text<span class="token punctuation">,</span> min_words<span class="token operator">=</span><span class="token number">50</span><span class="token punctuation">,</span> max_ratio_caps<span class="token operator">=</span><span class="token number">0.3</span><span class="token punctuation">,</span> max_ratio_special<span class="token operator">=</span><span class="token number">0.1</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    words <span class="token operator">=</span> text<span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>words<span class="token punctuation">)</span> <span class="token operator">&lt;</span> min_words<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token boolean">False</span>
+    caps_ratio <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token keyword">for</span> w <span class="token keyword">in</span> words <span class="token keyword">if</span> w<span class="token punctuation">.</span>isupper<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>words<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> caps_ratio <span class="token operator">></span> max_ratio_caps<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token boolean">False</span>
+    special_chars <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token keyword">for</span> c <span class="token keyword">in</span> text <span class="token keyword">if</span> <span class="token keyword">not</span> c<span class="token punctuation">.</span>isalnum<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">and</span> <span class="token keyword">not</span> c<span class="token punctuation">.</span>isspace<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> special_chars <span class="token operator">/</span> <span class="token builtin">max</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>text<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">></span> max_ratio_special<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token boolean">False</span>
+    <span class="token keyword">return</span> <span class="token boolean">True</span></code></pre>
+</figure>
+<p>The quality filter catches SEO spam (ALL CAPS), machine-generated noise (high special character ratio), and stub pages (too short). These three checks alone remove a surprising amount of garbage from web crawls.</p>
+<h3 id="step-2-minhash-deduplication" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-minhash-deduplication" aria-label="Link to this section">#</a>Step 2: MinHash Deduplication</h3>
+<p>Implement MinHash from scratch. No external libraries required -- just <code class="inline-code">hashlib</code>.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> hashlib
+<span class="token keyword">from</span> collections <span class="token keyword">import</span> defaultdict
+
+<span class="token keyword">def</span> <span class="token function">get_shingles</span><span class="token punctuation">(</span>text<span class="token punctuation">,</span> k<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    words <span class="token operator">=</span> text<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>words<span class="token punctuation">)</span> <span class="token operator">&lt;</span> k<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token builtin">set</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token string">" "</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>words<span class="token punctuation">[</span>i<span class="token punctuation">:</span>i<span class="token operator">+</span>k<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>words<span class="token punctuation">)</span> <span class="token operator">-</span> k <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">}</span>
+
+<span class="token keyword">def</span> <span class="token function">minhash_signature</span><span class="token punctuation">(</span>shingles<span class="token punctuation">,</span> num_hashes<span class="token operator">=</span><span class="token number">128</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    signature <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>num_hashes<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        min_hash <span class="token operator">=</span> <span class="token builtin">float</span><span class="token punctuation">(</span><span class="token string">"inf"</span><span class="token punctuation">)</span>
+        <span class="token keyword">for</span> shingle <span class="token keyword">in</span> shingles<span class="token punctuation">:</span>
+            h <span class="token operator">=</span> <span class="token builtin">int</span><span class="token punctuation">(</span>hashlib<span class="token punctuation">.</span>sha256<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>i<span class="token punctuation">}</span></span><span class="token string">:</span><span class="token interpolation"><span class="token punctuation">{</span>shingle<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span>hexdigest<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">16</span><span class="token punctuation">)</span>
+            min_hash <span class="token operator">=</span> <span class="token builtin">min</span><span class="token punctuation">(</span>min_hash<span class="token punctuation">,</span> h<span class="token punctuation">)</span>
+        signature<span class="token punctuation">.</span>append<span class="token punctuation">(</span>min_hash<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> signature
+
+<span class="token keyword">def</span> <span class="token function">lsh_buckets</span><span class="token punctuation">(</span>signature<span class="token punctuation">,</span> bands<span class="token operator">=</span><span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    rows_per_band <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>signature<span class="token punctuation">)</span> <span class="token operator">//</span> bands
+    buckets <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> b <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>bands<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        start <span class="token operator">=</span> b <span class="token operator">*</span> rows_per_band
+        band_data <span class="token operator">=</span> <span class="token builtin">tuple</span><span class="token punctuation">(</span>signature<span class="token punctuation">[</span>start<span class="token punctuation">:</span>start <span class="token operator">+</span> rows_per_band<span class="token punctuation">]</span><span class="token punctuation">)</span>
+        bucket_hash <span class="token operator">=</span> hashlib<span class="token punctuation">.</span>md5<span class="token punctuation">(</span><span class="token builtin">str</span><span class="token punctuation">(</span>band_data<span class="token punctuation">)</span><span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span>hexdigest<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        buckets<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">(</span>b<span class="token punctuation">,</span> bucket_hash<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> buckets
+
+<span class="token keyword">def</span> <span class="token function">deduplicate</span><span class="token punctuation">(</span>documents<span class="token punctuation">,</span> threshold<span class="token operator">=</span><span class="token number">0.8</span><span class="token punctuation">,</span> num_hashes<span class="token operator">=</span><span class="token number">128</span><span class="token punctuation">,</span> bands<span class="token operator">=</span><span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    signatures <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    shingle_sets <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> doc <span class="token keyword">in</span> documents<span class="token punctuation">:</span>
+        shingles <span class="token operator">=</span> get_shingles<span class="token punctuation">(</span>doc<span class="token punctuation">)</span>
+        shingle_sets<span class="token punctuation">.</span>append<span class="token punctuation">(</span>shingles<span class="token punctuation">)</span>
+        signatures<span class="token punctuation">.</span>append<span class="token punctuation">(</span>minhash_signature<span class="token punctuation">(</span>shingles<span class="token punctuation">,</span> num_hashes<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    bucket_map <span class="token operator">=</span> defaultdict<span class="token punctuation">(</span><span class="token builtin">list</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> doc_idx<span class="token punctuation">,</span> sig <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>signatures<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">for</span> band_id<span class="token punctuation">,</span> bucket_hash <span class="token keyword">in</span> lsh_buckets<span class="token punctuation">(</span>sig<span class="token punctuation">,</span> bands<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            bucket_map<span class="token punctuation">[</span><span class="token punctuation">(</span>band_id<span class="token punctuation">,</span> bucket_hash<span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">.</span>append<span class="token punctuation">(</span>doc_idx<span class="token punctuation">)</span>
+
+    duplicate_pairs <span class="token operator">=</span> <span class="token builtin">set</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> bucket_docs <span class="token keyword">in</span> bucket_map<span class="token punctuation">.</span>values<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>bucket_docs<span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">2</span><span class="token punctuation">:</span>
+            <span class="token keyword">continue</span>
+        <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>bucket_docs<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token builtin">len</span><span class="token punctuation">(</span>bucket_docs<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                duplicate_pairs<span class="token punctuation">.</span>add<span class="token punctuation">(</span><span class="token punctuation">(</span>bucket_docs<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> bucket_docs<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    removed <span class="token operator">=</span> <span class="token builtin">set</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> i<span class="token punctuation">,</span> j <span class="token keyword">in</span> duplicate_pairs<span class="token punctuation">:</span>
+        <span class="token keyword">if</span> i <span class="token keyword">in</span> removed <span class="token keyword">or</span> j <span class="token keyword">in</span> removed<span class="token punctuation">:</span>
+            <span class="token keyword">continue</span>
+        s1<span class="token punctuation">,</span> s2 <span class="token operator">=</span> shingle_sets<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> shingle_sets<span class="token punctuation">[</span>j<span class="token punctuation">]</span>
+        <span class="token keyword">if</span> <span class="token keyword">not</span> s1 <span class="token keyword">or</span> <span class="token keyword">not</span> s2<span class="token punctuation">:</span>
+            <span class="token keyword">continue</span>
+        jaccard <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>s1 <span class="token operator">&amp;</span> s2<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>s1 <span class="token operator">|</span> s2<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> jaccard <span class="token operator">>=</span> threshold<span class="token punctuation">:</span>
+            removed<span class="token punctuation">.</span>add<span class="token punctuation">(</span>j<span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> <span class="token punctuation">[</span>doc <span class="token keyword">for</span> idx<span class="token punctuation">,</span> doc <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>documents<span class="token punctuation">)</span> <span class="token keyword">if</span> idx <span class="token keyword">not</span> <span class="token keyword">in</span> removed<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token builtin">len</span><span class="token punctuation">(</span>removed<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>The <code class="inline-code">num_hashes=128</code> and <code class="inline-code">bands=16</code> parameters control the precision-recall tradeoff. More hashes give more accurate similarity estimates. More bands increase recall (catch more duplicates) at the cost of more false positives. These values work well for typical web text.</p>
+<h3 id="step-3-tokenize-and-pack-sequences" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-tokenize-and-pack-sequences" aria-label="Link to this section">#</a>Step 3: Tokenize and Pack Sequences</h3>
+<p>Take the clean, deduplicated text, tokenize it, and pack into fixed-length sequences for training.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">tokenize_corpus</span><span class="token punctuation">(</span>documents<span class="token punctuation">,</span> tokenizer<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    all_tokens <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> doc <span class="token keyword">in</span> documents<span class="token punctuation">:</span>
+        tokens <span class="token operator">=</span> tokenizer<span class="token punctuation">.</span>encode<span class="token punctuation">(</span>doc<span class="token punctuation">)</span>
+        all_tokens<span class="token punctuation">.</span>extend<span class="token punctuation">(</span>tokens<span class="token punctuation">)</span>
+        all_tokens<span class="token punctuation">.</span>append<span class="token punctuation">(</span>tokenizer<span class="token punctuation">.</span>eos_id<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> all_tokens
+
+<span class="token keyword">def</span> <span class="token function">pack_sequences</span><span class="token punctuation">(</span>token_ids<span class="token punctuation">,</span> seq_length<span class="token punctuation">,</span> pad_id<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    sequences <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    attention_masks <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token builtin">len</span><span class="token punctuation">(</span>token_ids<span class="token punctuation">)</span><span class="token punctuation">,</span> seq_length<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        seq <span class="token operator">=</span> token_ids<span class="token punctuation">[</span>i<span class="token punctuation">:</span>i <span class="token operator">+</span> seq_length<span class="token punctuation">]</span>
+        mask <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token builtin">len</span><span class="token punctuation">(</span>seq<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>seq<span class="token punctuation">)</span> <span class="token operator">&lt;</span> seq_length<span class="token punctuation">:</span>
+            pad_count <span class="token operator">=</span> seq_length <span class="token operator">-</span> <span class="token builtin">len</span><span class="token punctuation">(</span>seq<span class="token punctuation">)</span>
+            seq <span class="token operator">=</span> seq <span class="token operator">+</span> <span class="token punctuation">[</span>pad_id<span class="token punctuation">]</span> <span class="token operator">*</span> pad_count
+            mask <span class="token operator">=</span> mask <span class="token operator">+</span> <span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">*</span> pad_count
+        sequences<span class="token punctuation">.</span>append<span class="token punctuation">(</span>seq<span class="token punctuation">)</span>
+        attention_masks<span class="token punctuation">.</span>append<span class="token punctuation">(</span>mask<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> sequences<span class="token punctuation">,</span> attention_masks</code></pre>
+</figure>
+<h3 id="step-4-dataloader-for-training" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-dataloader-for-training" aria-label="Link to this section">#</a>Step 4: DataLoader for Training</h3>
+<p>Yield randomized batches of packed sequences. This is what the training loop consumes.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> random
+
+<span class="token keyword">class</span> <span class="token class-name">PreTrainingDataLoader</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> sequences<span class="token punctuation">,</span> attention_masks<span class="token punctuation">,</span> batch_size<span class="token punctuation">,</span> shuffle<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>sequences <span class="token operator">=</span> sequences
+        self<span class="token punctuation">.</span>attention_masks <span class="token operator">=</span> attention_masks
+        self<span class="token punctuation">.</span>batch_size <span class="token operator">=</span> batch_size
+        self<span class="token punctuation">.</span>shuffle <span class="token operator">=</span> shuffle
+
+    <span class="token keyword">def</span> <span class="token function">__len__</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>sequences<span class="token punctuation">)</span> <span class="token operator">+</span> self<span class="token punctuation">.</span>batch_size <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">//</span> self<span class="token punctuation">.</span>batch_size
+
+    <span class="token keyword">def</span> <span class="token function">__iter__</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        indices <span class="token operator">=</span> <span class="token builtin">list</span><span class="token punctuation">(</span><span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>sequences<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> self<span class="token punctuation">.</span>shuffle<span class="token punctuation">:</span>
+            random<span class="token punctuation">.</span>shuffle<span class="token punctuation">(</span>indices<span class="token punctuation">)</span>
+        <span class="token keyword">for</span> start <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token builtin">len</span><span class="token punctuation">(</span>indices<span class="token punctuation">)</span><span class="token punctuation">,</span> self<span class="token punctuation">.</span>batch_size<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            batch_idx <span class="token operator">=</span> indices<span class="token punctuation">[</span>start<span class="token punctuation">:</span>start <span class="token operator">+</span> self<span class="token punctuation">.</span>batch_size<span class="token punctuation">]</span>
+            batch_seqs <span class="token operator">=</span> <span class="token punctuation">[</span>self<span class="token punctuation">.</span>sequences<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token keyword">for</span> i <span class="token keyword">in</span> batch_idx<span class="token punctuation">]</span>
+            batch_masks <span class="token operator">=</span> <span class="token punctuation">[</span>self<span class="token punctuation">.</span>attention_masks<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token keyword">for</span> i <span class="token keyword">in</span> batch_idx<span class="token punctuation">]</span>
+            <span class="token keyword">yield</span> batch_seqs<span class="token punctuation">,</span> batch_masks</code></pre>
+</figure>
+<h3 id="step-5-dataset-statistics" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-dataset-statistics" aria-label="Link to this section">#</a>Step 5: Dataset Statistics</h3>
+<p>Compute the numbers that matter: total tokens, unique tokens, compression ratio, document length distribution.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> collections <span class="token keyword">import</span> Counter
+
+<span class="token keyword">def</span> <span class="token function">compute_statistics</span><span class="token punctuation">(</span>documents<span class="token punctuation">,</span> token_ids<span class="token punctuation">,</span> sequences<span class="token punctuation">,</span> tokenizer_vocab_size<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    total_chars <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>d<span class="token punctuation">)</span> <span class="token keyword">for</span> d <span class="token keyword">in</span> documents<span class="token punctuation">)</span>
+    total_tokens <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>token_ids<span class="token punctuation">)</span>
+    unique_tokens <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span><span class="token builtin">set</span><span class="token punctuation">(</span>token_ids<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    compression_ratio <span class="token operator">=</span> total_chars <span class="token operator">/</span> total_tokens
+
+    doc_lengths <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token builtin">len</span><span class="token punctuation">(</span>d<span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">for</span> d <span class="token keyword">in</span> documents<span class="token punctuation">]</span>
+    avg_doc_length <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>doc_lengths<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token builtin">max</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>doc_lengths<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span>
+    max_doc_length <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span>doc_lengths<span class="token punctuation">)</span> <span class="token keyword">if</span> doc_lengths <span class="token keyword">else</span> <span class="token number">0</span>
+    min_doc_length <span class="token operator">=</span> <span class="token builtin">min</span><span class="token punctuation">(</span>doc_lengths<span class="token punctuation">)</span> <span class="token keyword">if</span> doc_lengths <span class="token keyword">else</span> <span class="token number">0</span>
+
+    token_counts <span class="token operator">=</span> Counter<span class="token punctuation">(</span>token_ids<span class="token punctuation">)</span>
+    top_tokens <span class="token operator">=</span> token_counts<span class="token punctuation">.</span>most_common<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span>
+
+    non_pad_tokens <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token keyword">for</span> t <span class="token keyword">in</span> seq <span class="token keyword">if</span> t <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token keyword">for</span> seq <span class="token keyword">in</span> sequences<span class="token punctuation">)</span>
+    total_positions <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>seq<span class="token punctuation">)</span> <span class="token keyword">for</span> seq <span class="token keyword">in</span> sequences<span class="token punctuation">)</span>
+    utilization <span class="token operator">=</span> non_pad_tokens <span class="token operator">/</span> <span class="token builtin">max</span><span class="token punctuation">(</span>total_positions<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span>
+
+    stats <span class="token operator">=</span> <span class="token punctuation">{</span>
+        <span class="token string">"total_documents"</span><span class="token punctuation">:</span> <span class="token builtin">len</span><span class="token punctuation">(</span>documents<span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token string">"total_characters"</span><span class="token punctuation">:</span> total_chars<span class="token punctuation">,</span>
+        <span class="token string">"total_tokens"</span><span class="token punctuation">:</span> total_tokens<span class="token punctuation">,</span>
+        <span class="token string">"unique_tokens"</span><span class="token punctuation">:</span> unique_tokens<span class="token punctuation">,</span>
+        <span class="token string">"vocab_utilization"</span><span class="token punctuation">:</span> unique_tokens <span class="token operator">/</span> tokenizer_vocab_size<span class="token punctuation">,</span>
+        <span class="token string">"compression_ratio"</span><span class="token punctuation">:</span> compression_ratio<span class="token punctuation">,</span>
+        <span class="token string">"avg_doc_length_words"</span><span class="token punctuation">:</span> avg_doc_length<span class="token punctuation">,</span>
+        <span class="token string">"max_doc_length_words"</span><span class="token punctuation">:</span> max_doc_length<span class="token punctuation">,</span>
+        <span class="token string">"min_doc_length_words"</span><span class="token punctuation">:</span> min_doc_length<span class="token punctuation">,</span>
+        <span class="token string">"num_sequences"</span><span class="token punctuation">:</span> <span class="token builtin">len</span><span class="token punctuation">(</span>sequences<span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token string">"sequence_utilization"</span><span class="token punctuation">:</span> utilization<span class="token punctuation">,</span>
+        <span class="token string">"top_10_tokens"</span><span class="token punctuation">:</span> top_tokens<span class="token punctuation">,</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> stats</code></pre>
+</figure>
+<p>Compression ratio tells you how efficient the tokenizer is on this corpus. English text typically compresses to about 3-4 characters per token. If you see 1.5 characters per token, your tokenizer is splitting too aggressively. If you see 8+, it has learned very domain-specific merges.</p>
+<p>Sequence utilization tells you how much of your packed sequences is real data versus padding. Below 90% means your packing is inefficient -- you are wasting compute on padding tokens.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<h3 id="compare-with-huggingface-datasets" class="prose-h prose-h3"><a class="prose-h__anchor" href="#compare-with-huggingface-datasets" aria-label="Link to this section">#</a>Compare With HuggingFace Datasets</h3>
+<p>Load the same corpus through HuggingFace&#39;s datasets library and compare the pipeline speed.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> datasets <span class="token keyword">import</span> load_dataset
+<span class="token keyword">from</span> transformers <span class="token keyword">import</span> AutoTokenizer
+
+ds <span class="token operator">=</span> load_dataset<span class="token punctuation">(</span><span class="token string">"wikitext"</span><span class="token punctuation">,</span> <span class="token string">"wikitext-2-raw-v1"</span><span class="token punctuation">,</span> split<span class="token operator">=</span><span class="token string">"train"</span><span class="token punctuation">)</span>
+tokenizer <span class="token operator">=</span> AutoTokenizer<span class="token punctuation">.</span>from_pretrained<span class="token punctuation">(</span><span class="token string">"meta-llama/Meta-Llama-3-8B"</span><span class="token punctuation">)</span>
+
+<span class="token keyword">import</span> time
+
+start <span class="token operator">=</span> time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span>
+tokenized <span class="token operator">=</span> ds<span class="token punctuation">.</span><span class="token builtin">map</span><span class="token punctuation">(</span>
+    <span class="token keyword">lambda</span> x<span class="token punctuation">:</span> tokenizer<span class="token punctuation">(</span>x<span class="token punctuation">[</span><span class="token string">"text"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> truncation<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">,</span> max_length<span class="token operator">=</span><span class="token number">2048</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    batched<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">,</span>
+    num_proc<span class="token operator">=</span><span class="token number">4</span><span class="token punctuation">,</span>
+<span class="token punctuation">)</span>
+hf_time <span class="token operator">=</span> time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span> start
+total_tokens <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>t<span class="token punctuation">)</span> <span class="token keyword">for</span> t <span class="token keyword">in</span> tokenized<span class="token punctuation">[</span><span class="token string">"input_ids"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"HuggingFace: </span><span class="token interpolation"><span class="token punctuation">{</span>total_tokens<span class="token punctuation">:</span><span class="token format-spec">,</span><span class="token punctuation">}</span></span><span class="token string"> tokens in </span><span class="token interpolation"><span class="token punctuation">{</span>hf_time<span class="token punctuation">:</span><span class="token format-spec">.2f</span><span class="token punctuation">}</span></span><span class="token string">s (</span><span class="token interpolation"><span class="token punctuation">{</span>total_tokens<span class="token operator">/</span>hf_time<span class="token punctuation">:</span><span class="token format-spec">,.0f</span><span class="token punctuation">}</span></span><span class="token string"> tokens/sec)"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>The HuggingFace pipeline uses Rust tokenizers under the hood and parallel processing across 4 cores. Your pure Python pipeline will be 10-50x slower. That gap is why production teams use compiled tokenizers. The algorithm is the same. The implementation language is the difference.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces a prompt for validating and debugging data quality in LLM training pipelines. See <code class="inline-code">outputs/prompt-data-quality-checker.md</code>.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><strong>Easy:</strong> Add language detection to the cleaning pipeline using a simple heuristic (character set analysis). Filter to only English documents and measure how many documents get removed.</li>
+<li><strong>Medium:</strong> Implement exact deduplication using SHA-256 hashes alongside the MinHash near-deduplication. Compare the number of duplicates caught by each method on a web-scraped corpus.</li>
+<li><strong>Hard:</strong> Build a perplexity-based quality filter. Train a small bigram language model on Wikipedia text, score each document by perplexity, and remove the bottom 20%. Compare model output quality when training on filtered vs unfiltered data.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Common Crawl</td>
+<td>&quot;The internet&quot;</td>
+<td>A non-profit that crawls the web monthly -- ~250TB raw, the starting point for most LLM training data</td>
+</tr>
+<tr>
+<td>MinHash</td>
+<td>&quot;Some hashing trick&quot;</td>
+<td>A technique to estimate Jaccard similarity between sets using fixed-size signatures -- enables near-duplicate detection at scale</td>
+</tr>
+<tr>
+<td>LSH</td>
+<td>&quot;Locality-Sensitive Hashing&quot;</td>
+<td>A method to group similar items into the same bucket -- reduces pairwise comparisons from O(n^2) to near-linear</td>
+</tr>
+<tr>
+<td>Sequence packing</td>
+<td>&quot;Concatenating documents&quot;</td>
+<td>Fitting multiple documents into fixed-length sequences with proper attention masks -- eliminates padding waste</td>
+</tr>
+<tr>
+<td>Chinchilla scaling</td>
+<td>&quot;Train on more data&quot;</td>
+<td>For a fixed compute budget, optimal performance requires scaling model size and training tokens roughly equally</td>
+</tr>
+<tr>
+<td>Fertility</td>
+<td>&quot;Tokens per word&quot;</td>
+<td>Average number of tokens per word -- 1.3 for English in GPT-4, higher for non-Latin scripts</td>
+</tr>
+<tr>
+<td>Data mixing</td>
+<td>&quot;Choosing training data&quot;</td>
+<td>The ratio of code vs text vs math vs multilingual data -- no formula, requires experimentation</td>
+</tr>
+<tr>
+<td>Perplexity filter</td>
+<td>&quot;Quality scoring&quot;</td>
+<td>Use a small language model to score documents -- high perplexity means the text is unlike clean reference data</td>
+</tr>
+<tr>
+<td>Deduplication</td>
+<td>&quot;Removing copies&quot;</td>
+<td>Eliminating exact and near-duplicate documents -- typically removes 30-40% of raw web data</td>
+</tr>
+<tr>
+<td>Attention mask</td>
+<td>&quot;Which tokens to look at&quot;</td>
+<td>A binary mask that prevents attention across document boundaries in packed sequences</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2203.15556" target="_blank" rel="noopener">Hoffmann et al., 2022 -- Training Compute-Optimal Large Language Models (Chinchilla)</a> -- the paper that changed how we think about data scale</li>
+<li><a href="https://arxiv.org/abs/2306.01116" target="_blank" rel="noopener">Penedo et al., 2023 -- The RefinedWeb Dataset for Falcon LLM</a> -- how to filter Common Crawl to high quality</li>
+<li><a href="https://arxiv.org/abs/2307.09288" target="_blank" rel="noopener">Touvron et al., 2023 -- Llama 2: Open Foundation and Fine-Tuned Chat Models</a> -- data pipeline details for Llama 2</li>
+<li><a href="https://arxiv.org/abs/2107.06499" target="_blank" rel="noopener">Lee et al., 2022 -- Deduplicating Training Data Makes Language Models Better</a> -- why deduplication matters more than you think</li>
+<li><a href="https://ieeexplore.ieee.org/document/666900" target="_blank" rel="noopener">Broder, 1997 -- On the Resemblance and Containment of Documents</a> -- the original MinHash paper</li>
+<li><a href="https://arxiv.org/abs/2407.21783" target="_blank" rel="noopener">Meta, 2024 -- Llama 3 Technical Report</a> -- 15.6T tokens, data mixing ratios, filtering pipeline</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="02-building-a-tokenizer.html">
+  <span class="label">← Previous</span>
+  <b>Building a Tokenizer from Scratch</b>
+</a>
+      <a class="pager__item pager__item--next" href="04-pre-training-mini-gpt.html">
+  <span class="label">Next →</span>
+  <b>Pre-Training a Mini GPT (124M Parameters)</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>9 minutes</b> of LLMs from Scratch behind you.</p>
+      <a class="btn btn--solid" href="04-pre-training-mini-gpt.html">Continue to Pre-Training a Mini GPT (124M Parameters) →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#where-the-data-comes-from">Where the Data Comes From</a></li><li class="mini__item mini__item--d3"><a href="#data-cleaning">Data Cleaning</a></li><li class="mini__item mini__item--d3"><a href="#deduplication-with-minhash">Deduplication with MinHash</a></li><li class="mini__item mini__item--d3"><a href="#sequence-packing">Sequence Packing</a></li><li class="mini__item mini__item--d3"><a href="#the-chinchilla-scaling-law">The Chinchilla Scaling Law</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-text-cleaning">Step 1: Text Cleaning</a></li><li class="mini__item mini__item--d3"><a href="#step-2-minhash-deduplication">Step 2: MinHash Deduplication</a></li><li class="mini__item mini__item--d3"><a href="#step-3-tokenize-and-pack-sequences">Step 3: Tokenize and Pack Sequences</a></li><li class="mini__item mini__item--d3"><a href="#step-4-dataloader-for-training">Step 4: DataLoader for Training</a></li><li class="mini__item mini__item--d3"><a href="#step-5-dataset-statistics">Step 5: Dataset Statistics</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d3"><a href="#compare-with-huggingface-datasets">Compare With HuggingFace Datasets</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

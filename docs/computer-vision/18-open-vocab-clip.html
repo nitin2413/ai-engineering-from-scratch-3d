@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open-Vocabulary Vision — CLIP — Computer Vision — AIFS</title>
+<meta name="description" content="Computer Vision: Open-Vocabulary Vision — CLIP. 4 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Open-Vocabulary Vision — CLIP — Computer Vision — AIFS">
+<meta property="og:description" content="Computer Vision: Open-Vocabulary Vision — CLIP. 4 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"clip-contrastive":["../assets/figures/figures-cv2.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-cv2.js"];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#FF6B1A" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#FF6B1A;--accent-ink:#111111"
+  data-lesson-id="computer-vision/18-open-vocab-clip" data-module="computer-vision"
+  data-prev="17-self-supervised-vision.html" data-next="19-ocr-document-understanding.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#FF6B1A">
+        <span class="label">Phase 04</span>
+        <b>Computer Vision</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="computer-vision/01-image-fundamentals"><a href="01-image-fundamentals.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Image Fundamentals — Pixels, Channels, Color Spaces</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/02-convolutions-from-scratch"><a href="02-convolutions-from-scratch.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Convolutions from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/03-cnns-lenet-to-resnet"><a href="03-cnns-lenet-to-resnet.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">CNNs — LeNet to ResNet</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/04-image-classification"><a href="04-image-classification.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Image Classification</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/05-transfer-learning"><a href="05-transfer-learning.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Transfer Learning &amp; Fine-Tuning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/06-object-detection-yolo"><a href="06-object-detection-yolo.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Object Detection — YOLO from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/07-semantic-segmentation-unet"><a href="07-semantic-segmentation-unet.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Semantic Segmentation — U-Net</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/08-instance-segmentation-mask-rcnn"><a href="08-instance-segmentation-mask-rcnn.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Instance Segmentation — Mask R-CNN</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/09-image-generation-gans"><a href="09-image-generation-gans.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Image Generation — GANs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/10-image-generation-diffusion"><a href="10-image-generation-diffusion.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Image Generation — Diffusion Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/11-stable-diffusion"><a href="11-stable-diffusion.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Stable Diffusion — Architecture &amp; Fine-Tuning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/12-video-understanding"><a href="12-video-understanding.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Video Understanding — Temporal Modeling</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/13-3d-vision-nerf"><a href="13-3d-vision-nerf.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">3D Vision — Point Clouds &amp; NeRFs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/14-vision-transformers"><a href="14-vision-transformers.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Vision Transformers (ViT)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/15-real-time-edge"><a href="15-real-time-edge.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Real-Time Vision — Edge Deployment</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/16-vision-pipeline-capstone"><a href="16-vision-pipeline-capstone.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Build a Complete Vision Pipeline — Capstone</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/17-self-supervised-vision"><a href="17-self-supervised-vision.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Self-Supervised Vision — SimCLR, DINO, MAE</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/18-open-vocab-clip"><a href="18-open-vocab-clip.html" class="is-current">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Open-Vocabulary Vision — CLIP</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/19-ocr-document-understanding"><a href="19-ocr-document-understanding.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">OCR &amp; Document Understanding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/20-image-retrieval-metric"><a href="20-image-retrieval-metric.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Image Retrieval &amp; Metric Learning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/21-keypoint-pose"><a href="21-keypoint-pose.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Keypoint Detection &amp; Pose Estimation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/22-3d-gaussian-splatting"><a href="22-3d-gaussian-splatting.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">3D Gaussian Splatting from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/23-diffusion-transformers-rectified-flow"><a href="23-diffusion-transformers-rectified-flow.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Diffusion Transformers &amp; Rectified Flow</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/24-sam3-open-vocab-segmentation"><a href="24-sam3-open-vocab-segmentation.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">SAM 3 &amp; Open-Vocabulary Segmentation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/25-vision-language-models"><a href="25-vision-language-models.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Vision-Language Models — The ViT-MLP-LLM Pattern</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/26-monocular-depth"><a href="26-monocular-depth.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Monocular Depth &amp; Geometry Estimation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/27-multi-object-tracking"><a href="27-multi-object-tracking.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">Multi-Object Tracking &amp; Video Memory</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/28-world-models-video-diffusion"><a href="28-world-models-video-diffusion.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">World Models &amp; Video Diffusion</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Computer Vision</a></p>
+      <h1 class="page__title">Open-Vocabulary Vision — CLIP</h1>
+      <p class="page__lede">Train an image encoder and a text encoder together so that matching (image, caption) pairs land at the same point in a shared space. That is the whole trick.</p>
+      <div class="page__meta">
+        <span class="chip">4 min read</span>
+        <span class="chip">922 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build + Use</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 4 Lesson 14 (ViT), Phase 4 Lesson 17 (Self-Supervised)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~45 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Explain CLIP&#39;s two-tower architecture and contrastive training objective</li>
+<li>Use a pretrained CLIP (or SigLIP) for zero-shot classification without any task-specific training</li>
+<li>Implement zero-shot classification from scratch: encode class prompts, compute cosine similarity, take argmax</li>
+<li>Distinguish CLIP, SigLIP, OpenCLIP, and LLaVA/LLaMA-vision models — what each is for in 2026</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Traditional classifiers are closed-vocabulary: a 1000-class ImageNet model can only predict 1000 labels. Every new category requires labelled data and a retrained head.</p>
+<p>CLIP (Radford et al., OpenAI 2021) showed that training on 400M (image, caption) pairs scraped from the web produces a model that can classify into any set of categories at inference, described purely in natural language. You give it a new class by writing a sentence.</p>
+<p>That capability — zero-shot transfer — is why every modern vision system starts with a CLIP-family checkpoint. Detection (Grounding DINO, OWL-ViT), segmentation (CLIPSeg, SAM), retrieval, content moderation, VLMs, and text-to-image generation all build on CLIP-style joint embeddings.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="two-towers" class="prose-h prose-h3"><a class="prose-h__anchor" href="#two-towers" aria-label="Link to this section">#</a>Two towers</h3>
+<figure class="mermaid-figure">
+  <pre class="mermaid">flowchart LR
+    IMG[&quot;Image&quot;] --&gt; IENC[&quot;Image encoder&lt;br/&gt;(ViT-L/14)&quot;] --&gt; IEMB[&quot;Image embedding&lt;br/&gt;(1024,)&quot;]
+    TXT[&quot;Caption&quot;] --&gt; TENC[&quot;Text encoder&lt;br/&gt;(transformer)&quot;] --&gt; TEMB[&quot;Text embedding&lt;br/&gt;(1024,)&quot;]
+    IEMB --&gt; SIM[&quot;Cosine similarity&quot;]
+    TEMB --&gt; SIM
+
+    style IENC fill:#dbeafe,stroke:#2563eb
+    style TENC fill:#fef3c7,stroke:#d97706
+    style SIM fill:#dcfce7,stroke:#16a34a</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>Both encoders end with a linear projection to the same embedding dimension (512 for CLIP-B/32, 1024 for CLIP-L/14). L2-normalise and compute cosine similarity.</p>
+<h3 id="the-objective" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-objective" aria-label="Link to this section">#</a>The objective</h3>
+<p>Given a batch of N (image, caption) pairs, build an NxN similarity matrix. Train both encoders so the diagonal (matching pairs) has high similarity and off-diagonals (non-matching) have low similarity.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>sim_matrix = image_embeddings @ text_embeddings.T / tau
+
+loss_i2t = cross_entropy(sim_matrix,       targets=arange(N))
+loss_t2i = cross_entropy(sim_matrix.T,     targets=arange(N))
+loss = (loss_i2t + loss_t2i) / 2</code></pre>
+</figure>
+<p>Symmetric because both image-to-text and text-to-image retrieval should work. <code class="inline-code">tau</code> (temperature) is typically learned as a scalar parameter, initialised to 0.07.</p>
+<h3 id="siglip-a-better-loss" class="prose-h prose-h3"><a class="prose-h__anchor" href="#siglip-a-better-loss" aria-label="Link to this section">#</a>SigLIP: a better loss</h3>
+<p>SigLIP (Zhai et al., 2023) replaced the softmax with per-pair sigmoid:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>loss = mean over pairs of log(1 + exp(-y_ij * sim_ij))
+y_ij = +1 if matching, -1 otherwise</code></pre>
+</figure>
+<p>Per-pair loss removes the batch-level normalisation that CLIP requires. SigLIP trains better at small batch sizes and matches or exceeds CLIP at equal data.</p>
+<h3 id="zero-shot-classification" class="prose-h prose-h3"><a class="prose-h__anchor" href="#zero-shot-classification" aria-label="Link to this section">#</a>Zero-shot classification</h3>
+<p>Given a trained CLIP:</p>
+<ol>
+<li>For each class, compose a prompt: &quot;a photo of a {class}&quot;.</li>
+<li>Encode all class prompts with the text encoder -&gt; <code class="inline-code">T</code> shape (C, d).</li>
+<li>Encode the test image -&gt; <code class="inline-code">I</code> shape (1, d).</li>
+<li>Similarity = <code class="inline-code">I @ T.T</code> shape (1, C).</li>
+<li>Argmax -&gt; predicted class.</li>
+</ol>
+<p>Prompt engineering matters. OpenAI published 80 prompt templates for ImageNet (&quot;a photo of a {}&quot;, &quot;a blurry photo of a {}&quot;, &quot;a sketch of a {}&quot;, ...). Average the embeddings of all templates per class for an extra 1-3% top-1 accuracy.</p>
+<h3 id="where-clip-style-models-are-used-in-2026" class="prose-h prose-h3"><a class="prose-h__anchor" href="#where-clip-style-models-are-used-in-2026" aria-label="Link to this section">#</a>Where CLIP-style models are used in 2026</h3>
+<ul>
+<li><strong>Zero-shot classification</strong> — direct use.</li>
+<li><strong>Image retrieval</strong> — encode all images once, embed query at inference.</li>
+<li><strong>Text-conditioned detection</strong> — Grounding DINO, OWL-ViT wrap a CLIP text tower around a detector.</li>
+<li><strong>Text-conditioned segmentation</strong> — CLIPSeg; SAM uses text-prompt inputs via CLIP.</li>
+<li><strong>VLMs</strong> — LLaVA, Qwen-VL, InternVL wire a CLIP-family vision encoder into an LLM.</li>
+<li><strong>Text-to-image gen</strong> — Stable Diffusion, DALL-E 3 condition on CLIP text embeddings.</li>
+</ul>
+<p>Once you have a shared embedding space, every vision+language task becomes a distance computation.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="clip-contrastive"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">clip-contrastive</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> clip contrastive</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-a-tiny-two-tower-model" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-a-tiny-two-tower-model" aria-label="Link to this section">#</a>Step 1: A tiny two-tower model</h3>
+<p>Real CLIP is ViT + transformer. For this lesson the towers are small MLPs over pre-extracted features so the training signal is visible on CPU.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> torch
+<span class="token keyword">import</span> torch<span class="token punctuation">.</span>nn <span class="token keyword">as</span> nn
+<span class="token keyword">import</span> torch<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>functional <span class="token keyword">as</span> F
+
+
+<span class="token keyword">class</span> <span class="token class-name">TwoTower</span><span class="token punctuation">(</span>nn<span class="token punctuation">.</span>Module<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> img_in<span class="token operator">=</span><span class="token number">128</span><span class="token punctuation">,</span> txt_in<span class="token operator">=</span><span class="token number">64</span><span class="token punctuation">,</span> emb<span class="token operator">=</span><span class="token number">64</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token builtin">super</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>__init__<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>image_proj <span class="token operator">=</span> nn<span class="token punctuation">.</span>Sequential<span class="token punctuation">(</span>nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span>img_in<span class="token punctuation">,</span> <span class="token number">128</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nn<span class="token punctuation">.</span>ReLU<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">128</span><span class="token punctuation">,</span> emb<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>text_proj <span class="token operator">=</span> nn<span class="token punctuation">.</span>Sequential<span class="token punctuation">(</span>nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span>txt_in<span class="token punctuation">,</span> <span class="token number">128</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nn<span class="token punctuation">.</span>ReLU<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">128</span><span class="token punctuation">,</span> emb<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>logit_scale <span class="token operator">=</span> nn<span class="token punctuation">.</span>Parameter<span class="token punctuation">(</span>torch<span class="token punctuation">.</span>ones<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">2.6592</span><span class="token punctuation">)</span>  <span class="token comment"># ln(1/0.07)</span>
+
+    <span class="token keyword">def</span> <span class="token function">forward</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> img_feats<span class="token punctuation">,</span> txt_feats<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        i <span class="token operator">=</span> F<span class="token punctuation">.</span>normalize<span class="token punctuation">(</span>self<span class="token punctuation">.</span>image_proj<span class="token punctuation">(</span>img_feats<span class="token punctuation">)</span><span class="token punctuation">,</span> dim<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+        t <span class="token operator">=</span> F<span class="token punctuation">.</span>normalize<span class="token punctuation">(</span>self<span class="token punctuation">.</span>text_proj<span class="token punctuation">(</span>txt_feats<span class="token punctuation">)</span><span class="token punctuation">,</span> dim<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> i<span class="token punctuation">,</span> t<span class="token punctuation">,</span> self<span class="token punctuation">.</span>logit_scale<span class="token punctuation">.</span>exp<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Two projections, shared-dim output, learned temperature. Same shape as the real CLIP API.</p>
+<h3 id="step-2-contrastive-loss" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-contrastive-loss" aria-label="Link to this section">#</a>Step 2: Contrastive loss</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">clip_loss</span><span class="token punctuation">(</span>image_emb<span class="token punctuation">,</span> text_emb<span class="token punctuation">,</span> logit_scale<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    N <span class="token operator">=</span> image_emb<span class="token punctuation">.</span>size<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+    sim <span class="token operator">=</span> logit_scale <span class="token operator">*</span> image_emb @ text_emb<span class="token punctuation">.</span>T
+    targets <span class="token operator">=</span> torch<span class="token punctuation">.</span>arange<span class="token punctuation">(</span>N<span class="token punctuation">,</span> device<span class="token operator">=</span>sim<span class="token punctuation">.</span>device<span class="token punctuation">)</span>
+    l_i <span class="token operator">=</span> F<span class="token punctuation">.</span>cross_entropy<span class="token punctuation">(</span>sim<span class="token punctuation">,</span> targets<span class="token punctuation">)</span>
+    l_t <span class="token operator">=</span> F<span class="token punctuation">.</span>cross_entropy<span class="token punctuation">(</span>sim<span class="token punctuation">.</span>T<span class="token punctuation">,</span> targets<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span>l_i <span class="token operator">+</span> l_t<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token number">2</span></code></pre>
+</figure>
+<p>Symmetric. Higher logit_scale = sharper softmax = more confident but risk of instability.</p>
+<h3 id="step-3-zero-shot-classifier" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-zero-shot-classifier" aria-label="Link to this section">#</a>Step 3: Zero-shot classifier</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token decorator annotation punctuation">@torch<span class="token punctuation">.</span>no_grad</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">zero_shot_classify</span><span class="token punctuation">(</span>model<span class="token punctuation">,</span> image_feats<span class="token punctuation">,</span> class_text_feats<span class="token punctuation">,</span> class_names<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""
+    image_feats:      (N, img_in)
+    class_text_feats: (C, txt_in)   one averaged embedding per class
+    """</span>
+    i <span class="token operator">=</span> F<span class="token punctuation">.</span>normalize<span class="token punctuation">(</span>model<span class="token punctuation">.</span>image_proj<span class="token punctuation">(</span>image_feats<span class="token punctuation">)</span><span class="token punctuation">,</span> dim<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+    t <span class="token operator">=</span> F<span class="token punctuation">.</span>normalize<span class="token punctuation">(</span>model<span class="token punctuation">.</span>text_proj<span class="token punctuation">(</span>class_text_feats<span class="token punctuation">)</span><span class="token punctuation">,</span> dim<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+    sim <span class="token operator">=</span> i @ t<span class="token punctuation">.</span>T
+    pred <span class="token operator">=</span> sim<span class="token punctuation">.</span>argmax<span class="token punctuation">(</span>dim<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token punctuation">[</span>class_names<span class="token punctuation">[</span>p<span class="token punctuation">]</span> <span class="token keyword">for</span> p <span class="token keyword">in</span> pred<span class="token punctuation">.</span>tolist<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span></code></pre>
+</figure>
+<p>One line per step. This is the exact zero-shot procedure used with a production CLIP checkpoint.</p>
+<h3 id="step-4-sanity-check" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-sanity-check" aria-label="Link to this section">#</a>Step 4: Sanity check</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python">torch<span class="token punctuation">.</span>manual_seed<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+model <span class="token operator">=</span> TwoTower<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+img <span class="token operator">=</span> torch<span class="token punctuation">.</span>randn<span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">,</span> <span class="token number">128</span><span class="token punctuation">)</span>
+txt <span class="token operator">=</span> torch<span class="token punctuation">.</span>randn<span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">,</span> <span class="token number">64</span><span class="token punctuation">)</span>
+i<span class="token punctuation">,</span> t<span class="token punctuation">,</span> scale <span class="token operator">=</span> model<span class="token punctuation">(</span>img<span class="token punctuation">,</span> txt<span class="token punctuation">)</span>
+loss <span class="token operator">=</span> clip_loss<span class="token punctuation">(</span>i<span class="token punctuation">,</span> t<span class="token punctuation">,</span> scale<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"batch size: </span><span class="token interpolation"><span class="token punctuation">{</span>i<span class="token punctuation">.</span>size<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">   loss: </span><span class="token interpolation"><span class="token punctuation">{</span>loss<span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.3f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Loss should be close to <code class="inline-code">log(N) = log(8) = 2.08</code> for a randomly initialised model — the symmetric cross-entropy target when no structure is learned yet.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>OpenCLIP is the community default in 2026:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> open_clip
+<span class="token keyword">import</span> torch
+<span class="token keyword">from</span> PIL <span class="token keyword">import</span> Image
+
+model<span class="token punctuation">,</span> _<span class="token punctuation">,</span> preprocess <span class="token operator">=</span> open_clip<span class="token punctuation">.</span>create_model_and_transforms<span class="token punctuation">(</span><span class="token string">"ViT-B-32"</span><span class="token punctuation">,</span> pretrained<span class="token operator">=</span><span class="token string">"laion2b_s34b_b79k"</span><span class="token punctuation">)</span>
+tokenizer <span class="token operator">=</span> open_clip<span class="token punctuation">.</span>get_tokenizer<span class="token punctuation">(</span><span class="token string">"ViT-B-32"</span><span class="token punctuation">)</span>
+
+image <span class="token operator">=</span> preprocess<span class="token punctuation">(</span>Image<span class="token punctuation">.</span><span class="token builtin">open</span><span class="token punctuation">(</span><span class="token string">"dog.jpg"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span>unsqueeze<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+text <span class="token operator">=</span> tokenizer<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">"a photo of a dog"</span><span class="token punctuation">,</span> <span class="token string">"a photo of a cat"</span><span class="token punctuation">,</span> <span class="token string">"a photo of a car"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+<span class="token keyword">with</span> torch<span class="token punctuation">.</span>no_grad<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    image_features <span class="token operator">=</span> model<span class="token punctuation">.</span>encode_image<span class="token punctuation">(</span>image<span class="token punctuation">)</span>
+    text_features <span class="token operator">=</span> model<span class="token punctuation">.</span>encode_text<span class="token punctuation">(</span>text<span class="token punctuation">)</span>
+    image_features <span class="token operator">=</span> image_features <span class="token operator">/</span> image_features<span class="token punctuation">.</span>norm<span class="token punctuation">(</span>dim<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> keepdim<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+    text_features <span class="token operator">=</span> text_features <span class="token operator">/</span> text_features<span class="token punctuation">.</span>norm<span class="token punctuation">(</span>dim<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> keepdim<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+    probs <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token number">100.0</span> <span class="token operator">*</span> image_features @ text_features<span class="token punctuation">.</span>T<span class="token punctuation">)</span><span class="token punctuation">.</span>softmax<span class="token punctuation">(</span>dim<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span>probs<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>SigLIP is newer, trains better at small scales, and is preferred for new work: <code class="inline-code">google/siglip-base-patch16-224</code>. Hugging Face ships both.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces:</p>
+<ul>
+<li><code class="inline-code">outputs/prompt-zero-shot-class-picker.md</code> — a prompt that designs class templates for zero-shot CLIP given a list of classes and a domain.</li>
+<li><code class="inline-code">outputs/skill-image-text-retriever.md</code> — a skill that builds an image embedding index with any CLIP checkpoint, supports query-by-text and query-by-image.</li>
+</ul>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><strong>(Easy)</strong> Use a pretrained OpenCLIP ViT-B/32 and do zero-shot classification on CIFAR-10 with the 80-template prompt set. Report top-1 accuracy; it should be around 85-90%.</li>
+<li><strong>(Medium)</strong> Compare single-template (&quot;a photo of a {}&quot;) vs 80-template averaged embeddings on the same CIFAR-10 task. Quantify the gap and explain why templates help.</li>
+<li><strong>(Hard)</strong> Build a zero-shot image retrieval index: embed 1,000 images with CLIP, build a FAISS index, query with a natural language description. Report retrieval recall@5 for 20 held-out queries you write by hand.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Two-tower</td>
+<td>&quot;Dual encoder&quot;</td>
+<td>Separate image and text encoders ending in a shared-dim projection head</td>
+</tr>
+<tr>
+<td>Zero-shot</td>
+<td>&quot;No task-specific training&quot;</td>
+<td>Classify into classes described only by text at inference; no labels touched</td>
+</tr>
+<tr>
+<td>Temperature / logit_scale</td>
+<td>&quot;tau&quot;</td>
+<td>Learned scalar that scales the similarity matrix before softmax</td>
+</tr>
+<tr>
+<td>Prompt template</td>
+<td>&quot;A photo of a {}&quot;</td>
+<td>Natural-language wrapper around class names; averaging many templates boosts zero-shot accuracy</td>
+</tr>
+<tr>
+<td>CLIP</td>
+<td>&quot;Image+text model&quot;</td>
+<td>The 2021 OpenAI model; vocabulary of the field in 2026</td>
+</tr>
+<tr>
+<td>SigLIP</td>
+<td>&quot;Sigmoid CLIP&quot;</td>
+<td>Swaps softmax for per-pair sigmoid; trains better at small batches</td>
+</tr>
+<tr>
+<td>OpenCLIP</td>
+<td>&quot;Open reproduction&quot;</td>
+<td>Community-trained CLIP variants on LAION; production default for open-source pipelines</td>
+</tr>
+<tr>
+<td>VLM</td>
+<td>&quot;Vision-language model&quot;</td>
+<td>A CLIP-family encoder plus an LLM, trained to answer questions about images</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2103.00020" target="_blank" rel="noopener">CLIP: Learning Transferable Visual Models from Natural Language Supervision (Radford et al., 2021)</a></li>
+<li><a href="https://arxiv.org/abs/2303.15343" target="_blank" rel="noopener">SigLIP: Sigmoid Loss for Language-Image Pre-Training (Zhai et al., 2023)</a></li>
+<li><a href="https://github.com/mlfoundations/open_clip" target="_blank" rel="noopener">OpenCLIP</a> — the community codebase</li>
+<li><a href="https://huggingface.co/blog/dinov2" target="_blank" rel="noopener">DINOv2 vs CLIP vs MAE: a features comparison</a> — HF guide with side-by-side use cases</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="17-self-supervised-vision.html">
+  <span class="label">← Previous</span>
+  <b>Self-Supervised Vision — SimCLR, DINO, MAE</b>
+</a>
+      <a class="pager__item pager__item--next" href="19-ocr-document-understanding.html">
+  <span class="label">Next →</span>
+  <b>OCR &amp; Document Understanding</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>4 minutes</b> of Computer Vision behind you.</p>
+      <a class="btn btn--solid" href="19-ocr-document-understanding.html">Continue to OCR &amp; Document Understanding →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#two-towers">Two towers</a></li><li class="mini__item mini__item--d3"><a href="#the-objective">The objective</a></li><li class="mini__item mini__item--d3"><a href="#siglip-a-better-loss">SigLIP: a better loss</a></li><li class="mini__item mini__item--d3"><a href="#zero-shot-classification">Zero-shot classification</a></li><li class="mini__item mini__item--d3"><a href="#where-clip-style-models-are-used-in-2026">Where CLIP-style models are used in 2026</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-a-tiny-two-tower-model">Step 1: A tiny two-tower model</a></li><li class="mini__item mini__item--d3"><a href="#step-2-contrastive-loss">Step 2: Contrastive loss</a></li><li class="mini__item mini__item--d3"><a href="#step-3-zero-shot-classifier">Step 3: Zero-shot classifier</a></li><li class="mini__item mini__item--d3"><a href="#step-4-sanity-check">Step 4: Sanity check</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

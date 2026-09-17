@@ -1,0 +1,891 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Capstone 13: Stateless MCP Server with Registry and Governance — Capstone Projects — AIFS</title>
+<meta name="description" content="Capstone Projects: Capstone 13: Stateless MCP Server with Registry and Governance. 11 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Capstone 13: Stateless MCP Server with Registry and Governance — Capstone Projects — AIFS">
+<meta property="og:description" content="Capstone Projects: Capstone 13: Stateless MCP Server with Registry and Governance. 11 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"cf-mcp-gate":["../assets/figures/figures-capstone-f.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-capstone-f.js"];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#00FF85" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#00FF85;--accent-ink:#111111"
+  data-lesson-id="capstone-projects/13-mcp-server-with-registry" data-module="capstone-projects"
+  data-prev="12-video-understanding-pipeline.html" data-next="14-speculative-decoding-server.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#00FF85">
+        <span class="label">Phase 19</span>
+        <b>Capstone Projects</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="capstone-projects/01-terminal-native-coding-agent"><a href="01-terminal-native-coding-agent.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Capstone 01 — Terminal-Native Coding Agent</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/02-rag-over-codebase"><a href="02-rag-over-codebase.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Capstone 02 — RAG over Codebase (Cross-Repo Semantic Search)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/03-realtime-voice-assistant"><a href="03-realtime-voice-assistant.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Capstone 03 — Real-Time Voice Assistant (ASR to LLM to TTS)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/04-multimodal-document-qa"><a href="04-multimodal-document-qa.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Capstone 04 — Multimodal Document QA (Vision-First PDF, Tables, Charts)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/05-autonomous-research-agent"><a href="05-autonomous-research-agent.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Capstone 05 — Autonomous Research Agent (AI-Scientist Class)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/06-devops-troubleshooting-agent"><a href="06-devops-troubleshooting-agent.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Capstone 06 — DevOps Troubleshooting Agent for Kubernetes</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/07-end-to-end-fine-tuning-pipeline"><a href="07-end-to-end-fine-tuning-pipeline.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Capstone 07 — End-to-End Fine-Tuning Pipeline (Data to SFT to DPO to Serve)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/08-production-rag-chatbot"><a href="08-production-rag-chatbot.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Capstone 08 — Production RAG Chatbot for a Regulated Vertical</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/09-code-migration-agent"><a href="09-code-migration-agent.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Capstone 09 — Code Migration Agent (Repo-Level Language / Runtime Upgrade)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/10-multi-agent-software-team"><a href="10-multi-agent-software-team.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Capstone 10 — Multi-Agent Software Engineering Team</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/11-llm-observability-dashboard"><a href="11-llm-observability-dashboard.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Capstone 11 — LLM Observability &amp; Eval Dashboard</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/12-video-understanding-pipeline"><a href="12-video-understanding-pipeline.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Capstone 12 — Video Understanding Pipeline (Scene, QA, Search)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/13-mcp-server-with-registry"><a href="13-mcp-server-with-registry.html" class="is-current">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Capstone 13: Stateless MCP Server with Registry and Governance</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/14-speculative-decoding-server"><a href="14-speculative-decoding-server.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Capstone 14 — Speculative-Decoding Inference Server</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/15-constitutional-safety-harness"><a href="15-constitutional-safety-harness.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Capstone 15 — Constitutional Safety Harness + Red-Team Range</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/16-github-issue-to-pr-agent"><a href="16-github-issue-to-pr-agent.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Capstone 16 — GitHub Issue-to-PR Autonomous Agent</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/17-personal-ai-tutor"><a href="17-personal-ai-tutor.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Capstone 17 — Personal AI Tutor (Adaptive, Multimodal, with Memory)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/20-agent-harness-loop-contract"><a href="20-agent-harness-loop-contract.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Agent Harness Loop Contract</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/21-tool-registry-schema-validation"><a href="21-tool-registry-schema-validation.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Tool Registry with Schema Validation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/22-jsonrpc-stdio-transport"><a href="22-jsonrpc-stdio-transport.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">JSON-RPC 2.0 Over Newline-Delimited Stdio</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/23-function-call-dispatcher"><a href="23-function-call-dispatcher.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Function Call Dispatcher</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/24-plan-execute-control-flow"><a href="24-plan-execute-control-flow.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Plan-Execute Control Flow</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/25-verification-gates-observation-budget"><a href="25-verification-gates-observation-budget.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Capstone Lesson 25: Verification Gates and the Observation Budget</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/26-sandbox-runner-denylist"><a href="26-sandbox-runner-denylist.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Capstone Lesson 26: Sandbox Runner with Denylist and Path Jail</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/27-eval-harness-fixture-tasks"><a href="27-eval-harness-fixture-tasks.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">Capstone Lesson 27: Eval Harness with Fixture Tasks</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/28-observability-otel-traces"><a href="28-observability-otel-traces.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">Capstone Lesson 28: Observability with OTel GenAI Spans and Prometheus Metrics</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/29-end-to-end-coding-task-demo"><a href="29-end-to-end-coding-task-demo.html" class="">
+  <span class="snav__n">29</span>
+  <span class="snav__t">Capstone Lesson 29: End-to-End Coding Agent on the Harness</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/30-bpe-tokenizer-from-scratch"><a href="30-bpe-tokenizer-from-scratch.html" class="">
+  <span class="snav__n">30</span>
+  <span class="snav__t">BPE Tokenizer From Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/31-tokenized-dataset-sliding-window"><a href="31-tokenized-dataset-sliding-window.html" class="">
+  <span class="snav__n">31</span>
+  <span class="snav__t">Tokenized Dataset with Sliding Window</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/32-token-positional-embeddings"><a href="32-token-positional-embeddings.html" class="">
+  <span class="snav__n">32</span>
+  <span class="snav__t">Token and Positional Embeddings</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/33-multihead-self-attention"><a href="33-multihead-self-attention.html" class="">
+  <span class="snav__n">33</span>
+  <span class="snav__t">Multi-Head Self-Attention</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/34-transformer-block"><a href="34-transformer-block.html" class="">
+  <span class="snav__n">34</span>
+  <span class="snav__t">Transformer Block from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/35-gpt-model-assembly"><a href="35-gpt-model-assembly.html" class="">
+  <span class="snav__n">35</span>
+  <span class="snav__t">GPT Model Assembly</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/36-training-loop-eval"><a href="36-training-loop-eval.html" class="">
+  <span class="snav__n">36</span>
+  <span class="snav__t">Training Loop and Evaluation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/37-loading-pretrained-weights"><a href="37-loading-pretrained-weights.html" class="">
+  <span class="snav__n">37</span>
+  <span class="snav__t">Loading Pretrained Weights</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/38-classifier-finetuning"><a href="38-classifier-finetuning.html" class="">
+  <span class="snav__n">38</span>
+  <span class="snav__t">Capstone Lesson 38: Classifier Fine-Tuning by Head Swap</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/39-instruction-tuning-sft"><a href="39-instruction-tuning-sft.html" class="">
+  <span class="snav__n">39</span>
+  <span class="snav__t">Capstone Lesson 39: Instruction Tuning by Supervised Fine-Tuning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/40-dpo-from-scratch"><a href="40-dpo-from-scratch.html" class="">
+  <span class="snav__n">40</span>
+  <span class="snav__t">Capstone Lesson 40: Direct Preference Optimization from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/41-eval-pipeline"><a href="41-eval-pipeline.html" class="">
+  <span class="snav__n">41</span>
+  <span class="snav__t">Capstone Lesson 41: Full Evaluation Pipeline</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/42-large-corpus-downloader"><a href="42-large-corpus-downloader.html" class="">
+  <span class="snav__n">42</span>
+  <span class="snav__t">Large Corpus Downloader</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/43-hdf5-tokenized-corpus"><a href="43-hdf5-tokenized-corpus.html" class="">
+  <span class="snav__n">43</span>
+  <span class="snav__t">HDF5 Tokenized Corpus</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/44-cosine-lr-warmup"><a href="44-cosine-lr-warmup.html" class="">
+  <span class="snav__n">44</span>
+  <span class="snav__t">Cosine LR with Linear Warmup</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/45-gradient-clipping-amp"><a href="45-gradient-clipping-amp.html" class="">
+  <span class="snav__n">45</span>
+  <span class="snav__t">Gradient Clipping and Mixed Precision</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/46-gradient-accumulation"><a href="46-gradient-accumulation.html" class="">
+  <span class="snav__n">46</span>
+  <span class="snav__t">Gradient Accumulation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/47-checkpoint-save-resume"><a href="47-checkpoint-save-resume.html" class="">
+  <span class="snav__n">47</span>
+  <span class="snav__t">Checkpoint Save and Resume</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/48-distributed-fsdp-ddp"><a href="48-distributed-fsdp-ddp.html" class="">
+  <span class="snav__n">48</span>
+  <span class="snav__t">Distributed Data Parallel and FSDP from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/49-lm-eval-harness"><a href="49-lm-eval-harness.html" class="">
+  <span class="snav__n">49</span>
+  <span class="snav__t">Language Model Evaluation Harness</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/50-hypothesis-generator"><a href="50-hypothesis-generator.html" class="">
+  <span class="snav__n">50</span>
+  <span class="snav__t">Hypothesis Generator</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/51-literature-retrieval"><a href="51-literature-retrieval.html" class="">
+  <span class="snav__n">51</span>
+  <span class="snav__t">Literature Retrieval</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/52-experiment-runner"><a href="52-experiment-runner.html" class="">
+  <span class="snav__n">52</span>
+  <span class="snav__t">Experiment Runner</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/53-result-evaluator"><a href="53-result-evaluator.html" class="">
+  <span class="snav__n">53</span>
+  <span class="snav__t">Result Evaluator</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/54-paper-writer"><a href="54-paper-writer.html" class="">
+  <span class="snav__n">54</span>
+  <span class="snav__t">Paper Writer</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/55-critic-loop"><a href="55-critic-loop.html" class="">
+  <span class="snav__n">55</span>
+  <span class="snav__t">Critic Loop</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/56-iteration-scheduler"><a href="56-iteration-scheduler.html" class="">
+  <span class="snav__n">56</span>
+  <span class="snav__t">Iteration Scheduler</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/57-end-to-end-research-demo"><a href="57-end-to-end-research-demo.html" class="">
+  <span class="snav__n">57</span>
+  <span class="snav__t">End-to-End Research Demo</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/58-vision-encoder-patches"><a href="58-vision-encoder-patches.html" class="">
+  <span class="snav__n">58</span>
+  <span class="snav__t">Vision Encoder Patches</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/59-vit-transformer"><a href="59-vit-transformer.html" class="">
+  <span class="snav__n">59</span>
+  <span class="snav__t">Vision Transformer Encoder</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/60-projection-layer-modality-align"><a href="60-projection-layer-modality-align.html" class="">
+  <span class="snav__n">60</span>
+  <span class="snav__t">Projection Layer for Modality Alignment</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/61-cross-attention-fusion"><a href="61-cross-attention-fusion.html" class="">
+  <span class="snav__n">61</span>
+  <span class="snav__t">Cross-Attention Fusion</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/62-vision-language-pretraining"><a href="62-vision-language-pretraining.html" class="">
+  <span class="snav__n">62</span>
+  <span class="snav__t">Vision-Language Pretraining</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/63-multimodal-eval"><a href="63-multimodal-eval.html" class="">
+  <span class="snav__n">63</span>
+  <span class="snav__t">Multimodal Evaluation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/64-chunking-strategies-advanced"><a href="64-chunking-strategies-advanced.html" class="">
+  <span class="snav__n">64</span>
+  <span class="snav__t">Chunking Strategies, Compared</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/65-hybrid-retrieval-bm25-dense"><a href="65-hybrid-retrieval-bm25-dense.html" class="">
+  <span class="snav__n">65</span>
+  <span class="snav__t">Hybrid Retrieval with BM25 and Dense Embeddings</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/66-reranker-cross-encoder"><a href="66-reranker-cross-encoder.html" class="">
+  <span class="snav__n">66</span>
+  <span class="snav__t">Cross-Encoder Reranker</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/67-query-rewriting-hyde"><a href="67-query-rewriting-hyde.html" class="">
+  <span class="snav__n">67</span>
+  <span class="snav__t">Query Rewriting: HyDE, Multi-Query, and Decomposition</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/68-rag-eval-precision-recall"><a href="68-rag-eval-precision-recall.html" class="">
+  <span class="snav__n">68</span>
+  <span class="snav__t">RAG Evaluation: Precision, Recall, MRR, nDCG, Faithfulness, Answer Relevance</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/69-end-to-end-rag-system"><a href="69-end-to-end-rag-system.html" class="">
+  <span class="snav__n">69</span>
+  <span class="snav__t">End-to-End RAG System</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/70-task-spec-format"><a href="70-task-spec-format.html" class="">
+  <span class="snav__n">70</span>
+  <span class="snav__t">Task Spec Format</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/71-classical-metrics"><a href="71-classical-metrics.html" class="">
+  <span class="snav__n">71</span>
+  <span class="snav__t">Classical Metrics</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/72-code-exec-metric"><a href="72-code-exec-metric.html" class="">
+  <span class="snav__n">72</span>
+  <span class="snav__t">Code Exec Metric</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/73-perplexity-calibration"><a href="73-perplexity-calibration.html" class="">
+  <span class="snav__n">73</span>
+  <span class="snav__t">Perplexity and Calibration</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/74-leaderboard-aggregation"><a href="74-leaderboard-aggregation.html" class="">
+  <span class="snav__n">74</span>
+  <span class="snav__t">Leaderboard Aggregation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/75-end-to-end-eval-runner"><a href="75-end-to-end-eval-runner.html" class="">
+  <span class="snav__n">75</span>
+  <span class="snav__t">End-to-End Eval Runner</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/76-collective-ops-from-scratch"><a href="76-collective-ops-from-scratch.html" class="">
+  <span class="snav__n">76</span>
+  <span class="snav__t">Collective Ops From Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/77-data-parallel-ddp"><a href="77-data-parallel-ddp.html" class="">
+  <span class="snav__n">77</span>
+  <span class="snav__t">Data Parallel DDP From Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/78-zero-parameter-sharding"><a href="78-zero-parameter-sharding.html" class="">
+  <span class="snav__n">78</span>
+  <span class="snav__t">ZeRO Optimizer State Sharding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/79-pipeline-parallel"><a href="79-pipeline-parallel.html" class="">
+  <span class="snav__n">79</span>
+  <span class="snav__t">Pipeline Parallel and Bubble Analysis</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/80-checkpoint-sharded-resume"><a href="80-checkpoint-sharded-resume.html" class="">
+  <span class="snav__n">80</span>
+  <span class="snav__t">Sharded Checkpoint and Atomic Resume</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/81-end-to-end-distributed-train"><a href="81-end-to-end-distributed-train.html" class="">
+  <span class="snav__n">81</span>
+  <span class="snav__t">End-to-End Distributed Training</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/82-jailbreak-taxonomy"><a href="82-jailbreak-taxonomy.html" class="">
+  <span class="snav__n">82</span>
+  <span class="snav__t">Capstone 82 — Jailbreak Taxonomy</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/83-prompt-injection-detector"><a href="83-prompt-injection-detector.html" class="">
+  <span class="snav__n">83</span>
+  <span class="snav__t">Capstone 83 — Prompt Injection Detector</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/84-refusal-evaluation"><a href="84-refusal-evaluation.html" class="">
+  <span class="snav__n">84</span>
+  <span class="snav__t">Capstone 84 — Refusal Evaluation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/85-content-classifier-integration"><a href="85-content-classifier-integration.html" class="">
+  <span class="snav__n">85</span>
+  <span class="snav__t">Capstone 85 — Content Classifier Integration</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/86-constitutional-rules-engine"><a href="86-constitutional-rules-engine.html" class="">
+  <span class="snav__n">86</span>
+  <span class="snav__t">Capstone 86 — Constitutional Rules Engine</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/87-end-to-end-safety-gate"><a href="87-end-to-end-safety-gate.html" class="">
+  <span class="snav__n">87</span>
+  <span class="snav__t">Capstone 87 — End-to-End Safety Gate</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Capstone Projects</a></p>
+      <h1 class="page__title">Capstone 13: Stateless MCP Server with Registry and Governance</h1>
+      <p class="page__lede">Production MCP is not one server process. It is a chain of contracts: publishable metadata, live discovery, a stateless request envelope, authorization, policy, audit, and deployment evidence.</p>
+      <div class="page__meta">
+        <span class="chip">11 min read</span>
+        <span class="chip">2,347 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Capstone</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python and TypeScript reference models; any production language</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 11, Phase 13, Phase 14, Phase 17, and Phase 18</dd></div><div class="facts__pair"><dt class="label">Required MCP deep dives</dt><dd>[Lesson 28: Tool Contracts](../tools-and-protocols/28-mcp-tool-contracts-and-content.html), [Lesson 29: Reliability](../tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control.html), [Lesson 30: Registry Supply Chain](../tools-and-protocols/30-mcp-registry-supply-chain-and-drift.html), and [Lesson 31: Conformance Operations](../tools-and-protocols/31-mcp-conformance-versioning-and-operations.html)</dd></div><div class="facts__pair"><dt class="label">Protocol target</dt><dd>MCP <code class="inline-code">2026-07-28</code></dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~25 hours</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Implement the stateless MCP request and result envelope.</li>
+<li>Keep Registry metadata separate from live protocol discovery.</li>
+<li>Build deterministic, cache-aware tool discovery.</li>
+<li>Enforce issuer, audience, scope, and approval policy for every tool call.</li>
+<li>Deploy Streamable HTTP without session affinity.</li>
+<li>Prove behavior at the wire, authorization, policy, registry, and audit boundaries.</li>
+</ul>
+<h2 id="required-mcp-prerequisite-path" class="prose-h prose-h2"><a class="prose-h__anchor" href="#required-mcp-prerequisite-path" aria-label="Link to this section">#</a>Required MCP Prerequisite Path</h2>
+<p>Complete the four linked Phase 13 lessons in order before treating this capstone as production-ready:</p>
+<ol>
+<li><a href="../tools-and-protocols/28-mcp-tool-contracts-and-content.html">Lesson 28</a> defines the tool, schema, content, pagination, completion, routing, and error contracts this server must expose.</li>
+<li><a href="../tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control.html">Lesson 29</a> defines cancellation races, deadlines, idempotency, backpressure, retry, and reconnect behavior.</li>
+<li><a href="../tools-and-protocols/30-mcp-registry-supply-chain-and-drift.html">Lesson 30</a> defines namespace, provenance, admission pin, Registry status, drift, ledger, and rollback evidence.</li>
+<li><a href="../tools-and-protocols/31-mcp-conformance-versioning-and-operations.html">Lesson 31</a> defines golden and negative transcripts, strict version eras, SDK differential checks, proxy proof, redaction, health, and release gating.</li>
+</ol>
+<p>The capstone integrates those artifacts. It does not replace them with one happy-path SDK test.</p>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>An internal platform needs read-only data tools and a small set of state-changing tools. Developers must be able to discover the server, understand how to connect, inspect its live capabilities, and call only the operations they are authorized to use.</p>
+<p>The difficult part is not registering a function. The difficult part is keeping six different truths aligned:</p>
+<ol>
+<li><code class="inline-code">server.json</code> says where the server can be installed or reached.</li>
+<li><code class="inline-code">server/discover</code> says what the live process supports now.</li>
+<li>Every request says which protocol revision and client capabilities it uses.</li>
+<li>Authorization binds a caller to the correct issuer, resource, and scopes.</li>
+<li>Policy decides whether this specific action may run.</li>
+<li>Audit evidence records what crossed the boundary without leaking secrets or sensitive payloads.</li>
+</ol>
+<p>If any one of these drifts, the platform may list a server that cannot be reached, route an incompatible client, accept a token minted for another resource, or expose a destructive action without the expected review.</p>
+<h2 id="the-two-discovery-layers" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-two-discovery-layers" aria-label="Link to this section">#</a>The Two Discovery Layers</h2>
+<p>The Registry and the live MCP server answer different questions.</p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Contract</th>
+<th>Question it answers</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Publication</td>
+<td><code class="inline-code">server.json</code> and Registry API</td>
+<td>What is this server, where is its package or remote endpoint, and how is it configured?</td>
+</tr>
+<tr>
+<td>Runtime</td>
+<td><code class="inline-code">server/discover</code></td>
+<td>Which protocol versions, capabilities, extensions, and server identity does this process support?</td>
+</tr>
+</tbody></table>
+<p>The official Registry uses a versioned <code class="inline-code">server.json</code> schema. A remote entry can name a Streamable HTTP URL:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"$schema"</span><span class="token operator">:</span> <span class="token string">"https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json"</span><span class="token punctuation">,</span>
+  <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"com.example/internal-readonly"</span><span class="token punctuation">,</span>
+  <span class="token property">"title"</span><span class="token operator">:</span> <span class="token string">"Internal Read-Only Tools"</span><span class="token punctuation">,</span>
+  <span class="token property">"description"</span><span class="token operator">:</span> <span class="token string">"Read-only incident and data lookup tools."</span><span class="token punctuation">,</span>
+  <span class="token property">"version"</span><span class="token operator">:</span> <span class="token string">"1.0.0"</span><span class="token punctuation">,</span>
+  <span class="token property">"remotes"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">{</span>
+      <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"streamable-http"</span><span class="token punctuation">,</span>
+      <span class="token property">"url"</span><span class="token operator">:</span> <span class="token string">"https://mcp.internal.example.com/readonly"</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<p>The Registry schema version and the MCP protocol revision are independent. Do not rewrite one date to match the other. Validate each document against its own contract.</p>
+<p>Schema validity does not prove namespace ownership. A publisher verified for <code class="inline-code">example.com</code> uses the reverse-DNS namespace <code class="inline-code">com.example/*</code> or one of its child namespaces. The Registry authentication flow proves that ownership. Keeping the domain labels in their ordinary order names a different namespace.</p>
+<p>The stdlib model&#39;s <code class="inline-code">validate_registry_document</code> function is intentionally a partial remote-profile validator. It checks the official required <code class="inline-code">name</code>, <code class="inline-code">description</code>, and <code class="inline-code">version</code> fields; the optional <code class="inline-code">title</code>; the published name and length constraints; concrete-version shape; and each <code class="inline-code">streamable-http</code> or <code class="inline-code">sse</code> remote&#39;s HTTP(S) URL shape. It additionally requires a non-empty <code class="inline-code">remotes</code> list because this capstone always live-probes a remote. <code class="inline-code">validate_publisher_namespace</code> separately checks the name against the verified publisher domain, while <code class="inline-code">validate_runtime_alignment</code> compares the publication name and version with live <code class="inline-code">serverInfo</code>. The official schema also supports package-only records and more remote fields. Before publication, validate the entire document with the pinned official JSON Schema or <code class="inline-code">mcp-publisher</code>; do not present this dependency-free subset as full schema validation.</p>
+<p>The server must implement <code class="inline-code">server/discover</code>; a client may call it before other methods. This capstone client does so after resolving the endpoint, and receives the current protocol revision and live capabilities:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"resultType"</span><span class="token operator">:</span> <span class="token string">"complete"</span><span class="token punctuation">,</span>
+  <span class="token property">"supportedVersions"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"2026-07-28"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"capabilities"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"tools"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"listChanged"</span><span class="token operator">:</span> <span class="token boolean">false</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">"_meta"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"io.modelcontextprotocol/serverInfo"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"com.example/internal-readonly"</span><span class="token punctuation">,</span>
+      <span class="token property">"version"</span><span class="token operator">:</span> <span class="token string">"1.0.0"</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">"ttlMs"</span><span class="token operator">:</span> <span class="token number">3600000</span><span class="token punctuation">,</span>
+  <span class="token property">"cacheScope"</span><span class="token operator">:</span> <span class="token string">"public"</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<p>A private catalog may index extra ownership, review, or lifecycle data, but it must not invent that data as MCP wire fields or root <code class="inline-code">server.json</code> fields. Store organizational policy beside the published record. When public custom metadata is necessary, use the Registry&#39;s <code class="inline-code">_meta.io.modelcontextprotocol.registry/publisher-provided</code> extension and stay within its 4 KB limit.</p>
+<h2 id="stateless-mcp-core" class="prose-h prose-h2"><a class="prose-h__anchor" href="#stateless-mcp-core" aria-label="Link to this section">#</a>Stateless MCP Core</h2>
+<p>MCP revision <code class="inline-code">2026-07-28</code> removes protocol sessions and the <code class="inline-code">initialize</code> / <code class="inline-code">notifications/initialized</code> handshake. It also removes <code class="inline-code">Mcp-Session-Id</code>.</p>
+<p>Every request carries protocol context in <code class="inline-code">params._meta</code>:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"io.modelcontextprotocol/protocolVersion"</span><span class="token operator">:</span> <span class="token string">"2026-07-28"</span><span class="token punctuation">,</span>
+  <span class="token property">"io.modelcontextprotocol/clientCapabilities"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">"io.modelcontextprotocol/clientInfo"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"internal-platform-client"</span><span class="token punctuation">,</span>
+    <span class="token property">"version"</span><span class="token operator">:</span> <span class="token string">"1.0.0"</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<p>The version and capabilities are request facts, not connection facts. A load balancer may send consecutive requests to different healthy replicas because either replica can validate the request from the message itself.</p>
+<p>Ordinary results include <code class="inline-code">resultType: &quot;complete&quot;</code>. Servers should place their identity in <code class="inline-code">_meta.io.modelcontextprotocol/serverInfo</code> on each result. A missing or non-string protocol version is invalid params <code class="inline-code">-32602</code>. Error <code class="inline-code">-32022</code> is only for a supplied string that is unsupported, with exactly <code class="inline-code">{&quot;supported&quot;: [&quot;2026-07-28&quot;], &quot;requested&quot;: &quot;...&quot;}</code> as its data.</p>
+<h3 id="cacheable-discovery" class="prose-h prose-h3"><a class="prose-h__anchor" href="#cacheable-discovery" aria-label="Link to this section">#</a>Cacheable discovery</h3>
+<p><code class="inline-code">tools/list</code> must be deterministic for the same effective tool set. The result includes:</p>
+<ul>
+<li><code class="inline-code">ttlMs</code>, a freshness hint for the client;</li>
+<li><code class="inline-code">cacheScope</code>, either <code class="inline-code">public</code> or <code class="inline-code">private</code>;</li>
+<li>a stable tool order so identical lists can reuse prompt caches;</li>
+<li><code class="inline-code">resultType: &quot;complete&quot;</code> and server identity metadata.</li>
+</ul>
+<p>Per-user authorization should normally produce <code class="inline-code">cacheScope: &quot;private&quot;</code>. Do not put user-specific tool visibility behind a shared public cache.</p>
+<h2 id="streamable-http" class="prose-h prose-h2"><a class="prose-h__anchor" href="#streamable-http" aria-label="Link to this section">#</a>Streamable HTTP</h2>
+<p>A network server exposes one MCP endpoint that accepts POST. Each JSON-RPC request or notification gets its own POST.</p>
+<p>For a request, the server returns either one JSON object or an SSE stream scoped to that request. A long-lived <code class="inline-code">subscriptions/listen</code> request carries opted-in change notifications. There is no standalone GET stream, session DELETE, session header, or <code class="inline-code">Last-Event-ID</code> replay in the current transport.</p>
+<p>Each request includes:</p>
+<ul>
+<li><code class="inline-code">MCP-Protocol-Version</code>, matching the body metadata;</li>
+<li><code class="inline-code">Mcp-Method</code>, matching the JSON-RPC method;</li>
+<li><code class="inline-code">Mcp-Name</code> for <code class="inline-code">tools/call</code>, <code class="inline-code">resources/read</code>, and <code class="inline-code">prompts/get</code>;</li>
+<li><code class="inline-code">Accept: application/json, text/event-stream</code>.</li>
+</ul>
+<p>Reject mismatched mirrored headers with the specified <code class="inline-code">-32020</code> error. Validate <code class="inline-code">Origin</code>, bind local development servers to loopback, authenticate remote clients, and treat a closed request-scoped SSE response as cancellation.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">flowchart LR
+  R[Registry API] --&gt; J[server.json]
+  J --&gt; C[MCP client]
+  C --&gt; D[server/discover]
+  C --&gt; L[tools/list]
+  C --&gt; G[Authorization and policy gateway]
+  G --&gt; RO[Read-only MCP replicas]
+  G --&gt; RW[State-changing MCP replicas]
+  RO --&gt; A[Audit sink]
+  RW --&gt; H[Approval record]
+  RW --&gt; A</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="cf-mcp-gate"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">cf-mcp-gate</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> cf mcp gate</figcaption>
+</figure>
+<h2 id="authorization-and-policy" class="prose-h prose-h2"><a class="prose-h__anchor" href="#authorization-and-policy" aria-label="Link to this section">#</a>Authorization and Policy</h2>
+<p>Transport metadata is not authorization. Validate authorization on every call.</p>
+<p>For remote servers:</p>
+<ol>
+<li>Discover protected-resource metadata.</li>
+<li>Select the authorization server for that resource.</li>
+<li>Prefer Client ID Metadata Documents for client registration. Treat Dynamic Client Registration as compatibility support.</li>
+<li>Send the resource indicator during authorization.</li>
+<li>Validate a returned <code class="inline-code">iss</code> value against the authorization server recorded for the flow.</li>
+<li>Key client credentials by issuer. Never reuse registration data across issuers.</li>
+<li>Validate token issuer, audience or resource, expiry, and scopes at the MCP server.</li>
+<li>Apply a second policy decision to the concrete tool and arguments.</li>
+</ol>
+<p>Tool annotations such as <code class="inline-code">readOnlyHint</code> and <code class="inline-code">destructiveHint</code> help clients present risk. They are not trusted authorization controls.</p>
+<h3 id="approval-is-a-record-not-a-magic-scope" class="prose-h prose-h3"><a class="prose-h__anchor" href="#approval-is-a-record-not-a-magic-scope" aria-label="Link to this section">#</a>Approval is a record, not a magic scope</h3>
+<p>A state-changing call needs an approval record bound to the actor, tool, normalized arguments or digest, target environment, expiry, and one-time or repeat-use policy. A chat message alone is not proof of approval.</p>
+<p>The Python model hashes canonical JSON with sorted keys, then binds that digest with the token subject, tool name, server URL, and expiry. Replaying the record after changing even one argument fails before the handler runs. Approval is separate evidence, not a scope added to the access token.</p>
+<p>Keep high-risk tools on a separately reviewable surface when that materially reduces blast radius. Separation is useful only if credentials, policy, deployment identity, and audit controls are also separate.</p>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="1-model-publication-metadata" class="prose-h prose-h3"><a class="prose-h__anchor" href="#1-model-publication-metadata" aria-label="Link to this section">#</a>1. Model publication metadata</h3>
+<p>Create and schema-validate <code class="inline-code">server.json</code>. Include a stable name inside the namespace authenticated for the publisher, plus version, description, official <code class="inline-code">repository</code> or <code class="inline-code">packages</code> metadata when applicable, and a remote or stdio transport. Keep secrets as declared environment-variable inputs, never literal values.</p>
+<h3 id="2-implement-live-discovery" class="prose-h prose-h3"><a class="prose-h__anchor" href="#2-implement-live-discovery" aria-label="Link to this section">#</a>2. Implement live discovery</h3>
+<p>Implement <code class="inline-code">server/discover</code> before any feature RPC. Advertise supported protocol versions, capabilities, extensions, and server identity. Add a version rejection case using <code class="inline-code">-32022</code>.</p>
+<h3 id="3-implement-the-stateless-envelope" class="prose-h prose-h3"><a class="prose-h__anchor" href="#3-implement-the-stateless-envelope" aria-label="Link to this section">#</a>3. Implement the stateless envelope</h3>
+<p>Require protocol version and client capabilities in every request. Return <code class="inline-code">resultType</code> and server identity in every result. Remove initialization state, connection-scoped capability caches, and session identifiers.</p>
+<h3 id="4-build-the-tool-surface" class="prose-h prose-h3"><a class="prose-h__anchor" href="#4-build-the-tool-surface" aria-label="Link to this section">#</a>4. Build the tool surface</h3>
+<p>Start with two read-only tools and one state-changing tool. Give each a bounded JSON Schema, precise description, deterministic result shape, and honest annotations. Add output schemas when clients rely on structured results.</p>
+<h3 id="5-add-cache-aware-listing" class="prose-h prose-h3"><a class="prose-h__anchor" href="#5-add-cache-aware-listing" aria-label="Link to this section">#</a>5. Add cache-aware listing</h3>
+<p>Return tools in stable order with <code class="inline-code">ttlMs</code> and <code class="inline-code">cacheScope</code>. Exercise cache expiry and list-change notification behavior separately.</p>
+<h3 id="6-add-authorization-and-policy" class="prose-h prose-h3"><a class="prose-h__anchor" href="#6-add-authorization-and-policy" aria-label="Link to this section">#</a>6. Add authorization and policy</h3>
+<p>Validate issuer, audience, expiry, and scope. Run a policy decision for every tool call. Bind approvals to exact high-risk actions. Deny missing or stale approvals before executing a handler.</p>
+<h3 id="7-separate-registry-and-runtime-validation" class="prose-h prose-h3"><a class="prose-h__anchor" href="#7-separate-registry-and-runtime-validation" aria-label="Link to this section">#</a>7. Separate registry and runtime validation</h3>
+<p>Validate the static <code class="inline-code">server.json</code> record, then probe the remote endpoint with <code class="inline-code">server/discover</code>. Report drift when the published remote, identity, version, or required capabilities disagree with the live process.</p>
+<h3 id="8-add-audit-evidence" class="prose-h prose-h3"><a class="prose-h__anchor" href="#8-add-audit-evidence" aria-label="Link to this section">#</a>8. Add audit evidence</h3>
+<p>Record actor, issuer, resource, tool, policy decision, request identifier, trace context, latency, and outcome. Redact or digest sensitive arguments and results before persistence. Keep the audit sink outside model-visible context.</p>
+<h3 id="9-exercise-horizontal-scaling" class="prose-h prose-h3"><a class="prose-h__anchor" href="#9-exercise-horizontal-scaling" aria-label="Link to this section">#</a>9. Exercise horizontal scaling</h3>
+<p>Place two stateless replicas behind a load balancer. Send at least 100 concurrent requests. Demonstrate that correctness does not depend on affinity. If a tool needs cross-call state, mint an explicit opaque handle and store it in a shared durable system.</p>
+<h3 id="10-cross-the-real-wire" class="prose-h prose-h3"><a class="prose-h__anchor" href="#10-cross-the-real-wire" aria-label="Link to this section">#</a>10. Cross the real wire</h3>
+<p>Run conformance checks against the actual server binary. Capture request headers and JSON bodies, not only SDK objects. Exercise wrong version, header mismatch, missing scope, wrong audience, malformed arguments, handler failure, cancellation, and cache expiry.</p>
+<h2 id="required-evidence-pack" class="prose-h prose-h2"><a class="prose-h__anchor" href="#required-evidence-pack" aria-label="Link to this section">#</a>Required Evidence Pack</h2>
+<p>A submission is incomplete until it contains all five evidence classes:</p>
+<table>
+<thead>
+<tr>
+<th>Evidence</th>
+<th>Minimum proof</th>
+<th>Source lesson</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Wire</td>
+<td>Redacted raw headers and JSON-RPC bodies for golden and negative cases, including metadata type failure, header mismatch, unsupported version, missing or unknown <code class="inline-code">resultType</code>, notification no-response, and response ID matching</td>
+<td><a href="../tools-and-protocols/31-mcp-conformance-versioning-and-operations.html">Lesson 31</a></td>
+</tr>
+<tr>
+<td>Proxy</td>
+<td>The same stable case run directly and through the deployed intermediary, with ingress, origin, and egress status and body digests; prove protocol errors are not collapsed into generic 500 responses and streaming is not buffered</td>
+<td><a href="../tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control.html">Lessons 29</a> and <a href="../tools-and-protocols/31-mcp-conformance-versioning-and-operations.html">31</a></td>
+</tr>
+<tr>
+<td>Admission</td>
+<td>Verified publisher namespace, immutable Registry record digest, artifact or remote provenance, live <code class="inline-code">server/discover</code> identity and capability observation, descriptor pin, current Registry status, and admission-ledger event</td>
+<td><a href="../tools-and-protocols/30-mcp-registry-supply-chain-and-drift.html">Lesson 30</a></td>
+</tr>
+<tr>
+<td>Retry</td>
+<td>A cancellation-versus-completion race, explicit timeout, safe read retry, mutation idempotency key, reconnect refetch, and proof that request cancellation cannot silently become durable task cancellation</td>
+<td><a href="../tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control.html">Lesson 29</a></td>
+</tr>
+<tr>
+<td>Rollback</td>
+<td>Exact previous version, admission and artifact digests, descriptor pin, active Registry status, current health window, route restoration result, and redacted decision evidence</td>
+<td><a href="../tools-and-protocols/30-mcp-registry-supply-chain-and-drift.html">Lessons 30</a> and <a href="../tools-and-protocols/31-mcp-conformance-versioning-and-operations.html">31</a></td>
+</tr>
+</tbody></table>
+<p>Store a digest of the redacted pack with the release. If any class is missing, hold the release. Do not infer proxy behavior from an in-process dispatcher, admission from Registry presence, retry safety from a new JSON-RPC id, or rollback readiness from “the previous deployment.”</p>
+<h2 id="local-reference-models" class="prose-h prose-h2"><a class="prose-h__anchor" href="#local-reference-models" aria-label="Link to this section">#</a>Local Reference Models</h2>
+<p>The Python model demonstrates registry metadata, reverse-DNS publisher namespace validation, publication-to-runtime identity checks, live discovery, deterministic tool listing, per-request metadata, trusted-issuer, audience, expiry, and scope checks, action-bound approvals, a documented partial Registry validator, policy, and audit without opening a network socket:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">bash</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-bash"><span class="token builtin class-name">cd</span> phases/19-capstone-projects/13-mcp-server-with-registry
+python3 code/main.py
+python3 <span class="token parameter variable">-m</span> unittest discover <span class="token parameter variable">-s</span> code/tests <span class="token parameter variable">-v</span></code></pre>
+</figure>
+<p>The TypeScript project exposes the stateless JSON-RPC shape over stdio without an MCP SDK. Its <code class="inline-code">tools/call</code> path enforces the same bounded input schemas advertised by <code class="inline-code">tools/list</code>; invalid arguments for a known tool return a complete result with <code class="inline-code">isError: true</code> without invoking the executor:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">bash</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-bash"><span class="token builtin class-name">cd</span> phases/19-capstone-projects/13-mcp-server-with-registry/code/ts
+<span class="token function">npm</span> <span class="token function">install</span>
+<span class="token function">npm</span> run typecheck
+<span class="token function">npm</span> <span class="token builtin class-name">test</span>
+<span class="token function">npm</span> run demo</code></pre>
+</figure>
+<p>These models prove local contract logic. They do not prove HTTP headers, OAuth exchange, Registry publication, OPA integration, load balancing, or collector receipt.</p>
+<h2 id="wire-example" class="prose-h prose-h2"><a class="prose-h__anchor" href="#wire-example" aria-label="Link to this section">#</a>Wire Example</h2>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">http</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-http"><span class="token request-line"><span class="token method property">POST</span> <span class="token request-target url">/mcp</span> <span class="token http-version property">HTTP/1.1</span></span>
+<span class="token header"><span class="token header-name keyword">Host</span><span class="token punctuation">:</span> <span class="token header-value">mcp.internal.example.com</span></span>
+<span class="token header"><span class="token header-name keyword">Content-Type</span><span class="token punctuation">:</span> <span class="token header-value">application/json</span></span>
+<span class="token header"><span class="token header-name keyword">Accept</span><span class="token punctuation">:</span> <span class="token header-value">application/json, text/event-stream</span></span>
+<span class="token header"><span class="token header-name keyword">MCP-Protocol-Version</span><span class="token punctuation">:</span> <span class="token header-value">2026-07-28</span></span>
+<span class="token header"><span class="token header-name keyword">Mcp-Method</span><span class="token punctuation">:</span> <span class="token header-value">tools/call</span></span>
+<span class="token header"><span class="token header-name keyword">Mcp-Name</span><span class="token punctuation">:</span> <span class="token header-value">postgres.readonly</span></span>
+<span class="token header"><span class="token header-name keyword">Authorization</span><span class="token punctuation">:</span> <span class="token header-value">Bearer REDACTED</span></span>
+<span class="token application-json">
+<span class="token punctuation">{</span>
+  <span class="token property">"jsonrpc"</span><span class="token operator">:</span> <span class="token string">"2.0"</span><span class="token punctuation">,</span>
+  <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">42</span><span class="token punctuation">,</span>
+  <span class="token property">"method"</span><span class="token operator">:</span> <span class="token string">"tools/call"</span><span class="token punctuation">,</span>
+  <span class="token property">"params"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"postgres.readonly"</span><span class="token punctuation">,</span>
+    <span class="token property">"arguments"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token property">"sql"</span><span class="token operator">:</span> <span class="token string">"SELECT 1"</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token property">"_meta"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"io.modelcontextprotocol/protocolVersion"</span><span class="token operator">:</span> <span class="token string">"2026-07-28"</span><span class="token punctuation">,</span>
+      <span class="token property">"io.modelcontextprotocol/clientCapabilities"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token property">"io.modelcontextprotocol/clientInfo"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"internal-platform-client"</span><span class="token punctuation">,</span>
+        <span class="token property">"version"</span><span class="token operator">:</span> <span class="token string">"1.0.0"</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></span></code></pre>
+</figure>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>Ship a repository containing:</p>
+<ul>
+<li>a schema-valid <code class="inline-code">server.json</code>;</li>
+<li>read-only and state-changing server surfaces;</li>
+<li><code class="inline-code">server/discover</code>, deterministic <code class="inline-code">tools/list</code>, and policy-gated <code class="inline-code">tools/call</code>;</li>
+<li>a Streamable HTTP deployment with two interchangeable replicas;</li>
+<li>authorization and approval integration;</li>
+<li>a Registry publisher or private Registry API adapter;</li>
+<li>policy definitions and action-bound approval records;</li>
+<li>redacted audit output and trace propagation;</li>
+<li>wire and proxy failure evidence;</li>
+<li>admission, retry, health, and rollback evidence with a digest of the redacted pack.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="right">Weight</th>
+<th>Criterion</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right">25</td>
+<td>Protocol correctness</td>
+<td>Stateless request metadata, discovery, results, headers, and negative cases</td>
+</tr>
+<tr>
+<td align="right">20</td>
+<td>Authorization</td>
+<td>Issuer, audience, expiry, scope, and action-bound approval cases</td>
+</tr>
+<tr>
+<td align="right">15</td>
+<td>Registry integrity</td>
+<td>Valid <code class="inline-code">server.json</code>, publication record, live discovery probe, and drift report</td>
+</tr>
+<tr>
+<td align="right">15</td>
+<td>Policy and safety</td>
+<td>Allow, deny, malformed, stale approval, and sensitive-data cases</td>
+</tr>
+<tr>
+<td align="right">15</td>
+<td>Scale and reliability</td>
+<td>Two replicas, no affinity dependency, cancellation, timeout, and recovery</td>
+</tr>
+<tr>
+<td align="right">10</td>
+<td>Auditability</td>
+<td>Redacted receiver-side audit and trace evidence</td>
+</tr>
+</tbody></table>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li>Change the published remote URL while leaving the live server unchanged. Make the registry validation report the exact drift.</li>
+<li>Send <code class="inline-code">tools/list</code> twice with identical inputs and prove byte-stable tool order. Then expire <code class="inline-code">ttlMs</code> and refresh.</li>
+<li>Send a valid body with a different <code class="inline-code">MCP-Protocol-Version</code> header. Return <code class="inline-code">-32020</code> and do not invoke policy or the tool.</li>
+<li>Mint a token for the read-only server and present it to the state-changing server. Prove audience validation fails before the handler runs.</li>
+<li>Bind an approval to one normalized argument digest. Change one field and prove the approval cannot be replayed.</li>
+<li>Route consecutive calls to alternating replicas. Replace hidden process memory with an explicit shared handle wherever the workflow needs persistence.</li>
+<li>Break a request-scoped SSE connection and retry with a new JSON-RPC request ID. Verify that no <code class="inline-code">Last-Event-ID</code> recovery path is used.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Stateless MCP</td>
+<td>&quot;No state anywhere&quot;</td>
+<td>No protocol session; cross-call state is explicit and server-managed</td>
+</tr>
+<tr>
+<td><code class="inline-code">server.json</code></td>
+<td>&quot;The tool manifest&quot;</td>
+<td>Registry metadata for naming, packaging, configuration, and transports</td>
+</tr>
+<tr>
+<td><code class="inline-code">server/discover</code></td>
+<td>&quot;The handshake&quot;</td>
+<td>A normal mandatory RPC for live versions and capabilities, not a session initializer</td>
+</tr>
+<tr>
+<td>Cache scope</td>
+<td>&quot;Can I cache it?&quot;</td>
+<td>Whether a cacheable result is safe for shared or private reuse</td>
+</tr>
+<tr>
+<td>Policy decision</td>
+<td>&quot;The token allows it&quot;</td>
+<td>A separate decision over actor, tool, target, arguments, and context</td>
+</tr>
+<tr>
+<td>Approval record</td>
+<td>&quot;A human clicked yes&quot;</td>
+<td>Evidence bound to one actor and consequential action under an expiry policy</td>
+</tr>
+<tr>
+<td>Explicit handle</td>
+<td>&quot;A session ID&quot;</td>
+<td>Ordinary application data for named server-managed state, not protocol connection state</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/changelog" target="_blank" rel="noopener">MCP 2026-07-28 key changes</a></li>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http" target="_blank" rel="noopener">Streamable HTTP</a></li>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/server/discover" target="_blank" rel="noopener">Server discovery</a></li>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization" target="_blank" rel="noopener">MCP authorization</a></li>
+<li><a href="https://github.com/modelcontextprotocol/registry/blob/main/docs/reference/server-json/official-registry-requirements.md" target="_blank" rel="noopener">Official Registry server.json requirements</a></li>
+<li><a href="https://registry.modelcontextprotocol.io/openapi.yaml" target="_blank" rel="noopener">Official Registry OpenAPI contract</a></li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="12-video-understanding-pipeline.html">
+  <span class="label">← Previous</span>
+  <b>Capstone 12 — Video Understanding Pipeline (Scene, QA, Search)</b>
+</a>
+      <a class="pager__item pager__item--next" href="14-speculative-decoding-server.html">
+  <span class="label">Next →</span>
+  <b>Capstone 14 — Speculative-Decoding Inference Server</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>11 minutes</b> of Capstone Projects behind you.</p>
+      <a class="btn btn--solid" href="14-speculative-decoding-server.html">Continue to Capstone 14 — Speculative-Decoding Inference Server →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#required-mcp-prerequisite-path">Required MCP Prerequisite Path</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-two-discovery-layers">The Two Discovery Layers</a></li><li class="mini__item mini__item--d2"><a href="#stateless-mcp-core">Stateless MCP Core</a></li><li class="mini__item mini__item--d3"><a href="#cacheable-discovery">Cacheable discovery</a></li><li class="mini__item mini__item--d2"><a href="#streamable-http">Streamable HTTP</a></li><li class="mini__item mini__item--d2"><a href="#authorization-and-policy">Authorization and Policy</a></li><li class="mini__item mini__item--d3"><a href="#approval-is-a-record-not-a-magic-scope">Approval is a record, not a magic scope</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#1-model-publication-metadata">1. Model publication metadata</a></li><li class="mini__item mini__item--d3"><a href="#2-implement-live-discovery">2. Implement live discovery</a></li><li class="mini__item mini__item--d3"><a href="#3-implement-the-stateless-envelope">3. Implement the stateless envelope</a></li><li class="mini__item mini__item--d3"><a href="#4-build-the-tool-surface">4. Build the tool surface</a></li><li class="mini__item mini__item--d3"><a href="#5-add-cache-aware-listing">5. Add cache-aware listing</a></li><li class="mini__item mini__item--d3"><a href="#6-add-authorization-and-policy">6. Add authorization and policy</a></li><li class="mini__item mini__item--d3"><a href="#7-separate-registry-and-runtime-validation">7. Separate registry and runtime validation</a></li><li class="mini__item mini__item--d3"><a href="#8-add-audit-evidence">8. Add audit evidence</a></li><li class="mini__item mini__item--d3"><a href="#9-exercise-horizontal-scaling">9. Exercise horizontal scaling</a></li><li class="mini__item mini__item--d3"><a href="#10-cross-the-real-wire">10. Cross the real wire</a></li><li class="mini__item mini__item--d2"><a href="#required-evidence-pack">Required Evidence Pack</a></li><li class="mini__item mini__item--d2"><a href="#local-reference-models">Local Reference Models</a></li><li class="mini__item mini__item--d2"><a href="#wire-example">Wire Example</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

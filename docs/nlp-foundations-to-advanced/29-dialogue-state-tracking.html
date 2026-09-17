@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dialogue State Tracking — NLP, Foundations to Advanced — AIFS</title>
+<meta name="description" content="NLP, Foundations to Advanced: Dialogue State Tracking. 4 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Dialogue State Tracking — NLP, Foundations to Advanced — AIFS">
+<meta property="og:description" content="NLP, Foundations to Advanced: Dialogue State Tracking. 4 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"n5-slot-tracker":["../assets/figures/figures-nlp5.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-nlp5.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#B8FF3C" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#B8FF3C;--accent-ink:#111111"
+  data-lesson-id="nlp-foundations-to-advanced/29-dialogue-state-tracking" data-module="nlp-foundations-to-advanced"
+  data-prev="28-long-context-evaluation.html" data-next="">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#B8FF3C">
+        <span class="label">Phase 05</span>
+        <b>NLP, Foundations to Advanced</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="nlp-foundations-to-advanced/01-text-processing"><a href="01-text-processing.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Text Processing — Tokenization, Stemming, Lemmatization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/02-bag-of-words-tfidf"><a href="02-bag-of-words-tfidf.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Bag of Words, TF-IDF, and Text Representation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/03-word-embeddings-word2vec"><a href="03-word-embeddings-word2vec.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Word Embeddings — Word2Vec from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/04-glove-fasttext-subword"><a href="04-glove-fasttext-subword.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">GloVe, FastText, and Subword Embeddings</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/05-sentiment-analysis"><a href="05-sentiment-analysis.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Sentiment Analysis</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/06-named-entity-recognition"><a href="06-named-entity-recognition.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Named Entity Recognition</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/07-pos-tagging-parsing"><a href="07-pos-tagging-parsing.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">POS Tagging and Syntactic Parsing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/08-cnns-rnns-for-text"><a href="08-cnns-rnns-for-text.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">CNNs and RNNs for Text</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/09-sequence-to-sequence"><a href="09-sequence-to-sequence.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Sequence-to-Sequence Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/10-attention-mechanism"><a href="10-attention-mechanism.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Attention Mechanism — The Breakthrough</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/11-machine-translation"><a href="11-machine-translation.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Machine Translation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/12-text-summarization"><a href="12-text-summarization.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Text Summarization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/13-question-answering"><a href="13-question-answering.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Question Answering Systems</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/14-information-retrieval-search"><a href="14-information-retrieval-search.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Information Retrieval and Search</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/15-topic-modeling"><a href="15-topic-modeling.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Topic Modeling — LDA and BERTopic</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/16-text-generation-pre-transformer"><a href="16-text-generation-pre-transformer.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Text Generation Before Transformers — N-gram Language Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/17-chatbots-rule-to-neural"><a href="17-chatbots-rule-to-neural.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Chatbots — Rule-Based to Neural to LLM Agents</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/18-multilingual-nlp"><a href="18-multilingual-nlp.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Multilingual NLP</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/19-subword-tokenization"><a href="19-subword-tokenization.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">Subword Tokenization — BPE, WordPiece, Unigram, SentencePiece</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/20-structured-outputs-constrained-decoding"><a href="20-structured-outputs-constrained-decoding.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Structured Outputs &amp; Constrained Decoding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/21-nli-textual-entailment"><a href="21-nli-textual-entailment.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Natural Language Inference — Textual Entailment</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/22-embedding-models-deep-dive"><a href="22-embedding-models-deep-dive.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Embedding Models — The 2026 Deep Dive</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/23-chunking-strategies-rag"><a href="23-chunking-strategies-rag.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Chunking Strategies for RAG</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/24-coreference-resolution"><a href="24-coreference-resolution.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Coreference Resolution</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/25-entity-linking"><a href="25-entity-linking.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Entity Linking &amp; Disambiguation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/26-relation-extraction-kg"><a href="26-relation-extraction-kg.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Relation Extraction &amp; Knowledge Graph Construction</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/27-llm-evaluation-frameworks"><a href="27-llm-evaluation-frameworks.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">LLM Evaluation — RAGAS, DeepEval, G-Eval</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/28-long-context-evaluation"><a href="28-long-context-evaluation.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">Long-Context Evaluation — NIAH, RULER, LongBench, MRCR</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="nlp-foundations-to-advanced/29-dialogue-state-tracking"><a href="29-dialogue-state-tracking.html" class="is-current">
+  <span class="snav__n">29</span>
+  <span class="snav__t">Dialogue State Tracking</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">NLP, Foundations to Advanced</a></p>
+      <h1 class="page__title">Dialogue State Tracking</h1>
+      <p class="page__lede">&quot;I want a cheap restaurant in the north... actually make it moderate... and add Italian.&quot; Three turns, three state updates. DST keeps the slot-value dict in sync so the booking works.</p>
+      <div class="page__meta">
+        <span class="chip">4 min read</span>
+        <span class="chip">970 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 5 · 17 (Chatbots), Phase 5 · 20 (Structured Outputs)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>In a task-oriented dialogue system, the user&#39;s goal is encoded as a set of slot-value pairs: <code class="inline-code">{cuisine: italian, area: north, price: moderate}</code>. Every user turn can add, change, or remove a slot. The system must read the whole conversation and output the current state correctly.</p>
+<p>Get a single slot wrong and the system books the wrong restaurant, schedules the wrong flight, or charges the wrong card. DST is the hinge between what the user said and what the backend executes.</p>
+<p>Why it still matters in 2026 despite LLMs:</p>
+<ul>
+<li>Compliance-sensitive domains (banking, healthcare, airline booking) require deterministic slot values, not free-form generation.</li>
+<li>Tool-use agents still need slot resolution before calling APIs.</li>
+<li>Multi-turn correction is harder than it looks: &quot;actually no, make it Thursday.&quot;</li>
+</ul>
+<p>The modern pipeline: classical DST concepts + LLM extractors + structured-output guardrails.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<p><img src="assets/29-dialogue-state-tracking/dst.svg" alt="DST: dialog history → slot-value state" loading="lazy"></p>
+<p><strong>Task structure.</strong> A schema defines domains (restaurant, hotel, taxi) and their slots (cuisine, area, price, people). Each slot can be empty, filled with a value from a closed set (price: {cheap, moderate, expensive}), or a free-form value (name: &quot;The Copper Kettle&quot;).</p>
+<p><strong>Two DST formulations.</strong></p>
+<ul>
+<li><strong>Classification.</strong> For each (slot, candidate_value) pair, predict yes/no. Works for closed-vocab slots. Standard pre-2020.</li>
+<li><strong>Generation.</strong> Given the dialogue, generate slot values as free text. Works for open-vocab slots. The modern default.</li>
+</ul>
+<p><strong>Metric.</strong> Joint Goal Accuracy (JGA) — the fraction of turns where <em>every</em> slot is correct. All-or-nothing. MultiWOZ 2.4 leaderboard tops around 83% in 2026.</p>
+<p><strong>Architectures.</strong></p>
+<ol>
+<li><strong>Rule-based (slot regex + keyword).</strong> Strong baseline for narrow domains. Debuggable.</li>
+<li><strong>TripPy / BERT-DST.</strong> Copy-based generation with BERT encoding. Pre-LLM standard.</li>
+<li><strong>LDST (LLaMA + LoRA).</strong> Instruction-tuned LLM with domain-slot prompting. Reaches ChatGPT-level quality on MultiWOZ 2.4.</li>
+<li><strong>Ontology-free (2024–26).</strong> Skip the schema; generate slot names and values directly. Handles open domains.</li>
+<li><strong>Prompt + structured output (2024–26).</strong> LLM with Pydantic schema + constrained decoding. 5 lines of code, production-ready.</li>
+</ol>
+<h3 id="the-classic-failure-modes" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-classic-failure-modes" aria-label="Link to this section">#</a>The classic failure modes</h3>
+<ul>
+<li><strong>Co-reference across turns.</strong> &quot;Let&#39;s stay with the first option.&quot; Needs to resolve which option.</li>
+<li><strong>Over-write vs append.</strong> User says &quot;add Italian.&quot; Do you replace cuisine or append?</li>
+<li><strong>Implicit confirmations.</strong> &quot;OK cool&quot; — did that accept the offered booking?</li>
+<li><strong>Correction.</strong> &quot;Actually make it 7 pm.&quot; Must update time without clearing other slots.</li>
+<li><strong>Coreference to previous system utterance.</strong> &quot;Yes, that one.&quot; Which &quot;that&quot;?</li>
+</ul>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="n5-slot-tracker"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">n5-slot-tracker</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> n5 slot tracker</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-rule-based-slot-extractor" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-rule-based-slot-extractor" aria-label="Link to this section">#</a>Step 1: rule-based slot extractor</h3>
+<p>See <code class="inline-code">code/main.py</code>. Regex + synonym dictionaries cover 70% of canonical utterances in narrow domains:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python">CUISINE_SYNONYMS <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">"italian"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">"italian"</span><span class="token punctuation">,</span> <span class="token string">"pasta"</span><span class="token punctuation">,</span> <span class="token string">"pizza"</span><span class="token punctuation">,</span> <span class="token string">"italy"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token string">"chinese"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">"chinese"</span><span class="token punctuation">,</span> <span class="token string">"chow mein"</span><span class="token punctuation">,</span> <span class="token string">"noodles"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span>
+
+
+<span class="token keyword">def</span> <span class="token function">extract_cuisine</span><span class="token punctuation">(</span>utterance<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">for</span> canonical<span class="token punctuation">,</span> synonyms <span class="token keyword">in</span> CUISINE_SYNONYMS<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> <span class="token builtin">any</span><span class="token punctuation">(</span>syn <span class="token keyword">in</span> utterance<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">for</span> syn <span class="token keyword">in</span> synonyms<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">return</span> canonical
+    <span class="token keyword">return</span> <span class="token boolean">None</span></code></pre>
+</figure>
+<p>Brittle outside the canonical vocabulary. Works for deterministic slot confirmations.</p>
+<h3 id="step-2-state-update-loop" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-state-update-loop" aria-label="Link to this section">#</a>Step 2: state update loop</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">update_state</span><span class="token punctuation">(</span>state<span class="token punctuation">,</span> utterance<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    new_state <span class="token operator">=</span> <span class="token builtin">dict</span><span class="token punctuation">(</span>state<span class="token punctuation">)</span>
+    <span class="token keyword">for</span> slot<span class="token punctuation">,</span> extractor <span class="token keyword">in</span> SLOT_EXTRACTORS<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        value <span class="token operator">=</span> extractor<span class="token punctuation">(</span>utterance<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> value <span class="token keyword">is</span> <span class="token keyword">not</span> <span class="token boolean">None</span><span class="token punctuation">:</span>
+            new_state<span class="token punctuation">[</span>slot<span class="token punctuation">]</span> <span class="token operator">=</span> value
+    <span class="token keyword">for</span> slot <span class="token keyword">in</span> NEGATION_CLEARS<span class="token punctuation">:</span>
+        <span class="token keyword">if</span> is_negated<span class="token punctuation">(</span>utterance<span class="token punctuation">,</span> slot<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            new_state<span class="token punctuation">[</span>slot<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token boolean">None</span>
+    <span class="token keyword">return</span> new_state</code></pre>
+</figure>
+<p>Three invariants:</p>
+<ul>
+<li>Never reset a slot the user did not touch.</li>
+<li>Explicit negation (&quot;never mind the cuisine&quot;) must clear.</li>
+<li>User correction (&quot;actually...&quot;) must overwrite, not append.</li>
+</ul>
+<h3 id="step-3-llm-driven-dst-with-structured-output" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-llm-driven-dst-with-structured-output" aria-label="Link to this section">#</a>Step 3: LLM-driven DST with structured output</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> pydantic <span class="token keyword">import</span> BaseModel
+<span class="token keyword">from</span> typing <span class="token keyword">import</span> Literal<span class="token punctuation">,</span> Optional
+<span class="token keyword">import</span> instructor
+
+<span class="token keyword">class</span> <span class="token class-name">RestaurantState</span><span class="token punctuation">(</span>BaseModel<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    cuisine<span class="token punctuation">:</span> Optional<span class="token punctuation">[</span>Literal<span class="token punctuation">[</span><span class="token string">"italian"</span><span class="token punctuation">,</span> <span class="token string">"chinese"</span><span class="token punctuation">,</span> <span class="token string">"indian"</span><span class="token punctuation">,</span> <span class="token string">"thai"</span><span class="token punctuation">,</span> <span class="token string">"any"</span><span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token boolean">None</span>
+    area<span class="token punctuation">:</span> Optional<span class="token punctuation">[</span>Literal<span class="token punctuation">[</span><span class="token string">"north"</span><span class="token punctuation">,</span> <span class="token string">"south"</span><span class="token punctuation">,</span> <span class="token string">"east"</span><span class="token punctuation">,</span> <span class="token string">"west"</span><span class="token punctuation">,</span> <span class="token string">"center"</span><span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token boolean">None</span>
+    price<span class="token punctuation">:</span> Optional<span class="token punctuation">[</span>Literal<span class="token punctuation">[</span><span class="token string">"cheap"</span><span class="token punctuation">,</span> <span class="token string">"moderate"</span><span class="token punctuation">,</span> <span class="token string">"expensive"</span><span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token boolean">None</span>
+    people<span class="token punctuation">:</span> Optional<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token boolean">None</span>
+    day<span class="token punctuation">:</span> Optional<span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token boolean">None</span>
+
+
+<span class="token keyword">def</span> <span class="token function">llm_dst</span><span class="token punctuation">(</span>history<span class="token punctuation">,</span> llm<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    prompt <span class="token operator">=</span> <span class="token string-interpolation"><span class="token string">f"""You track the slot values of a restaurant booking across turns.
+Dialogue so far:
+</span><span class="token interpolation"><span class="token punctuation">{</span>render<span class="token punctuation">(</span>history<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">
+
+Update the state based on the latest user turn. Output only the JSON state."""</span></span>
+    <span class="token keyword">return</span> llm<span class="token punctuation">(</span>prompt<span class="token punctuation">,</span> response_model<span class="token operator">=</span>RestaurantState<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Instructor + Pydantic guarantees a valid state object. No regex, no schema mismatches, no hallucinated slots.</p>
+<h3 id="step-4-jga-evaluation" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-jga-evaluation" aria-label="Link to this section">#</a>Step 4: JGA evaluation</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">joint_goal_accuracy</span><span class="token punctuation">(</span>predicted_states<span class="token punctuation">,</span> gold_states<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    correct <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token keyword">for</span> p<span class="token punctuation">,</span> g <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>predicted_states<span class="token punctuation">,</span> gold_states<span class="token punctuation">)</span> <span class="token keyword">if</span> p <span class="token operator">==</span> g<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> correct <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>predicted_states<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Calibrate: what fraction of turns does the system get ALL slots right? For MultiWOZ 2.4, top 2026 systems: 80-83%. Your in-domain system should exceed that on your narrow vocabulary or the LLM baseline beats you.</p>
+<h3 id="step-5-handling-correction" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-handling-correction" aria-label="Link to this section">#</a>Step 5: handling correction</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python">CORRECTION_CUES <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"actually"</span><span class="token punctuation">,</span> <span class="token string">"no wait"</span><span class="token punctuation">,</span> <span class="token string">"on second thought"</span><span class="token punctuation">,</span> <span class="token string">"change that to"</span><span class="token punctuation">}</span>
+
+
+<span class="token keyword">def</span> <span class="token function">is_correction</span><span class="token punctuation">(</span>utterance<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token builtin">any</span><span class="token punctuation">(</span>cue <span class="token keyword">in</span> utterance<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">for</span> cue <span class="token keyword">in</span> CORRECTION_CUES<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>On a detected correction, overwrite the last-updated slot rather than appending. Hard to get right without LLM help. The modern pattern: always let the LLM regenerate the whole state from history rather than incrementally updating — this naturally handles corrections.</p>
+<h2 id="pitfalls" class="prose-h prose-h2"><a class="prose-h__anchor" href="#pitfalls" aria-label="Link to this section">#</a>Pitfalls</h2>
+<ul>
+<li><strong>Full-history regeneration cost.</strong> Letting the LLM regenerate state each turn costs O(n²) total tokens. Cap history or summarize older turns.</li>
+<li><strong>Schema drift.</strong> Adding new slots post-hoc breaks old training data. Version your schema.</li>
+<li><strong>Case sensitivity.</strong> &quot;Italian&quot; vs &quot;italian&quot; vs &quot;ITALIAN&quot; — normalize everywhere.</li>
+<li><strong>Implicit inheritance.</strong> If the user has previously specified &quot;for 4 people,&quot; a new request for a different time should not clear people. Always pass the full history.</li>
+<li><strong>Free-form vs closed-set.</strong> Names, times, and addresses need free-form slots; cuisines and areas are closed. Mix both in the schema.</li>
+</ul>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>The 2026 stack:</p>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Approach</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Narrow domain (one or two intents)</td>
+<td>Rule-based + regex</td>
+</tr>
+<tr>
+<td>Broad domain, labeled data available</td>
+<td>LDST (LLaMA + LoRA on MultiWOZ-style data)</td>
+</tr>
+<tr>
+<td>Broad domain, no labels, prod-ready</td>
+<td>LLM + Instructor + Pydantic schema</td>
+</tr>
+<tr>
+<td>Spoken / voice</td>
+<td>ASR + normalizer + LLM-DST</td>
+</tr>
+<tr>
+<td>Multi-domain booking flow</td>
+<td>Schema-guided LLM with per-domain Pydantic models</td>
+</tr>
+<tr>
+<td>Compliance-sensitive</td>
+<td>Rule-based primary, LLM fallback with confirmation flow</td>
+</tr>
+</tbody></table>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>Save as <code class="inline-code">outputs/skill-dst-designer.md</code>:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">markdown</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-markdown"><span class="token front-matter-block"><span class="token punctuation">---</span>
+<span class="token front-matter yaml language-yaml"><span class="token key atrule">name</span><span class="token punctuation">:</span> dst<span class="token punctuation">-</span>designer
+<span class="token key atrule">description</span><span class="token punctuation">:</span> Design a dialogue state tracker — schema<span class="token punctuation">,</span> extractor<span class="token punctuation">,</span> update policy<span class="token punctuation">,</span> evaluation.
+<span class="token key atrule">version</span><span class="token punctuation">:</span> 1.0.0
+<span class="token key atrule">phase</span><span class="token punctuation">:</span> <span class="token number">5</span>
+<span class="token key atrule">lesson</span><span class="token punctuation">:</span> <span class="token number">29</span>
+<span class="token key atrule">tags</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>nlp<span class="token punctuation">,</span> dialogue<span class="token punctuation">,</span> task<span class="token punctuation">-</span>oriented<span class="token punctuation">]</span></span>
+<span class="token punctuation">---</span></span>
+
+Given a use case (domain, languages, vocab openness, compliance needs), output:
+
+<span class="token list punctuation">1.</span> Schema. Domain list, slots per domain, open vs closed vocabulary per slot.
+<span class="token list punctuation">2.</span> Extractor. Rule-based / seq2seq / LLM-with-Pydantic. Reason.
+<span class="token list punctuation">3.</span> Update policy. Regenerate-whole-state / incremental; correction handling; negation handling.
+<span class="token list punctuation">4.</span> Evaluation. Joint Goal Accuracy on a held-out dialogue set, slot-level precision/recall, confusion on the hardest slot.
+<span class="token list punctuation">5.</span> Confirmation flow. When to explicitly ask the user to confirm (destructive actions, low-confidence extractions).
+
+Refuse LLM-only DST for compliance-sensitive slots without a rule-based secondary check. Refuse any DST that cannot roll back a slot on user correction. Flag schemas without version tags.</code></pre>
+</figure>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><strong>Easy.</strong> Build the rule-based state tracker in <code class="inline-code">code/main.py</code> for 3 slots (cuisine, area, price). Test on 10 hand-crafted dialogues. Measure JGA.</li>
+<li><strong>Medium.</strong> Same dataset with Instructor + Pydantic + a small LLM. Compare JGA. Inspect the hardest turns.</li>
+<li><strong>Hard.</strong> Implement both and route: rule-based primary, LLM fallback when rule-based emits &lt;2 slots with confidence. Measure the combined JGA and inference cost per turn.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>DST</td>
+<td>Dialogue state tracking</td>
+<td>Maintain the slot-value dict across dialogue turns.</td>
+</tr>
+<tr>
+<td>Slot</td>
+<td>Unit of user intent</td>
+<td>Named parameter the backend needs (cuisine, date).</td>
+</tr>
+<tr>
+<td>Domain</td>
+<td>The task area</td>
+<td>Restaurant, hotel, taxi — sets of slots.</td>
+</tr>
+<tr>
+<td>JGA</td>
+<td>Joint Goal Accuracy</td>
+<td>Fraction of turns where every slot is correct. All-or-nothing.</td>
+</tr>
+<tr>
+<td>MultiWOZ</td>
+<td>The benchmark</td>
+<td>Multi-domain WOZ dataset; standard DST evaluation.</td>
+</tr>
+<tr>
+<td>Ontology-free DST</td>
+<td>No schema</td>
+<td>Generate slot names and values directly, no fixed list.</td>
+</tr>
+<tr>
+<td>Correction</td>
+<td>&quot;Actually...&quot;</td>
+<td>Turn that overwrites a previously-filled slot.</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/1810.00278" target="_blank" rel="noopener">Budzianowski et al. (2018). MultiWOZ — A Large-Scale Multi-Domain Wizard-of-Oz</a> — the canonical benchmark.</li>
+<li><a href="https://arxiv.org/abs/2310.14970" target="_blank" rel="noopener">Feng et al. (2023). Towards LLM-driven Dialogue State Tracking (LDST)</a> — LLaMA + LoRA instruction tuning for DST.</li>
+<li><a href="https://arxiv.org/abs/2005.02877" target="_blank" rel="noopener">Heck et al. (2020). TripPy — A Triple Copy Strategy for Value Independent Neural Dialog State Tracking</a> — the copy-based DST workhorse.</li>
+<li><a href="https://arxiv.org/abs/2404.10753" target="_blank" rel="noopener">King, Flanigan (2024). Unsupervised End-to-End Task-Oriented Dialogue with LLMs</a> — EM-based unsupervised TOD.</li>
+<li><a href="https://github.com/budzianowski/multiwoz" target="_blank" rel="noopener">MultiWOZ leaderboard</a> — canonical DST results.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="28-long-context-evaluation.html">
+  <span class="label">← Previous</span>
+  <b>Long-Context Evaluation — NIAH, RULER, LongBench, MRCR</b>
+</a>
+      <span class="pager__item pager__item--next is-empty">
+  <span class="label">Next →</span>
+  <b>End of this module</b>
+</span>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>4 minutes</b> of NLP, Foundations to Advanced behind you.</p>
+      <a class="btn btn--solid" href="../index.html#modules">Pick the next module →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#the-classic-failure-modes">The classic failure modes</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-rule-based-slot-extractor">Step 1: rule-based slot extractor</a></li><li class="mini__item mini__item--d3"><a href="#step-2-state-update-loop">Step 2: state update loop</a></li><li class="mini__item mini__item--d3"><a href="#step-3-llm-driven-dst-with-structured-output">Step 3: LLM-driven DST with structured output</a></li><li class="mini__item mini__item--d3"><a href="#step-4-jga-evaluation">Step 4: JGA evaluation</a></li><li class="mini__item mini__item--d3"><a href="#step-5-handling-correction">Step 5: handling correction</a></li><li class="mini__item mini__item--d2"><a href="#pitfalls">Pitfalls</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

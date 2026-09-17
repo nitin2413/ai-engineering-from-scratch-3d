@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Building a Tokenizer from Scratch — LLMs from Scratch — AIFS</title>
+<meta name="description" content="LLMs from Scratch: Building a Tokenizer from Scratch. 7 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Building a Tokenizer from Scratch — LLMs from Scratch — AIFS">
+<meta property="og:description" content="LLMs from Scratch: Building a Tokenizer from Scratch. 7 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"weight-tying":["../assets/figures/figures-llms2.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-llms2.js"];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#6C4DFF" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#6C4DFF;--accent-ink:#FFFFFF"
+  data-lesson-id="llms-from-scratch/02-building-a-tokenizer" data-module="llms-from-scratch"
+  data-prev="01-tokenizers.html" data-next="03-data-pipelines.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#6C4DFF">
+        <span class="label">Phase 10</span>
+        <b>LLMs from Scratch</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="llms-from-scratch/01-tokenizers"><a href="01-tokenizers.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Tokenizers: BPE, WordPiece, SentencePiece</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/02-building-a-tokenizer"><a href="02-building-a-tokenizer.html" class="is-current">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Building a Tokenizer from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/03-data-pipelines"><a href="03-data-pipelines.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Data Pipelines for Pre-Training</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/04-pre-training-mini-gpt"><a href="04-pre-training-mini-gpt.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Pre-Training a Mini GPT (124M Parameters)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/05-scaling-distributed"><a href="05-scaling-distributed.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Scaling: Distributed Training, FSDP, DeepSpeed</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/06-instruction-tuning-sft"><a href="06-instruction-tuning-sft.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Instruction Tuning (SFT)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/07-rlhf"><a href="07-rlhf.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">RLHF: Reward Model + PPO</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/08-dpo"><a href="08-dpo.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">DPO: Direct Preference Optimization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/09-constitutional-ai-self-improvement"><a href="09-constitutional-ai-self-improvement.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Constitutional AI and Self-Improvement</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/10-evaluation"><a href="10-evaluation.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Evaluation: Benchmarks, Evals, LM Harness</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/11-quantization"><a href="11-quantization.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Quantization: Making Models Fit</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/12-inference-optimization"><a href="12-inference-optimization.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Inference Optimization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/13-building-complete-llm-pipeline"><a href="13-building-complete-llm-pipeline.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Building a Complete LLM Pipeline</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/14-open-models-architecture-walkthroughs"><a href="14-open-models-architecture-walkthroughs.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Open Models: Architecture Walkthroughs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/15-speculative-decoding-eagle3"><a href="15-speculative-decoding-eagle3.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Speculative Decoding and EAGLE-3</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/16-differential-attention-v2"><a href="16-differential-attention-v2.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Differential Attention (V2)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/17-native-sparse-attention"><a href="17-native-sparse-attention.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Native Sparse Attention (DeepSeek NSA)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/18-multi-token-prediction"><a href="18-multi-token-prediction.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Multi-Token Prediction (MTP)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/19-dualpipe-parallelism"><a href="19-dualpipe-parallelism.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">DualPipe Parallelism</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/20-deepseek-v3-walkthrough"><a href="20-deepseek-v3-walkthrough.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">DeepSeek-V3 Architecture Walkthrough</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/21-jamba-hybrid-ssm-transformer"><a href="21-jamba-hybrid-ssm-transformer.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Jamba — Hybrid SSM-Transformer</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/22-async-hogwild-inference"><a href="22-async-hogwild-inference.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Async and Hogwild! Inference</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/25-speculative-decoding"><a href="25-speculative-decoding.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Speculative Decoding and EAGLE</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/34-gradient-checkpointing"><a href="34-gradient-checkpointing.html" class="">
+  <span class="snav__n">34</span>
+  <span class="snav__t">Gradient Checkpointing and Activation Recomputation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">LLMs from Scratch</a></p>
+      <h1 class="page__title">Building a Tokenizer from Scratch</h1>
+      <p class="page__lede">Lesson 01 gave you a toy. This lesson gives you a weapon.</p>
+      <div class="page__meta">
+        <span class="chip">7 min read</span>
+        <span class="chip">1,619 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 10, Lesson 01 (Tokenizers: BPE, WordPiece, SentencePiece)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~90 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Build a production-grade BPE tokenizer that handles Unicode, whitespace normalization, and special tokens</li>
+<li>Implement byte-level fallback so the tokenizer can encode any input (including emoji, CJK, and code) without unknown tokens</li>
+<li>Add pre-tokenization regex patterns that split text at word boundaries before applying BPE merges</li>
+<li>Train a custom tokenizer on a corpus and evaluate its compression ratio against tiktoken on multilingual text</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Your BPE tokenizer from Lesson 01 works on English text. Now throw Japanese at it. Or emoji. Or Python code with mixed tabs and spaces.</p>
+<p>It breaks.</p>
+<p>Not because BPE is wrong -- because the implementation is incomplete. A production tokenizer handles raw bytes in any encoding, normalizes Unicode before splitting, manages special tokens that never get merged, chains pre-tokenization with subword splitting, and does all of this fast enough to not bottleneck a training pipeline processing 15 trillion tokens.</p>
+<p>GPT-2&#39;s tokenizer has 50,257 tokens. Llama 3 has 128,256. GPT-4 has roughly 100,000. These are not toy numbers. The merge tables behind those vocabularies were trained on hundreds of gigabytes of text, and the surrounding machinery -- normalization, pre-tokenization, special token injection, chat template formatting -- is what separates a tokenizer that handles &quot;hello world&quot; from one that handles the entire internet.</p>
+<p>You are going to build that machinery.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="the-full-pipeline" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-full-pipeline" aria-label="Link to this section">#</a>The Full Pipeline</h3>
+<p>A production tokenizer is not one algorithm. It is a pipeline of five stages, each solving a different problem.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph LR
+    A[Raw Text] --&gt; B[Normalize]
+    B --&gt; C[Pre-Tokenize]
+    C --&gt; D[BPE Merge]
+    D --&gt; E[Special Tokens]
+    E --&gt; F[Token IDs]
+
+    style A fill:#1a1a2e,stroke:#e94560,color:#fff
+    style B fill:#1a1a2e,stroke:#e94560,color:#fff
+    style C fill:#1a1a2e,stroke:#e94560,color:#fff
+    style D fill:#1a1a2e,stroke:#e94560,color:#fff
+    style E fill:#1a1a2e,stroke:#e94560,color:#fff
+    style F fill:#1a1a2e,stroke:#e94560,color:#fff</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>Each stage has a specific job:</p>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>What It Does</th>
+<th>Why It Matters</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Normalize</td>
+<td>NFKC Unicode, lowercase optional, strip accents optional</td>
+<td>&quot;fi&quot; ligature (U+FB01) becomes &quot;fi&quot; (two chars). Without this, same word gets different tokens.</td>
+</tr>
+<tr>
+<td>Pre-Tokenize</td>
+<td>Split text into chunks before BPE</td>
+<td>Prevents BPE from merging across word boundaries. &quot;the cat&quot; should never produce a token &quot;e c&quot;.</td>
+</tr>
+<tr>
+<td>BPE Merge</td>
+<td>Apply learned merge rules to byte sequences</td>
+<td>The core compression. Turns raw bytes into subword tokens.</td>
+</tr>
+<tr>
+<td>Special Tokens</td>
+<td>Inject [BOS], [EOS], [PAD], chat template markers</td>
+<td>These tokens have fixed IDs. They never participate in BPE merges. The model needs them for structure.</td>
+</tr>
+<tr>
+<td>ID Mapping</td>
+<td>Convert token strings to integer IDs</td>
+<td>The model sees integers, not strings.</td>
+</tr>
+</tbody></table>
+<h3 id="byte-level-bpe" class="prose-h prose-h3"><a class="prose-h__anchor" href="#byte-level-bpe" aria-label="Link to this section">#</a>Byte-Level BPE</h3>
+<p>Lesson 01&#39;s tokenizer operated on UTF-8 bytes. That was the right call. But we skipped something important: what happens when those bytes are not valid UTF-8?</p>
+<p>Byte-level BPE solves this by treating every possible byte value (0-255) as a valid token. Your base vocabulary is exactly 256 entries. Any file -- text, binary, corrupted -- can be tokenized without producing an unknown token.</p>
+<p>GPT-2 added a trick: map each byte to a printable Unicode character so the vocabulary stays human-readable. Byte 0x20 (space) becomes the character &quot;G&quot; in their mapping. This is purely cosmetic. The algorithm does not care.</p>
+<p>The real power: byte-level BPE handles every language on earth. Chinese characters are 3 UTF-8 bytes each. Japanese can be 3-4 bytes. Arabic, Devanagari, emoji -- all just byte sequences. The BPE algorithm finds patterns in these byte sequences exactly the same way it finds patterns in English ASCII bytes.</p>
+<h3 id="pre-tokenization" class="prose-h prose-h3"><a class="prose-h__anchor" href="#pre-tokenization" aria-label="Link to this section">#</a>Pre-Tokenization</h3>
+<p>Before BPE touches your text, you need to split it into chunks. This prevents the merge algorithm from creating tokens that span word boundaries.</p>
+<p>GPT-2 uses a regex pattern to split text:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>'(?:[sdmt]|ll|ve|re)| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+</code></pre>
+</figure>
+<p>This pattern splits on contractions (&quot;don&#39;t&quot; becomes &quot;don&quot; + &quot;&#39;t&quot;), words with optional leading spaces, numbers, punctuation, and whitespace. The leading space is kept attached to the word -- so &quot;the cat&quot; becomes [&quot; the&quot;, &quot; cat&quot;], not [&quot;the&quot;, &quot; &quot;, &quot;cat&quot;].</p>
+<p>Llama uses SentencePiece, which skips regex entirely. It treats the raw byte stream as one long sequence and lets the BPE algorithm figure out the boundaries. This is simpler but gives BPE more freedom to create cross-word tokens.</p>
+<p>The choice matters. GPT-2&#39;s regex prevents the tokenizer from learning that &quot;the&quot; at the end of one word and &quot;the&quot; at the start of the next should merge. SentencePiece allows it, which sometimes produces more efficient compression but less interpretable tokens.</p>
+<h3 id="special-tokens" class="prose-h prose-h3"><a class="prose-h__anchor" href="#special-tokens" aria-label="Link to this section">#</a>Special Tokens</h3>
+<p>Every production tokenizer reserves token IDs for structural markers:</p>
+<table>
+<thead>
+<tr>
+<th>Token</th>
+<th>Purpose</th>
+<th>Used By</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code class="inline-code">[BOS]</code> / <code class="inline-code">&lt;s&gt;</code></td>
+<td>Beginning of sequence</td>
+<td>Llama 3, GPT</td>
+</tr>
+<tr>
+<td><code class="inline-code">[EOS]</code> / <code class="inline-code">&lt;/s&gt;</code></td>
+<td>End of sequence</td>
+<td>All models</td>
+</tr>
+<tr>
+<td><code class="inline-code">[PAD]</code></td>
+<td>Padding for batch alignment</td>
+<td>BERT, T5</td>
+</tr>
+<tr>
+<td><code class="inline-code">[UNK]</code></td>
+<td>Unknown token (byte-level BPE eliminates this)</td>
+<td>BERT, WordPiece</td>
+</tr>
+<tr>
+<td><code class="inline-code">&lt;|im_start|&gt;</code></td>
+<td>Chat message boundary start</td>
+<td>ChatGPT, Qwen</td>
+</tr>
+<tr>
+<td><code class="inline-code">&lt;|im_end|&gt;</code></td>
+<td>Chat message boundary end</td>
+<td>ChatGPT, Qwen</td>
+</tr>
+<tr>
+<td><code class="inline-code">&lt;|user|&gt;</code></td>
+<td>User turn marker</td>
+<td>Llama 3</td>
+</tr>
+<tr>
+<td><code class="inline-code">&lt;|assistant|&gt;</code></td>
+<td>Assistant turn marker</td>
+<td>Llama 3</td>
+</tr>
+</tbody></table>
+<p>Special tokens are never split by BPE. They are matched exactly before the merge algorithm runs, replaced with their fixed ID, and the surrounding text is tokenized normally.</p>
+<h3 id="chat-templates" class="prose-h prose-h3"><a class="prose-h__anchor" href="#chat-templates" aria-label="Link to this section">#</a>Chat Templates</h3>
+<p>This is where most people get confused and most implementations break.</p>
+<p>When you send messages to a chat model, the API accepts a list of messages:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>[
+  {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;You are helpful.&quot;},
+  {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Hello&quot;},
+  {&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: &quot;Hi there!&quot;}
+]</code></pre>
+</figure>
+<p>The model does not see JSON. It sees a flat token sequence. The chat template converts messages into that flat sequence using special tokens. Every model does this differently:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>Llama 3:
+&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+You are helpful.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+Hello&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+Hi there!&lt;|eot_id|&gt;
+
+ChatGPT:
+&lt;|im_start|&gt;system
+You are helpful.&lt;|im_end|&gt;
+&lt;|im_start|&gt;user
+Hello&lt;|im_end|&gt;
+&lt;|im_start|&gt;assistant
+Hi there!&lt;|im_end|&gt;</code></pre>
+</figure>
+<p>Get the template wrong and the model produces garbage. It was trained on one exact format. Any deviation -- a missing newline, a swapped token, an extra space -- puts the input outside the training distribution.</p>
+<h3 id="speed" class="prose-h prose-h3"><a class="prose-h__anchor" href="#speed" aria-label="Link to this section">#</a>Speed</h3>
+<p>Python is too slow for production tokenization.</p>
+<p>tiktoken (OpenAI) is written in Rust with Python bindings. HuggingFace tokenizers is also Rust. SentencePiece is C++. These achieve 10-100x speedups over pure Python.</p>
+<p>For perspective: tokenizing 15 trillion tokens for Llama 3 pre-training at 1 million tokens per second (fast Python) would take 174 days. At 100 million tokens per second (Rust), it takes 1.7 days.</p>
+<p>You are building in Python to understand the algorithm. In production, you would use a compiled implementation and only touch the Python wrapper.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="weight-tying"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">weight-tying</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> weight tying</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-byte-level-encoding" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-byte-level-encoding" aria-label="Link to this section">#</a>Step 1: Byte-Level Encoding</h3>
+<p>The foundation. Convert any string into a sequence of bytes, map each byte to a printable character for display, and reverse the process.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">bytes_to_tokens</span><span class="token punctuation">(</span>text<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token builtin">list</span><span class="token punctuation">(</span>text<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token string">"utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token keyword">def</span> <span class="token function">tokens_to_text</span><span class="token punctuation">(</span>token_bytes<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token builtin">bytes</span><span class="token punctuation">(</span>token_bytes<span class="token punctuation">)</span><span class="token punctuation">.</span>decode<span class="token punctuation">(</span><span class="token string">"utf-8"</span><span class="token punctuation">,</span> errors<span class="token operator">=</span><span class="token string">"replace"</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Test on multilingual text to see the byte counts:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python">texts <span class="token operator">=</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">(</span><span class="token string">"English"</span><span class="token punctuation">,</span> <span class="token string">"hello"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">(</span><span class="token string">"Chinese"</span><span class="token punctuation">,</span> <span class="token string">"你好"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">(</span><span class="token string">"Emoji"</span><span class="token punctuation">,</span> <span class="token string">"🔥"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">(</span><span class="token string">"Mixed"</span><span class="token punctuation">,</span> <span class="token string">"hello你好🔥"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">]</span>
+
+<span class="token keyword">for</span> label<span class="token punctuation">,</span> text <span class="token keyword">in</span> texts<span class="token punctuation">:</span>
+    b <span class="token operator">=</span> bytes_to_tokens<span class="token punctuation">(</span>text<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>label<span class="token punctuation">}</span></span><span class="token string">: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">len</span><span class="token punctuation">(</span>text<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string"> chars -> </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">len</span><span class="token punctuation">(</span>b<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string"> bytes -> </span><span class="token interpolation"><span class="token punctuation">{</span>b<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>&quot;hello&quot; is 5 bytes. &quot;你好&quot; is 6 bytes (3 per character). The fire emoji is 4 bytes. The byte-level tokenizer does not care what language it is. Bytes are bytes.</p>
+<h3 id="step-2-pre-tokenizer-with-regex" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-pre-tokenizer-with-regex" aria-label="Link to this section">#</a>Step 2: Pre-Tokenizer with Regex</h3>
+<p>Split text into chunks using the GPT-2 regex pattern. Each chunk gets tokenized independently by BPE.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> re
+
+<span class="token keyword">try</span><span class="token punctuation">:</span>
+    <span class="token keyword">import</span> regex
+    GPT2_PATTERN <span class="token operator">=</span> regex<span class="token punctuation">.</span><span class="token builtin">compile</span><span class="token punctuation">(</span>
+        <span class="token triple-quoted-string string">r"""'(?:[sdmt]|ll|ve|re)| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+"""</span>
+    <span class="token punctuation">)</span>
+<span class="token keyword">except</span> ImportError<span class="token punctuation">:</span>
+    GPT2_PATTERN <span class="token operator">=</span> re<span class="token punctuation">.</span><span class="token builtin">compile</span><span class="token punctuation">(</span>
+        <span class="token triple-quoted-string string">r"""'(?:[sdmt]|ll|ve|re)| ?[a-zA-Z]+| ?[0-9]+| ?[^\s\w]+|\s+(?!\S)|\s+"""</span>
+    <span class="token punctuation">)</span>
+
+<span class="token keyword">def</span> <span class="token function">pre_tokenize</span><span class="token punctuation">(</span>text<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token keyword">match</span><span class="token punctuation">.</span>group<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">for</span> <span class="token keyword">match</span> <span class="token keyword">in</span> GPT2_PATTERN<span class="token punctuation">.</span>finditer<span class="token punctuation">(</span>text<span class="token punctuation">)</span><span class="token punctuation">]</span></code></pre>
+</figure>
+<p>The <code class="inline-code">regex</code> module supports Unicode property escapes (<code class="inline-code">\p{L}</code> for letters, <code class="inline-code">\p{N}</code> for numbers). The standard library <code class="inline-code">re</code> module does not, so we fall back to ASCII character classes. For production multilingual tokenizers, install <code class="inline-code">regex</code>.</p>
+<p>Try it:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">print</span><span class="token punctuation">(</span>pre_tokenize<span class="token punctuation">(</span><span class="token string">"Hello, world! Don't stop."</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token comment"># [' Hello', ',', ' world', '!', " Don", "'t", ' stop', '.']</span></code></pre>
+</figure>
+<p>The leading space stays attached to the word. Contractions split at the apostrophe. Punctuation becomes its own chunk. BPE will never merge tokens across these boundaries.</p>
+<h3 id="step-3-bpe-on-byte-sequences" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-bpe-on-byte-sequences" aria-label="Link to this section">#</a>Step 3: BPE on Byte Sequences</h3>
+<p>The core algorithm from Lesson 01, but now operating on pre-tokenized chunks independently.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> collections <span class="token keyword">import</span> Counter
+
+<span class="token keyword">def</span> <span class="token function">get_byte_pairs</span><span class="token punctuation">(</span>chunks<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    pairs <span class="token operator">=</span> Counter<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> chunk <span class="token keyword">in</span> chunks<span class="token punctuation">:</span>
+        byte_seq <span class="token operator">=</span> <span class="token builtin">list</span><span class="token punctuation">(</span>chunk<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token string">"utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>byte_seq<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            pairs<span class="token punctuation">[</span><span class="token punctuation">(</span>byte_seq<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> byte_seq<span class="token punctuation">[</span>i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token operator">+=</span> <span class="token number">1</span>
+    <span class="token keyword">return</span> pairs
+
+<span class="token keyword">def</span> <span class="token function">apply_merge</span><span class="token punctuation">(</span>byte_seq<span class="token punctuation">,</span> pair<span class="token punctuation">,</span> new_id<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    merged <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    i <span class="token operator">=</span> <span class="token number">0</span>
+    <span class="token keyword">while</span> i <span class="token operator">&lt;</span> <span class="token builtin">len</span><span class="token punctuation">(</span>byte_seq<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> i <span class="token operator">&lt;</span> <span class="token builtin">len</span><span class="token punctuation">(</span>byte_seq<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span> <span class="token keyword">and</span> byte_seq<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">==</span> pair<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token keyword">and</span> byte_seq<span class="token punctuation">[</span>i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">==</span> pair<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
+            merged<span class="token punctuation">.</span>append<span class="token punctuation">(</span>new_id<span class="token punctuation">)</span>
+            i <span class="token operator">+=</span> <span class="token number">2</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            merged<span class="token punctuation">.</span>append<span class="token punctuation">(</span>byte_seq<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span>
+            i <span class="token operator">+=</span> <span class="token number">1</span>
+    <span class="token keyword">return</span> merged</code></pre>
+</figure>
+<h3 id="step-4-special-token-handling" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-special-token-handling" aria-label="Link to this section">#</a>Step 4: Special Token Handling</h3>
+<p>Special tokens need exact matching and fixed IDs. They bypass BPE entirely.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">SpecialTokenHandler</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>special_tokens <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+        self<span class="token punctuation">.</span>pattern <span class="token operator">=</span> <span class="token boolean">None</span>
+
+    <span class="token keyword">def</span> <span class="token function">add_token</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> token_str<span class="token punctuation">,</span> token_id<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>special_tokens<span class="token punctuation">[</span>token_str<span class="token punctuation">]</span> <span class="token operator">=</span> token_id
+        escaped <span class="token operator">=</span> <span class="token punctuation">[</span>re<span class="token punctuation">.</span>escape<span class="token punctuation">(</span>t<span class="token punctuation">)</span> <span class="token keyword">for</span> t <span class="token keyword">in</span> <span class="token builtin">sorted</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>special_tokens<span class="token punctuation">.</span>keys<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> key<span class="token operator">=</span><span class="token builtin">len</span><span class="token punctuation">,</span> reverse<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+        self<span class="token punctuation">.</span>pattern <span class="token operator">=</span> re<span class="token punctuation">.</span><span class="token builtin">compile</span><span class="token punctuation">(</span><span class="token string">"|"</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>escaped<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">split_with_specials</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> text<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> <span class="token keyword">not</span> self<span class="token punctuation">.</span>pattern<span class="token punctuation">:</span>
+            <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token punctuation">(</span>text<span class="token punctuation">,</span> <span class="token boolean">False</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+        parts <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        last_end <span class="token operator">=</span> <span class="token number">0</span>
+        <span class="token keyword">for</span> <span class="token keyword">match</span> <span class="token keyword">in</span> self<span class="token punctuation">.</span>pattern<span class="token punctuation">.</span>finditer<span class="token punctuation">(</span>text<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> <span class="token keyword">match</span><span class="token punctuation">.</span>start<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">></span> last_end<span class="token punctuation">:</span>
+                parts<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">(</span>text<span class="token punctuation">[</span>last_end<span class="token punctuation">:</span><span class="token keyword">match</span><span class="token punctuation">.</span>start<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token boolean">False</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            parts<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">match</span><span class="token punctuation">.</span>group<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token boolean">True</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            last_end <span class="token operator">=</span> <span class="token keyword">match</span><span class="token punctuation">.</span>end<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> last_end <span class="token operator">&lt;</span> <span class="token builtin">len</span><span class="token punctuation">(</span>text<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            parts<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">(</span>text<span class="token punctuation">[</span>last_end<span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token boolean">False</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> parts</code></pre>
+</figure>
+<h3 id="step-5-full-tokenizer-class" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-full-tokenizer-class" aria-label="Link to this section">#</a>Step 5: Full Tokenizer Class</h3>
+<p>Chain everything together: normalize, split on special tokens, pre-tokenize, BPE merge, map to IDs.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> unicodedata
+
+<span class="token keyword">class</span> <span class="token class-name">ProductionTokenizer</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>merges <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+        self<span class="token punctuation">.</span>vocab <span class="token operator">=</span> <span class="token punctuation">{</span>i<span class="token punctuation">:</span> <span class="token builtin">bytes</span><span class="token punctuation">(</span><span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">256</span><span class="token punctuation">)</span><span class="token punctuation">}</span>
+        self<span class="token punctuation">.</span>special_handler <span class="token operator">=</span> SpecialTokenHandler<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>next_id <span class="token operator">=</span> <span class="token number">256</span>
+
+    <span class="token keyword">def</span> <span class="token function">normalize</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> text<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> unicodedata<span class="token punctuation">.</span>normalize<span class="token punctuation">(</span><span class="token string">"NFKC"</span><span class="token punctuation">,</span> text<span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">train</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> text<span class="token punctuation">,</span> num_merges<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        text <span class="token operator">=</span> self<span class="token punctuation">.</span>normalize<span class="token punctuation">(</span>text<span class="token punctuation">)</span>
+        chunks <span class="token operator">=</span> pre_tokenize<span class="token punctuation">(</span>text<span class="token punctuation">)</span>
+        chunk_bytes <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token builtin">list</span><span class="token punctuation">(</span>chunk<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token string">"utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">for</span> chunk <span class="token keyword">in</span> chunks<span class="token punctuation">]</span>
+
+        <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>num_merges<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            pairs <span class="token operator">=</span> Counter<span class="token punctuation">(</span><span class="token punctuation">)</span>
+            <span class="token keyword">for</span> seq <span class="token keyword">in</span> chunk_bytes<span class="token punctuation">:</span>
+                <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>seq<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                    pairs<span class="token punctuation">[</span><span class="token punctuation">(</span>seq<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">,</span> seq<span class="token punctuation">[</span>j <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token operator">+=</span> <span class="token number">1</span>
+            <span class="token keyword">if</span> <span class="token keyword">not</span> pairs<span class="token punctuation">:</span>
+                <span class="token keyword">break</span>
+            best <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span>pairs<span class="token punctuation">,</span> key<span class="token operator">=</span>pairs<span class="token punctuation">.</span>get<span class="token punctuation">)</span>
+            new_id <span class="token operator">=</span> self<span class="token punctuation">.</span>next_id
+            self<span class="token punctuation">.</span>next_id <span class="token operator">+=</span> <span class="token number">1</span>
+            self<span class="token punctuation">.</span>merges<span class="token punctuation">[</span>best<span class="token punctuation">]</span> <span class="token operator">=</span> new_id
+            self<span class="token punctuation">.</span>vocab<span class="token punctuation">[</span>new_id<span class="token punctuation">]</span> <span class="token operator">=</span> self<span class="token punctuation">.</span>vocab<span class="token punctuation">[</span>best<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">+</span> self<span class="token punctuation">.</span>vocab<span class="token punctuation">[</span>best<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">]</span>
+            chunk_bytes <span class="token operator">=</span> <span class="token punctuation">[</span>apply_merge<span class="token punctuation">(</span>seq<span class="token punctuation">,</span> best<span class="token punctuation">,</span> new_id<span class="token punctuation">)</span> <span class="token keyword">for</span> seq <span class="token keyword">in</span> chunk_bytes<span class="token punctuation">]</span>
+
+    <span class="token keyword">def</span> <span class="token function">add_special_token</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> token_str<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        token_id <span class="token operator">=</span> self<span class="token punctuation">.</span>next_id
+        self<span class="token punctuation">.</span>next_id <span class="token operator">+=</span> <span class="token number">1</span>
+        self<span class="token punctuation">.</span>special_handler<span class="token punctuation">.</span>add_token<span class="token punctuation">(</span>token_str<span class="token punctuation">,</span> token_id<span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>vocab<span class="token punctuation">[</span>token_id<span class="token punctuation">]</span> <span class="token operator">=</span> token_str<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token string">"utf-8"</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> token_id
+
+    <span class="token keyword">def</span> <span class="token function">encode</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> text<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        text <span class="token operator">=</span> self<span class="token punctuation">.</span>normalize<span class="token punctuation">(</span>text<span class="token punctuation">)</span>
+        parts <span class="token operator">=</span> self<span class="token punctuation">.</span>special_handler<span class="token punctuation">.</span>split_with_specials<span class="token punctuation">(</span>text<span class="token punctuation">)</span>
+        all_ids <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">for</span> part_text<span class="token punctuation">,</span> is_special <span class="token keyword">in</span> parts<span class="token punctuation">:</span>
+            <span class="token keyword">if</span> is_special<span class="token punctuation">:</span>
+                all_ids<span class="token punctuation">.</span>append<span class="token punctuation">(</span>self<span class="token punctuation">.</span>special_handler<span class="token punctuation">.</span>special_tokens<span class="token punctuation">[</span>part_text<span class="token punctuation">]</span><span class="token punctuation">)</span>
+            <span class="token keyword">else</span><span class="token punctuation">:</span>
+                <span class="token keyword">for</span> chunk <span class="token keyword">in</span> pre_tokenize<span class="token punctuation">(</span>part_text<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                    byte_seq <span class="token operator">=</span> <span class="token builtin">list</span><span class="token punctuation">(</span>chunk<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token string">"utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                    <span class="token keyword">for</span> pair<span class="token punctuation">,</span> new_id <span class="token keyword">in</span> self<span class="token punctuation">.</span>merges<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                        byte_seq <span class="token operator">=</span> apply_merge<span class="token punctuation">(</span>byte_seq<span class="token punctuation">,</span> pair<span class="token punctuation">,</span> new_id<span class="token punctuation">)</span>
+                    all_ids<span class="token punctuation">.</span>extend<span class="token punctuation">(</span>byte_seq<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> all_ids
+
+    <span class="token keyword">def</span> <span class="token function">decode</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> ids<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        byte_parts <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">for</span> token_id <span class="token keyword">in</span> ids<span class="token punctuation">:</span>
+            <span class="token keyword">if</span> token_id <span class="token keyword">in</span> self<span class="token punctuation">.</span>vocab<span class="token punctuation">:</span>
+                byte_parts<span class="token punctuation">.</span>append<span class="token punctuation">(</span>self<span class="token punctuation">.</span>vocab<span class="token punctuation">[</span>token_id<span class="token punctuation">]</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token string">b""</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>byte_parts<span class="token punctuation">)</span><span class="token punctuation">.</span>decode<span class="token punctuation">(</span><span class="token string">"utf-8"</span><span class="token punctuation">,</span> errors<span class="token operator">=</span><span class="token string">"replace"</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">vocab_size</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token builtin">len</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>vocab<span class="token punctuation">)</span></code></pre>
+</figure>
+<h3 id="step-6-multilingual-test" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-6-multilingual-test" aria-label="Link to this section">#</a>Step 6: Multilingual Test</h3>
+<p>The real test. Throw English, Chinese, emoji, and code at it.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python">corpus <span class="token operator">=</span> <span class="token punctuation">(</span>
+    <span class="token string">"The quick brown fox jumps over the lazy dog. "</span>
+    <span class="token string">"The quick brown fox runs through the forest. "</span>
+    <span class="token string">"Machine learning models process natural language. "</span>
+    <span class="token string">"Deep learning transforms how we build software. "</span>
+    <span class="token string">"def train(model, data): return model.fit(data) "</span>
+    <span class="token string">"def predict(model, x): return model(x) "</span>
+<span class="token punctuation">)</span>
+
+tok <span class="token operator">=</span> ProductionTokenizer<span class="token punctuation">(</span><span class="token punctuation">)</span>
+tok<span class="token punctuation">.</span>train<span class="token punctuation">(</span>corpus<span class="token punctuation">,</span> num_merges<span class="token operator">=</span><span class="token number">50</span><span class="token punctuation">)</span>
+
+bos <span class="token operator">=</span> tok<span class="token punctuation">.</span>add_special_token<span class="token punctuation">(</span><span class="token string">"&lt;|begin|>"</span><span class="token punctuation">)</span>
+eos <span class="token operator">=</span> tok<span class="token punctuation">.</span>add_special_token<span class="token punctuation">(</span><span class="token string">"&lt;|end|>"</span><span class="token punctuation">)</span>
+
+test_texts <span class="token operator">=</span> <span class="token punctuation">[</span>
+    <span class="token string">"The quick brown fox."</span><span class="token punctuation">,</span>
+    <span class="token string">"你好世界"</span><span class="token punctuation">,</span>
+    <span class="token string">"Hello 🌍 World"</span><span class="token punctuation">,</span>
+    <span class="token string">"def foo(x): return x + 1"</span><span class="token punctuation">,</span>
+    <span class="token string-interpolation"><span class="token string">f"&lt;|begin|>Hello&lt;|end|>"</span></span><span class="token punctuation">,</span>
+<span class="token punctuation">]</span>
+
+<span class="token keyword">for</span> text <span class="token keyword">in</span> test_texts<span class="token punctuation">:</span>
+    ids <span class="token operator">=</span> tok<span class="token punctuation">.</span>encode<span class="token punctuation">(</span>text<span class="token punctuation">)</span>
+    decoded <span class="token operator">=</span> tok<span class="token punctuation">.</span>decode<span class="token punctuation">(</span>ids<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Input:   </span><span class="token interpolation"><span class="token punctuation">{</span>text<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Tokens:  </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">len</span><span class="token punctuation">(</span>ids<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string"> ids"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Decoded: </span><span class="token interpolation"><span class="token punctuation">{</span>decoded<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Chinese characters produce 3 bytes each. The emoji produces 4 bytes. None of these crash the tokenizer. None produce unknown tokens. That is the power of byte-level BPE.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<h3 id="comparing-real-tokenizers" class="prose-h prose-h3"><a class="prose-h__anchor" href="#comparing-real-tokenizers" aria-label="Link to this section">#</a>Comparing Real Tokenizers</h3>
+<p>Load the actual tokenizers from Llama 3, GPT-4, and Mistral. See how each handles the same multilingual paragraph.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> tiktoken
+
+gpt4_enc <span class="token operator">=</span> tiktoken<span class="token punctuation">.</span>get_encoding<span class="token punctuation">(</span><span class="token string">"cl100k_base"</span><span class="token punctuation">)</span>
+
+test_paragraph <span class="token operator">=</span> <span class="token string">"Machine learning is powerful. 机器学习很强大。 L'apprentissage automatique est puissant. 🤖💪"</span>
+
+tokens <span class="token operator">=</span> gpt4_enc<span class="token punctuation">.</span>encode<span class="token punctuation">(</span>test_paragraph<span class="token punctuation">)</span>
+pieces <span class="token operator">=</span> <span class="token punctuation">[</span>gpt4_enc<span class="token punctuation">.</span>decode<span class="token punctuation">(</span><span class="token punctuation">[</span>t<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token keyword">for</span> t <span class="token keyword">in</span> tokens<span class="token punctuation">]</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"GPT-4 (</span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">len</span><span class="token punctuation">(</span>tokens<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string"> tokens): </span><span class="token interpolation"><span class="token punctuation">{</span>pieces<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> transformers <span class="token keyword">import</span> AutoTokenizer
+
+llama_tok <span class="token operator">=</span> AutoTokenizer<span class="token punctuation">.</span>from_pretrained<span class="token punctuation">(</span><span class="token string">"meta-llama/Meta-Llama-3-8B"</span><span class="token punctuation">)</span>
+mistral_tok <span class="token operator">=</span> AutoTokenizer<span class="token punctuation">.</span>from_pretrained<span class="token punctuation">(</span><span class="token string">"mistralai/Mistral-7B-v0.1"</span><span class="token punctuation">)</span>
+
+<span class="token keyword">for</span> name<span class="token punctuation">,</span> tok <span class="token keyword">in</span> <span class="token punctuation">[</span><span class="token punctuation">(</span><span class="token string">"Llama 3"</span><span class="token punctuation">,</span> llama_tok<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token string">"Mistral"</span><span class="token punctuation">,</span> mistral_tok<span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
+    tokens <span class="token operator">=</span> tok<span class="token punctuation">.</span>encode<span class="token punctuation">(</span>test_paragraph<span class="token punctuation">)</span>
+    pieces <span class="token operator">=</span> tok<span class="token punctuation">.</span>convert_ids_to_tokens<span class="token punctuation">(</span>tokens<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>name<span class="token punctuation">}</span></span><span class="token string"> (</span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">len</span><span class="token punctuation">(</span>tokens<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string"> tokens): </span><span class="token interpolation"><span class="token punctuation">{</span>pieces<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token format-spec">20]</span><span class="token punctuation">}</span></span><span class="token string">..."</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>You will see different token counts for the same text. Llama 3 with 128K vocabulary is more aggressive at merging common patterns. GPT-4 with 100K sits in the middle. Mistral with 32K produces more tokens but has a smaller embedding layer.</p>
+<p>The tradeoff is always the same: larger vocabulary means shorter sequences but more parameters.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces a prompt for building and debugging production tokenizers. See <code class="inline-code">outputs/prompt-tokenizer-builder.md</code>.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><strong>Easy:</strong> Add a <code class="inline-code">get_token_bytes(id)</code> method that shows the raw bytes for any token ID. Use it to inspect what your most common merged tokens actually represent.</li>
+<li><strong>Medium:</strong> Implement the Llama-style pre-tokenizer that splits on whitespace and digits but keeps leading spaces. Compare its vocabulary with the GPT-2 regex approach on the same corpus.</li>
+<li><strong>Hard:</strong> Add a chat template method that takes a list of <code class="inline-code">{&quot;role&quot;: ..., &quot;content&quot;: ...}</code> messages and produces the correct token sequence for the Llama 3 chat format. Test it against the HuggingFace implementation.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Byte-level BPE</td>
+<td>&quot;Tokenizer that works on bytes&quot;</td>
+<td>BPE with a base vocabulary of 256 byte values -- handles any input without unknown tokens</td>
+</tr>
+<tr>
+<td>Pre-tokenization</td>
+<td>&quot;Splitting before BPE&quot;</td>
+<td>Regex or rule-based splitting that prevents BPE from merging across word boundaries</td>
+</tr>
+<tr>
+<td>NFKC normalization</td>
+<td>&quot;Unicode cleanup&quot;</td>
+<td>Canonical decomposition followed by compatibility composition -- &quot;fi&quot; ligature becomes &quot;fi&quot;, fullwidth &quot;A&quot; becomes &quot;A&quot;</td>
+</tr>
+<tr>
+<td>Chat template</td>
+<td>&quot;How messages become tokens&quot;</td>
+<td>The exact format for converting a list of role/content messages into a flat token sequence -- model-specific and must match training format</td>
+</tr>
+<tr>
+<td>Special tokens</td>
+<td>&quot;Control tokens&quot;</td>
+<td>Reserved token IDs that bypass BPE -- [BOS], [EOS], [PAD], chat markers -- matched exactly before merge</td>
+</tr>
+<tr>
+<td>Fertility</td>
+<td>&quot;Tokens per word&quot;</td>
+<td>Ratio of output tokens to input words -- 1.3 for English in GPT-4, 2-3 for Korean, higher means wasted context</td>
+</tr>
+<tr>
+<td>tiktoken</td>
+<td>&quot;OpenAI tokenizer&quot;</td>
+<td>Rust BPE implementation with Python bindings -- 10-100x faster than pure Python</td>
+</tr>
+<tr>
+<td>Merge table</td>
+<td>&quot;The vocabulary&quot;</td>
+<td>Ordered list of byte-pair merges learned during training -- this IS the tokenizer&#39;s learned knowledge</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://github.com/openai/tiktoken" target="_blank" rel="noopener">OpenAI tiktoken source</a> -- Rust BPE implementation used by GPT-3.5/4</li>
+<li><a href="https://github.com/huggingface/tokenizers" target="_blank" rel="noopener">HuggingFace tokenizers</a> -- Rust tokenizer library supporting BPE, WordPiece, Unigram</li>
+<li><a href="https://arxiv.org/abs/2407.21783" target="_blank" rel="noopener">Llama 3 paper (Meta, 2024)</a> -- details on 128K vocabulary and tokenizer training</li>
+<li><a href="https://arxiv.org/abs/1808.06226" target="_blank" rel="noopener">SentencePiece (Kudo &amp; Richardson, 2018)</a> -- language-agnostic tokenization</li>
+<li><a href="https://github.com/openai/gpt-2/blob/master/src/encoder.py" target="_blank" rel="noopener">GPT-2 tokenizer source</a> -- the original byte-to-Unicode mapping</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="01-tokenizers.html">
+  <span class="label">← Previous</span>
+  <b>Tokenizers: BPE, WordPiece, SentencePiece</b>
+</a>
+      <a class="pager__item pager__item--next" href="03-data-pipelines.html">
+  <span class="label">Next →</span>
+  <b>Data Pipelines for Pre-Training</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>7 minutes</b> of LLMs from Scratch behind you.</p>
+      <a class="btn btn--solid" href="03-data-pipelines.html">Continue to Data Pipelines for Pre-Training →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#the-full-pipeline">The Full Pipeline</a></li><li class="mini__item mini__item--d3"><a href="#byte-level-bpe">Byte-Level BPE</a></li><li class="mini__item mini__item--d3"><a href="#pre-tokenization">Pre-Tokenization</a></li><li class="mini__item mini__item--d3"><a href="#special-tokens">Special Tokens</a></li><li class="mini__item mini__item--d3"><a href="#chat-templates">Chat Templates</a></li><li class="mini__item mini__item--d3"><a href="#speed">Speed</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-byte-level-encoding">Step 1: Byte-Level Encoding</a></li><li class="mini__item mini__item--d3"><a href="#step-2-pre-tokenizer-with-regex">Step 2: Pre-Tokenizer with Regex</a></li><li class="mini__item mini__item--d3"><a href="#step-3-bpe-on-byte-sequences">Step 3: BPE on Byte Sequences</a></li><li class="mini__item mini__item--d3"><a href="#step-4-special-token-handling">Step 4: Special Token Handling</a></li><li class="mini__item mini__item--d3"><a href="#step-5-full-tokenizer-class">Step 5: Full Tokenizer Class</a></li><li class="mini__item mini__item--d3"><a href="#step-6-multilingual-test">Step 6: Multilingual Test</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d3"><a href="#comparing-real-tokenizers">Comparing Real Tokenizers</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

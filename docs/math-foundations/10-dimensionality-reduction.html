@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dimensionality Reduction — Math Foundations — AIFS</title>
+<meta name="description" content="Math Foundations: Dimensionality Reduction. 8 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Dimensionality Reduction — Math Foundations — AIFS">
+<meta property="og:description" content="Math Foundations: Dimensionality Reduction. 8 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"pca-axes":["../assets/figures/figures-math.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-math.js"];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#4D5BFF" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#4D5BFF;--accent-ink:#FFFFFF"
+  data-lesson-id="math-foundations/10-dimensionality-reduction" data-module="math-foundations"
+  data-prev="09-information-theory.html" data-next="11-singular-value-decomposition.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#4D5BFF">
+        <span class="label">Phase 01</span>
+        <b>Math Foundations</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="math-foundations/01-linear-algebra-intuition"><a href="01-linear-algebra-intuition.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Linear Algebra Intuition</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/02-vectors-matrices-operations"><a href="02-vectors-matrices-operations.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Vectors, Matrices &amp; Operations</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/03-matrix-transformations"><a href="03-matrix-transformations.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Matrix Transformations</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/04-calculus-for-ml"><a href="04-calculus-for-ml.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Calculus for Machine Learning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/05-chain-rule-and-autodiff"><a href="05-chain-rule-and-autodiff.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Chain Rule &amp; Automatic Differentiation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/06-probability-and-distributions"><a href="06-probability-and-distributions.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Probability and Distributions</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/07-bayes-theorem"><a href="07-bayes-theorem.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Bayes' Theorem</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/08-optimization"><a href="08-optimization.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Optimization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/09-information-theory"><a href="09-information-theory.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Information Theory</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/10-dimensionality-reduction"><a href="10-dimensionality-reduction.html" class="is-current">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Dimensionality Reduction</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/11-singular-value-decomposition"><a href="11-singular-value-decomposition.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Singular Value Decomposition</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/12-tensor-operations"><a href="12-tensor-operations.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Tensor Operations</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/13-numerical-stability"><a href="13-numerical-stability.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Numerical Stability</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/14-norms-and-distances"><a href="14-norms-and-distances.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Norms and Distances</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/15-statistics-for-ml"><a href="15-statistics-for-ml.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Statistics for Machine Learning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/16-sampling-methods"><a href="16-sampling-methods.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Sampling Methods</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/17-linear-systems"><a href="17-linear-systems.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Linear Systems</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/18-convex-optimization"><a href="18-convex-optimization.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Convex Optimization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/19-complex-numbers"><a href="19-complex-numbers.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">Complex Numbers for AI</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/20-fourier-transform"><a href="20-fourier-transform.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">The Fourier Transform</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/21-graph-theory"><a href="21-graph-theory.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Graph Theory for Machine Learning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="math-foundations/22-stochastic-processes"><a href="22-stochastic-processes.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Stochastic Processes</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Math Foundations</a></p>
+      <h1 class="page__title">Dimensionality Reduction</h1>
+      <p class="page__lede">High-dimensional data has structure. You find it by looking from the right angle.</p>
+      <div class="page__meta">
+        <span class="chip">8 min read</span>
+        <span class="chip">1,772 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Language</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 1, Lessons 01 (Linear Algebra Intuition), 02 (Vectors, Matrices &amp; Operations), 03 (Eigenvalues &amp; Eigenvectors), 06 (Probability &amp; Distributions)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~90 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Implement PCA from scratch: center data, compute the covariance matrix, eigendecompose, and project</li>
+<li>Use explained variance ratio and the elbow method to choose the number of principal components</li>
+<li>Compare PCA, t-SNE, and UMAP for visualizing MNIST digits in 2D and explain their tradeoffs</li>
+<li>Apply kernel PCA with an RBF kernel to separate nonlinear data structures that standard PCA cannot handle</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>You have a dataset with 784 features per sample. Maybe it is pixel values of handwritten digits. Maybe it is gene expression levels. Maybe it is user behavior signals. You cannot visualize 784 dimensions. You cannot plot them. You cannot even think about them.</p>
+<p>But most of those 784 features are redundant. The actual information lives on a much smaller surface. A handwritten &quot;7&quot; does not need 784 independent numbers to describe it. It needs a few: the angle of the stroke, the length of the crossbar, how much it leans. The rest is noise.</p>
+<p>Dimensionality reduction finds that smaller surface. It takes your 784-dimensional data and compresses it to 2, 10, or 50 dimensions while keeping the structure that matters.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="the-curse-of-dimensionality" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-curse-of-dimensionality" aria-label="Link to this section">#</a>The curse of dimensionality</h3>
+<p>High-dimensional spaces are unintuitive. Three things break as dimensions grow.</p>
+<p><strong>Distance becomes meaningless.</strong> In high dimensions, the distance between any two random points converges to the same value. If every point is roughly the same distance from every other point, nearest-neighbor search stops working.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>Dimension    Avg distance ratio (max/min between random points)
+2            ~5.0
+10           ~1.8
+100          ~1.2
+1000         ~1.02</code></pre>
+</figure>
+<p><strong>Volume concentrates in corners.</strong> A unit hypercube in d dimensions has 2^d corners. In 100 dimensions, nearly all the volume is in the corners, far from the center. Data points spread to the edges and your models starve for data in the interior.</p>
+<p><strong>You need exponentially more data.</strong> To maintain the same density of samples in a space, going from 2D to 20D means you need 10^18 times more data. You never have enough. Reducing dimensions brings the data density back to something workable.</p>
+<h3 id="pca-find-the-directions-that-matter" class="prose-h prose-h3"><a class="prose-h__anchor" href="#pca-find-the-directions-that-matter" aria-label="Link to this section">#</a>PCA: find the directions that matter</h3>
+<p>Principal Component Analysis (PCA) finds the axes along which your data varies the most. It rotates your coordinate system so the first axis captures the most variance, the second captures the next most, and so on.</p>
+<p>The algorithm:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>1. Center the data        (subtract the mean from each feature)
+2. Compute covariance     (how features move together)
+3. Eigendecomposition     (find the principal directions)
+4. Sort by eigenvalue     (biggest variance first)
+5. Project               (keep top k eigenvectors, drop the rest)</code></pre>
+</figure>
+<p>Why eigendecomposition? The covariance matrix is symmetric and positive semi-definite. Its eigenvectors are orthogonal directions in feature space. The eigenvalues tell you how much variance each direction captures. The eigenvector with the largest eigenvalue points along the direction of maximum variance.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph LR
+    A[&quot;Original data (2D)&lt;br/&gt;Data spread in both&lt;br/&gt;x and y directions&quot;] --&gt;|&quot;PCA rotation&quot;| B[&quot;After PCA&lt;br/&gt;PC1 captures the elongated spread&lt;br/&gt;PC2 captures the narrow spread&lt;br/&gt;Drop PC2 and you lose little info&quot;]</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<ul>
+<li><strong>Before PCA:</strong> Data cloud is spread diagonally across both x and y axes</li>
+<li><strong>After PCA:</strong> Coordinate system is rotated so PC1 aligns with the direction of maximum variance (elongated spread) and PC2 aligns with the direction of minimum variance (narrow spread)</li>
+<li><strong>Dimensionality reduction:</strong> Dropping PC2 projects the data onto PC1, losing very little information</li>
+</ul>
+<h3 id="explained-variance-ratio" class="prose-h prose-h3"><a class="prose-h__anchor" href="#explained-variance-ratio" aria-label="Link to this section">#</a>Explained variance ratio</h3>
+<p>Each principal component captures a fraction of the total variance. The explained variance ratio tells you how much.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>Component    Eigenvalue    Explained ratio    Cumulative
+PC1          4.73          0.473              0.473
+PC2          2.51          0.251              0.724
+PC3          1.12          0.112              0.836
+PC4          0.89          0.089              0.925
+...</code></pre>
+</figure>
+<p>When the cumulative explained variance reaches 0.95, you know that many components capture 95% of the information. Everything after that is mostly noise.</p>
+<h3 id="choosing-the-number-of-components" class="prose-h prose-h3"><a class="prose-h__anchor" href="#choosing-the-number-of-components" aria-label="Link to this section">#</a>Choosing the number of components</h3>
+<p>Three strategies:</p>
+<ol>
+<li><strong>Threshold.</strong> Keep enough components to explain 90-95% of the variance.</li>
+<li><strong>Elbow method.</strong> Plot explained variance per component. Look for a sharp drop-off.</li>
+<li><strong>Downstream performance.</strong> Use PCA as preprocessing. Sweep k and measure your model&#39;s accuracy. The best k is wherever accuracy plateaus.</li>
+</ol>
+<h3 id="t-sne-preserve-neighborhoods" class="prose-h prose-h3"><a class="prose-h__anchor" href="#t-sne-preserve-neighborhoods" aria-label="Link to this section">#</a>t-SNE: preserve neighborhoods</h3>
+<p>t-Distributed Stochastic Neighbor Embedding (t-SNE) is designed for visualization. It maps high-dimensional data to 2D (or 3D) while preserving which points are near each other.</p>
+<p>The intuition: in the original space, compute a probability distribution over pairs of points based on their distances. Near points get high probability. Far points get low probability. Then find a 2D arrangement where the same probability distribution holds. Points that were neighbors in 784 dimensions stay neighbors in 2D.</p>
+<p>Key properties of t-SNE:</p>
+<ul>
+<li>Non-linear. It can unfold complex manifolds that PCA cannot.</li>
+<li>Stochastic. Different runs produce different layouts.</li>
+<li>Perplexity parameter controls how many neighbors to consider (typical range: 5-50).</li>
+<li>Distances between clusters in the output are not meaningful. Only the clusters themselves are.</li>
+<li>Slow on large datasets. O(n^2) by default.</li>
+</ul>
+<h3 id="umap-faster-better-global-structure" class="prose-h prose-h3"><a class="prose-h__anchor" href="#umap-faster-better-global-structure" aria-label="Link to this section">#</a>UMAP: faster, better global structure</h3>
+<p>Uniform Manifold Approximation and Projection (UMAP) works similarly to t-SNE but with two advantages:</p>
+<ul>
+<li>Faster. It uses approximate nearest-neighbor graphs instead of computing all pairwise distances.</li>
+<li>Better global structure. The relative positions of clusters in the output tend to be more meaningful than in t-SNE.</li>
+</ul>
+<p>UMAP builds a weighted graph in high-dimensional space (the &quot;fuzzy topological representation&quot;) and then finds a low-dimensional layout that preserves this graph as well as possible.</p>
+<p>Key parameters:</p>
+<ul>
+<li><code class="inline-code">n_neighbors</code>: how many neighbors define local structure (similar to perplexity). Higher values preserve more global structure.</li>
+<li><code class="inline-code">min_dist</code>: how tightly points pack together in the output. Lower values create denser clusters.</li>
+</ul>
+<h3 id="when-to-use-which" class="prose-h prose-h3"><a class="prose-h__anchor" href="#when-to-use-which" aria-label="Link to this section">#</a>When to use which</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Use case</th>
+<th>Preserves</th>
+<th>Speed</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>PCA</td>
+<td>Preprocessing before training</td>
+<td>Global variance</td>
+<td>Fast (exact), works on millions of samples</td>
+</tr>
+<tr>
+<td>PCA</td>
+<td>Quick exploratory visualization</td>
+<td>Linear structure</td>
+<td>Fast</td>
+</tr>
+<tr>
+<td>t-SNE</td>
+<td>Publication-quality 2D plots</td>
+<td>Local neighborhoods</td>
+<td>Slow (&lt; 10k samples ideal)</td>
+</tr>
+<tr>
+<td>UMAP</td>
+<td>2D visualization at scale</td>
+<td>Local + some global structure</td>
+<td>Medium (handles millions)</td>
+</tr>
+<tr>
+<td>PCA</td>
+<td>Feature reduction for models</td>
+<td>Variance-ranked features</td>
+<td>Fast</td>
+</tr>
+<tr>
+<td>t-SNE / UMAP</td>
+<td>Understanding cluster structure</td>
+<td>Cluster separation</td>
+<td>Medium to slow</td>
+</tr>
+</tbody></table>
+<p>Rule of thumb: use PCA for preprocessing and data compression. Use t-SNE or UMAP when you need to visualize structure in 2D.</p>
+<h3 id="kernel-pca" class="prose-h prose-h3"><a class="prose-h__anchor" href="#kernel-pca" aria-label="Link to this section">#</a>Kernel PCA</h3>
+<p>Standard PCA finds linear subspaces. It rotates your coordinate system and drops axes. But what if the data lies on a nonlinear manifold? A circle in 2D cannot be separated by any line. Standard PCA will not help.</p>
+<p>Kernel PCA applies PCA in a high-dimensional feature space induced by a kernel function, without explicitly computing the coordinates in that space. This is the kernel trick -- the same idea behind SVMs.</p>
+<p>The algorithm:</p>
+<ol>
+<li>Compute the kernel matrix K where K_ij = k(x_i, x_j)</li>
+<li>Center the kernel matrix in feature space</li>
+<li>Eigendecompose the centered kernel matrix</li>
+<li>The top eigenvectors (scaled by 1/sqrt(eigenvalue)) are the projections</li>
+</ol>
+<p>Common kernel functions:</p>
+<table>
+<thead>
+<tr>
+<th>Kernel</th>
+<th>Formula</th>
+<th>Good for</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>RBF (Gaussian)</td>
+<td>exp(-gamma * ||x - y||^2)</td>
+<td>Most nonlinear data, smooth manifolds</td>
+</tr>
+<tr>
+<td>Polynomial</td>
+<td>(x . y + c)^d</td>
+<td>Polynomial relationships</td>
+</tr>
+<tr>
+<td>Sigmoid</td>
+<td>tanh(alpha * x . y + c)</td>
+<td>Neural network-like mappings</td>
+</tr>
+</tbody></table>
+<p>When to use kernel PCA vs standard PCA:</p>
+<table>
+<thead>
+<tr>
+<th>Criterion</th>
+<th>Standard PCA</th>
+<th>Kernel PCA</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Data structure</td>
+<td>Linear subspace</td>
+<td>Nonlinear manifold</td>
+</tr>
+<tr>
+<td>Speed</td>
+<td>O(min(n^2 d, d^2 n))</td>
+<td>O(n^2 d + n^3)</td>
+</tr>
+<tr>
+<td>Interpretability</td>
+<td>Components are linear combinations of features</td>
+<td>Components lack direct feature interpretation</td>
+</tr>
+<tr>
+<td>Scalability</td>
+<td>Works on millions of samples</td>
+<td>Kernel matrix is n x n, memory-limited</td>
+</tr>
+<tr>
+<td>Reconstruction</td>
+<td>Direct inverse transform</td>
+<td>Requires pre-image approximation</td>
+</tr>
+</tbody></table>
+<p>The classic example: concentric circles in 2D. Two rings of points, one inside the other. Standard PCA projects both onto the same line -- useless for classification. Kernel PCA with an RBF kernel maps the inner circle and outer circle to different regions, making them linearly separable.</p>
+<h3 id="reconstruction-error" class="prose-h prose-h3"><a class="prose-h__anchor" href="#reconstruction-error" aria-label="Link to this section">#</a>Reconstruction Error</h3>
+<p>How good is your dimensionality reduction? You compressed 784 dimensions to 50. What did you lose?</p>
+<p>Measure reconstruction error:</p>
+<ol>
+<li>Project data to k dimensions: X_reduced = X @ W_k</li>
+<li>Reconstruct: X_hat = X_reduced @ W_k^T</li>
+<li>Compute MSE: mean((X - X_hat)^2)</li>
+</ol>
+<p>For PCA, reconstruction error has a clean relationship to explained variance:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>Reconstruction error = sum of eigenvalues NOT included
+Total variance = sum of ALL eigenvalues
+Fraction lost = (sum of dropped eigenvalues) / (sum of all eigenvalues)</code></pre>
+</figure>
+<p>The explained variance ratio for each component is:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>explained_ratio_k = eigenvalue_k / sum(all eigenvalues)</code></pre>
+</figure>
+<p>Plotting cumulative explained variance against number of components gives you the &quot;elbow&quot; curve. The right number of components is where:</p>
+<ul>
+<li>The curve flattens out (diminishing returns)</li>
+<li>Cumulative variance crosses your threshold (usually 0.90 or 0.95)</li>
+<li>Downstream task performance plateaus</li>
+</ul>
+<p>Reconstruction error is useful beyond choosing k. You can use it for anomaly detection: samples with high reconstruction error are outliers that do not fit the learned subspace. This is the basis of PCA-based anomaly detection in production systems.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="pca-axes"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">pca-axes</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> pca axes</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-pca-from-scratch" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-pca-from-scratch" aria-label="Link to this section">#</a>Step 1: PCA from scratch</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+
+<span class="token keyword">class</span> <span class="token class-name">PCA</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> n_components<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>n_components <span class="token operator">=</span> n_components
+        self<span class="token punctuation">.</span>components <span class="token operator">=</span> <span class="token boolean">None</span>
+        self<span class="token punctuation">.</span>mean <span class="token operator">=</span> <span class="token boolean">None</span>
+        self<span class="token punctuation">.</span>eigenvalues <span class="token operator">=</span> <span class="token boolean">None</span>
+        self<span class="token punctuation">.</span>explained_variance_ratio_ <span class="token operator">=</span> <span class="token boolean">None</span>
+
+    <span class="token keyword">def</span> <span class="token function">fit</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> X<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>mean <span class="token operator">=</span> np<span class="token punctuation">.</span>mean<span class="token punctuation">(</span>X<span class="token punctuation">,</span> axis<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span>
+        X_centered <span class="token operator">=</span> X <span class="token operator">-</span> self<span class="token punctuation">.</span>mean
+
+        cov_matrix <span class="token operator">=</span> np<span class="token punctuation">.</span>cov<span class="token punctuation">(</span>X_centered<span class="token punctuation">,</span> rowvar<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">)</span>
+
+        eigenvalues<span class="token punctuation">,</span> eigenvectors <span class="token operator">=</span> np<span class="token punctuation">.</span>linalg<span class="token punctuation">.</span>eigh<span class="token punctuation">(</span>cov_matrix<span class="token punctuation">)</span>
+
+        sorted_idx <span class="token operator">=</span> np<span class="token punctuation">.</span>argsort<span class="token punctuation">(</span>eigenvalues<span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span>
+        eigenvalues <span class="token operator">=</span> eigenvalues<span class="token punctuation">[</span>sorted_idx<span class="token punctuation">]</span>
+        eigenvectors <span class="token operator">=</span> eigenvectors<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> sorted_idx<span class="token punctuation">]</span>
+
+        self<span class="token punctuation">.</span>components <span class="token operator">=</span> eigenvectors<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token punctuation">:</span>self<span class="token punctuation">.</span>n_components<span class="token punctuation">]</span><span class="token punctuation">.</span>T
+        self<span class="token punctuation">.</span>eigenvalues <span class="token operator">=</span> eigenvalues<span class="token punctuation">[</span><span class="token punctuation">:</span>self<span class="token punctuation">.</span>n_components<span class="token punctuation">]</span>
+        total_var <span class="token operator">=</span> np<span class="token punctuation">.</span><span class="token builtin">sum</span><span class="token punctuation">(</span>eigenvalues<span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>explained_variance_ratio_ <span class="token operator">=</span> self<span class="token punctuation">.</span>eigenvalues <span class="token operator">/</span> total_var
+
+        <span class="token keyword">return</span> self
+
+    <span class="token keyword">def</span> <span class="token function">transform</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> X<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        X_centered <span class="token operator">=</span> X <span class="token operator">-</span> self<span class="token punctuation">.</span>mean
+        <span class="token keyword">return</span> X_centered @ self<span class="token punctuation">.</span>components<span class="token punctuation">.</span>T
+
+    <span class="token keyword">def</span> <span class="token function">fit_transform</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> X<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> self<span class="token punctuation">.</span>transform<span class="token punctuation">(</span>X<span class="token punctuation">)</span></code></pre>
+</figure>
+<h3 id="step-2-test-on-synthetic-data" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-test-on-synthetic-data" aria-label="Link to this section">#</a>Step 2: Test on synthetic data</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python">np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>seed<span class="token punctuation">(</span><span class="token number">42</span><span class="token punctuation">)</span>
+n_samples <span class="token operator">=</span> <span class="token number">500</span>
+
+t <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>uniform<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">2</span> <span class="token operator">*</span> np<span class="token punctuation">.</span>pi<span class="token punctuation">,</span> n_samples<span class="token punctuation">)</span>
+x1 <span class="token operator">=</span> <span class="token number">3</span> <span class="token operator">*</span> np<span class="token punctuation">.</span>cos<span class="token punctuation">(</span>t<span class="token punctuation">)</span> <span class="token operator">+</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>normal<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0.2</span><span class="token punctuation">,</span> n_samples<span class="token punctuation">)</span>
+x2 <span class="token operator">=</span> <span class="token number">3</span> <span class="token operator">*</span> np<span class="token punctuation">.</span>sin<span class="token punctuation">(</span>t<span class="token punctuation">)</span> <span class="token operator">+</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>normal<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0.2</span><span class="token punctuation">,</span> n_samples<span class="token punctuation">)</span>
+x3 <span class="token operator">=</span> <span class="token number">0.5</span> <span class="token operator">*</span> x1 <span class="token operator">+</span> <span class="token number">0.3</span> <span class="token operator">*</span> x2 <span class="token operator">+</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>normal<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0.1</span><span class="token punctuation">,</span> n_samples<span class="token punctuation">)</span>
+
+X_synthetic <span class="token operator">=</span> np<span class="token punctuation">.</span>column_stack<span class="token punctuation">(</span><span class="token punctuation">[</span>x1<span class="token punctuation">,</span> x2<span class="token punctuation">,</span> x3<span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+pca <span class="token operator">=</span> PCA<span class="token punctuation">(</span>n_components<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">)</span>
+X_reduced <span class="token operator">=</span> pca<span class="token punctuation">.</span>fit_transform<span class="token punctuation">(</span>X_synthetic<span class="token punctuation">)</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Original shape: </span><span class="token interpolation"><span class="token punctuation">{</span>X_synthetic<span class="token punctuation">.</span>shape<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Reduced shape:  </span><span class="token interpolation"><span class="token punctuation">{</span>X_reduced<span class="token punctuation">.</span>shape<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Explained variance ratios: </span><span class="token interpolation"><span class="token punctuation">{</span>pca<span class="token punctuation">.</span>explained_variance_ratio_<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Total variance captured: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">sum</span><span class="token punctuation">(</span>pca<span class="token punctuation">.</span>explained_variance_ratio_<span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h3 id="step-3-mnist-digits-in-2d" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-mnist-digits-in-2d" aria-label="Link to this section">#</a>Step 3: MNIST digits in 2D</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>datasets <span class="token keyword">import</span> fetch_openml
+
+mnist <span class="token operator">=</span> fetch_openml<span class="token punctuation">(</span><span class="token string">"mnist_784"</span><span class="token punctuation">,</span> version<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span> as_frame<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">,</span> parser<span class="token operator">=</span><span class="token string">"auto"</span><span class="token punctuation">)</span>
+X_mnist <span class="token operator">=</span> mnist<span class="token punctuation">.</span>data<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">5000</span><span class="token punctuation">]</span><span class="token punctuation">.</span>astype<span class="token punctuation">(</span><span class="token builtin">float</span><span class="token punctuation">)</span>
+y_mnist <span class="token operator">=</span> mnist<span class="token punctuation">.</span>target<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">5000</span><span class="token punctuation">]</span><span class="token punctuation">.</span>astype<span class="token punctuation">(</span><span class="token builtin">int</span><span class="token punctuation">)</span>
+
+pca_mnist <span class="token operator">=</span> PCA<span class="token punctuation">(</span>n_components<span class="token operator">=</span><span class="token number">50</span><span class="token punctuation">)</span>
+X_pca50 <span class="token operator">=</span> pca_mnist<span class="token punctuation">.</span>fit_transform<span class="token punctuation">(</span>X_mnist<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"50 components capture </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">sum</span><span class="token punctuation">(</span>pca_mnist<span class="token punctuation">.</span>explained_variance_ratio_<span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.2%</span><span class="token punctuation">}</span></span><span class="token string"> of variance"</span></span><span class="token punctuation">)</span>
+
+pca_2d <span class="token operator">=</span> PCA<span class="token punctuation">(</span>n_components<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">)</span>
+X_pca2d <span class="token operator">=</span> pca_2d<span class="token punctuation">.</span>fit_transform<span class="token punctuation">(</span>X_mnist<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"2 components capture </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">sum</span><span class="token punctuation">(</span>pca_2d<span class="token punctuation">.</span>explained_variance_ratio_<span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.2%</span><span class="token punctuation">}</span></span><span class="token string"> of variance"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h3 id="step-4-compare-with-sklearn" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-compare-with-sklearn" aria-label="Link to this section">#</a>Step 4: Compare with sklearn</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>decomposition <span class="token keyword">import</span> PCA <span class="token keyword">as</span> SklearnPCA
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>manifold <span class="token keyword">import</span> TSNE
+
+sklearn_pca <span class="token operator">=</span> SklearnPCA<span class="token punctuation">(</span>n_components<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">)</span>
+X_sklearn_pca <span class="token operator">=</span> sklearn_pca<span class="token punctuation">.</span>fit_transform<span class="token punctuation">(</span>X_mnist<span class="token punctuation">)</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"\nOur PCA explained variance:     </span><span class="token interpolation"><span class="token punctuation">{</span>pca_2d<span class="token punctuation">.</span>explained_variance_ratio_<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Sklearn PCA explained variance: </span><span class="token interpolation"><span class="token punctuation">{</span>sklearn_pca<span class="token punctuation">.</span>explained_variance_ratio_<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+diff <span class="token operator">=</span> np<span class="token punctuation">.</span><span class="token builtin">abs</span><span class="token punctuation">(</span>np<span class="token punctuation">.</span><span class="token builtin">abs</span><span class="token punctuation">(</span>X_pca2d<span class="token punctuation">)</span> <span class="token operator">-</span> np<span class="token punctuation">.</span><span class="token builtin">abs</span><span class="token punctuation">(</span>X_sklearn_pca<span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Max absolute difference: </span><span class="token interpolation"><span class="token punctuation">{</span>diff<span class="token punctuation">.</span><span class="token builtin">max</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.10f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+tsne <span class="token operator">=</span> TSNE<span class="token punctuation">(</span>n_components<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">,</span> perplexity<span class="token operator">=</span><span class="token number">30</span><span class="token punctuation">,</span> random_state<span class="token operator">=</span><span class="token number">42</span><span class="token punctuation">)</span>
+X_tsne <span class="token operator">=</span> tsne<span class="token punctuation">.</span>fit_transform<span class="token punctuation">(</span>X_mnist<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"\nt-SNE output shape: </span><span class="token interpolation"><span class="token punctuation">{</span>X_tsne<span class="token punctuation">.</span>shape<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h3 id="step-5-umap-comparison" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-umap-comparison" aria-label="Link to this section">#</a>Step 5: UMAP comparison</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">try</span><span class="token punctuation">:</span>
+    <span class="token keyword">from</span> umap <span class="token keyword">import</span> UMAP
+
+    reducer <span class="token operator">=</span> UMAP<span class="token punctuation">(</span>n_components<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">,</span> n_neighbors<span class="token operator">=</span><span class="token number">15</span><span class="token punctuation">,</span> min_dist<span class="token operator">=</span><span class="token number">0.1</span><span class="token punctuation">,</span> random_state<span class="token operator">=</span><span class="token number">42</span><span class="token punctuation">)</span>
+    X_umap <span class="token operator">=</span> reducer<span class="token punctuation">.</span>fit_transform<span class="token punctuation">(</span>X_mnist<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"UMAP output shape: </span><span class="token interpolation"><span class="token punctuation">{</span>X_umap<span class="token punctuation">.</span>shape<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">except</span> ImportError<span class="token punctuation">:</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Install umap-learn: pip install umap-learn"</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>PCA as preprocessing before a classifier:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>decomposition <span class="token keyword">import</span> PCA <span class="token keyword">as</span> SklearnPCA
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>linear_model <span class="token keyword">import</span> LogisticRegression
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>model_selection <span class="token keyword">import</span> train_test_split
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>metrics <span class="token keyword">import</span> accuracy_score
+
+X_train<span class="token punctuation">,</span> X_test<span class="token punctuation">,</span> y_train<span class="token punctuation">,</span> y_test <span class="token operator">=</span> train_test_split<span class="token punctuation">(</span>
+    X_mnist<span class="token punctuation">,</span> y_mnist<span class="token punctuation">,</span> test_size<span class="token operator">=</span><span class="token number">0.2</span><span class="token punctuation">,</span> random_state<span class="token operator">=</span><span class="token number">42</span>
+<span class="token punctuation">)</span>
+
+results <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token keyword">for</span> k <span class="token keyword">in</span> <span class="token punctuation">[</span><span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">30</span><span class="token punctuation">,</span> <span class="token number">50</span><span class="token punctuation">,</span> <span class="token number">100</span><span class="token punctuation">,</span> <span class="token number">200</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
+    pca_k <span class="token operator">=</span> SklearnPCA<span class="token punctuation">(</span>n_components<span class="token operator">=</span>k<span class="token punctuation">)</span>
+    X_tr <span class="token operator">=</span> pca_k<span class="token punctuation">.</span>fit_transform<span class="token punctuation">(</span>X_train<span class="token punctuation">)</span>
+    X_te <span class="token operator">=</span> pca_k<span class="token punctuation">.</span>transform<span class="token punctuation">(</span>X_test<span class="token punctuation">)</span>
+
+    clf <span class="token operator">=</span> LogisticRegression<span class="token punctuation">(</span>max_iter<span class="token operator">=</span><span class="token number">1000</span><span class="token punctuation">,</span> random_state<span class="token operator">=</span><span class="token number">42</span><span class="token punctuation">)</span>
+    clf<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X_tr<span class="token punctuation">,</span> y_train<span class="token punctuation">)</span>
+    acc <span class="token operator">=</span> accuracy_score<span class="token punctuation">(</span>y_test<span class="token punctuation">,</span> clf<span class="token punctuation">.</span>predict<span class="token punctuation">(</span>X_te<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    var_captured <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>pca_k<span class="token punctuation">.</span>explained_variance_ratio_<span class="token punctuation">)</span>
+    results<span class="token punctuation">[</span>k<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span>acc<span class="token punctuation">,</span> var_captured<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"k=</span><span class="token interpolation"><span class="token punctuation">{</span>k<span class="token punctuation">:</span><span class="token format-spec">>3d</span><span class="token punctuation">}</span></span><span class="token string">  accuracy=</span><span class="token interpolation"><span class="token punctuation">{</span>acc<span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">  variance=</span><span class="token interpolation"><span class="token punctuation">{</span>var_captured<span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Performance plateaus well before 784 dimensions. That plateau is your operating point.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces:</p>
+<ul>
+<li><code class="inline-code">outputs/skill-dimensionality-reduction.md</code> - a skill for choosing the right dimensionality reduction technique for a given task</li>
+</ul>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p>Modify the PCA class to support <code class="inline-code">inverse_transform</code>. Reconstruct MNIST digits from 10, 50, and 200 components. Print the reconstruction error (mean squared difference from the original) for each.</p>
+</li>
+<li><p>Run t-SNE on the same MNIST subset with perplexity values of 5, 30, and 100. Describe how the output changes. Why does perplexity affect cluster tightness?</p>
+</li>
+<li><p>Take a dataset with 50 features where only 5 are informative (generate one with <code class="inline-code">sklearn.datasets.make_classification</code>). Apply PCA and check whether the explained variance curve correctly identifies that the data is effectively 5-dimensional.</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Curse of dimensionality</td>
+<td>&quot;Too many features&quot;</td>
+<td>Distances, volumes, and data density all behave counterintuitively as dimensions grow. Models need exponentially more data to compensate.</td>
+</tr>
+<tr>
+<td>PCA</td>
+<td>&quot;Reduce dimensions&quot;</td>
+<td>Rotate your coordinate system so the axes align with the directions of maximum variance, then drop the low-variance axes.</td>
+</tr>
+<tr>
+<td>Principal component</td>
+<td>&quot;An important direction&quot;</td>
+<td>An eigenvector of the covariance matrix. The direction in feature space along which the data varies most.</td>
+</tr>
+<tr>
+<td>Explained variance ratio</td>
+<td>&quot;How much info this component has&quot;</td>
+<td>The fraction of total variance captured by one principal component. Sum the top k ratios to see how much k components preserve.</td>
+</tr>
+<tr>
+<td>Covariance matrix</td>
+<td>&quot;How features correlate&quot;</td>
+<td>A symmetric matrix where entry (i,j) measures how feature i and feature j move together. Diagonal entries are individual variances.</td>
+</tr>
+<tr>
+<td>t-SNE</td>
+<td>&quot;That cluster plot&quot;</td>
+<td>A nonlinear method that maps high-dimensional data to 2D by preserving pairwise neighborhood probabilities. Good for visualization, not for preprocessing.</td>
+</tr>
+<tr>
+<td>UMAP</td>
+<td>&quot;Faster t-SNE&quot;</td>
+<td>A nonlinear method based on topological data analysis. Preserves both local and some global structure. Scales better than t-SNE.</td>
+</tr>
+<tr>
+<td>Perplexity</td>
+<td>&quot;A t-SNE knob&quot;</td>
+<td>Controls the effective number of neighbors each point considers. Low perplexity focuses on very local structure. High perplexity captures broader patterns.</td>
+</tr>
+<tr>
+<td>Manifold</td>
+<td>&quot;The surface the data lives on&quot;</td>
+<td>A lower-dimensional surface embedded in a higher-dimensional space. A sheet of paper crumpled in 3D is a 2D manifold.</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/1404.1100" target="_blank" rel="noopener">A Tutorial on Principal Component Analysis</a> (Shlens) - clear derivation of PCA from the ground up</li>
+<li><a href="https://distill.pub/2016/misread-tsne/" target="_blank" rel="noopener">How to Use t-SNE Effectively</a> (Wattenberg et al.) - interactive guide to t-SNE pitfalls and parameter choices</li>
+<li><a href="https://umap-learn.readthedocs.io/" target="_blank" rel="noopener">UMAP documentation</a> - theory and practical guidance from the UMAP authors</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="09-information-theory.html">
+  <span class="label">← Previous</span>
+  <b>Information Theory</b>
+</a>
+      <a class="pager__item pager__item--next" href="11-singular-value-decomposition.html">
+  <span class="label">Next →</span>
+  <b>Singular Value Decomposition</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>8 minutes</b> of Math Foundations behind you.</p>
+      <a class="btn btn--solid" href="11-singular-value-decomposition.html">Continue to Singular Value Decomposition →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#the-curse-of-dimensionality">The curse of dimensionality</a></li><li class="mini__item mini__item--d3"><a href="#pca-find-the-directions-that-matter">PCA: find the directions that matter</a></li><li class="mini__item mini__item--d3"><a href="#explained-variance-ratio">Explained variance ratio</a></li><li class="mini__item mini__item--d3"><a href="#choosing-the-number-of-components">Choosing the number of components</a></li><li class="mini__item mini__item--d3"><a href="#t-sne-preserve-neighborhoods">t-SNE: preserve neighborhoods</a></li><li class="mini__item mini__item--d3"><a href="#umap-faster-better-global-structure">UMAP: faster, better global structure</a></li><li class="mini__item mini__item--d3"><a href="#when-to-use-which">When to use which</a></li><li class="mini__item mini__item--d3"><a href="#kernel-pca">Kernel PCA</a></li><li class="mini__item mini__item--d3"><a href="#reconstruction-error">Reconstruction Error</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-pca-from-scratch">Step 1: PCA from scratch</a></li><li class="mini__item mini__item--d3"><a href="#step-2-test-on-synthetic-data">Step 2: Test on synthetic data</a></li><li class="mini__item mini__item--d3"><a href="#step-3-mnist-digits-in-2d">Step 3: MNIST digits in 2D</a></li><li class="mini__item mini__item--d3"><a href="#step-4-compare-with-sklearn">Step 4: Compare with sklearn</a></li><li class="mini__item mini__item--d3"><a href="#step-5-umap-comparison">Step 5: UMAP comparison</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

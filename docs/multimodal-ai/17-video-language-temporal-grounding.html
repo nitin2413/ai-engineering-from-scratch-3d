@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Video-Language Models: Temporal Tokens and Grounding — Multimodal AI — AIFS</title>
+<meta name="description" content="Multimodal AI: Video-Language Models: Temporal Tokens and Grounding. 5 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Video-Language Models: Temporal Tokens and Grounding — Multimodal AI — AIFS">
+<meta property="og:description" content="Multimodal AI: Video-Language Models: Temporal Tokens and Grounding. 5 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"video-temporal-patches":["../assets/figures/figures-multimodal.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-multimodal.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#FF8FB1" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#FF8FB1;--accent-ink:#111111"
+  data-lesson-id="multimodal-ai/17-video-language-temporal-grounding" data-module="multimodal-ai"
+  data-prev="16-mio-any-to-any-streaming.html" data-next="18-long-video-million-token.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#FF8FB1">
+        <span class="label">Phase 12</span>
+        <b>Multimodal AI</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="multimodal-ai/01-vision-transformer-patch-tokens"><a href="01-vision-transformer-patch-tokens.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Vision Transformers and the Patch-Token Primitive</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/02-clip-contrastive-pretraining"><a href="02-clip-contrastive-pretraining.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">CLIP and Contrastive Vision-Language Pretraining</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/03-blip2-qformer-bridge"><a href="03-blip2-qformer-bridge.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">From CLIP to BLIP-2 — Q-Former as Modality Bridge</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/04-flamingo-gated-cross-attention"><a href="04-flamingo-gated-cross-attention.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Flamingo and Gated Cross-Attention for Few-Shot VLMs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/05-llava-visual-instruction-tuning"><a href="05-llava-visual-instruction-tuning.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">LLaVA and Visual Instruction Tuning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/06-any-resolution-patch-n-pack"><a href="06-any-resolution-patch-n-pack.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Any-Resolution Vision: Patch-n'-Pack and NaFlex</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/07-open-weight-vlm-recipes"><a href="07-open-weight-vlm-recipes.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Open-Weight VLM Recipes: What Actually Matters</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/08-llava-onevision-single-multi-video"><a href="08-llava-onevision-single-multi-video.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">LLaVA-OneVision: Single-Image, Multi-Image, Video in One Model</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/09-qwen-vl-family-dynamic-fps"><a href="09-qwen-vl-family-dynamic-fps.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Qwen-VL Family and Dynamic-FPS Video</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/10-internvl3-native-multimodal"><a href="10-internvl3-native-multimodal.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">InternVL3: Native Multimodal Pretraining</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/11-chameleon-early-fusion-tokens"><a href="11-chameleon-early-fusion-tokens.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Chameleon and Early-Fusion Token-Only Multimodal Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/12-emu3-next-token-for-generation"><a href="12-emu3-next-token-for-generation.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Emu3: Next-Token Prediction for Image and Video Generation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/13-transfusion-autoregressive-diffusion"><a href="13-transfusion-autoregressive-diffusion.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Transfusion: Autoregressive Text + Diffusion Image in One Transformer</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/14-show-o-discrete-diffusion-unified"><a href="14-show-o-discrete-diffusion-unified.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Show-o and Discrete-Diffusion Unified Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/15-janus-pro-decoupled-encoders"><a href="15-janus-pro-decoupled-encoders.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Janus-Pro: Decoupled Encoders for Unified Multimodal Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/16-mio-any-to-any-streaming"><a href="16-mio-any-to-any-streaming.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">MIO and Any-to-Any Streaming Multimodal Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/17-video-language-temporal-grounding"><a href="17-video-language-temporal-grounding.html" class="is-current">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Video-Language Models: Temporal Tokens and Grounding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/18-long-video-million-token"><a href="18-long-video-million-token.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Long-Video Understanding at Million-Token Context</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/19-audio-language-whisper-to-af3"><a href="19-audio-language-whisper-to-af3.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">Audio-Language Models: the Whisper to Audio Flamingo 3 Arc</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/20-omni-models-thinker-talker"><a href="20-omni-models-thinker-talker.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Omni Models: Qwen2.5-Omni and the Thinker-Talker Split</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/21-embodied-vlas-openvla-pi0-groot"><a href="21-embodied-vlas-openvla-pi0-groot.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Embodied VLAs: RT-2, OpenVLA, π0, GR00T</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/22-document-diagram-understanding"><a href="22-document-diagram-understanding.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Document and Diagram Understanding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/23-colpali-vision-native-rag"><a href="23-colpali-vision-native-rag.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">ColPali and Vision-Native Document RAG</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/24-multimodal-rag-cross-modal"><a href="24-multimodal-rag-cross-modal.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Multimodal RAG and Cross-Modal Retrieval</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multimodal-ai/25-multimodal-agents-computer-use"><a href="25-multimodal-agents-computer-use.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Multimodal Agents and Computer-Use (Capstone)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Multimodal AI</a></p>
+      <h1 class="page__title">Video-Language Models: Temporal Tokens and Grounding</h1>
+      <p class="page__lede">Video is not a stack of photos. A 5-second clip has causal ordering, action verbs, and event timing that an image model cannot represent. Video-LLaMA (Zhang et al., June 2023) shipped the first open video-LLM with audio-visual grounding. VideoChat and Video-LLaVA scaled the pattern. By 2025 Qwen2.5-VL's TMRoPE closed the gap with frontier proprietary models. Each system solved temporal tokens differently — Q-former per clip, concat-pool per frame, TMRoPE per token. This lesson reads the patterns, builds a uniform-vs-dynamic frame sampler, and evaluates on temporal grounding tasks.</p>
+      <div class="page__meta">
+        <span class="chip">5 min read</span>
+        <span class="chip">1,021 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (stdlib, frame sampler + temporal-grounding evaluator)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 12 · 08 (LLaVA-OneVision)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~180 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Explain why temporal positional encoding changes video VLM performance independently of the vision encoder.</li>
+<li>Compare uniform, dynamic-FPS, and event-driven frame sampling on tokens-per-second vs grounding accuracy.</li>
+<li>Describe Q-former-per-clip (Video-LLaMA) vs pooled-per-frame (Video-LLaVA) vs M-RoPE-per-token (Qwen2.5-VL) designs.</li>
+<li>Name the four video benchmarks: VideoMME, TempCompass, EgoSchema, Video-MMMU.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>A 1-minute video at 30 FPS is 1800 frames. At 196 visual tokens per frame (ViT-B at 224), that is 352k tokens — larger than any 2024-era LLM context.</p>
+<p>Three reduction strategies exist:</p>
+<ol>
+<li>Subsample frames (1-8 FPS depending on content).</li>
+<li>Pool each frame&#39;s patch tokens aggressively (3x3 or 4x4 bilinear pool).</li>
+<li>Compress via a Q-former that takes a 16-frame clip and outputs 64 tokens.</li>
+</ol>
+<p>Each trade-off is different. Subsampling loses temporal detail. Pooling loses spatial detail. Q-former loses both a little but saves tokens.</p>
+<p>Temporal position encoding is the other axis: how does the model know frame 5 came before frame 6? Options include simple 1D temporal RoPE (Video-LLaMA), learned temporal embeddings (Video-LLaVA), and TMRoPE (Qwen2.5-VL, full 3D).</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="video-llama-q-former-per-clip-audio-branch" class="prose-h prose-h3"><a class="prose-h__anchor" href="#video-llama-q-former-per-clip-audio-branch" aria-label="Link to this section">#</a>Video-LLaMA: Q-former per clip + audio branch</h3>
+<p>Video-LLaMA (2023) was the first open video-LLM. Architecture:</p>
+<ul>
+<li>16-frame clips at 2 FPS (so 8 seconds).</li>
+<li>Per-frame ViT features -&gt; Video Q-former that cross-attends over all 16 frames -&gt; 32 learned queries -&gt; LLM.</li>
+<li>Parallel audio branch: waveform -&gt; ImageBind audio encoder -&gt; Audio Q-former -&gt; 32 queries -&gt; LLM.</li>
+</ul>
+<p>Strength: audio-visual joint reasoning. Weakness: fixed clip length, no arbitrary time grounding.</p>
+<h3 id="videochat-and-video-llava" class="prose-h prose-h3"><a class="prose-h__anchor" href="#videochat-and-video-llava" aria-label="Link to this section">#</a>VideoChat and Video-LLaVA</h3>
+<p>VideoChat kept the Video-LLaMA idea but dropped audio and simplified. Video-LLaVA (Lin et al., 2023) trained a single visual encoder on both images and video frames (&quot;alignment before projection&quot;), giving a unified representation. Both are frozen-CLIP-encoder + MLP + LLM.</p>
+<p>Neither handles long video. Both are 8-16 frame systems.</p>
+<h3 id="qwen2-5-vl-and-tmrope" class="prose-h prose-h3"><a class="prose-h__anchor" href="#qwen2-5-vl-and-tmrope" aria-label="Link to this section">#</a>Qwen2.5-VL and TMRoPE</h3>
+<p>Qwen2.5-VL introduced TMRoPE — Temporal-Modality Rotary Position Embedding. Each patch token carries an (t, h, w) position where t is the actual timestamp (not frame index).</p>
+<p>Key differences from simple temporal embedding:</p>
+<ul>
+<li>Absolute time, not index. The model sees &quot;at 4.2 seconds&quot; not &quot;at frame 15.&quot;</li>
+<li>Per-token rotation, not per-clip. Each visual token rotates independently by its timestamp.</li>
+<li>Compatible with dynamic FPS. If you sample at 2 FPS here and 4 FPS there, TMRoPE handles the uneven spacing natively.</li>
+</ul>
+<p>TMRoPE enables &quot;at what second does the cat jump?&quot; queries. The model can output &quot;at 4.2 seconds.&quot; Video-LLaMA could only say &quot;early in the clip.&quot;</p>
+<h3 id="frame-sampling-strategies" class="prose-h prose-h3"><a class="prose-h__anchor" href="#frame-sampling-strategies" aria-label="Link to this section">#</a>Frame sampling strategies</h3>
+<p>Uniform: sample N frames evenly over duration. Simple, loses motion peaks.</p>
+<p>Dynamic FPS: sample adaptively based on motion intensity. Optical flow or frame differencing picks high-motion segments for denser sampling. Qwen2.5-VL trains on this.</p>
+<p>Event-driven: run a lightweight detector, sample more where action happens. Used by VideoAgent.</p>
+<p>Keyframe + context: sample at shot boundaries + a few adjacent frames. Used for cinematic content.</p>
+<h3 id="pooling-per-frame" class="prose-h prose-h3"><a class="prose-h__anchor" href="#pooling-per-frame" aria-label="Link to this section">#</a>Pooling per frame</h3>
+<p>At 1 FPS and 576 tokens per frame, a 5-minute clip is 172,800 tokens. Doable with Qwen2.5-VL-72B&#39;s 128k context but expensive.</p>
+<p>3x3 bilinear pool reduces to 64 tokens per frame -&gt; 19,200 tokens for 5 minutes. Sweet spot for most tasks.</p>
+<p>Pool more aggressively (6x6 -&gt; 16 tokens per frame) for agent workflows where spatial detail matters less.</p>
+<h3 id="the-four-video-benchmarks" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-four-video-benchmarks" aria-label="Link to this section">#</a>The four video benchmarks</h3>
+<ul>
+<li>VideoMME: comprehensive video understanding, short + medium + long.</li>
+<li>TempCompass: fine-grained temporal reasoning, &quot;before&quot; / &quot;after&quot; questions.</li>
+<li>EgoSchema: long-horizon first-person video.</li>
+<li>Video-MMMU: multimodal multi-discipline video questions.</li>
+</ul>
+<p>A full video-VLM evaluation hits all four. They stress different axes — TempCompass is all about ordering, EgoSchema is about 3+ minute reasoning, VideoMME spans durations.</p>
+<h3 id="grounding-output-formats" class="prose-h prose-h3"><a class="prose-h__anchor" href="#grounding-output-formats" aria-label="Link to this section">#</a>Grounding output formats</h3>
+<p>Output formats for temporal grounding:</p>
+<ul>
+<li>Free text: &quot;The cat jumps around the 4-second mark.&quot; Easy to parse but imprecise.</li>
+<li>Structured JSON: <code class="inline-code">{&quot;event&quot;: &quot;jump&quot;, &quot;start&quot;: 4.1, &quot;end&quot;: 4.3}</code>. Qwen2.5-VL trains this.</li>
+<li>Token-based: special <code class="inline-code">&lt;time&gt;4.1&lt;/time&gt;</code> tokens interleaved with the answer. Qwen2.5-VL&#39;s internal format.</li>
+</ul>
+<p>Token-based is most accurate for downstream use. Qwen2.5-VL&#39;s JSON output format parses directly.</p>
+<h3 id="2026-best-practice" class="prose-h prose-h3"><a class="prose-h__anchor" href="#2026-best-practice" aria-label="Link to this section">#</a>2026 best practice</h3>
+<p>For video VLMs in 2026:</p>
+<ul>
+<li>Encoder: SigLIP 2 with M-RoPE or TMRoPE (Qwen2.5-VL).</li>
+<li>Frame sampling: dynamic FPS (1-4 depending on motion) with max-frame cap.</li>
+<li>Per-frame pooling: 3x3 bilinear.</li>
+<li>Output: structured JSON with time + event fields.</li>
+<li>Benchmarks: VideoMME + TempCompass for general; EgoSchema for long-horizon.</li>
+</ul>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="video-temporal-patches"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">video-temporal-patches</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> video temporal patches</figcaption>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p><code class="inline-code">code/main.py</code> includes:</p>
+<ul>
+<li>Uniform and dynamic-FPS frame samplers.</li>
+<li>A toy temporal-grounding evaluator: given a &quot;ground truth&quot; event at time T and a model output, score accuracy with tolerance.</li>
+<li>A comparison across Video-LLaMA (16 frames, Q-former), Video-LLaVA (8 frames, MLP), Qwen2.5-VL (dynamic FPS + TMRoPE).</li>
+</ul>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces <code class="inline-code">outputs/skill-video-vlm-frame-planner.md</code>. Given a video task (monitoring, action recognition, temporal grounding, summarization), it picks the frame sampler, pooling factor, output format, and expected accuracy tier.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p>For a 3-minute cooking demo, pick uniform vs dynamic FPS. Justify with a token count.</p>
+</li>
+<li><p>TMRoPE adds what specifically that a simple temporal embedding table cannot do?</p>
+</li>
+<li><p>Write a JSON schema for temporal grounding that a VLM can learn to emit. Include error cases.</p>
+</li>
+<li><p>Read Video-LLaVA&#39;s Section 3 on &quot;Alignment Before Projection.&quot; Why is this better than training separate image and video encoders?</p>
+</li>
+<li><p>Given the VideoMME leaderboard, what is the gap between the top open model and the top proprietary model as of 2026? How much of that gap is attributable to temporal encoding vs base LLM scale?</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Temporal grounding</td>
+<td>&quot;Time-localized answers&quot;</td>
+<td>VLM outputs a specific timestamp range for when an event happens</td>
+</tr>
+<tr>
+<td>TMRoPE</td>
+<td>&quot;Time-Multimodal RoPE&quot;</td>
+<td>3D rotary position with absolute timestamps, used by Qwen2.5-VL</td>
+</tr>
+<tr>
+<td>Dynamic FPS</td>
+<td>&quot;Motion-aware sampling&quot;</td>
+<td>Sample more frames in high-motion segments, fewer in static ones</td>
+</tr>
+<tr>
+<td>Frame pooling</td>
+<td>&quot;Spatial compress per frame&quot;</td>
+<td>Reduce patches per frame with bilinear interpolation before the LLM</td>
+</tr>
+<tr>
+<td>Video Q-former</td>
+<td>&quot;Clip compressor&quot;</td>
+<td>Cross-attention bottleneck mapping N frames to K learned queries</td>
+</tr>
+<tr>
+<td>VideoMME</td>
+<td>&quot;Video bench&quot;</td>
+<td>Comprehensive short/medium/long video benchmark, 2500+ samples</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2306.02858" target="_blank" rel="noopener">Zhang et al. — Video-LLaMA (arXiv:2306.02858)</a></li>
+<li><a href="https://arxiv.org/abs/2305.06355" target="_blank" rel="noopener">Li et al. — VideoChat (arXiv:2305.06355)</a></li>
+<li><a href="https://arxiv.org/abs/2311.10122" target="_blank" rel="noopener">Lin et al. — Video-LLaVA (arXiv:2311.10122)</a></li>
+<li><a href="https://arxiv.org/abs/2502.13923" target="_blank" rel="noopener">Qwen Team — Qwen2.5-VL (arXiv:2502.13923)</a></li>
+<li><a href="https://arxiv.org/abs/2312.07533" target="_blank" rel="noopener">Lin et al. — VILA-1.5 (arXiv:2312.07533)</a></li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="16-mio-any-to-any-streaming.html">
+  <span class="label">← Previous</span>
+  <b>MIO and Any-to-Any Streaming Multimodal Models</b>
+</a>
+      <a class="pager__item pager__item--next" href="18-long-video-million-token.html">
+  <span class="label">Next →</span>
+  <b>Long-Video Understanding at Million-Token Context</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>5 minutes</b> of Multimodal AI behind you.</p>
+      <a class="btn btn--solid" href="18-long-video-million-token.html">Continue to Long-Video Understanding at Million-Token Context →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#video-llama-q-former-per-clip-audio-branch">Video-LLaMA: Q-former per clip + audio branch</a></li><li class="mini__item mini__item--d3"><a href="#videochat-and-video-llava">VideoChat and Video-LLaVA</a></li><li class="mini__item mini__item--d3"><a href="#qwen2-5-vl-and-tmrope">Qwen2.5-VL and TMRoPE</a></li><li class="mini__item mini__item--d3"><a href="#frame-sampling-strategies">Frame sampling strategies</a></li><li class="mini__item mini__item--d3"><a href="#pooling-per-frame">Pooling per frame</a></li><li class="mini__item mini__item--d3"><a href="#the-four-video-benchmarks">The four video benchmarks</a></li><li class="mini__item mini__item--d3"><a href="#grounding-output-formats">Grounding output formats</a></li><li class="mini__item mini__item--d3"><a href="#2026-best-practice">2026 best practice</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

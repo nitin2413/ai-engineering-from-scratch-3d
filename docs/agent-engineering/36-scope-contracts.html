@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scope Contracts and Task Boundaries — Agent Engineering — AIFS</title>
+<meta name="description" content="Agent Engineering: Scope Contracts and Task Boundaries. 7 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Scope Contracts and Task Boundaries — Agent Engineering — AIFS">
+<meta property="og:description" content="Agent Engineering: Scope Contracts and Task Boundaries. 7 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"wb-scope-bounce":["../assets/figures/figures-workbench.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-workbench.js"];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#0091FF" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#0091FF;--accent-ink:#FFFFFF"
+  data-lesson-id="agent-engineering/36-scope-contracts" data-module="agent-engineering"
+  data-prev="35-initialization-scripts.html" data-next="37-runtime-feedback-loops.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#0091FF">
+        <span class="label">Phase 14</span>
+        <b>Agent Engineering</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="agent-engineering/01-the-agent-loop"><a href="01-the-agent-loop.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">The Agent Loop: Observe, Think, Act</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/02-rewoo-plan-and-execute"><a href="02-rewoo-plan-and-execute.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">ReWOO and Plan-and-Execute: Decoupled Planning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/03-reflexion-verbal-rl"><a href="03-reflexion-verbal-rl.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Reflexion: Verbal Reinforcement Learning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/04-tree-of-thoughts-lats"><a href="04-tree-of-thoughts-lats.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Tree of Thoughts and LATS: Deliberate Search</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/05-self-refine-and-critic"><a href="05-self-refine-and-critic.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Self-Refine and CRITIC: Iterative Output Improvement</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/06-tool-use-and-function-calling"><a href="06-tool-use-and-function-calling.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Tool Use and Function Calling</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/07-memory-virtual-context-memgpt"><a href="07-memory-virtual-context-memgpt.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Agent Memory — Virtual Context and Memory Paging</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/08-memory-blocks-sleep-time-compute"><a href="08-memory-blocks-sleep-time-compute.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Memory Blocks and Sleep-Time Compute</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/09-hybrid-memory-mem0"><a href="09-hybrid-memory-mem0.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Hybrid Memory: Vector + Graph + KV</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/10-skill-libraries-voyager"><a href="10-skill-libraries-voyager.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Skill Libraries and Lifelong Learning (Voyager)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/11-planning-htn-and-evolutionary"><a href="11-planning-htn-and-evolutionary.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Planning with HTN and Evolutionary Search</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/12-anthropic-workflow-patterns"><a href="12-anthropic-workflow-patterns.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Anthropic's Workflow Patterns: Simple Over Complex</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/13-langgraph-stateful-graphs"><a href="13-langgraph-stateful-graphs.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Stateful Graph Orchestration — Durable Execution and Checkpoints</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/14-autogen-actor-model"><a href="14-autogen-actor-model.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">The Actor Model for Agents — Async Messages and Typed Runtimes</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/15-crewai-role-based-crews"><a href="15-crewai-role-based-crews.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Role-Based Agent Teams — Roles, Tasks, Processes</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/16-openai-agents-sdk"><a href="16-openai-agents-sdk.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">OpenAI Agents SDK: Handoffs, Guardrails, Tracing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/17-claude-agent-sdk"><a href="17-claude-agent-sdk.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">The Harness as a Library — Subagents and Session Store</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/18-agno-and-mastra-runtimes"><a href="18-agno-and-mastra-runtimes.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Production Agent Runtimes — Fast Instantiation and Typed Workflows</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/19-benchmarks-swebench-gaia"><a href="19-benchmarks-swebench-gaia.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">Benchmarks: SWE-bench, GAIA, AgentBench</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/20-benchmarks-webarena-osworld"><a href="20-benchmarks-webarena-osworld.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Benchmarks: WebArena and OSWorld</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/21-computer-use-agents"><a href="21-computer-use-agents.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Computer Use: Claude, OpenAI CUA, Gemini</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/22-voice-agents-pipecat-livekit"><a href="22-voice-agents-pipecat-livekit.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Voice Agents: Pipecat and LiveKit</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/23-otel-genai-conventions"><a href="23-otel-genai-conventions.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">OpenTelemetry GenAI Semantic Conventions</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/24-agent-observability-platforms"><a href="24-agent-observability-platforms.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Agent Observability: Langfuse, Phoenix, Opik</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/25-multi-agent-debate"><a href="25-multi-agent-debate.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Multi-Agent Debate and Collaboration</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/26-failure-modes-agentic"><a href="26-failure-modes-agentic.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Failure Modes: Why Agents Break</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/27-prompt-injection-defense"><a href="27-prompt-injection-defense.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">Prompt Injection and the PVE Defense</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/28-orchestration-patterns"><a href="28-orchestration-patterns.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">Orchestration Patterns: Supervisor, Swarm, Hierarchical</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/29-production-runtimes"><a href="29-production-runtimes.html" class="">
+  <span class="snav__n">29</span>
+  <span class="snav__t">Production Runtimes: Queue, Event, Cron</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/30-eval-driven-agent-development"><a href="30-eval-driven-agent-development.html" class="">
+  <span class="snav__n">30</span>
+  <span class="snav__t">Eval-Driven Agent Development</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/31-agent-workbench-why-models-fail"><a href="31-agent-workbench-why-models-fail.html" class="">
+  <span class="snav__n">31</span>
+  <span class="snav__t">Agent Workbench Engineering: Why Capable Models Still Fail</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/32-minimal-agent-workbench"><a href="32-minimal-agent-workbench.html" class="">
+  <span class="snav__n">32</span>
+  <span class="snav__t">The Minimal Agent Workbench</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/33-instructions-as-executable-constraints"><a href="33-instructions-as-executable-constraints.html" class="">
+  <span class="snav__n">33</span>
+  <span class="snav__t">Agent Instructions as Executable Constraints</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/34-repo-memory-and-state"><a href="34-repo-memory-and-state.html" class="">
+  <span class="snav__n">34</span>
+  <span class="snav__t">Repo Memory and Durable State</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/35-initialization-scripts"><a href="35-initialization-scripts.html" class="">
+  <span class="snav__n">35</span>
+  <span class="snav__t">Initialization Scripts for Agents</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/36-scope-contracts"><a href="36-scope-contracts.html" class="is-current">
+  <span class="snav__n">36</span>
+  <span class="snav__t">Scope Contracts and Task Boundaries</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/37-runtime-feedback-loops"><a href="37-runtime-feedback-loops.html" class="">
+  <span class="snav__n">37</span>
+  <span class="snav__t">Runtime Feedback Loops</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/38-verification-gates"><a href="38-verification-gates.html" class="">
+  <span class="snav__n">38</span>
+  <span class="snav__t">Verification Gates</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/39-reviewer-agent"><a href="39-reviewer-agent.html" class="">
+  <span class="snav__n">39</span>
+  <span class="snav__t">Reviewer Agent: Separate Builder from Marker</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/40-multi-session-handoff"><a href="40-multi-session-handoff.html" class="">
+  <span class="snav__n">40</span>
+  <span class="snav__t">Multi-Session Handoff</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/41-workbench-for-real-repos"><a href="41-workbench-for-real-repos.html" class="">
+  <span class="snav__n">41</span>
+  <span class="snav__t">The Workbench on a Real Repo</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/42-agent-workbench-capstone"><a href="42-agent-workbench-capstone.html" class="">
+  <span class="snav__n">42</span>
+  <span class="snav__t">Capstone: Ship a Reusable Agent Workbench Pack</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/43-frame-the-task-before-code"><a href="43-frame-the-task-before-code.html" class="">
+  <span class="snav__n">43</span>
+  <span class="snav__t">Frame the Task Before the Agent Writes Code</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/44-plan-from-evidence"><a href="44-plan-from-evidence.html" class="">
+  <span class="snav__n">44</span>
+  <span class="snav__t">Build an Evidence-Backed Execution Plan</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/45-delegate-with-isolation"><a href="45-delegate-with-isolation.html" class="">
+  <span class="snav__n">45</span>
+  <span class="snav__t">Delegate Agent Work with Isolation and Merge Contracts</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/46-turn-feedback-into-system"><a href="46-turn-feedback-into-system.html" class="">
+  <span class="snav__n">46</span>
+  <span class="snav__t">Turn Every Agent Correction into a System Improvement</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/47-outcomes-before-output"><a href="47-outcomes-before-output.html" class="">
+  <span class="snav__n">47</span>
+  <span class="snav__t">Define the Outcome Before You Choose the Output</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/48-discover-the-real-workflow"><a href="48-discover-the-real-workflow.html" class="">
+  <span class="snav__n">48</span>
+  <span class="snav__t">Discover the Workflow People Actually Perform</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/49-map-assumptions-and-risk"><a href="49-map-assumptions-and-risk.html" class="">
+  <span class="snav__n">49</span>
+  <span class="snav__t">Map Assumptions and Resolve the Riskiest One First</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/50-choose-the-smallest-testable-slice"><a href="50-choose-the-smallest-testable-slice.html" class="">
+  <span class="snav__n">50</span>
+  <span class="snav__t">Choose the Smallest Slice That Can Change the Decision</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/51-write-specifications-that-preserve-judgment"><a href="51-write-specifications-that-preserve-judgment.html" class="">
+  <span class="snav__n">51</span>
+  <span class="snav__t">Write Specifications That Preserve Judgment</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/52-design-success-metrics"><a href="52-design-success-metrics.html" class="">
+  <span class="snav__n">52</span>
+  <span class="snav__t">Design Success Metrics Before the Result Exists</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/53-prototype-pilot-or-production"><a href="53-prototype-pilot-or-production.html" class="">
+  <span class="snav__n">53</span>
+  <span class="snav__t">Choose Prototype, Pilot, or Production Deliberately</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="agent-engineering/54-build-the-feedback-ratchet"><a href="54-build-the-feedback-ratchet.html" class="">
+  <span class="snav__n">54</span>
+  <span class="snav__t">Build a Feedback Ratchet with Ownership and Retirement</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Agent Engineering</a></p>
+      <h1 class="page__title">Scope Contracts and Task Boundaries</h1>
+      <p class="page__lede">The model does not know where the work ends. A scope contract is a per-task file that says where the work begins, where it ends, and how to roll back if it spills. The contract turns &quot;stay in scope&quot; from a wish into a check.</p>
+      <div class="page__meta">
+        <span class="chip">7 min read</span>
+        <span class="chip">1,549 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (stdlib)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 14 · 32 (Minimal Workbench), Phase 14 · 33 (Rules as Constraints)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~50 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Write a scope contract that an agent reads at task start and a verifier reads at task end.</li>
+<li>Specify allowed files, forbidden files, acceptance criteria, rollback plan, and approval boundaries.</li>
+<li>Implement a scope checker that compares a diff against the contract and flags violations.</li>
+<li>Make scope creep visible, automatic, and reviewable.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Agents creep. The task is &quot;fix the login bug.&quot; The diff touches the login route, the email helper, the database driver, the README, and the release script. Each touch had a plausible reason in the moment. Together they are a different change than the one that was reviewed.</p>
+<p>Scope creep is the most under-monitored failure mode in agent work because the agent narrates each step in good faith. The fix is not a stricter prompt. The fix is a contract on disk that says what was promised and a check that compares the result against the promise.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<figure class="mermaid-figure">
+  <pre class="mermaid">flowchart LR
+  Task[Task] --&gt; Contract[scope_contract.json]
+  Contract --&gt; Agent[Agent Loop]
+  Agent --&gt; Diff[final diff]
+  Diff --&gt; Checker[scope_checker.py]
+  Contract --&gt; Checker
+  Checker --&gt; Verdict{in scope?}
+  Verdict -- yes --&gt; Verify[Verification Gate]
+  Verdict -- no --&gt; Block[block + open question]</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<h3 id="what-goes-in-a-scope-contract" class="prose-h prose-h3"><a class="prose-h__anchor" href="#what-goes-in-a-scope-contract" aria-label="Link to this section">#</a>What goes in a scope contract</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code class="inline-code">task_id</code></td>
+<td>Links to the task on the board</td>
+</tr>
+<tr>
+<td><code class="inline-code">goal</code></td>
+<td>One sentence the reviewer can verify</td>
+</tr>
+<tr>
+<td><code class="inline-code">allowed_files</code></td>
+<td>Globs the agent may write</td>
+</tr>
+<tr>
+<td><code class="inline-code">forbidden_files</code></td>
+<td>Globs the agent must not touch even by accident</td>
+</tr>
+<tr>
+<td><code class="inline-code">acceptance_criteria</code></td>
+<td>Test commands or assertion lines that prove done</td>
+</tr>
+<tr>
+<td><code class="inline-code">rollback_plan</code></td>
+<td>One paragraph the operator can execute if a halt is required</td>
+</tr>
+<tr>
+<td><code class="inline-code">approvals_required</code></td>
+<td>Actions outside scope that need explicit human sign-off</td>
+</tr>
+</tbody></table>
+<p>A contract without <code class="inline-code">forbidden_files</code> is incomplete. The negative space is half the contract.</p>
+<h3 id="globs-not-raw-paths" class="prose-h prose-h3"><a class="prose-h__anchor" href="#globs-not-raw-paths" aria-label="Link to this section">#</a>Globs, not raw paths</h3>
+<p>Real repos move files. Pin contracts to globs (<code class="inline-code">app/**/*.py</code>, <code class="inline-code">tests/test_signup*.py</code>) so a refactor between sessions does not invalidate the contract.</p>
+<h3 id="rollback-is-part-of-scope" class="prose-h prose-h3"><a class="prose-h__anchor" href="#rollback-is-part-of-scope" aria-label="Link to this section">#</a>Rollback is part of scope</h3>
+<p>Listing how to roll back forces the contract author to think about what could go wrong. A contract you cannot roll back from is a contract that should not be approved.</p>
+<h3 id="scope-check-is-a-diff-check" class="prose-h prose-h3"><a class="prose-h__anchor" href="#scope-check-is-a-diff-check" aria-label="Link to this section">#</a>Scope check is a diff check</h3>
+<p>The agent writes a diff. The checker reads the diff, the allowed globs, the forbidden globs, and a list of any acceptance commands that ran. Each violation is a tagged finding the verification gate can refuse.</p>
+<h3 id="two-altitudes-of-scope-the-feature-list-and-the-task-contract" class="prose-h prose-h3"><a class="prose-h__anchor" href="#two-altitudes-of-scope-the-feature-list-and-the-task-contract" aria-label="Link to this section">#</a>Two altitudes of scope: the feature list and the task contract</h3>
+<p>The scope contract bounds one task. It does not bound the project. An agent can stay perfectly inside a contract for the login fix and still, on the next turn, decide the project also needs a settings page, a dark mode toggle, and a rewrite of the router. The contract was never asked which work was in scope for the project, only which files were in scope for the task.</p>
+<p>That second altitude needs its own primitive: a <code class="inline-code">feature_list.json</code> the agent reads at session start. It is the project backlog as a machine-readable, ordered file. The agent picks exactly one feature whose <code class="inline-code">status</code> is <code class="inline-code">todo</code>, writes its <code class="inline-code">id</code> into the active scope contract, and is forbidden from starting a second feature in the same session. &quot;One feature at a time&quot; stops being a line in the prompt the agent can rationalize past and becomes a value it reads off disk and a check the gate enforces.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"project"</span><span class="token operator">:</span> <span class="token string">"knowledge-base"</span><span class="token punctuation">,</span>
+  <span class="token property">"active"</span><span class="token operator">:</span> <span class="token string">"import-pdf"</span><span class="token punctuation">,</span>
+  <span class="token property">"features"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">{</span> <span class="token property">"id"</span><span class="token operator">:</span> <span class="token string">"import-pdf"</span><span class="token punctuation">,</span>   <span class="token property">"status"</span><span class="token operator">:</span> <span class="token string">"in_progress"</span><span class="token punctuation">,</span> <span class="token property">"goal"</span><span class="token operator">:</span> <span class="token string">"import a PDF into the library"</span><span class="token punctuation">,</span>        <span class="token property">"done_when"</span><span class="token operator">:</span> <span class="token string">"pytest tests/test_import.py &amp;&amp; a sample PDF appears in the library view"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span> <span class="token property">"id"</span><span class="token operator">:</span> <span class="token string">"full-text-search"</span><span class="token punctuation">,</span> <span class="token property">"status"</span><span class="token operator">:</span> <span class="token string">"todo"</span><span class="token punctuation">,</span>     <span class="token property">"goal"</span><span class="token operator">:</span> <span class="token string">"search document text and rank hits"</span><span class="token punctuation">,</span>   <span class="token property">"done_when"</span><span class="token operator">:</span> <span class="token string">"query returns ranked results with snippets"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span> <span class="token property">"id"</span><span class="token operator">:</span> <span class="token string">"cite-answers"</span><span class="token punctuation">,</span> <span class="token property">"status"</span><span class="token operator">:</span> <span class="token string">"todo"</span><span class="token punctuation">,</span>         <span class="token property">"goal"</span><span class="token operator">:</span> <span class="token string">"answers carry source citations"</span><span class="token punctuation">,</span>        <span class="token property">"done_when"</span><span class="token operator">:</span> <span class="token string">"every answer renders at least one clickable citation"</span> <span class="token punctuation">}</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code class="inline-code">active</code></td>
+<td>The single feature the current session may touch; empty means pick one and set it</td>
+</tr>
+<tr>
+<td><code class="inline-code">features[].id</code></td>
+<td>Stable slug the scope contract&#39;s <code class="inline-code">task_id</code> points at</td>
+</tr>
+<tr>
+<td><code class="inline-code">features[].status</code></td>
+<td><code class="inline-code">todo</code>, <code class="inline-code">in_progress</code>, <code class="inline-code">done</code>, <code class="inline-code">blocked</code>; only one <code class="inline-code">in_progress</code> at a time</td>
+</tr>
+<tr>
+<td><code class="inline-code">features[].goal</code></td>
+<td>One sentence the reviewer can verify</td>
+</tr>
+<tr>
+<td><code class="inline-code">features[].done_when</code></td>
+<td>The acceptance line that flips <code class="inline-code">in_progress</code> to <code class="inline-code">done</code></td>
+</tr>
+</tbody></table>
+<p>Two rules make the list load-bearing instead of decorative. First, the invariant &quot;at most one <code class="inline-code">in_progress</code>&quot; is itself a startup check (Phase 14 · 33): if the list shows two, the session refuses to start until a human resolves it. Second, the feature list is a file, not a chat message, because the chat scrolls out of context and the file persists across sessions and across agents. The handoff (Phase 14 · 40) writes the finished feature&#39;s status back to <code class="inline-code">done</code> so the next session opens to an accurate board instead of re-deriving what is left.</p>
+<p>The contract and the list compose by least privilege, the same merge described below: the task contract&#39;s <code class="inline-code">allowed_files</code> must sit inside whatever the active feature touches, never outside it.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="wb-scope-bounce"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">wb-scope-bounce</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> wb scope bounce</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<p><code class="inline-code">code/main.py</code> implements:</p>
+<ul>
+<li><code class="inline-code">scope_contract.json</code> schema (subset of JSON Schema, glob arrays).</li>
+<li>A diff parser that turns a list of touched files plus a list of run commands into a <code class="inline-code">RunSummary</code>.</li>
+<li>A <code class="inline-code">scope_check</code> that returns <code class="inline-code">(violations, in_scope, off_scope)</code> against the contract.</li>
+<li>Two demo runs: one that stays in scope, one that creeps. The checker flags the creep with the exact file and reason.</li>
+</ul>
+<p>Run it:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>python3 code/main.py</code></pre>
+</figure>
+<p>Output: the contract, the two runs, the per-run verdicts, and a saved <code class="inline-code">scope_report.json</code>.</p>
+<h2 id="production-patterns-in-the-wild" class="prose-h prose-h2"><a class="prose-h__anchor" href="#production-patterns-in-the-wild" aria-label="Link to this section">#</a>Production patterns in the wild</h2>
+<p>A practitioner running &quot;specsmaxxing&quot; (scope contracts in YAML before invoking the agent) reports rabbit-hole rate dropped from 52% to 21% in three weeks without changing the agent. The contract did the work, not the model. Three patterns make the gain stick.</p>
+<p><strong>Violation budgets, not binary failures.</strong> <code class="inline-code">agent-guardrails</code> (the OSS merge gate used by Claude Code, Cursor, Windsurf, Codex via MCP) ships a <code class="inline-code">violationBudget</code> per task: minor scope slips within budget are surfaced as warnings; only when the budget is exceeded does the merge gate refuse. Pair with <code class="inline-code">violationSeverity: &quot;error&quot; | &quot;warning&quot;</code>. The budget is the difference between a gate that ships and a gate that gets disabled by the team that hated it.</p>
+<p><strong>Severity asymmetry by path family.</strong> Off-scope writes to <code class="inline-code">docs/**</code> are usually <code class="inline-code">warn</code>; off-scope writes to <code class="inline-code">scripts/**</code>, <code class="inline-code">migrations/**</code>, <code class="inline-code">config/prod/**</code> are always <code class="inline-code">block</code>. This asymmetry has to live in the contract, not in the runtime, because it is project-specific and changes per task.</p>
+<p><strong>Time and network budgets next to file budgets.</strong> A <code class="inline-code">time_budget_minutes</code> field bounds the wall clock; the runtime refuses to continue past it without re-approval. A <code class="inline-code">network_egress</code> allowlist on hostnames prevents the agent from quietly hitting an external API that was not part of the task. These are scope dimensions too; the file globs are necessary, not sufficient.</p>
+<p><strong>Multi-contract merge semantics (least privilege).</strong> When two scope contracts apply (e.g., a project-wide contract plus a task-specific one), the merge is: <strong>intersect</strong> <code class="inline-code">allowed_files</code> (both contracts must permit the path), <strong>union</strong> <code class="inline-code">forbidden_files</code> (either can prohibit), <code class="inline-code">time_budget_minutes</code> is the most restrictive (min), <code class="inline-code">approvals_required</code> accumulates. <code class="inline-code">network_egress</code> is <code class="inline-code">None</code> for no enforcement, <code class="inline-code">[]</code> for deny-all, <code class="inline-code">[...]</code> as an allowlist; under merge, <code class="inline-code">None</code> defers to the other side, two lists intersect, and deny-all stays deny-all. State this in the contract schema so the merge is mechanical and reviewable.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>Production patterns:</p>
+<ul>
+<li><strong>Claude Code slash commands.</strong> A <code class="inline-code">/scope</code> command writes the contract and pins it as session context. Subagents read the contract before acting.</li>
+<li><strong>GitHub PRs.</strong> Push the contract as a JSON file in the PR body or as a checked-in artifact. CI runs the scope checker against the merge diff.</li>
+<li><strong>LangGraph interrupts.</strong> A scope violation triggers an interrupt; the handler asks the human whether the contract needs to grow or the agent needs to back off.</li>
+</ul>
+<p>The contract travels with the task. When the task closes, the contract is archived under <code class="inline-code">outputs/scope/closed/</code>.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p><code class="inline-code">outputs/skill-scope-contract.md</code> generates a scope contract for a task description and a glob-aware checker that runs in CI on every agent diff.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li>Add a <code class="inline-code">network_egress</code> field listing allowed external hosts. Refuse runs that touch other hosts.</li>
+<li>Extend the checker to fail soft on <code class="inline-code">docs/**</code> and hard on <code class="inline-code">scripts/**</code>. Justify the asymmetry.</li>
+<li>Make the contract derive <code class="inline-code">allowed_files</code> from a <code class="inline-code">goal</code> field using a static rule set (no LLM). What goes wrong on the first edge case?</li>
+<li>Add a <code class="inline-code">time_budget_minutes</code> and refuse to continue once the wall clock exceeds it.</li>
+<li>Run two contracts against the same diff. What is the right merge semantics when both apply?</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Scope contract</td>
+<td>&quot;The task brief&quot;</td>
+<td>Per-task JSON listing allowed/forbidden files, acceptance, rollback</td>
+</tr>
+<tr>
+<td>Scope creep</td>
+<td>&quot;It also touched...&quot;</td>
+<td>Files outside the contract changed in the same task</td>
+</tr>
+<tr>
+<td>Rollback plan</td>
+<td>&quot;We can revert&quot;</td>
+<td>The one-paragraph operator runbook for halting</td>
+</tr>
+<tr>
+<td>Approval boundary</td>
+<td>&quot;Needs sign-off&quot;</td>
+<td>An action listed in the contract as requiring explicit human approval</td>
+</tr>
+<tr>
+<td>Diff check</td>
+<td>&quot;Path audit&quot;</td>
+<td>Comparing touched files against the contract globs</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://langchain-ai.github.io/langgraph/concepts/human_in_the_loop/" target="_blank" rel="noopener">LangGraph human-in-the-loop interrupts</a></li>
+<li><a href="https://platform.openai.com/docs/guides/agents-sdk" target="_blank" rel="noopener">OpenAI Agents SDK tool approval policies</a></li>
+<li><a href="https://github.com/logi-cmd/agent-guardrails" target="_blank" rel="noopener">logi-cmd/agent-guardrails — merge gates and scope validation</a> — violation budgets, severity tiers</li>
+<li><a href="https://earezki.com/ai-news/2026-05-05-i-built-a-tiny-ci-tool-to-keep-ai-agent-configs-from-drifting-in-my-repo/" target="_blank" rel="noopener">Dev|Journal, Preventing AI Agent Configuration Drift with Agent Contract Testing</a> — <code class="inline-code">--strict</code> mode without external deps</li>
+<li><a href="https://dev.to/jtorchia/agentic-coding-is-not-a-trap-i-answered-the-viral-hn-post-with-my-own-production-logs-33d9" target="_blank" rel="noopener">Agentic Coding Is Not a Trap (production logs)</a> — specsmaxxing receipts: 52% → 21%</li>
+<li><a href="https://opencode.ai/docs/agents/" target="_blank" rel="noopener">OpenCode permission globs</a> — fine-grained per-permission scope</li>
+<li><a href="https://www.knostic.ai/blog/ai-coding-agent-security" target="_blank" rel="noopener">Knostic, AI Coding Agent Security: Threat Models and Protection Strategies</a> — scope as part of least privilege</li>
+<li><a href="https://www.augmentcode.com/guides/ai-spec-template" target="_blank" rel="noopener">Augment Code, AI Spec Template</a> — three-tier boundary system (must/ask/never)</li>
+<li>Phase 14 · 27 — prompt injection defenses that pair with scope locks</li>
+<li>Phase 14 · 33 — the rule set this contract specializes per task</li>
+<li>Phase 14 · 38 — the verification gate the checker reports into</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="35-initialization-scripts.html">
+  <span class="label">← Previous</span>
+  <b>Initialization Scripts for Agents</b>
+</a>
+      <a class="pager__item pager__item--next" href="37-runtime-feedback-loops.html">
+  <span class="label">Next →</span>
+  <b>Runtime Feedback Loops</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>7 minutes</b> of Agent Engineering behind you.</p>
+      <a class="btn btn--solid" href="37-runtime-feedback-loops.html">Continue to Runtime Feedback Loops →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#what-goes-in-a-scope-contract">What goes in a scope contract</a></li><li class="mini__item mini__item--d3"><a href="#globs-not-raw-paths">Globs, not raw paths</a></li><li class="mini__item mini__item--d3"><a href="#rollback-is-part-of-scope">Rollback is part of scope</a></li><li class="mini__item mini__item--d3"><a href="#scope-check-is-a-diff-check">Scope check is a diff check</a></li><li class="mini__item mini__item--d3"><a href="#two-altitudes-of-scope-the-feature-list-and-the-task-contract">Two altitudes of scope: the feature list and the task contract</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d2"><a href="#production-patterns-in-the-wild">Production patterns in the wild</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

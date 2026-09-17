@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Actor-Critic — A2C and A3C — Reinforcement Learning — AIFS</title>
+<meta name="description" content="Reinforcement Learning: Actor-Critic — A2C and A3C. 6 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Actor-Critic — A2C and A3C — Reinforcement Learning — AIFS">
+<meta property="og:description" content="Reinforcement Learning: Actor-Critic — A2C and A3C. 6 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"actor-critic":["../assets/figures/figures-alignment2.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-alignment2.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#FFB800" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#FFB800;--accent-ink:#111111"
+  data-lesson-id="reinforcement-learning/07-actor-critic-a2c-a3c" data-module="reinforcement-learning"
+  data-prev="06-policy-gradients-reinforce.html" data-next="08-ppo.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#FFB800">
+        <span class="label">Phase 09</span>
+        <b>Reinforcement Learning</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="reinforcement-learning/01-mdps-states-actions-rewards"><a href="01-mdps-states-actions-rewards.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">MDPs, States, Actions &amp; Rewards</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/02-dynamic-programming"><a href="02-dynamic-programming.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Dynamic Programming — Policy Iteration &amp; Value Iteration</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/03-monte-carlo-methods"><a href="03-monte-carlo-methods.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Monte Carlo Methods — Learning from Complete Episodes</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/04-q-learning-sarsa"><a href="04-q-learning-sarsa.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Temporal Difference — Q-Learning &amp; SARSA</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/05-dqn"><a href="05-dqn.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Deep Q-Networks (DQN)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/06-policy-gradients-reinforce"><a href="06-policy-gradients-reinforce.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Policy Gradient — REINFORCE from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/07-actor-critic-a2c-a3c"><a href="07-actor-critic-a2c-a3c.html" class="is-current">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Actor-Critic — A2C and A3C</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/08-ppo"><a href="08-ppo.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Proximal Policy Optimization (PPO)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/09-reward-modeling-rlhf"><a href="09-reward-modeling-rlhf.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Reward Modeling &amp; RLHF</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/10-multi-agent-rl"><a href="10-multi-agent-rl.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Multi-Agent RL</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/11-sim-to-real-transfer"><a href="11-sim-to-real-transfer.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Sim-to-Real Transfer</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/12-rl-for-games"><a href="12-rl-for-games.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">RL for Games — AlphaZero, MuZero, and the LLM-Reasoning Era</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Reinforcement Learning</a></p>
+      <h1 class="page__title">Actor-Critic — A2C and A3C</h1>
+      <p class="page__lede">REINFORCE is noisy. Add a critic that learns <code class="inline-code">V̂(s)</code>, subtract it from the return, and you get an advantage that has the same expectation but far lower variance. That is actor-critic. A2C runs it synchronously; A3C runs it across threads. Both are the mental model for every modern deep-RL method.</p>
+      <div class="page__meta">
+        <span class="chip">6 min read</span>
+        <span class="chip">1,287 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 9 · 04 (TD Learning), Phase 9 · 06 (REINFORCE)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Vanilla REINFORCE works, but its variance is terrible. Monte Carlo returns <code class="inline-code">G_t</code> can swing over a factor of 10 between episodes. Multiplying that noise by <code class="inline-code">∇ log π</code> and averaging produces a gradient estimator that takes thousands of episodes to move the policy the same distance you could move it with far fewer DQN updates.</p>
+<p>The variance comes from using raw returns. If you subtract a baseline <code class="inline-code">b(s_t)</code> — any function of state, including a learned value — the expectation is unchanged and the variance drops. The best tractable baseline is <code class="inline-code">V̂(s_t)</code>. Now the quantity multiplying <code class="inline-code">∇ log π</code> is the <em>advantage</em>:</p>
+<p><code class="inline-code">A(s, a) = G - V̂(s)</code></p>
+<p>An action is good if it produced above-average return; bad if below. REINFORCE with a learned critic is <em>actor-critic</em>. The critic gives the actor a low-variance teacher. This is every deep-policy method after 2015 (A2C, A3C, PPO, SAC, IMPALA).</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<p><img src="assets/07-actor-critic-a2c-a3c/actor-critic.svg" alt="Actor-critic: policy net plus value net, TD residual as advantage" loading="lazy"></p>
+<p><strong>Two networks, one shared loss:</strong></p>
+<ul>
+<li><strong>Actor</strong> <code class="inline-code">π_θ(a | s)</code>: the policy. Sampled to act. Trained with policy gradient.</li>
+<li><strong>Critic</strong> <code class="inline-code">V_φ(s)</code>: estimates expected return from state. Trained to minimize <code class="inline-code">(V_φ(s) - target)²</code>.</li>
+</ul>
+<p><strong>The advantage.</strong> Two standard forms:</p>
+<ul>
+<li><em>MC advantage:</em> <code class="inline-code">A_t = G_t - V_φ(s_t)</code>. Unbiased, higher variance.</li>
+<li><em>TD advantage:</em> <code class="inline-code">A_t = r_{t+1} + γ V_φ(s_{t+1}) - V_φ(s_t)</code>. Biased (uses <code class="inline-code">V_φ</code>), far lower variance. Also called the <em>TD residual</em> <code class="inline-code">δ_t</code>.</li>
+</ul>
+<p><strong>n-step advantage.</strong> Interpolate between the two:</p>
+<p><code class="inline-code">A_t^{(n)} = r_{t+1} + γ r_{t+2} + … + γ^{n-1} r_{t+n} + γ^n V_φ(s_{t+n}) - V_φ(s_t)</code></p>
+<p><code class="inline-code">n = 1</code> is pure TD. <code class="inline-code">n = ∞</code> is MC. Most implementations use <code class="inline-code">n = 5</code> for Atari, <code class="inline-code">n = 2048</code> for PPO on MuJoCo.</p>
+<p><strong>Generalized Advantage Estimation (GAE).</strong> Schulman et al. (2016) proposed an exponentially weighted average over all n-step advantages:</p>
+<p><code class="inline-code">A_t^{GAE} = Σ_{l=0}^{∞} (γλ)^l δ_{t+l}</code></p>
+<p>with <code class="inline-code">λ ∈ [0, 1]</code>. <code class="inline-code">λ = 0</code> is TD (low variance, high bias). <code class="inline-code">λ = 1</code> is MC (high variance, unbiased). <code class="inline-code">λ = 0.95</code> is the 2026 default — tune until the bias/variance dial is where you want it.</p>
+<p><strong>A2C: synchronous advantage actor-critic.</strong> Collect <code class="inline-code">T</code> steps across <code class="inline-code">N</code> parallel environments. Compute advantages for each step. Update actor and critic on the combined batch. Repeat. The simpler, more-scalable sibling of A3C.</p>
+<p><strong>A3C: asynchronous advantage actor-critic.</strong> Mnih et al. (2016). Spawn <code class="inline-code">N</code> worker threads, each running an env. Each worker computes gradients locally on its own rollout, then asynchronously applies them to a shared parameter server. No replay buffer needed — workers decorrelate by running different trajectories. A3C proved you could train on CPUs at scale. In 2026, GPU-based A2C (batched parallel envs) dominates because GPUs want large batches.</p>
+<p><strong>The combined loss.</strong></p>
+<p><code class="inline-code">L(θ, φ) = -E[ A_t · log π_θ(a_t | s_t) ]  +  c_v · E[(V_φ(s_t) - G_t)²]  -  c_e · E[H(π_θ(·|s_t))]</code></p>
+<p>Three terms: policy-gradient loss, value regression, entropy bonus. <code class="inline-code">c_v ~ 0.5</code>, <code class="inline-code">c_e ~ 0.01</code> are canonical starting points.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="actor-critic"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">actor-critic</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> actor critic</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-a-critic" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-a-critic" aria-label="Link to this section">#</a>Step 1: a critic</h3>
+<p>Linear critic <code class="inline-code">V_φ(s) = w · features(s)</code> updated with MSE:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">critic_update</span><span class="token punctuation">(</span>w<span class="token punctuation">,</span> x<span class="token punctuation">,</span> target<span class="token punctuation">,</span> lr<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    v_hat <span class="token operator">=</span> dot<span class="token punctuation">(</span>w<span class="token punctuation">,</span> x<span class="token punctuation">)</span>
+    err <span class="token operator">=</span> target <span class="token operator">-</span> v_hat
+    <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>w<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        w<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">+=</span> lr <span class="token operator">*</span> err <span class="token operator">*</span> x<span class="token punctuation">[</span>j<span class="token punctuation">]</span>
+    <span class="token keyword">return</span> v_hat</code></pre>
+</figure>
+<p>On a tabular env the critic converges in a few hundred episodes. On Atari, replace the linear critic with a shared CNN trunk + value head.</p>
+<h3 id="step-2-n-step-advantage" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-n-step-advantage" aria-label="Link to this section">#</a>Step 2: n-step advantage</h3>
+<p>Given a rollout of length <code class="inline-code">T</code> and a bootstrapped final <code class="inline-code">V(s_T)</code>:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">compute_advantages</span><span class="token punctuation">(</span>rewards<span class="token punctuation">,</span> values<span class="token punctuation">,</span> gamma<span class="token operator">=</span><span class="token number">0.99</span><span class="token punctuation">,</span> lam<span class="token operator">=</span><span class="token number">0.95</span><span class="token punctuation">,</span> last_value<span class="token operator">=</span><span class="token number">0.0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    advantages <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token builtin">len</span><span class="token punctuation">(</span>rewards<span class="token punctuation">)</span>
+    gae <span class="token operator">=</span> <span class="token number">0.0</span>
+    <span class="token keyword">for</span> t <span class="token keyword">in</span> <span class="token builtin">reversed</span><span class="token punctuation">(</span><span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>rewards<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        next_v <span class="token operator">=</span> values<span class="token punctuation">[</span>t <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span> <span class="token keyword">if</span> t <span class="token operator">+</span> <span class="token number">1</span> <span class="token operator">&lt;</span> <span class="token builtin">len</span><span class="token punctuation">(</span>values<span class="token punctuation">)</span> <span class="token keyword">else</span> last_value
+        delta <span class="token operator">=</span> rewards<span class="token punctuation">[</span>t<span class="token punctuation">]</span> <span class="token operator">+</span> gamma <span class="token operator">*</span> next_v <span class="token operator">-</span> values<span class="token punctuation">[</span>t<span class="token punctuation">]</span>
+        gae <span class="token operator">=</span> delta <span class="token operator">+</span> gamma <span class="token operator">*</span> lam <span class="token operator">*</span> gae
+        advantages<span class="token punctuation">[</span>t<span class="token punctuation">]</span> <span class="token operator">=</span> gae
+    returns <span class="token operator">=</span> <span class="token punctuation">[</span>a <span class="token operator">+</span> v <span class="token keyword">for</span> a<span class="token punctuation">,</span> v <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>advantages<span class="token punctuation">,</span> values<span class="token punctuation">)</span><span class="token punctuation">]</span>
+    <span class="token keyword">return</span> advantages<span class="token punctuation">,</span> returns</code></pre>
+</figure>
+<p><code class="inline-code">returns</code> is the critic target. <code class="inline-code">advantages</code> is what multiplies <code class="inline-code">∇ log π</code>.</p>
+<h3 id="step-3-combined-update" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-combined-update" aria-label="Link to this section">#</a>Step 3: combined update</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">for</span> step_i<span class="token punctuation">,</span> <span class="token punctuation">(</span>x<span class="token punctuation">,</span> a<span class="token punctuation">,</span> _r<span class="token punctuation">,</span> probs<span class="token punctuation">)</span> <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>traj<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    adv <span class="token operator">=</span> advantages<span class="token punctuation">[</span>step_i<span class="token punctuation">]</span>
+    target_v <span class="token operator">=</span> returns<span class="token punctuation">[</span>step_i<span class="token punctuation">]</span>
+
+    <span class="token comment"># critic</span>
+    critic_update<span class="token punctuation">(</span>w<span class="token punctuation">,</span> x<span class="token punctuation">,</span> target_v<span class="token punctuation">,</span> lr_v<span class="token punctuation">)</span>
+
+    <span class="token comment"># actor</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>N_ACTIONS<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        grad_logpi <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token number">1.0</span> <span class="token keyword">if</span> i <span class="token operator">==</span> a <span class="token keyword">else</span> <span class="token number">0.0</span><span class="token punctuation">)</span> <span class="token operator">-</span> probs<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+        <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>N_FEAT<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            theta<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">+=</span> lr_a <span class="token operator">*</span> adv <span class="token operator">*</span> grad_logpi <span class="token operator">*</span> x<span class="token punctuation">[</span>j<span class="token punctuation">]</span></code></pre>
+</figure>
+<p>On-policy, one rollout per update, separate learning rates for actor and critic.</p>
+<h3 id="step-4-parallelization-a3c-vs-a2c" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-parallelization-a3c-vs-a2c" aria-label="Link to this section">#</a>Step 4: parallelization (A3C vs A2C)</h3>
+<ul>
+<li><strong>A3C:</strong> spin up <code class="inline-code">N</code> threads. Each runs its own env and its own forward pass. Periodically push gradient updates to a shared master. No locks on the master — races are ok, they just add noise.</li>
+<li><strong>A2C:</strong> run <code class="inline-code">N</code> env instances in a single process, stack observations into a <code class="inline-code">[N, obs_dim]</code> batch, batched forward pass, batched backward pass. Higher GPU utilization, deterministic, easier to reason about. The default in 2026.</li>
+</ul>
+<p>Our toy code is single-threaded for clarity; rewriting to batched A2C is three lines of numpy.</p>
+<h2 id="pitfalls" class="prose-h prose-h2"><a class="prose-h__anchor" href="#pitfalls" aria-label="Link to this section">#</a>Pitfalls</h2>
+<ul>
+<li><strong>Critic bias before actor gradient.</strong> If the critic is random, its baseline is uninformative and you are training on pure noise. Warm up the critic for a few hundred steps before turning on the policy gradient, or use a slow actor learning rate.</li>
+<li><strong>Advantage normalization.</strong> Normalize advantages to zero-mean/unit-std per batch. Stabilizes training massively at near-zero cost.</li>
+<li><strong>Shared trunk.</strong> Use a shared feature extractor for actor and critic on image inputs. Separate heads. The shared features free-ride on both losses.</li>
+<li><strong>On-policy contract.</strong> A2C reuses data for exactly one update. More and your gradient is biased (importance-sampling correction is what PPO adds).</li>
+<li><strong>Entropy collapse.</strong> Without <code class="inline-code">c_e &gt; 0</code>, policy becomes near-deterministic in a few hundred updates and stops exploring.</li>
+<li><strong>Reward scale.</strong> Advantage magnitudes depend on reward scale. Normalize rewards (e.g., running-std dividing) for consistent gradient magnitudes across tasks.</li>
+</ul>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>A2C/A3C are rarely the final choice in 2026 but they are the architecture everything later refines:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Relation to A2C</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>PPO</td>
+<td>A2C + clipped importance ratio for multi-epoch updates</td>
+</tr>
+<tr>
+<td>IMPALA</td>
+<td>A3C + V-trace off-policy correction</td>
+</tr>
+<tr>
+<td>SAC (Phase 9 · 07)</td>
+<td>Off-policy A2C with a soft-value critic (next lesson)</td>
+</tr>
+<tr>
+<td>GRPO (Phase 9 · 12)</td>
+<td>A2C without the critic — group-relative advantage</td>
+</tr>
+<tr>
+<td>DPO</td>
+<td>A2C collapsed into a preference-ranking loss, no sampling</td>
+</tr>
+<tr>
+<td>AlphaStar / OpenAI Five</td>
+<td>A2C with league training + imitation pre-training</td>
+</tr>
+</tbody></table>
+<p>If you see &quot;advantage&quot; in a 2026 paper, think actor-critic.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>Save as <code class="inline-code">outputs/skill-actor-critic-trainer.md</code>:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">markdown</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-markdown"><span class="token front-matter-block"><span class="token punctuation">---</span>
+<span class="token front-matter yaml language-yaml"><span class="token key atrule">name</span><span class="token punctuation">:</span> actor<span class="token punctuation">-</span>critic<span class="token punctuation">-</span>trainer
+<span class="token key atrule">description</span><span class="token punctuation">:</span> Produce an A2C / A3C / GAE configuration for a given environment<span class="token punctuation">,</span> with advantage estimation and loss weights specified.
+<span class="token key atrule">version</span><span class="token punctuation">:</span> 1.0.0
+<span class="token key atrule">phase</span><span class="token punctuation">:</span> <span class="token number">9</span>
+<span class="token key atrule">lesson</span><span class="token punctuation">:</span> <span class="token number">7</span>
+<span class="token key atrule">tags</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>rl<span class="token punctuation">,</span> actor<span class="token punctuation">-</span>critic<span class="token punctuation">,</span> gae<span class="token punctuation">]</span></span>
+<span class="token punctuation">---</span></span>
+
+Given an environment and compute budget, output:
+
+<span class="token list punctuation">1.</span> Parallelism. A2C (GPU batched) vs A3C (CPU async) and the number of workers.
+<span class="token list punctuation">2.</span> Rollout length T. Steps per env per update.
+<span class="token list punctuation">3.</span> Advantage estimator. n-step or GAE(λ); specify λ.
+<span class="token list punctuation">4.</span> Loss weights. <span class="token code-snippet code keyword">`c_v`</span> (value), <span class="token code-snippet code keyword">`c_e`</span> (entropy), gradient clip.
+<span class="token list punctuation">5.</span> Learning rates. Actor and critic (separate if using).
+
+Refuse single-worker A2C on environments with horizon > 1000 (too on-policy, too slow). Refuse to ship without advantage normalization. Flag any run with <span class="token code-snippet code keyword">`c_e = 0`</span> and observed entropy &lt; 0.1 as entropy-collapsed.</code></pre>
+</figure>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><strong>Easy.</strong> Train actor-critic with MC advantage (<code class="inline-code">G_t - V(s_t)</code>) on 4×4 GridWorld. Compare sample efficiency to REINFORCE-with-running-mean-baseline from Lesson 06.</li>
+<li><strong>Medium.</strong> Switch to TD-residual advantage (<code class="inline-code">r + γ V(s') - V(s)</code>). Measure variance of the advantage batches. By how much does it drop?</li>
+<li><strong>Hard.</strong> Implement GAE(λ). Sweep <code class="inline-code">λ ∈ {0, 0.5, 0.9, 0.95, 1.0}</code>. Plot final return vs sample efficiency. Where is the bias/variance sweet spot for this task?</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Actor</td>
+<td>&quot;The policy net&quot;</td>
+<td><code class="inline-code">π_θ(a|s)</code>, updated by policy gradient.</td>
+</tr>
+<tr>
+<td>Critic</td>
+<td>&quot;The value net&quot;</td>
+<td><code class="inline-code">V_φ(s)</code>, updated by MSE regression to returns / TD targets.</td>
+</tr>
+<tr>
+<td>Advantage</td>
+<td>&quot;How much better than average&quot;</td>
+<td><code class="inline-code">A(s, a) = Q(s, a) - V(s)</code> or its estimators. Multiplier for <code class="inline-code">∇ log π</code>.</td>
+</tr>
+<tr>
+<td>TD residual</td>
+<td>&quot;δ&quot;</td>
+<td><code class="inline-code">δ_t = r + γ V(s') - V(s)</code>; one-step advantage estimate.</td>
+</tr>
+<tr>
+<td>GAE</td>
+<td>&quot;The interpolation knob&quot;</td>
+<td>Exponentially weighted sum of n-step advantages, parameterized by <code class="inline-code">λ</code>.</td>
+</tr>
+<tr>
+<td>A2C</td>
+<td>&quot;Synchronous actor-critic&quot;</td>
+<td>Batched across envs; one gradient step per rollout.</td>
+</tr>
+<tr>
+<td>A3C</td>
+<td>&quot;Async actor-critic&quot;</td>
+<td>Worker threads push gradients to a shared param server. Original paper; less common in 2026.</td>
+</tr>
+<tr>
+<td>Bootstrap</td>
+<td>&quot;Use V at the horizon&quot;</td>
+<td>Truncate the rollout, add <code class="inline-code">γ^n V(s_{t+n})</code> to close the sum.</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/1602.01783" target="_blank" rel="noopener">Mnih et al. (2016). Asynchronous Methods for Deep Reinforcement Learning</a> — A3C, the original async actor-critic paper.</li>
+<li><a href="https://arxiv.org/abs/1506.02438" target="_blank" rel="noopener">Schulman et al. (2016). High-Dimensional Continuous Control Using Generalized Advantage Estimation</a> — GAE.</li>
+<li><a href="http://incompleteideas.net/book/RLbook2020.pdf" target="_blank" rel="noopener">Sutton &amp; Barto (2018). Ch. 13 — Actor-Critic Methods</a> — foundations; pair this with Ch. 9 on function approximation when the critic is a neural net.</li>
+<li><a href="https://arxiv.org/abs/1802.01561" target="_blank" rel="noopener">Espeholt et al. (2018). IMPALA</a> — scalable distributed actor-critic with V-trace off-policy correction.</li>
+<li><a href="https://stable-baselines3.readthedocs.io/" target="_blank" rel="noopener">OpenAI Baselines / Stable-Baselines3</a> — production A2C/PPO implementations worth reading.</li>
+<li><a href="https://papers.nips.cc/paper/1786-actor-critic-algorithms" target="_blank" rel="noopener">Konda &amp; Tsitsiklis (2000). Actor-Critic Algorithms</a> — the foundational convergence result for the two-timescale actor-critic decomposition.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="06-policy-gradients-reinforce.html">
+  <span class="label">← Previous</span>
+  <b>Policy Gradient — REINFORCE from Scratch</b>
+</a>
+      <a class="pager__item pager__item--next" href="08-ppo.html">
+  <span class="label">Next →</span>
+  <b>Proximal Policy Optimization (PPO)</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>6 minutes</b> of Reinforcement Learning behind you.</p>
+      <a class="btn btn--solid" href="08-ppo.html">Continue to Proximal Policy Optimization (PPO) →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-a-critic">Step 1: a critic</a></li><li class="mini__item mini__item--d3"><a href="#step-2-n-step-advantage">Step 2: n-step advantage</a></li><li class="mini__item mini__item--d3"><a href="#step-3-combined-update">Step 3: combined update</a></li><li class="mini__item mini__item--d3"><a href="#step-4-parallelization-a3c-vs-a2c">Step 4: parallelization (A3C vs A2C)</a></li><li class="mini__item mini__item--d2"><a href="#pitfalls">Pitfalls</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

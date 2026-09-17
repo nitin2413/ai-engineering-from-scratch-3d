@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Optimizers — Deep Learning Core — AIFS</title>
+<meta name="description" content="Deep Learning Core: Optimizers. 8 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Optimizers — Deep Learning Core — AIFS">
+<meta property="og:description" content="Deep Learning Core: Optimizers. 8 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"optimizer-trajectory":["../assets/figures/figures-dl.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-dl.js"];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#FF4FA3" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#FF4FA3;--accent-ink:#111111"
+  data-lesson-id="deep-learning-core/06-optimizers" data-module="deep-learning-core"
+  data-prev="05-loss-functions.html" data-next="07-regularization.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#FF4FA3">
+        <span class="label">Phase 03</span>
+        <b>Deep Learning Core</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="deep-learning-core/01-the-perceptron"><a href="01-the-perceptron.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">The Perceptron</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/02-multi-layer-networks"><a href="02-multi-layer-networks.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Multi-Layer Networks and Forward Pass</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/03-backpropagation"><a href="03-backpropagation.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Backpropagation from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/04-activation-functions"><a href="04-activation-functions.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Activation Functions</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/05-loss-functions"><a href="05-loss-functions.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Loss Functions</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/06-optimizers"><a href="06-optimizers.html" class="is-current">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Optimizers</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/07-regularization"><a href="07-regularization.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Regularization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/08-weight-initialization"><a href="08-weight-initialization.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Weight Initialization and Training Stability</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/09-learning-rate-schedules"><a href="09-learning-rate-schedules.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Learning Rate Schedules and Warmup</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/10-mini-framework"><a href="10-mini-framework.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Build Your Own Mini Framework</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/11-intro-to-pytorch"><a href="11-intro-to-pytorch.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Introduction to PyTorch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/12-intro-to-jax"><a href="12-intro-to-jax.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Introduction to JAX</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/13-debugging-neural-networks"><a href="13-debugging-neural-networks.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Debugging Neural Networks</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Deep Learning Core</a></p>
+      <h1 class="page__title">Optimizers</h1>
+      <p class="page__lede">Gradient descent tells you which direction to move. It says nothing about how far or how fast. SGD is a compass. Adam is GPS with traffic data.</p>
+      <div class="page__meta">
+        <span class="chip">8 min read</span>
+        <span class="chip">1,818 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Lesson 03.05 (Loss Functions)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Implement SGD, SGD with momentum, Adam, and AdamW optimizers from scratch in Python</li>
+<li>Explain how Adam&#39;s bias correction compensates for zero-initialized moment estimates in early training steps</li>
+<li>Demonstrate why AdamW produces better generalization than Adam with L2 regularization on the same task</li>
+<li>Select the appropriate optimizer and default hyperparameters for transformers, CNNs, GANs, and fine-tuning</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>You computed the gradients. You know that weight #4,721 should decrease by 0.003 to reduce the loss. But 0.003 in what units? Scaled by what? And should you move the same amount on step 1 as on step 1,000?</p>
+<p>Vanilla gradient descent applies the same learning rate to every parameter on every step: w = w - lr * gradient. This creates three problems that make training neural networks painful in practice.</p>
+<p>First, oscillation. The loss landscape is rarely shaped like a smooth bowl. It&#39;s more like a long, narrow valley. The gradient points across the valley (steep direction), not along it (shallow direction). Gradient descent bounces back and forth across the narrow dimension while making tiny progress along the useful one. You&#39;ve seen this: loss drops fast then plateaus, not because the model converged but because it&#39;s oscillating.</p>
+<p>Second, one learning rate for all parameters is wrong. Some weights need large updates (they&#39;re in the early, underfitting stage). Others need tiny updates (they&#39;re near their optimal value). A learning rate that works for the former destroys the latter, and vice versa.</p>
+<p>Third, saddle points. In high dimensions, the loss landscape has vast flat regions where the gradient is near zero. Vanilla SGD crawls through these at the speed of the gradient, which is effectively zero. The model looks stuck. It isn&#39;t stuck -- it&#39;s in a flat region with useful descent on the other side. But SGD has no mechanism to push through.</p>
+<p>Adam solves all three. It maintains two running averages per parameter -- the mean gradient (momentum, handles oscillation) and the mean squared gradient (adaptive rate, handles different scales). Combined with bias correction for the first few steps, it gives you a single optimizer that works on 80% of problems with default hyperparameters. This lesson builds it from scratch so you understand exactly when and why it fails on the other 20%.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="stochastic-gradient-descent-sgd" class="prose-h prose-h3"><a class="prose-h__anchor" href="#stochastic-gradient-descent-sgd" aria-label="Link to this section">#</a>Stochastic Gradient Descent (SGD)</h3>
+<p>The simplest optimizer. Compute the gradient on a mini-batch and step in the opposite direction.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>w = w - lr * gradient</code></pre>
+</figure>
+<p>The &quot;stochastic&quot; means you use a random subset (mini-batch) of data to estimate the gradient, rather than the full dataset. This noise is actually useful -- it helps escape sharp local minima. But the noise also causes oscillation.</p>
+<p>Learning rate is the only knob. Too high: the loss diverges. Too low: training takes forever. The optimal value depends on the architecture, the data, the batch size, and the current stage of training. For vanilla SGD on modern networks, typical values range from 0.01 to 0.1. But even within a single training run, the ideal learning rate changes.</p>
+<h3 id="momentum" class="prose-h prose-h3"><a class="prose-h__anchor" href="#momentum" aria-label="Link to this section">#</a>Momentum</h3>
+<p>The ball-rolling-downhill analogy is overused but accurate. Instead of stepping by the gradient alone, you maintain a velocity that accumulates past gradients.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>m_t = beta * m_{t-1} + gradient
+w = w - lr * m_t</code></pre>
+</figure>
+<p>Beta (typically 0.9) controls how much history to keep. With beta = 0.9, the momentum is roughly the average of the last 10 gradients (1 / (1 - 0.9) = 10).</p>
+<p>Why this fixes oscillation: gradients that point in the same direction accumulate. Gradients that flip direction cancel out. In that narrow valley, the &quot;across&quot; component flips sign each step and gets dampened. The &quot;along&quot; component stays consistent and gets amplified. The result is smooth acceleration in the useful direction.</p>
+<p>Real numbers: SGD alone on a badly conditioned loss landscape might take 10,000 steps. SGD with momentum (beta=0.9) typically takes 3,000-5,000 steps on the same problem. The speedup is not marginal.</p>
+<h3 id="rmsprop" class="prose-h prose-h3"><a class="prose-h__anchor" href="#rmsprop" aria-label="Link to this section">#</a>RMSProp</h3>
+<p>The first per-parameter adaptive learning rate method that actually worked. Proposed by Hinton in a Coursera lecture (never formally published).</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>s_t = beta * s_{t-1} + (1 - beta) * gradient^2
+w = w - lr * gradient / (sqrt(s_t) + epsilon)</code></pre>
+</figure>
+<p>s_t tracks the running average of squared gradients. Parameters with consistently large gradients get divided by a large number (smaller effective learning rate). Parameters with small gradients get divided by a small number (larger effective learning rate).</p>
+<p>This solves the &quot;one learning rate for all parameters&quot; problem. A weight that&#39;s already been getting large updates is probably near its target -- slow it down. A weight that&#39;s been getting tiny updates might be undertrained -- speed it up.</p>
+<p>Epsilon (typically 1e-8) prevents division by zero when a parameter hasn&#39;t been updated.</p>
+<h3 id="adam-momentum-rmsprop" class="prose-h prose-h3"><a class="prose-h__anchor" href="#adam-momentum-rmsprop" aria-label="Link to this section">#</a>Adam: Momentum + RMSProp</h3>
+<p>Adam combines both ideas. It maintains two exponential moving averages per parameter:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>m_t = beta1 * m_{t-1} + (1 - beta1) * gradient        (first moment: mean)
+v_t = beta2 * v_{t-1} + (1 - beta2) * gradient^2       (second moment: variance)</code></pre>
+</figure>
+<p><strong>Bias correction</strong> is the key detail most explanations skip. At step 1, m_1 = (1 - beta1) * gradient. With beta1 = 0.9, that&#39;s 0.1 * gradient -- ten times too small. The moving average hasn&#39;t warmed up yet. Bias correction compensates:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>m_hat = m_t / (1 - beta1^t)
+v_hat = v_t / (1 - beta2^t)</code></pre>
+</figure>
+<p>At step 1 with beta1 = 0.9: m_hat = m_1 / (1 - 0.9) = m_1 / 0.1 = the actual gradient. At step 100: (1 - 0.9^100) is approximately 1.0, so the correction vanishes. Bias correction matters for the first ~10 steps and is irrelevant after ~50.</p>
+<p>The update:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>w = w - lr * m_hat / (sqrt(v_hat) + epsilon)</code></pre>
+</figure>
+<p>Adam defaults: lr = 0.001, beta1 = 0.9, beta2 = 0.999, epsilon = 1e-8. These defaults work for 80% of problems. When they don&#39;t, change lr first. Then beta2. Almost never change beta1 or epsilon.</p>
+<h3 id="adamw-weight-decay-done-right" class="prose-h prose-h3"><a class="prose-h__anchor" href="#adamw-weight-decay-done-right" aria-label="Link to this section">#</a>AdamW: Weight Decay Done Right</h3>
+<p>L2 regularization adds lambda * w^2 to the loss. In vanilla SGD, this is equivalent to weight decay (subtracting lambda * w from the weight at each step). In Adam, this equivalence breaks.</p>
+<p>The Loshchilov &amp; Hutter insight: when you add L2 to the loss and then Adam processes the gradient, the adaptive learning rate scales the regularization term too. Parameters with large gradient variance get less regularization. Parameters with small variance get more. This is not what you want -- you want uniform regularization regardless of the gradient statistics.</p>
+<p>AdamW fixes this by applying weight decay directly to the weights, after the Adam update:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>w = w - lr * m_hat / (sqrt(v_hat) + epsilon) - lr * lambda * w</code></pre>
+</figure>
+<p>The weight decay term (lr * lambda * w) is not scaled by Adam&#39;s adaptive factor. Every parameter gets the same proportional shrinkage.</p>
+<p>This seems like a minor detail. It&#39;s not. AdamW converges to better solutions than Adam + L2 regularization on virtually every task. It&#39;s the default optimizer in PyTorch for training transformers, diffusion models, and most modern architectures. BERT, GPT, LLaMA, Stable Diffusion -- all trained with AdamW.</p>
+<h3 id="learning-rate-the-most-important-hyperparameter" class="prose-h prose-h3"><a class="prose-h__anchor" href="#learning-rate-the-most-important-hyperparameter" aria-label="Link to this section">#</a>Learning Rate: The Most Important Hyperparameter</h3>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph TD
+    LR[&quot;Learning Rate&quot;] --&gt; TooHigh[&quot;Too high (lr &gt; 0.01)&quot;]
+    LR --&gt; JustRight[&quot;Just right&quot;]
+    LR --&gt; TooLow[&quot;Too low (lr &lt; 0.00001)&quot;]
+
+    TooHigh --&gt; Diverge[&quot;Loss explodes&lt;br/&gt;NaN weights&lt;br/&gt;Training crashes&quot;]
+    JustRight --&gt; Converge[&quot;Loss decreases steadily&lt;br/&gt;Reaches good minimum&lt;br/&gt;Generalizes well&quot;]
+    TooLow --&gt; Stall[&quot;Loss decreases slowly&lt;br/&gt;Gets stuck in suboptimal minimum&lt;br/&gt;Wastes compute&quot;]
+
+    JustRight --&gt; Schedule[&quot;Usually needs scheduling&quot;]
+    Schedule --&gt; Warmup[&quot;Warmup: ramp from 0 to max&lt;br/&gt;First 1-10% of training&quot;]
+    Schedule --&gt; Decay[&quot;Decay: reduce over time&lt;br/&gt;Cosine or linear&quot;]</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>If you tune one hyperparameter, tune the learning rate. A 10x change in learning rate matters more than any architectural decision you&#39;ll make. Common defaults:</p>
+<ul>
+<li>SGD: lr = 0.01 to 0.1</li>
+<li>Adam/AdamW: lr = 1e-4 to 3e-4</li>
+<li>Fine-tuning pretrained models: lr = 1e-5 to 5e-5</li>
+<li>Learning rate warmup: linear ramp over first 1-10% of steps</li>
+</ul>
+<h3 id="optimizer-comparison" class="prose-h prose-h3"><a class="prose-h__anchor" href="#optimizer-comparison" aria-label="Link to this section">#</a>Optimizer Comparison</h3>
+<figure class="mermaid-figure">
+  <pre class="mermaid">flowchart LR
+    subgraph &quot;Optimization Path&quot;
+        SGD_P[&quot;SGD&lt;br/&gt;Oscillates across valley&lt;br/&gt;Slow but finds flat minima&quot;]
+        Mom_P[&quot;SGD + Momentum&lt;br/&gt;Smoother path&lt;br/&gt;3x faster than SGD&quot;]
+        Adam_P[&quot;Adam&lt;br/&gt;Adapts per-parameter&lt;br/&gt;Fast convergence&quot;]
+        AdamW_P[&quot;AdamW&lt;br/&gt;Adam + proper decay&lt;br/&gt;Best generalization&quot;]
+    end
+    SGD_P --&gt; Mom_P --&gt; Adam_P --&gt; AdamW_P</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<h3 id="when-each-optimizer-wins" class="prose-h prose-h3"><a class="prose-h__anchor" href="#when-each-optimizer-wins" aria-label="Link to this section">#</a>When Each Optimizer Wins</h3>
+<figure class="mermaid-figure">
+  <pre class="mermaid">flowchart TD
+    Task[&quot;What are you training?&quot;] --&gt; Type{&quot;Model type?&quot;}
+
+    Type --&gt;|&quot;Transformer / LLM&quot;| AdamW[&quot;AdamW&lt;br/&gt;lr=1e-4, wd=0.01-0.1&quot;]
+    Type --&gt;|&quot;CNN / ResNet&quot;| SGD_M[&quot;SGD + Momentum&lt;br/&gt;lr=0.1, momentum=0.9&quot;]
+    Type --&gt;|&quot;GAN&quot;| Adam2[&quot;Adam&lt;br/&gt;lr=2e-4, beta1=0.5&quot;]
+    Type --&gt;|&quot;Fine-tuning&quot;| AdamW2[&quot;AdamW&lt;br/&gt;lr=2e-5, wd=0.01&quot;]
+    Type --&gt;|&quot;Don't know yet&quot;| Default[&quot;Start with AdamW&lt;br/&gt;lr=3e-4, wd=0.01&quot;]</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="optimizer-trajectory"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">optimizer-trajectory</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> optimizer trajectory</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-vanilla-sgd" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-vanilla-sgd" aria-label="Link to this section">#</a>Step 1: Vanilla SGD</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">SGD</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> lr<span class="token operator">=</span><span class="token number">0.01</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>lr <span class="token operator">=</span> lr
+
+    <span class="token keyword">def</span> <span class="token function">step</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> params<span class="token punctuation">,</span> grads<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>params<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            params<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">-=</span> self<span class="token punctuation">.</span>lr <span class="token operator">*</span> grads<span class="token punctuation">[</span>i<span class="token punctuation">]</span></code></pre>
+</figure>
+<h3 id="step-2-sgd-with-momentum" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-sgd-with-momentum" aria-label="Link to this section">#</a>Step 2: SGD with Momentum</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">SGDMomentum</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> lr<span class="token operator">=</span><span class="token number">0.01</span><span class="token punctuation">,</span> beta<span class="token operator">=</span><span class="token number">0.9</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>lr <span class="token operator">=</span> lr
+        self<span class="token punctuation">.</span>beta <span class="token operator">=</span> beta
+        self<span class="token punctuation">.</span>velocities <span class="token operator">=</span> <span class="token boolean">None</span>
+
+    <span class="token keyword">def</span> <span class="token function">step</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> params<span class="token punctuation">,</span> grads<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> self<span class="token punctuation">.</span>velocities <span class="token keyword">is</span> <span class="token boolean">None</span><span class="token punctuation">:</span>
+            self<span class="token punctuation">.</span>velocities <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token builtin">len</span><span class="token punctuation">(</span>params<span class="token punctuation">)</span>
+        <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>params<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            self<span class="token punctuation">.</span>velocities<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> self<span class="token punctuation">.</span>beta <span class="token operator">*</span> self<span class="token punctuation">.</span>velocities<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+</span> grads<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+            params<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">-=</span> self<span class="token punctuation">.</span>lr <span class="token operator">*</span> self<span class="token punctuation">.</span>velocities<span class="token punctuation">[</span>i<span class="token punctuation">]</span></code></pre>
+</figure>
+<h3 id="step-3-adam" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-adam" aria-label="Link to this section">#</a>Step 3: Adam</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> math
+
+<span class="token keyword">class</span> <span class="token class-name">Adam</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> lr<span class="token operator">=</span><span class="token number">0.001</span><span class="token punctuation">,</span> beta1<span class="token operator">=</span><span class="token number">0.9</span><span class="token punctuation">,</span> beta2<span class="token operator">=</span><span class="token number">0.999</span><span class="token punctuation">,</span> epsilon<span class="token operator">=</span><span class="token number">1e-8</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>lr <span class="token operator">=</span> lr
+        self<span class="token punctuation">.</span>beta1 <span class="token operator">=</span> beta1
+        self<span class="token punctuation">.</span>beta2 <span class="token operator">=</span> beta2
+        self<span class="token punctuation">.</span>epsilon <span class="token operator">=</span> epsilon
+        self<span class="token punctuation">.</span>m <span class="token operator">=</span> <span class="token boolean">None</span>
+        self<span class="token punctuation">.</span>v <span class="token operator">=</span> <span class="token boolean">None</span>
+        self<span class="token punctuation">.</span>t <span class="token operator">=</span> <span class="token number">0</span>
+
+    <span class="token keyword">def</span> <span class="token function">step</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> params<span class="token punctuation">,</span> grads<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> self<span class="token punctuation">.</span>m <span class="token keyword">is</span> <span class="token boolean">None</span><span class="token punctuation">:</span>
+            self<span class="token punctuation">.</span>m <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token builtin">len</span><span class="token punctuation">(</span>params<span class="token punctuation">)</span>
+            self<span class="token punctuation">.</span>v <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token builtin">len</span><span class="token punctuation">(</span>params<span class="token punctuation">)</span>
+
+        self<span class="token punctuation">.</span>t <span class="token operator">+=</span> <span class="token number">1</span>
+
+        <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>params<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            self<span class="token punctuation">.</span>m<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> self<span class="token punctuation">.</span>beta1 <span class="token operator">*</span> self<span class="token punctuation">.</span>m<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> self<span class="token punctuation">.</span>beta1<span class="token punctuation">)</span> <span class="token operator">*</span> grads<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+            self<span class="token punctuation">.</span>v<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> self<span class="token punctuation">.</span>beta2 <span class="token operator">*</span> self<span class="token punctuation">.</span>v<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> self<span class="token punctuation">.</span>beta2<span class="token punctuation">)</span> <span class="token operator">*</span> grads<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">**</span> <span class="token number">2</span>
+
+            m_hat <span class="token operator">=</span> self<span class="token punctuation">.</span>m<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">/</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> self<span class="token punctuation">.</span>beta1 <span class="token operator">**</span> self<span class="token punctuation">.</span>t<span class="token punctuation">)</span>
+            v_hat <span class="token operator">=</span> self<span class="token punctuation">.</span>v<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">/</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> self<span class="token punctuation">.</span>beta2 <span class="token operator">**</span> self<span class="token punctuation">.</span>t<span class="token punctuation">)</span>
+
+            params<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">-=</span> self<span class="token punctuation">.</span>lr <span class="token operator">*</span> m_hat <span class="token operator">/</span> <span class="token punctuation">(</span>math<span class="token punctuation">.</span>sqrt<span class="token punctuation">(</span>v_hat<span class="token punctuation">)</span> <span class="token operator">+</span> self<span class="token punctuation">.</span>epsilon<span class="token punctuation">)</span></code></pre>
+</figure>
+<h3 id="step-4-adamw" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-adamw" aria-label="Link to this section">#</a>Step 4: AdamW</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">AdamW</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> lr<span class="token operator">=</span><span class="token number">0.001</span><span class="token punctuation">,</span> beta1<span class="token operator">=</span><span class="token number">0.9</span><span class="token punctuation">,</span> beta2<span class="token operator">=</span><span class="token number">0.999</span><span class="token punctuation">,</span> epsilon<span class="token operator">=</span><span class="token number">1e-8</span><span class="token punctuation">,</span> weight_decay<span class="token operator">=</span><span class="token number">0.01</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>lr <span class="token operator">=</span> lr
+        self<span class="token punctuation">.</span>beta1 <span class="token operator">=</span> beta1
+        self<span class="token punctuation">.</span>beta2 <span class="token operator">=</span> beta2
+        self<span class="token punctuation">.</span>epsilon <span class="token operator">=</span> epsilon
+        self<span class="token punctuation">.</span>weight_decay <span class="token operator">=</span> weight_decay
+        self<span class="token punctuation">.</span>m <span class="token operator">=</span> <span class="token boolean">None</span>
+        self<span class="token punctuation">.</span>v <span class="token operator">=</span> <span class="token boolean">None</span>
+        self<span class="token punctuation">.</span>t <span class="token operator">=</span> <span class="token number">0</span>
+
+    <span class="token keyword">def</span> <span class="token function">step</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> params<span class="token punctuation">,</span> grads<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> self<span class="token punctuation">.</span>m <span class="token keyword">is</span> <span class="token boolean">None</span><span class="token punctuation">:</span>
+            self<span class="token punctuation">.</span>m <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token builtin">len</span><span class="token punctuation">(</span>params<span class="token punctuation">)</span>
+            self<span class="token punctuation">.</span>v <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token builtin">len</span><span class="token punctuation">(</span>params<span class="token punctuation">)</span>
+
+        self<span class="token punctuation">.</span>t <span class="token operator">+=</span> <span class="token number">1</span>
+
+        <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>params<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            self<span class="token punctuation">.</span>m<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> self<span class="token punctuation">.</span>beta1 <span class="token operator">*</span> self<span class="token punctuation">.</span>m<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> self<span class="token punctuation">.</span>beta1<span class="token punctuation">)</span> <span class="token operator">*</span> grads<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+            self<span class="token punctuation">.</span>v<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> self<span class="token punctuation">.</span>beta2 <span class="token operator">*</span> self<span class="token punctuation">.</span>v<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> self<span class="token punctuation">.</span>beta2<span class="token punctuation">)</span> <span class="token operator">*</span> grads<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">**</span> <span class="token number">2</span>
+
+            m_hat <span class="token operator">=</span> self<span class="token punctuation">.</span>m<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">/</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> self<span class="token punctuation">.</span>beta1 <span class="token operator">**</span> self<span class="token punctuation">.</span>t<span class="token punctuation">)</span>
+            v_hat <span class="token operator">=</span> self<span class="token punctuation">.</span>v<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">/</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> self<span class="token punctuation">.</span>beta2 <span class="token operator">**</span> self<span class="token punctuation">.</span>t<span class="token punctuation">)</span>
+
+            params<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">-=</span> self<span class="token punctuation">.</span>lr <span class="token operator">*</span> m_hat <span class="token operator">/</span> <span class="token punctuation">(</span>math<span class="token punctuation">.</span>sqrt<span class="token punctuation">(</span>v_hat<span class="token punctuation">)</span> <span class="token operator">+</span> self<span class="token punctuation">.</span>epsilon<span class="token punctuation">)</span>
+            params<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">-=</span> self<span class="token punctuation">.</span>lr <span class="token operator">*</span> self<span class="token punctuation">.</span>weight_decay <span class="token operator">*</span> params<span class="token punctuation">[</span>i<span class="token punctuation">]</span></code></pre>
+</figure>
+<h3 id="step-5-training-comparison" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-training-comparison" aria-label="Link to this section">#</a>Step 5: Training Comparison</h3>
+<p>Train the same two-layer network on the circle dataset from lesson 05 with all four optimizers. Compare convergence.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> random
+
+<span class="token keyword">def</span> <span class="token function">sigmoid</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    x <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">500</span><span class="token punctuation">,</span> <span class="token builtin">min</span><span class="token punctuation">(</span><span class="token number">500</span><span class="token punctuation">,</span> x<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token number">1.0</span> <span class="token operator">/</span> <span class="token punctuation">(</span><span class="token number">1.0</span> <span class="token operator">+</span> math<span class="token punctuation">.</span>exp<span class="token punctuation">(</span><span class="token operator">-</span>x<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token keyword">def</span> <span class="token function">make_circle_data</span><span class="token punctuation">(</span>n<span class="token operator">=</span><span class="token number">200</span><span class="token punctuation">,</span> seed<span class="token operator">=</span><span class="token number">42</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    random<span class="token punctuation">.</span>seed<span class="token punctuation">(</span>seed<span class="token punctuation">)</span>
+    data <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        x <span class="token operator">=</span> random<span class="token punctuation">.</span>uniform<span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span>
+        y <span class="token operator">=</span> random<span class="token punctuation">.</span>uniform<span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span>
+        label <span class="token operator">=</span> <span class="token number">1.0</span> <span class="token keyword">if</span> x <span class="token operator">*</span> x <span class="token operator">+</span> y <span class="token operator">*</span> y <span class="token operator">&lt;</span> <span class="token number">1.5</span> <span class="token keyword">else</span> <span class="token number">0.0</span>
+        data<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">[</span>x<span class="token punctuation">,</span> y<span class="token punctuation">]</span><span class="token punctuation">,</span> label<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> data
+
+
+<span class="token keyword">class</span> <span class="token class-name">OptimizerTestNetwork</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> optimizer<span class="token punctuation">,</span> hidden_size<span class="token operator">=</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        random<span class="token punctuation">.</span>seed<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>hidden_size <span class="token operator">=</span> hidden_size
+        self<span class="token punctuation">.</span>optimizer <span class="token operator">=</span> optimizer
+
+        self<span class="token punctuation">.</span>w1 <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">[</span>random<span class="token punctuation">.</span>gauss<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0.5</span><span class="token punctuation">)</span> <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>hidden_size<span class="token punctuation">)</span><span class="token punctuation">]</span>
+        self<span class="token punctuation">.</span>b1 <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> hidden_size
+        self<span class="token punctuation">.</span>w2 <span class="token operator">=</span> <span class="token punctuation">[</span>random<span class="token punctuation">.</span>gauss<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0.5</span><span class="token punctuation">)</span> <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>hidden_size<span class="token punctuation">)</span><span class="token punctuation">]</span>
+        self<span class="token punctuation">.</span>b2 <span class="token operator">=</span> <span class="token number">0.0</span>
+
+    <span class="token keyword">def</span> <span class="token function">get_params</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        params <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">for</span> row <span class="token keyword">in</span> self<span class="token punctuation">.</span>w1<span class="token punctuation">:</span>
+            params<span class="token punctuation">.</span>extend<span class="token punctuation">(</span>row<span class="token punctuation">)</span>
+        params<span class="token punctuation">.</span>extend<span class="token punctuation">(</span>self<span class="token punctuation">.</span>b1<span class="token punctuation">)</span>
+        params<span class="token punctuation">.</span>extend<span class="token punctuation">(</span>self<span class="token punctuation">.</span>w2<span class="token punctuation">)</span>
+        params<span class="token punctuation">.</span>append<span class="token punctuation">(</span>self<span class="token punctuation">.</span>b2<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> params
+
+    <span class="token keyword">def</span> <span class="token function">set_params</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> params<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        idx <span class="token operator">=</span> <span class="token number">0</span>
+        <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>hidden_size<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                self<span class="token punctuation">.</span>w1<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> params<span class="token punctuation">[</span>idx<span class="token punctuation">]</span>
+                idx <span class="token operator">+=</span> <span class="token number">1</span>
+        <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>hidden_size<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            self<span class="token punctuation">.</span>b1<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> params<span class="token punctuation">[</span>idx<span class="token punctuation">]</span>
+            idx <span class="token operator">+=</span> <span class="token number">1</span>
+        <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>hidden_size<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            self<span class="token punctuation">.</span>w2<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> params<span class="token punctuation">[</span>idx<span class="token punctuation">]</span>
+            idx <span class="token operator">+=</span> <span class="token number">1</span>
+        self<span class="token punctuation">.</span>b2 <span class="token operator">=</span> params<span class="token punctuation">[</span>idx<span class="token punctuation">]</span>
+
+    <span class="token keyword">def</span> <span class="token function">forward</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>x <span class="token operator">=</span> x
+        self<span class="token punctuation">.</span>z1 <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        self<span class="token punctuation">.</span>h <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>hidden_size<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            z <span class="token operator">=</span> self<span class="token punctuation">.</span>w1<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">*</span> x<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">+</span> self<span class="token punctuation">.</span>w1<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">*</span> x<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">+</span> self<span class="token punctuation">.</span>b1<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+            self<span class="token punctuation">.</span>z1<span class="token punctuation">.</span>append<span class="token punctuation">(</span>z<span class="token punctuation">)</span>
+            self<span class="token punctuation">.</span>h<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token builtin">max</span><span class="token punctuation">(</span><span class="token number">0.0</span><span class="token punctuation">,</span> z<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+        self<span class="token punctuation">.</span>z2 <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>w2<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">*</span> self<span class="token punctuation">.</span>h<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>hidden_size<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">+</span> self<span class="token punctuation">.</span>b2
+        self<span class="token punctuation">.</span>out <span class="token operator">=</span> sigmoid<span class="token punctuation">(</span>self<span class="token punctuation">.</span>z2<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> self<span class="token punctuation">.</span>out
+
+    <span class="token keyword">def</span> <span class="token function">compute_grads</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> target<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        eps <span class="token operator">=</span> <span class="token number">1e-15</span>
+        p <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span>eps<span class="token punctuation">,</span> <span class="token builtin">min</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> eps<span class="token punctuation">,</span> self<span class="token punctuation">.</span>out<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        d_loss <span class="token operator">=</span> <span class="token operator">-</span><span class="token punctuation">(</span>target <span class="token operator">/</span> p<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> target<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> p<span class="token punctuation">)</span>
+        d_sigmoid <span class="token operator">=</span> self<span class="token punctuation">.</span>out <span class="token operator">*</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> self<span class="token punctuation">.</span>out<span class="token punctuation">)</span>
+        d_out <span class="token operator">=</span> d_loss <span class="token operator">*</span> d_sigmoid
+
+        grads <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token punctuation">(</span>self<span class="token punctuation">.</span>hidden_size <span class="token operator">*</span> <span class="token number">2</span> <span class="token operator">+</span> self<span class="token punctuation">.</span>hidden_size <span class="token operator">+</span> self<span class="token punctuation">.</span>hidden_size <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span>
+        idx <span class="token operator">=</span> <span class="token number">0</span>
+        <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>hidden_size<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            d_relu <span class="token operator">=</span> <span class="token number">1.0</span> <span class="token keyword">if</span> self<span class="token punctuation">.</span>z1<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">></span> <span class="token number">0</span> <span class="token keyword">else</span> <span class="token number">0.0</span>
+            d_h <span class="token operator">=</span> d_out <span class="token operator">*</span> self<span class="token punctuation">.</span>w2<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">*</span> d_relu
+            grads<span class="token punctuation">[</span>idx<span class="token punctuation">]</span> <span class="token operator">=</span> d_h <span class="token operator">*</span> self<span class="token punctuation">.</span>x<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+            grads<span class="token punctuation">[</span>idx <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">=</span> d_h <span class="token operator">*</span> self<span class="token punctuation">.</span>x<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span>
+            idx <span class="token operator">+=</span> <span class="token number">2</span>
+
+        <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>hidden_size<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            d_relu <span class="token operator">=</span> <span class="token number">1.0</span> <span class="token keyword">if</span> self<span class="token punctuation">.</span>z1<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">></span> <span class="token number">0</span> <span class="token keyword">else</span> <span class="token number">0.0</span>
+            grads<span class="token punctuation">[</span>idx<span class="token punctuation">]</span> <span class="token operator">=</span> d_out <span class="token operator">*</span> self<span class="token punctuation">.</span>w2<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">*</span> d_relu
+            idx <span class="token operator">+=</span> <span class="token number">1</span>
+
+        <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>hidden_size<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            grads<span class="token punctuation">[</span>idx<span class="token punctuation">]</span> <span class="token operator">=</span> d_out <span class="token operator">*</span> self<span class="token punctuation">.</span>h<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+            idx <span class="token operator">+=</span> <span class="token number">1</span>
+
+        grads<span class="token punctuation">[</span>idx<span class="token punctuation">]</span> <span class="token operator">=</span> d_out
+        <span class="token keyword">return</span> grads
+
+    <span class="token keyword">def</span> <span class="token function">train</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> data<span class="token punctuation">,</span> epochs<span class="token operator">=</span><span class="token number">300</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        losses <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">for</span> epoch <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>epochs<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            total_loss <span class="token operator">=</span> <span class="token number">0.0</span>
+            correct <span class="token operator">=</span> <span class="token number">0</span>
+            <span class="token keyword">for</span> x<span class="token punctuation">,</span> y <span class="token keyword">in</span> data<span class="token punctuation">:</span>
+                pred <span class="token operator">=</span> self<span class="token punctuation">.</span>forward<span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+                grads <span class="token operator">=</span> self<span class="token punctuation">.</span>compute_grads<span class="token punctuation">(</span>y<span class="token punctuation">)</span>
+                params <span class="token operator">=</span> self<span class="token punctuation">.</span>get_params<span class="token punctuation">(</span><span class="token punctuation">)</span>
+                self<span class="token punctuation">.</span>optimizer<span class="token punctuation">.</span>step<span class="token punctuation">(</span>params<span class="token punctuation">,</span> grads<span class="token punctuation">)</span>
+                self<span class="token punctuation">.</span>set_params<span class="token punctuation">(</span>params<span class="token punctuation">)</span>
+
+                eps <span class="token operator">=</span> <span class="token number">1e-15</span>
+                p <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span>eps<span class="token punctuation">,</span> <span class="token builtin">min</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> eps<span class="token punctuation">,</span> pred<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                total_loss <span class="token operator">+=</span> <span class="token operator">-</span><span class="token punctuation">(</span>y <span class="token operator">*</span> math<span class="token punctuation">.</span>log<span class="token punctuation">(</span>p<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> y<span class="token punctuation">)</span> <span class="token operator">*</span> math<span class="token punctuation">.</span>log<span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> p<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>pred <span class="token operator">>=</span> <span class="token number">0.5</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token punctuation">(</span>y <span class="token operator">>=</span> <span class="token number">0.5</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                    correct <span class="token operator">+=</span> <span class="token number">1</span>
+            avg_loss <span class="token operator">=</span> total_loss <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span>
+            accuracy <span class="token operator">=</span> correct <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">100</span>
+            losses<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">(</span>avg_loss<span class="token punctuation">,</span> accuracy<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token keyword">if</span> epoch <span class="token operator">%</span> <span class="token number">75</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token keyword">or</span> epoch <span class="token operator">==</span> epochs <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">:</span>
+                <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"    Epoch </span><span class="token interpolation"><span class="token punctuation">{</span>epoch<span class="token punctuation">:</span><span class="token format-spec">3d</span><span class="token punctuation">}</span></span><span class="token string">: loss=</span><span class="token interpolation"><span class="token punctuation">{</span>avg_loss<span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">, accuracy=</span><span class="token interpolation"><span class="token punctuation">{</span>accuracy<span class="token punctuation">:</span><span class="token format-spec">.1f</span><span class="token punctuation">}</span></span><span class="token string">%"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> losses</code></pre>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>PyTorch optimizers handle parameter groups, gradient clipping, and learning rate scheduling:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> torch
+<span class="token keyword">import</span> torch<span class="token punctuation">.</span>optim <span class="token keyword">as</span> optim
+
+model <span class="token operator">=</span> torch<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>Sequential<span class="token punctuation">(</span>
+    torch<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">784</span><span class="token punctuation">,</span> <span class="token number">256</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    torch<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>ReLU<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    torch<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">256</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">)</span>
+
+optimizer <span class="token operator">=</span> optim<span class="token punctuation">.</span>AdamW<span class="token punctuation">(</span>model<span class="token punctuation">.</span>parameters<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> lr<span class="token operator">=</span><span class="token number">3e-4</span><span class="token punctuation">,</span> weight_decay<span class="token operator">=</span><span class="token number">0.01</span><span class="token punctuation">)</span>
+
+scheduler <span class="token operator">=</span> optim<span class="token punctuation">.</span>lr_scheduler<span class="token punctuation">.</span>CosineAnnealingLR<span class="token punctuation">(</span>optimizer<span class="token punctuation">,</span> T_max<span class="token operator">=</span><span class="token number">100</span><span class="token punctuation">)</span>
+
+<span class="token keyword">for</span> epoch <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    optimizer<span class="token punctuation">.</span>zero_grad<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    output <span class="token operator">=</span> model<span class="token punctuation">(</span>torch<span class="token punctuation">.</span>randn<span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">,</span> <span class="token number">784</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    loss <span class="token operator">=</span> torch<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>functional<span class="token punctuation">.</span>cross_entropy<span class="token punctuation">(</span>output<span class="token punctuation">,</span> torch<span class="token punctuation">.</span>randint<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">,</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    loss<span class="token punctuation">.</span>backward<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    torch<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>utils<span class="token punctuation">.</span>clip_grad_norm_<span class="token punctuation">(</span>model<span class="token punctuation">.</span>parameters<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> max_norm<span class="token operator">=</span><span class="token number">1.0</span><span class="token punctuation">)</span>
+    optimizer<span class="token punctuation">.</span>step<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    scheduler<span class="token punctuation">.</span>step<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>The pattern is always: zero_grad, forward, loss, backward, (clip), step, (schedule). Memorize this order. Getting it wrong (e.g., calling scheduler.step() before optimizer.step()) is a common source of subtle bugs.</p>
+<p>For CNNs, many practitioners still prefer SGD + momentum (lr=0.1, momentum=0.9, weight_decay=1e-4) with a step or cosine schedule. SGD finds flatter minima, which often generalize better. For transformers and LLMs, AdamW with warmup + cosine decay is the universal default. Don&#39;t fight the consensus without a measured reason.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces:</p>
+<ul>
+<li><code class="inline-code">outputs/prompt-optimizer-selector.md</code> -- a decision prompt for choosing the right optimizer and learning rate for any architecture</li>
+</ul>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p>Implement Nesterov momentum, where you compute the gradient at the &quot;lookahead&quot; position (w - lr * beta * v) instead of the current position. Compare convergence to standard momentum on the circle dataset.</p>
+</li>
+<li><p>Implement a learning rate warmup schedule: linear ramp from 0 to max_lr over the first 10% of training steps, then cosine decay to 0. Train with Adam + warmup vs Adam without warmup. Measure how many epochs it takes to reach 90% accuracy on the circle dataset.</p>
+</li>
+<li><p>Track the effective learning rate for each parameter during Adam training. The effective rate is lr * m_hat / (sqrt(v_hat) + eps). Plot the distribution of effective rates after 10, 50, and 200 steps. Are all parameters being updated at the same speed?</p>
+</li>
+<li><p>Implement gradient clipping (clip by global norm). Set the max gradient norm to 1.0. Train with and without clipping using a high learning rate (lr=0.01 for Adam). Count how many runs diverge (loss goes to NaN) with and without clipping over 10 random seeds.</p>
+</li>
+<li><p>Compare Adam vs AdamW on a network with large weights. Initialize all weights to random values in [-5, 5] (much larger than normal). Train for 200 epochs with weight_decay=0.1. Plot the L2 norm of weights over training for both optimizers. AdamW should show faster weight shrinkage.</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Learning rate</td>
+<td>&quot;Step size&quot;</td>
+<td>The scalar multiplier on the gradient update; the single most impactful hyperparameter in training</td>
+</tr>
+<tr>
+<td>SGD</td>
+<td>&quot;Basic gradient descent&quot;</td>
+<td>Stochastic gradient descent: update weights by subtracting lr * gradient, computed on a mini-batch</td>
+</tr>
+<tr>
+<td>Momentum</td>
+<td>&quot;Rolling ball analogy&quot;</td>
+<td>Exponential moving average of past gradients; dampens oscillation and accelerates consistent directions</td>
+</tr>
+<tr>
+<td>RMSProp</td>
+<td>&quot;Adaptive learning rate&quot;</td>
+<td>Divides each parameter&#39;s gradient by the running RMS of its recent gradients; equalizes learning rates</td>
+</tr>
+<tr>
+<td>Adam</td>
+<td>&quot;The default optimizer&quot;</td>
+<td>Combines momentum (first moment) and RMSProp (second moment) with bias correction for the initial steps</td>
+</tr>
+<tr>
+<td>AdamW</td>
+<td>&quot;Adam done right&quot;</td>
+<td>Adam with decoupled weight decay; applies regularization directly to weights rather than through the gradient</td>
+</tr>
+<tr>
+<td>Bias correction</td>
+<td>&quot;Warmup for running averages&quot;</td>
+<td>Dividing by (1 - beta^t) to compensate for the zero-initialization of Adam&#39;s moment estimates</td>
+</tr>
+<tr>
+<td>Weight decay</td>
+<td>&quot;Shrink the weights&quot;</td>
+<td>Subtracting a fraction of the weight value at each step; a regularizer that penalizes large weights</td>
+</tr>
+<tr>
+<td>Learning rate schedule</td>
+<td>&quot;Changing lr over time&quot;</td>
+<td>A function that adjusts the learning rate during training; warmup + cosine decay is the modern default</td>
+</tr>
+<tr>
+<td>Gradient clipping</td>
+<td>&quot;Capping the gradient norm&quot;</td>
+<td>Scaling down the gradient vector when its norm exceeds a threshold; prevents exploding gradient updates</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li>Kingma &amp; Ba, &quot;Adam: A Method for Stochastic Optimization&quot; (2014) -- the original Adam paper with convergence analysis and the bias correction derivation</li>
+<li>Loshchilov &amp; Hutter, &quot;Decoupled Weight Decay Regularization&quot; (2017) -- proved that L2 regularization and weight decay are not equivalent in Adam, and proposed AdamW</li>
+<li>Smith, &quot;Cyclical Learning Rates for Training Neural Networks&quot; (2017) -- introduced the LR range test and cyclical schedules that remove the need to tune a fixed learning rate</li>
+<li>Ruder, &quot;An Overview of Gradient Descent Optimization Algorithms&quot; (2016) -- the best single survey of all optimizer variants, with clear comparisons and intuitions</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="05-loss-functions.html">
+  <span class="label">← Previous</span>
+  <b>Loss Functions</b>
+</a>
+      <a class="pager__item pager__item--next" href="07-regularization.html">
+  <span class="label">Next →</span>
+  <b>Regularization</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>8 minutes</b> of Deep Learning Core behind you.</p>
+      <a class="btn btn--solid" href="07-regularization.html">Continue to Regularization →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#stochastic-gradient-descent-sgd">Stochastic Gradient Descent (SGD)</a></li><li class="mini__item mini__item--d3"><a href="#momentum">Momentum</a></li><li class="mini__item mini__item--d3"><a href="#rmsprop">RMSProp</a></li><li class="mini__item mini__item--d3"><a href="#adam-momentum-rmsprop">Adam: Momentum + RMSProp</a></li><li class="mini__item mini__item--d3"><a href="#adamw-weight-decay-done-right">AdamW: Weight Decay Done Right</a></li><li class="mini__item mini__item--d3"><a href="#learning-rate-the-most-important-hyperparameter">Learning Rate: The Most Important Hyperparameter</a></li><li class="mini__item mini__item--d3"><a href="#optimizer-comparison">Optimizer Comparison</a></li><li class="mini__item mini__item--d3"><a href="#when-each-optimizer-wins">When Each Optimizer Wins</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-vanilla-sgd">Step 1: Vanilla SGD</a></li><li class="mini__item mini__item--d3"><a href="#step-2-sgd-with-momentum">Step 2: SGD with Momentum</a></li><li class="mini__item mini__item--d3"><a href="#step-3-adam">Step 3: Adam</a></li><li class="mini__item mini__item--d3"><a href="#step-4-adamw">Step 4: AdamW</a></li><li class="mini__item mini__item--d3"><a href="#step-5-training-comparison">Step 5: Training Comparison</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

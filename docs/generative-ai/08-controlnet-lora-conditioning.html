@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ControlNet, LoRA &amp; Conditioning — Generative AI — AIFS</title>
+<meta name="description" content="Generative AI: ControlNet, LoRA &amp; Conditioning. 7 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="ControlNet, LoRA &amp; Conditioning — Generative AI — AIFS">
+<meta property="og:description" content="Generative AI: ControlNet, LoRA &amp; Conditioning. 7 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"v4-controlnet-zero":["../assets/figures/figures-visaudio4.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-visaudio4.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#FF2D55" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#FF2D55;--accent-ink:#FFFFFF"
+  data-lesson-id="generative-ai/08-controlnet-lora-conditioning" data-module="generative-ai"
+  data-prev="07-latent-diffusion-stable-diffusion.html" data-next="09-inpainting-outpainting-editing.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#FF2D55">
+        <span class="label">Phase 08</span>
+        <b>Generative AI</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="generative-ai/01-generative-models-taxonomy-history"><a href="01-generative-models-taxonomy-history.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Generative Models — Taxonomy &amp; History</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="generative-ai/02-autoencoders-vae"><a href="02-autoencoders-vae.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Autoencoders &amp; Variational Autoencoders (VAE)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="generative-ai/03-gans-generator-discriminator"><a href="03-gans-generator-discriminator.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">GANs — Generator vs Discriminator</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="generative-ai/04-conditional-gans-pix2pix"><a href="04-conditional-gans-pix2pix.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Conditional GANs &amp; Pix2Pix</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="generative-ai/05-stylegan"><a href="05-stylegan.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">StyleGAN</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="generative-ai/06-diffusion-ddpm-from-scratch"><a href="06-diffusion-ddpm-from-scratch.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Diffusion Models — DDPM from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="generative-ai/07-latent-diffusion-stable-diffusion"><a href="07-latent-diffusion-stable-diffusion.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Latent Diffusion &amp; Stable Diffusion</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="generative-ai/08-controlnet-lora-conditioning"><a href="08-controlnet-lora-conditioning.html" class="is-current">
+  <span class="snav__n">08</span>
+  <span class="snav__t">ControlNet, LoRA &amp; Conditioning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="generative-ai/09-inpainting-outpainting-editing"><a href="09-inpainting-outpainting-editing.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Inpainting, Outpainting &amp; Image Editing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="generative-ai/10-video-generation"><a href="10-video-generation.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Video Generation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="generative-ai/11-audio-generation"><a href="11-audio-generation.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Audio Generation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="generative-ai/12-3d-generation"><a href="12-3d-generation.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">3D Generation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="generative-ai/13-flow-matching-rectified-flows"><a href="13-flow-matching-rectified-flows.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Flow Matching &amp; Rectified Flows</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="generative-ai/14-evaluation-fid-clip-score"><a href="14-evaluation-fid-clip-score.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Evaluation — FID, CLIP Score, Human Preference</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="generative-ai/19-visual-autoregressive-var"><a href="19-visual-autoregressive-var.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">Visual Autoregressive Modeling (VAR): Next-Scale Prediction</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Generative AI</a></p>
+      <h1 class="page__title">ControlNet, LoRA &amp; Conditioning</h1>
+      <p class="page__lede">Text alone is a clumsy control signal. ControlNet lets you clone a pretrained diffusion model and steer it with a depth map, pose skeleton, scribble, or edge image. LoRA lets you fine-tune a 2B-parameter model by training 10 million parameters. Together they turned Stable Diffusion from a toy into the 2026 image pipeline that ships at every agency.</p>
+      <div class="page__meta">
+        <span class="chip">7 min read</span>
+        <span class="chip">1,430 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 8 · 07 (Latent Diffusion), Phase 10 (LLMs from Scratch — for LoRA foundation)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>A prompt like &quot;a woman in a red dress walking a dog on a busy street&quot; gives the model no information about <em>where</em> the dog is, <em>what pose</em> the woman is in, or <em>the perspective</em> of the street. Text pins down about 10% of what you need to specify an image. The rest is visual and cannot be described efficiently in words.</p>
+<p>Training a new conditional model from scratch for every signal (pose, depth, canny, segmentation) is prohibitive. You want to keep the 2.6B-param SDXL backbone frozen, attach a small side-network that reads the conditioning, and have it nudge the backbone&#39;s intermediate features. That is ControlNet.</p>
+<p>You also want to teach the model new concepts (your face, your product, your style) without retraining the full model. You want a 100x smaller delta. That is LoRA — low-rank adapters that plug into existing attention weights.</p>
+<p>ControlNet + LoRA + text = the 2026 practitioner&#39;s toolkit. Most production image pipelines layer 2-5 LoRAs, 1-3 ControlNets, and an IP-Adapter on top of an SDXL / SD3 / Flux base.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<p><img src="assets/08-controlnet-lora-conditioning/controlnet-lora.svg" alt="ControlNet clones the encoder; LoRA adds low-rank deltas" loading="lazy"></p>
+<h3 id="controlnet-zhang-et-al-2023" class="prose-h prose-h3"><a class="prose-h__anchor" href="#controlnet-zhang-et-al-2023" aria-label="Link to this section">#</a>ControlNet (Zhang et al., 2023)</h3>
+<p>Take a pretrained SD. <em>Clone</em> the encoder half of the U-Net. Freeze the original. Train the clone to accept an extra conditioning input (edges, depth, pose). Connect the clone back to the decoder half of the original with <em>zero-convolution</em> skip connections (1×1 convs initialized to zero — start as a no-op, learn a delta).</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>SD U-Net decoder:   ... ← orig_enc_features + zero_conv(controlnet_enc(condition))</code></pre>
+</figure>
+<p>Zero-conv init means ControlNet starts as identity — no harm even before training. Train on 1M (prompt, condition, image) triples with the standard diffusion loss.</p>
+<p>Per-modality ControlNets ship as small side models (~360M for SDXL, ~70M for SD 1.5). You can compose them at inference:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>features += weight_a * control_a(depth) + weight_b * control_b(pose)</code></pre>
+</figure>
+<h3 id="lora-hu-et-al-2021" class="prose-h prose-h3"><a class="prose-h__anchor" href="#lora-hu-et-al-2021" aria-label="Link to this section">#</a>LoRA (Hu et al., 2021)</h3>
+<p>For any linear layer <code class="inline-code">W ∈ R^{d×d}</code> in the model, freeze <code class="inline-code">W</code> and add a low-rank delta:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>W' = W + ΔW,  ΔW = B @ A,  A ∈ R^{r×d},  B ∈ R^{d×r}</code></pre>
+</figure>
+<p>with <code class="inline-code">r &lt;&lt; d</code>. Rank 4-16 is standard for attention, rank 64-128 for heavy fine-tunes. Number of new parameters: <code class="inline-code">2 · d · r</code> instead of <code class="inline-code">d²</code>. For SDXL attention with <code class="inline-code">d=640</code>, <code class="inline-code">r=16</code>: 20k params per adapter instead of 410k — a 20x reduction. Across the whole model: a LoRA is usually 20-200MB vs the base 5GB.</p>
+<p>At inference you can scale the LoRA: <code class="inline-code">W' = W + α · B @ A</code>. <code class="inline-code">α = 0.5-1.5</code> is normal. Multiple LoRAs stack additively (with the usual caveat that they interact in non-linear ways).</p>
+<h3 id="ip-adapter-ye-et-al-2023" class="prose-h prose-h3"><a class="prose-h__anchor" href="#ip-adapter-ye-et-al-2023" aria-label="Link to this section">#</a>IP-Adapter (Ye et al., 2023)</h3>
+<p>A tiny adapter that accepts an <em>image</em> as conditioning (alongside text). Uses the CLIP image encoder to produce image tokens, injects them into cross-attention alongside text tokens. ~20MB per base model. Lets you do &quot;generate an image in the style of this reference&quot; without a LoRA.</p>
+<h2 id="composability-matrix" class="prose-h prose-h2"><a class="prose-h__anchor" href="#composability-matrix" aria-label="Link to this section">#</a>Composability matrix</h2>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>What it controls</th>
+<th>Size</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ControlNet</td>
+<td>Spatial structure (pose, depth, edges)</td>
+<td>70-360MB</td>
+<td>Exact layout, composition</td>
+</tr>
+<tr>
+<td>LoRA</td>
+<td>Style, subject, concept</td>
+<td>20-200MB</td>
+<td>Personalization, style</td>
+</tr>
+<tr>
+<td>IP-Adapter</td>
+<td>Style or subject from reference image</td>
+<td>20MB</td>
+<td>No text can describe the look</td>
+</tr>
+<tr>
+<td>Textual Inversion</td>
+<td>Single concept as a new token</td>
+<td>10KB</td>
+<td>Legacy, mostly replaced by LoRA</td>
+</tr>
+<tr>
+<td>DreamBooth</td>
+<td>Full fine-tune on a subject</td>
+<td>2-5GB</td>
+<td>Strong identity, high compute</td>
+</tr>
+<tr>
+<td>T2I-Adapter</td>
+<td>Lighter ControlNet alternative</td>
+<td>70MB</td>
+<td>Edge devices, inference budget</td>
+</tr>
+</tbody></table>
+<p>ControlNet ≈ spatial. LoRA ≈ semantic. Use both.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="v4-controlnet-zero"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">v4-controlnet-zero</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> v4 controlnet zero</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<p><code class="inline-code">code/main.py</code> simulates the two mechanisms on 1-D:</p>
+<ol>
+<li><p><strong>LoRA.</strong> A pretrained linear layer <code class="inline-code">W</code>. Freeze it. Train a low-rank <code class="inline-code">B @ A</code> such that <code class="inline-code">W + BA</code> matches a target linear layer. Show that <code class="inline-code">r = 1</code> is enough to learn a rank-1 correction perfectly.</p>
+</li>
+<li><p><strong>ControlNet-lite.</strong> A &quot;frozen base&quot; predictor and a &quot;side network&quot; that reads an extra signal. The side network&#39;s output is gated by a learnable scalar initialized to zero (our version of zero-conv). Train and watch the gate ramp up.</p>
+</li>
+</ol>
+<h3 id="step-1-lora-math" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-lora-math" aria-label="Link to this section">#</a>Step 1: LoRA math</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">lora</span><span class="token punctuation">(</span>W<span class="token punctuation">,</span> A<span class="token punctuation">,</span> B<span class="token punctuation">,</span> x<span class="token punctuation">,</span> alpha<span class="token operator">=</span><span class="token number">1.0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token comment"># W is frozen; A, B are the trainable low-rank factors.</span>
+    <span class="token keyword">return</span> <span class="token punctuation">[</span>W<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">*</span> x<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token keyword">for</span> i<span class="token punctuation">,</span> j <span class="token keyword">in</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span> <span class="token operator">+</span> alpha <span class="token operator">*</span> <span class="token punctuation">(</span>B @ <span class="token punctuation">(</span>A @ x<span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h3 id="step-2-zero-init-side-network" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-zero-init-side-network" aria-label="Link to this section">#</a>Step 2: zero-init side network</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python">side_out <span class="token operator">=</span> control_net<span class="token punctuation">(</span>x<span class="token punctuation">,</span> condition<span class="token punctuation">)</span>
+gated <span class="token operator">=</span> gate <span class="token operator">*</span> side_out  <span class="token comment"># gate initialized to 0</span>
+h <span class="token operator">=</span> base<span class="token punctuation">(</span>x<span class="token punctuation">)</span> <span class="token operator">+</span> gated</code></pre>
+</figure>
+<p>At step 0 the output is identical to base. Early training updates <code class="inline-code">gate</code> slowly — no catastrophic drift.</p>
+<h2 id="pitfalls" class="prose-h prose-h2"><a class="prose-h__anchor" href="#pitfalls" aria-label="Link to this section">#</a>Pitfalls</h2>
+<ul>
+<li><strong>Over-scaling LoRAs.</strong> <code class="inline-code">α = 2</code> or <code class="inline-code">α = 3</code> is a common &quot;make it stronger&quot; hack that produces over-stylized / broken outputs. Keep <code class="inline-code">α ≤ 1.5</code>.</li>
+<li><strong>ControlNet weight conflict.</strong> Using a Pose ControlNet at weight 1.0 and a Depth ControlNet at weight 1.0 usually overshoots. Sum of weights ≈ 1.0 is a safe default.</li>
+<li><strong>LoRA on the wrong base.</strong> SDXL LoRAs silently no-op on SD 1.5 because the attention dimensions do not match. Diffusers will warn in 0.30+.</li>
+<li><strong>Textual Inversion drift.</strong> Tokens trained on one checkpoint drift badly on another. LoRA is more portable.</li>
+<li><strong>LoRA weight-merging and storage.</strong> You can bake a LoRA into the base model weights for faster inference (no runtime addition), but you lose the ability to scale <code class="inline-code">α</code> at runtime. Keep both versions.</li>
+</ul>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<table>
+<thead>
+<tr>
+<th>Goal</th>
+<th>2026 pipeline</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Reproduce a brand&#39;s art style</td>
+<td>LoRA trained on ~30 curated images at rank 32</td>
+</tr>
+<tr>
+<td>Put my face in a generated image</td>
+<td>DreamBooth or LoRA + IP-Adapter-FaceID</td>
+</tr>
+<tr>
+<td>Specific pose + prompt</td>
+<td>ControlNet-Openpose + SDXL + text</td>
+</tr>
+<tr>
+<td>Depth-aware composition</td>
+<td>ControlNet-Depth + SD3</td>
+</tr>
+<tr>
+<td>Reference + prompt</td>
+<td>IP-Adapter + text</td>
+</tr>
+<tr>
+<td>Exact layout</td>
+<td>ControlNet-Scribble or ControlNet-Canny</td>
+</tr>
+<tr>
+<td>Background replace</td>
+<td>ControlNet-Seg + Inpainting (Lesson 09)</td>
+</tr>
+<tr>
+<td>Fast 1-step style</td>
+<td>LCM-LoRA on SDXL-Turbo</td>
+</tr>
+</tbody></table>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>Save <code class="inline-code">outputs/skill-sd-toolkit-composer.md</code>. Skill takes a task (input assets: prompt, optional reference image, optional pose, optional depth, optional scribble) and outputs the tool stack, weights, and a reproducible seed protocol.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><strong>Easy.</strong> In <code class="inline-code">code/main.py</code>, vary the LoRA rank <code class="inline-code">r</code> from 1 to 4. At what rank does the LoRA exactly match a rank-2 target delta?</li>
+<li><strong>Medium.</strong> Train two separate LoRAs on two target transforms. Load them together and show their additive interaction. When does the interaction break linearity?</li>
+<li><strong>Hard.</strong> Use diffusers to stack: SDXL-base + Canny-ControlNet (weight 0.8) + a style LoRA (α 0.8) + IP-Adapter (weight 0.6). Measure FID-vs-prompt-adherence trade-off as the stack weights vary.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ControlNet</td>
+<td>&quot;Spatial control&quot;</td>
+<td>Cloned encoder + zero-conv skips; reads a conditioning image.</td>
+</tr>
+<tr>
+<td>Zero convolution</td>
+<td>&quot;Starts as identity&quot;</td>
+<td>1×1 conv initialized to zero; ControlNet starts as no-op.</td>
+</tr>
+<tr>
+<td>LoRA</td>
+<td>&quot;Low-rank adapter&quot;</td>
+<td><code class="inline-code">W + B @ A</code>, <code class="inline-code">r &lt;&lt; d</code>; 100x fewer params than a full fine-tune.</td>
+</tr>
+<tr>
+<td>rank r</td>
+<td>&quot;The knob&quot;</td>
+<td>LoRA compression; 4-16 typical, 64+ for heavy personalization.</td>
+</tr>
+<tr>
+<td>α</td>
+<td>&quot;LoRA strength&quot;</td>
+<td>Runtime scaling of the LoRA delta.</td>
+</tr>
+<tr>
+<td>IP-Adapter</td>
+<td>&quot;Reference image&quot;</td>
+<td>Small image-conditioning adapter via CLIP-image tokens.</td>
+</tr>
+<tr>
+<td>DreamBooth</td>
+<td>&quot;Full subject fine-tune&quot;</td>
+<td>Train the full model on ~30 images of a subject.</td>
+</tr>
+<tr>
+<td>Textual Inversion</td>
+<td>&quot;New token&quot;</td>
+<td>Learn a new word embedding only; legacy, mostly replaced.</td>
+</tr>
+</tbody></table>
+<h2 id="production-note-lora-swaps-controlnet-lanes-multi-tenant-serving" class="prose-h prose-h2"><a class="prose-h__anchor" href="#production-note-lora-swaps-controlnet-lanes-multi-tenant-serving" aria-label="Link to this section">#</a>Production note: LoRA swaps, ControlNet lanes, multi-tenant serving</h2>
+<p>A real text-to-image SaaS serves hundreds of LoRAs and a dozen ControlNets over the same base checkpoint. The serving problem looks a lot like LLM multi-tenancy (the production literature covers the LLM case under continuous batching and LoRAX / S-LoRA):</p>
+<ul>
+<li><strong>Hot-swap LoRAs, do not merge.</strong> Merging <code class="inline-code">W' = W + α·B·A</code> into the base gives ~3-5% faster per-step inference but freezes <code class="inline-code">α</code> and the base. Keep LoRAs hot in VRAM as rank-r deltas; diffusers exposes <code class="inline-code">pipe.load_lora_weights()</code> + <code class="inline-code">pipe.set_adapters([...], adapter_weights=[...])</code> for per-request activation. Swap cost is the <code class="inline-code">2 · d · r · num_layers</code> weights — MB-scale, sub-second.</li>
+<li><strong>ControlNet as a second attention lane.</strong> The cloned encoder runs in parallel with the base. Two ControlNets at weight 1.0 each = two extra forward passes per step, not one merged pass. Batch-size headroom drops quadratically. Budget for ~1.5× step cost per active ControlNet.</li>
+<li><strong>Quantized LoRAs too.</strong> If you quantized the base (see Lesson 07, Flux on 8GB), the LoRA delta also quantizes cleanly to 8-bit or 4-bit. QLoRA-style loading lets you stack 5-10 LoRAs on top of a 4-bit Flux base without blowing memory.</li>
+</ul>
+<p>Flux-specific: Niels&#39; Flux-on-8GB notebook quantizes the base to 4-bit; stacking a style LoRA (<code class="inline-code">pipe.load_lora_weights(&quot;user/style-lora&quot;)</code>) on that quantized base at <code class="inline-code">weight_name=&quot;pytorch_lora_weights.safetensors&quot;</code> still works. This is the recipe most SaaS agencies ship in 2026.</p>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2302.05543" target="_blank" rel="noopener">Zhang, Rao, Agrawala (2023). Adding Conditional Control to Text-to-Image Diffusion Models</a> — ControlNet.</li>
+<li><a href="https://arxiv.org/abs/2106.09685" target="_blank" rel="noopener">Hu et al. (2021). LoRA: Low-Rank Adaptation of Large Language Models</a> — LoRA (originally for LLMs; ports to diffusion).</li>
+<li><a href="https://arxiv.org/abs/2308.06721" target="_blank" rel="noopener">Ye et al. (2023). IP-Adapter: Text Compatible Image Prompt Adapter</a> — IP-Adapter.</li>
+<li><a href="https://arxiv.org/abs/2302.08453" target="_blank" rel="noopener">Mou et al. (2023). T2I-Adapter: Learning Adapters to Dig Out More Controllable Ability</a> — lighter alternative to ControlNet.</li>
+<li><a href="https://arxiv.org/abs/2208.12242" target="_blank" rel="noopener">Ruiz et al. (2023). DreamBooth: Fine Tuning Text-to-Image Diffusion Models for Subject-Driven Generation</a> — DreamBooth.</li>
+<li><a href="https://huggingface.co/docs/diffusers/training/controlnet" target="_blank" rel="noopener">HuggingFace Diffusers — ControlNet / LoRA / IP-Adapter docs</a> — reference pipelines.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="07-latent-diffusion-stable-diffusion.html">
+  <span class="label">← Previous</span>
+  <b>Latent Diffusion &amp; Stable Diffusion</b>
+</a>
+      <a class="pager__item pager__item--next" href="09-inpainting-outpainting-editing.html">
+  <span class="label">Next →</span>
+  <b>Inpainting, Outpainting &amp; Image Editing</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>7 minutes</b> of Generative AI behind you.</p>
+      <a class="btn btn--solid" href="09-inpainting-outpainting-editing.html">Continue to Inpainting, Outpainting &amp; Image Editing →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#controlnet-zhang-et-al-2023">ControlNet (Zhang et al., 2023)</a></li><li class="mini__item mini__item--d3"><a href="#lora-hu-et-al-2021">LoRA (Hu et al., 2021)</a></li><li class="mini__item mini__item--d3"><a href="#ip-adapter-ye-et-al-2023">IP-Adapter (Ye et al., 2023)</a></li><li class="mini__item mini__item--d2"><a href="#composability-matrix">Composability matrix</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-lora-math">Step 1: LoRA math</a></li><li class="mini__item mini__item--d3"><a href="#step-2-zero-init-side-network">Step 2: zero-init side network</a></li><li class="mini__item mini__item--d2"><a href="#pitfalls">Pitfalls</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#production-note-lora-swaps-controlnet-lanes-multi-tenant-serving">Production note: LoRA swaps, ControlNet lanes, multi-tenant serving</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

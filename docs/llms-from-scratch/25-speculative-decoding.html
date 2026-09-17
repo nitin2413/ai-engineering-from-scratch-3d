@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Speculative Decoding and EAGLE — LLMs from Scratch — AIFS</title>
+<meta name="description" content="LLMs from Scratch: Speculative Decoding and EAGLE. 8 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Speculative Decoding and EAGLE — LLMs from Scratch — AIFS">
+<meta property="og:description" content="LLMs from Scratch: Speculative Decoding and EAGLE. 8 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"speculative-decoding":["../assets/figures/figures-llms-systems.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-llms-systems.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#6C4DFF" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#6C4DFF;--accent-ink:#FFFFFF"
+  data-lesson-id="llms-from-scratch/25-speculative-decoding" data-module="llms-from-scratch"
+  data-prev="22-async-hogwild-inference.html" data-next="34-gradient-checkpointing.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#6C4DFF">
+        <span class="label">Phase 10</span>
+        <b>LLMs from Scratch</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="llms-from-scratch/01-tokenizers"><a href="01-tokenizers.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Tokenizers: BPE, WordPiece, SentencePiece</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/02-building-a-tokenizer"><a href="02-building-a-tokenizer.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Building a Tokenizer from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/03-data-pipelines"><a href="03-data-pipelines.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Data Pipelines for Pre-Training</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/04-pre-training-mini-gpt"><a href="04-pre-training-mini-gpt.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Pre-Training a Mini GPT (124M Parameters)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/05-scaling-distributed"><a href="05-scaling-distributed.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Scaling: Distributed Training, FSDP, DeepSpeed</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/06-instruction-tuning-sft"><a href="06-instruction-tuning-sft.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Instruction Tuning (SFT)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/07-rlhf"><a href="07-rlhf.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">RLHF: Reward Model + PPO</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/08-dpo"><a href="08-dpo.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">DPO: Direct Preference Optimization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/09-constitutional-ai-self-improvement"><a href="09-constitutional-ai-self-improvement.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Constitutional AI and Self-Improvement</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/10-evaluation"><a href="10-evaluation.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Evaluation: Benchmarks, Evals, LM Harness</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/11-quantization"><a href="11-quantization.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Quantization: Making Models Fit</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/12-inference-optimization"><a href="12-inference-optimization.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Inference Optimization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/13-building-complete-llm-pipeline"><a href="13-building-complete-llm-pipeline.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Building a Complete LLM Pipeline</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/14-open-models-architecture-walkthroughs"><a href="14-open-models-architecture-walkthroughs.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Open Models: Architecture Walkthroughs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/15-speculative-decoding-eagle3"><a href="15-speculative-decoding-eagle3.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Speculative Decoding and EAGLE-3</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/16-differential-attention-v2"><a href="16-differential-attention-v2.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Differential Attention (V2)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/17-native-sparse-attention"><a href="17-native-sparse-attention.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Native Sparse Attention (DeepSeek NSA)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/18-multi-token-prediction"><a href="18-multi-token-prediction.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Multi-Token Prediction (MTP)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/19-dualpipe-parallelism"><a href="19-dualpipe-parallelism.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">DualPipe Parallelism</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/20-deepseek-v3-walkthrough"><a href="20-deepseek-v3-walkthrough.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">DeepSeek-V3 Architecture Walkthrough</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/21-jamba-hybrid-ssm-transformer"><a href="21-jamba-hybrid-ssm-transformer.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Jamba — Hybrid SSM-Transformer</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/22-async-hogwild-inference"><a href="22-async-hogwild-inference.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Async and Hogwild! Inference</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/25-speculative-decoding"><a href="25-speculative-decoding.html" class="is-current">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Speculative Decoding and EAGLE</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llms-from-scratch/34-gradient-checkpointing"><a href="34-gradient-checkpointing.html" class="">
+  <span class="snav__n">34</span>
+  <span class="snav__t">Gradient Checkpointing and Activation Recomputation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">LLMs from Scratch</a></p>
+      <h1 class="page__title">Speculative Decoding and EAGLE</h1>
+      <p class="page__lede">A frontier LLM generating one token requires a full forward pass over billions of parameters. That forward pass is massively over-provisioned: most of the time a much smaller model can guess the next 3-5 tokens correctly, and the big model only needs to *verify* the guess. When the guess is right you got 5 tokens for the price of one. Speculative decoding (Leviathan et al. 2023) made this exact, and EAGLE-3 (2025) pushed acceptance rates to ~4.5 tokens per verify — a 4-5x speedup at matched output distribution.</p>
+      <div class="page__meta">
+        <span class="chip">8 min read</span>
+        <span class="chip">1,696 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (with numpy)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 10 Lesson 12 (Inference Optimization), Phase 10 Lesson 04 (Pre-training Mini-GPT)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Decode throughput for a 70B-class model on H100 is typically 40-80 tokens/second. Each token requires a full forward pass reading all model weights from HBM. You cannot make the model smaller without changing its output. You cannot increase batch size beyond memory. You&#39;re stuck — unless you can let the model output more than one token per forward pass.</p>
+<p>Autoregressive generation looks inherently serial: <code class="inline-code">x_{t+1} = sample(p(· | x_{1:t}))</code>. But there is a concurrency opportunity. If you had a cheap predictor that said &quot;the next 4 tokens are probably [a, b, c, d]&quot; you could verify all 5 positions in a <strong>single forward pass of the big model</strong> and accept the longest matching prefix.</p>
+<p>Leviathan, Kalai, Matias (2023, &quot;Fast Inference from Transformers via Speculative Decoding&quot;) made this exact via a clever accept/reject rule that preserves the target model&#39;s sampling distribution. The same output distribution, 2-4× faster.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="the-two-model-setup" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-two-model-setup" aria-label="Link to this section">#</a>The Two-Model Setup</h3>
+<ul>
+<li><strong>Target model</strong> <code class="inline-code">M_p</code>: the big, slow, high-quality model you actually want samples from. Distribution: <code class="inline-code">p(x)</code>.</li>
+<li><strong>Draft model</strong> <code class="inline-code">M_q</code>: a small, fast, lower-quality model. Distribution: <code class="inline-code">q(x)</code>. 5-30× smaller.</li>
+</ul>
+<p>Per step:</p>
+<ol>
+<li>Draft model proposes <code class="inline-code">K</code> tokens autoregressively: <code class="inline-code">x_1, x_2, ..., x_K ~ q</code>.</li>
+<li>Target model runs ONE forward pass over all <code class="inline-code">K+1</code> positions in parallel, producing <code class="inline-code">p(x_k)</code> for each proposed token.</li>
+<li>Accept/reject each token left-to-right via the modified rejection-sampling rule below. Accept the longest matching prefix.</li>
+<li>If any token is rejected, sample the replacement from the corrected distribution and stop. Otherwise sample one bonus token from <code class="inline-code">p(· | x_1...x_K)</code>.</li>
+</ol>
+<p>If the draft matches the target perfectly, you get K+1 tokens per target-forward. If the draft is wrong at position 1, you get only 1 token.</p>
+<h3 id="the-exactness-rule" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-exactness-rule" aria-label="Link to this section">#</a>The Exactness Rule</h3>
+<p>Speculative decoding is <strong>provably equivalent in distribution to sampling from p</strong>. The rejection rule:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>For each drafted token x_t:
+    r ~ Uniform(0, 1)
+    if r &lt; p(x_t) / q(x_t):
+        accept x_t
+    else:
+        sample replacement from residual: (p - q)+ / ||(p - q)+||_1
+        stop</code></pre>
+</figure>
+<p>where <code class="inline-code">(p - q)+</code> denotes the positive part of the pointwise difference. When the draft and target agree (<code class="inline-code">p ≈ q</code>) acceptance is nearly 1. When they disagree, the residual distribution is constructed so that the overall sample is still exactly <code class="inline-code">p</code>.</p>
+<p><strong>Greedy case.</strong> For temperature=0 sampling just check <code class="inline-code">argmax(p) == x_t</code>. If yes, accept; if no, output <code class="inline-code">argmax(p)</code> and stop.</p>
+<h3 id="expected-speedup" class="prose-h prose-h3"><a class="prose-h__anchor" href="#expected-speedup" aria-label="Link to this section">#</a>Expected Speedup</h3>
+<p>If the draft model&#39;s token-level acceptance rate is <code class="inline-code">α</code>, the expected tokens produced per target-forward pass is:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>E[tokens] = (1 - α^{K+1}) / (1 - α)        # K = draft length, α in [0, 1]</code></pre>
+</figure>
+<p>At <code class="inline-code">α = 0.8, K = 4</code>: <code class="inline-code">(1 - 0.8^5)/(1 - 0.8) = 3.36</code> tokens per forward. A single target forward costs roughly <code class="inline-code">cost_q * K + cost_p</code> (K draft steps plus one target verify). If <code class="inline-code">cost_p &gt;&gt; cost_q * K</code> the speedup ratio is <code class="inline-code">3.36× / 1 = 3.36×</code> on throughput.</p>
+<p>The only real parameter is <code class="inline-code">α</code>, which depends entirely on the draft-target alignment. A good draft is everything.</p>
+<h3 id="training-the-draft-distillation" class="prose-h prose-h3"><a class="prose-h__anchor" href="#training-the-draft-distillation" aria-label="Link to this section">#</a>Training the Draft: Distillation</h3>
+<p>A random small model makes a poor draft. The standard recipe is to distill from the target:</p>
+<ol>
+<li>Pick a small architecture (~1B for a 70B target, ~500M for a 7B target).</li>
+<li>Run the target model on a large text corpus; store its next-token distributions.</li>
+<li>Train the draft with KL divergence against the target&#39;s distribution (not against ground-truth tokens).</li>
+</ol>
+<p>The result: <code class="inline-code">α</code> typically 0.6-0.8 on coding, 0.7-0.85 on natural-language chat. Speedups 2-3× in production.</p>
+<h3 id="eagle-tree-drafting-feature-reuse" class="prose-h prose-h3"><a class="prose-h__anchor" href="#eagle-tree-drafting-feature-reuse" aria-label="Link to this section">#</a>EAGLE: Tree Drafting + Feature Reuse</h3>
+<p>Li, Wei, Zhang, Zhang (2024, &quot;EAGLE: Speculative Sampling Requires Rethinking Feature Uncertainty&quot;) observed two inefficiencies in standard speculative decoding:</p>
+<ol>
+<li>The draft does K serial steps, each full-stack. But the draft could reuse the target&#39;s features (hidden states) from the most recent verify — the target already computed rich representations that the draft is re-deriving from scratch.</li>
+<li>The draft outputs a linear chain. If the draft could output a <em>tree</em> of candidates (each node multiple guesses), the target&#39;s single forward pass could verify multiple candidate paths in parallel via a tree attention mask, and pick the longest accepted branch.</li>
+</ol>
+<p>EAGLE-1 changes:</p>
+<ul>
+<li>Draft input = target&#39;s final hidden state at position t, not raw tokens.</li>
+<li>Draft architecture = 1 transformer decoder layer (not a separate small model).</li>
+<li>Output = tree of K = 4-8 candidates per depth, depth 4-6.</li>
+</ul>
+<p>EAGLE-2 (2024) adds dynamic tree topology: the tree grows wider where the draft is uncertain and stays narrow where it is confident. Raises <code class="inline-code">α_effective</code> without increasing verify cost.</p>
+<p>EAGLE-3 (Li et al. 2025, &quot;EAGLE-3: Scaling up Inference Acceleration of Large Language Models via Training-Time Test&quot;) removes the fixed top-layer feature dependency and trains the draft with a new &quot;test-time simulation&quot; loss — the draft is trained on outputs that match the target&#39;s test-time distribution rather than teacher-forced training distribution. Acceptance rate rises from 0.75 (EAGLE-2) to 0.82 (EAGLE-3), and mean tokens/verify from 3.0 to 4.5.</p>
+<h3 id="tree-attention-verification" class="prose-h prose-h3"><a class="prose-h__anchor" href="#tree-attention-verification" aria-label="Link to this section">#</a>Tree Attention Verification</h3>
+<p>When the draft outputs a tree, the target model verifies it in a single forward pass using a <strong>tree attention mask</strong> — a causal mask that encodes the tree topology rather than a pure line. Each token attends only to its ancestors in the tree. The verify pass is still one forward, one matmul; the topological mask costs only a few extra KV entries.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>        root
+       /    \
+      a      b
+     / \    / \
+    c  d   e   f</code></pre>
+</figure>
+<p>If <code class="inline-code">a, b</code> are competing first-token candidates and <code class="inline-code">c, d, e, f</code> are second-token candidates, all six positions are verified in one forward pass. The output is the longest prefix along any accepted path.</p>
+<h3 id="when-it-wins-when-it-doesn-t" class="prose-h prose-h3"><a class="prose-h__anchor" href="#when-it-wins-when-it-doesn-t" aria-label="Link to this section">#</a>When It Wins, When It Doesn&#39;t</h3>
+<p><strong>Wins:</strong></p>
+<ul>
+<li>Chat / completion with predictable text (code, common English, structured output). <code class="inline-code">α</code> is high.</li>
+<li>Settings with unused GPU compute during decode (memory-bound phase). Tree drafting uses the available FLOPs.</li>
+</ul>
+<p><strong>Loses / no win:</strong></p>
+<ul>
+<li>Highly stochastic outputs (creative writing at high temperature). <code class="inline-code">α</code> drops toward <code class="inline-code">1/|vocab|</code>.</li>
+<li>Batch serving with very high concurrency — batching already fills the FLOPs, little room for tree verification.</li>
+<li>Very small target models where the draft isn&#39;t much smaller.</li>
+</ul>
+<p>Production shops typically report 2-3× wall-clock speedup on chat, 3-5× on code generation, and near-zero on creative writing.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="speculative-decoding"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">speculative-decoding</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> speculative decoding</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<p><code class="inline-code">code/main.py</code>:</p>
+<ul>
+<li>A reference <code class="inline-code">speculative_decode(target, draft, prompt, K, temperature)</code> that implements the exact rejection rule and verifies it preserves the target&#39;s distribution (empirical KL &lt; 0.01 vs plain target sampling).</li>
+<li>An EAGLE-style tree drafter that builds a depth-K tree with top-p branching.</li>
+<li>A tree attention mask builder that produces the right causal pattern for a verifier.</li>
+<li>An acceptance-rate harness that runs both on a tiny LM (distill one GPT-2-small from a GPT-2-medium target).</li>
+</ul>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">speculative_step</span><span class="token punctuation">(</span>p_target<span class="token punctuation">,</span> q_draft<span class="token punctuation">,</span> K<span class="token punctuation">,</span> temperature<span class="token operator">=</span><span class="token number">1.0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""One round of speculative decoding. Returns list of accepted tokens."""</span>
+    <span class="token comment"># 1. Draft K tokens</span>
+    draft_tokens <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    q_probs <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    state <span class="token operator">=</span> draft_state_init<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>K<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        probs <span class="token operator">=</span> softmax<span class="token punctuation">(</span>q_draft<span class="token punctuation">(</span>state<span class="token punctuation">)</span> <span class="token operator">/</span> temperature<span class="token punctuation">)</span>
+        t <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>choice<span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>probs<span class="token punctuation">)</span><span class="token punctuation">,</span> p<span class="token operator">=</span>probs<span class="token punctuation">)</span>
+        draft_tokens<span class="token punctuation">.</span>append<span class="token punctuation">(</span>t<span class="token punctuation">)</span>
+        q_probs<span class="token punctuation">.</span>append<span class="token punctuation">(</span>probs<span class="token punctuation">[</span>t<span class="token punctuation">]</span><span class="token punctuation">)</span>
+        state <span class="token operator">=</span> draft_step<span class="token punctuation">(</span>state<span class="token punctuation">,</span> t<span class="token punctuation">)</span>
+
+    <span class="token comment"># 2. Target computes p at every drafted position + 1 extra</span>
+    p_probs_all <span class="token operator">=</span> target_forward_batched<span class="token punctuation">(</span>p_target<span class="token punctuation">,</span> draft_tokens<span class="token punctuation">,</span> temperature<span class="token punctuation">)</span>
+
+    <span class="token comment"># 3. Accept/reject left-to-right</span>
+    accepted <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> k<span class="token punctuation">,</span> tok <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>draft_tokens<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        r <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>uniform<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> r <span class="token operator">&lt;</span> p_probs_all<span class="token punctuation">[</span>k<span class="token punctuation">]</span><span class="token punctuation">[</span>tok<span class="token punctuation">]</span> <span class="token operator">/</span> q_probs<span class="token punctuation">[</span>k<span class="token punctuation">]</span><span class="token punctuation">:</span>
+            accepted<span class="token punctuation">.</span>append<span class="token punctuation">(</span>tok<span class="token punctuation">)</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            residual <span class="token operator">=</span> np<span class="token punctuation">.</span>maximum<span class="token punctuation">(</span>p_probs_all<span class="token punctuation">[</span>k<span class="token punctuation">]</span> <span class="token operator">-</span> q_probs<span class="token punctuation">[</span>k<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
+            residual <span class="token operator">/=</span> residual<span class="token punctuation">.</span><span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+            accepted<span class="token punctuation">.</span>append<span class="token punctuation">(</span>np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>choice<span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>residual<span class="token punctuation">)</span><span class="token punctuation">,</span> p<span class="token operator">=</span>residual<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span> accepted
+    <span class="token comment"># 4. All K accepted → sample bonus token from target</span>
+    accepted<span class="token punctuation">.</span>append<span class="token punctuation">(</span>np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>choice<span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>p_probs_all<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">,</span> p<span class="token operator">=</span>p_probs_all<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> accepted</code></pre>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<ul>
+<li><strong>vLLM</strong> and <strong>SGLang</strong> ship first-class speculative decoding. Flags: <code class="inline-code">--speculative_model</code>, <code class="inline-code">--num_speculative_tokens</code>. EAGLE-2/3 support via the <code class="inline-code">--spec_decoding_algorithm eagle</code> flag.</li>
+<li><strong>NVIDIA TensorRT-LLM</strong> supports Medusa and EAGLE trees natively.</li>
+<li><strong>Reference draft models</strong>: <code class="inline-code">Qwen/Qwen3-0.6B-spec</code> (drafts for Qwen3-32B), <code class="inline-code">meta-llama/Llama-3.2-1B-Instruct-spec</code> (drafts for 70B).</li>
+<li><strong>Medusa heads</strong> (Cai et al. 2024, &quot;Medusa: Simple LLM Inference Acceleration Framework with Multiple Decoding Heads&quot;): instead of a draft model, add K parallel prediction heads to the target itself. Simpler to deploy, slightly lower acceptance than EAGLE.</li>
+</ul>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces <code class="inline-code">outputs/skill-speculative-tuning.md</code> — a skill that profiles a target model&#39;s workload and chooses: draft model, K (draft length), tree width, temperature, and when to fall back to plain decode.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p>Implement the exact rejection rule and empirically verify it. Run 10K samples via <code class="inline-code">speculative_decode</code> and via plain target sampling; compute TV distance between the two output distributions. Should be &lt; 0.01.</p>
+</li>
+<li><p>Compute the speedup formula. Given fixed <code class="inline-code">α</code> and <code class="inline-code">K</code>, plot expected tokens per target-forward. Find the optimal K for α ∈ {0.5, 0.7, 0.9}.</p>
+</li>
+<li><p>Train a tiny draft. Take a 124M GPT-2 target and distill a 30M GPT-2 draft on 100M tokens with KL loss. Measure <code class="inline-code">α</code> on held-out text. Expected: 0.6-0.7.</p>
+</li>
+<li><p>Implement EAGLE-style tree drafting. Instead of a chain, have the draft output top-3 branches at each depth. Build the tree attention mask. Verify the target accepts the longest correct branch.</p>
+</li>
+<li><p>Measure failure modes. Run speculative decode at temperature=1.5 (high stochasticity). Show α collapses and the algorithm is slower than plain decode due to draft overhead.</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Target model</td>
+<td>&quot;The big model&quot;</td>
+<td>The slow, high-quality model you want samples from (p distribution)</td>
+</tr>
+<tr>
+<td>Draft model</td>
+<td>&quot;The speculator&quot;</td>
+<td>The small, fast predictor (q distribution); 5-30x smaller</td>
+</tr>
+<tr>
+<td>K / draft length</td>
+<td>&quot;Look-ahead&quot;</td>
+<td>Number of speculated tokens per verify pass</td>
+</tr>
+<tr>
+<td>α / acceptance rate</td>
+<td>&quot;Hit rate&quot;</td>
+<td>Per-token probability that the draft&#39;s proposal is accepted</td>
+</tr>
+<tr>
+<td>Exact rejection rule</td>
+<td>&quot;The accept test&quot;</td>
+<td>r &lt; p/q compare that preserves target&#39;s distribution</td>
+</tr>
+<tr>
+<td>Residual distribution</td>
+<td>&quot;Corrected p-q&quot;</td>
+<td>(p - q)+ /</td>
+</tr>
+<tr>
+<td>Tree drafting</td>
+<td>&quot;Branching speculation&quot;</td>
+<td>Draft outputs a tree of candidates, verified in one pass with tree-structured attention mask</td>
+</tr>
+<tr>
+<td>Tree attention mask</td>
+<td>&quot;Topological mask&quot;</td>
+<td>Causal mask encoding the tree topology so each node attends only to its ancestors</td>
+</tr>
+<tr>
+<td>Medusa heads</td>
+<td>&quot;Parallel heads&quot;</td>
+<td>K extra prediction heads on the target itself; no separate draft model</td>
+</tr>
+<tr>
+<td>EAGLE feature reuse</td>
+<td>&quot;Hidden-state draft&quot;</td>
+<td>Draft input is target&#39;s last hidden state, not raw tokens, shrinking the draft</td>
+</tr>
+<tr>
+<td>Test-time simulation loss</td>
+<td>&quot;EAGLE-3 training&quot;</td>
+<td>Train draft on outputs matching target&#39;s test-time distribution, not teacher forcing</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2211.17192" target="_blank" rel="noopener">Leviathan, Kalai, Matias, 2023 — &quot;Fast Inference from Transformers via Speculative Decoding&quot;</a> — the exact rejection rule and the theoretical speedup analysis</li>
+<li><a href="https://arxiv.org/abs/2302.01318" target="_blank" rel="noopener">Chen, Borgeaud, Irving et al., 2023 — &quot;Accelerating Large Language Model Decoding with Speculative Sampling&quot;</a> — concurrent speculative-sampling paper at DeepMind</li>
+<li><a href="https://arxiv.org/abs/2401.10774" target="_blank" rel="noopener">Cai, Li, Geng, Wang, Wang, Zhu, Dao, 2024 — &quot;Medusa: Simple LLM Inference Acceleration Framework with Multiple Decoding Heads&quot;</a> — parallel-heads alternative to a draft model</li>
+<li><a href="https://arxiv.org/abs/2401.15077" target="_blank" rel="noopener">Li, Wei, Zhang, Zhang, 2024 — &quot;EAGLE: Speculative Sampling Requires Rethinking Feature Uncertainty&quot;</a> — feature reuse and tree drafting</li>
+<li><a href="https://arxiv.org/abs/2406.16858" target="_blank" rel="noopener">Li et al., 2024 — &quot;EAGLE-2: Faster Inference of Language Models with Dynamic Draft Trees&quot;</a> — dynamic tree topology</li>
+<li><a href="https://arxiv.org/abs/2503.01840" target="_blank" rel="noopener">Li et al., 2025 — &quot;EAGLE-3: Scaling up Inference Acceleration of Large Language Models via Training-Time Test&quot;</a> — train-time test-time matching</li>
+<li><a href="https://arxiv.org/abs/2402.02057" target="_blank" rel="noopener">Fu, Haotian, Peng et al., 2024 — &quot;Break the Sequential Dependency of LLM Inference Using Lookahead Decoding&quot;</a> — Jacobi/lookahead decoding, a speculator-free alternative</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="22-async-hogwild-inference.html">
+  <span class="label">← Previous</span>
+  <b>Async and Hogwild! Inference</b>
+</a>
+      <a class="pager__item pager__item--next" href="34-gradient-checkpointing.html">
+  <span class="label">Next →</span>
+  <b>Gradient Checkpointing and Activation Recomputation</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>8 minutes</b> of LLMs from Scratch behind you.</p>
+      <a class="btn btn--solid" href="34-gradient-checkpointing.html">Continue to Gradient Checkpointing and Activation Recomputation →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#the-two-model-setup">The Two-Model Setup</a></li><li class="mini__item mini__item--d3"><a href="#the-exactness-rule">The Exactness Rule</a></li><li class="mini__item mini__item--d3"><a href="#expected-speedup">Expected Speedup</a></li><li class="mini__item mini__item--d3"><a href="#training-the-draft-distillation">Training the Draft: Distillation</a></li><li class="mini__item mini__item--d3"><a href="#eagle-tree-drafting-feature-reuse">EAGLE: Tree Drafting + Feature Reuse</a></li><li class="mini__item mini__item--d3"><a href="#tree-attention-verification">Tree Attention Verification</a></li><li class="mini__item mini__item--d3"><a href="#when-it-wins-when-it-doesn-t">When It Wins, When It Doesn't</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

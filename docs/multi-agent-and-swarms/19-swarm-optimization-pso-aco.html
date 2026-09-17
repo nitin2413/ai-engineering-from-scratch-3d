@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Swarm Optimization for LLMs (PSO, ACO) — Multi-Agent &amp; Swarms — AIFS</title>
+<meta name="description" content="Multi-Agent &amp; Swarms: Swarm Optimization for LLMs (PSO, ACO). 6 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Swarm Optimization for LLMs (PSO, ACO) — Multi-Agent &amp; Swarms — AIFS">
+<meta property="og:description" content="Multi-Agent &amp; Swarms: Swarm Optimization for LLMs (PSO, ACO). 6 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"swarm-stigmergy":["../assets/figures/figures-swarms2.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-swarms2.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#7CFFB2" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#7CFFB2;--accent-ink:#111111"
+  data-lesson-id="multi-agent-and-swarms/19-swarm-optimization-pso-aco" data-module="multi-agent-and-swarms"
+  data-prev="18-theory-of-mind-coordination.html" data-next="20-marl-maddpg-qmix-mappo.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#7CFFB2">
+        <span class="label">Phase 16</span>
+        <b>Multi-Agent &amp; Swarms</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="multi-agent-and-swarms/01-why-multi-agent"><a href="01-why-multi-agent.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Why Multi-Agent?</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/02-fipa-acl-heritage"><a href="02-fipa-acl-heritage.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Heritage of FIPA-ACL and Speech Acts</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/03-communication-protocols"><a href="03-communication-protocols.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Communication Protocols</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/04-primitive-model"><a href="04-primitive-model.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">The Multi-Agent Primitive Model</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/05-supervisor-orchestrator-pattern"><a href="05-supervisor-orchestrator-pattern.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Supervisor / Orchestrator-Worker Pattern</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/06-hierarchical-architecture"><a href="06-hierarchical-architecture.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Hierarchical Architecture and Its Failure Mode</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/07-society-of-mind-debate"><a href="07-society-of-mind-debate.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Society of Mind and Multi-Agent Debate</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/08-role-specialization"><a href="08-role-specialization.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Role Specialization — Planner, Critic, Executor, Verifier</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/09-parallel-swarm-networks"><a href="09-parallel-swarm-networks.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Parallel / Swarm / Networked Architectures</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/10-group-chat-speaker-selection"><a href="10-group-chat-speaker-selection.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Group Chat and Speaker Selection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/11-handoffs-and-routines"><a href="11-handoffs-and-routines.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Handoffs and Routines — Stateless Orchestration</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/12-a2a-protocol"><a href="12-a2a-protocol.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">A2A — The Agent-to-Agent Protocol</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/13-shared-memory-blackboard"><a href="13-shared-memory-blackboard.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Shared Memory and Blackboard Patterns</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/14-consensus-and-bft"><a href="14-consensus-and-bft.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Consensus and Byzantine Fault Tolerance for Agents</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/15-voting-debate-topology"><a href="15-voting-debate-topology.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Voting, Self-Consistency, and Debate Topology</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/16-negotiation-bargaining"><a href="16-negotiation-bargaining.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Negotiation and Bargaining</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/17-generative-agents-simulation"><a href="17-generative-agents-simulation.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Generative Agents and Emergent Simulation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/18-theory-of-mind-coordination"><a href="18-theory-of-mind-coordination.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Theory of Mind and Emergent Coordination</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/19-swarm-optimization-pso-aco"><a href="19-swarm-optimization-pso-aco.html" class="is-current">
+  <span class="snav__n">19</span>
+  <span class="snav__t">Swarm Optimization for LLMs (PSO, ACO)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/20-marl-maddpg-qmix-mappo"><a href="20-marl-maddpg-qmix-mappo.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">MARL — MADDPG, QMIX, MAPPO</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/21-agent-economies"><a href="21-agent-economies.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Agent Economies, Token Incentives, Reputation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/22-production-scaling-queues-checkpoints"><a href="22-production-scaling-queues-checkpoints.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Production Scaling — Queues, Checkpoints, Durability</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/23-failure-modes-mast-groupthink"><a href="23-failure-modes-mast-groupthink.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Failure Modes — MAST, Groupthink, Monoculture, Cascading Errors</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/24-evaluation-coordination-benchmarks"><a href="24-evaluation-coordination-benchmarks.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Evaluation and Coordination Benchmarks</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/25-case-studies-2026-sota"><a href="25-case-studies-2026-sota.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Case Studies and the 2026 State of the Art</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Multi-Agent &amp; Swarms</a></p>
+      <h1 class="page__title">Swarm Optimization for LLMs (PSO, ACO)</h1>
+      <p class="page__lede">Bio-inspired optimization is making an LLM comeback. <b>LMPSO</b> (arXiv:2504.09247) uses PSO where each particle's velocity is a prompt and the LLM generates the next candidate; works well on structured-sequence outputs (math expressions, programs). <b>Model Swarms</b> (arXiv:2410.11163) treats each LLM expert as a PSO particle on a model-weight manifold and reports <b>13.3% average gain</b> over 12 baselines on 9 datasets with just 200 instances. <b>SwarmPrompt</b> (ICAART 2025) hybridizes PSO + Grey Wolf for prompt optimization. <b>AMRO-S</b> (arXiv:2603.12933) is ACO-inspired pheromone specialists for multi-agent LLM routing — <b>4.7x speedup</b>, interpretable routing evidence, quality-gated asynchronous update that decouples inference from learning. This lesson implements PSO on prompt parameter space and ACO on agent routing, measures why these classical algorithms fit the LLM era, and when they do not.</p>
+      <div class="page__meta">
+        <span class="chip">6 min read</span>
+        <span class="chip">1,298 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Learn + Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (stdlib)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 16 · 09 (Parallel Swarm Networks), Phase 16 · 14 (Consensus and BFT)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#problem" aria-label="Link to this section">#</a>Problem</h2>
+<p>You have a prompt that scores 62% on your task eval. You want to improve it. The naive move is gradient-free manual tweaking, which scales badly. Reinforcement learning needs reward signals and enough rollouts to train. Backprop through prompts is not really possible — the prompt is a discrete string, not a differentiable parameter.</p>
+<p>Classical bio-inspired optimization — PSO for continuous search spaces, ACO for path selection — was designed exactly for this regime: gradient-free, population-based, cheap per evaluation. Pair them with LLMs for the gradient-free search step, and you get a surprisingly practical optimizer.</p>
+<p>The same patterns apply to agent <em>routing</em> in multi-agent systems. An ACO-style pheromone trail records which agent worked best on which task-type, lets the router exploit the trail, and decays pheromones so routes can be rediscovered.</p>
+<h2 id="concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#concept" aria-label="Link to this section">#</a>Concept</h2>
+<h3 id="pso-refresher-kennedy-eberhart-1995" class="prose-h prose-h3"><a class="prose-h__anchor" href="#pso-refresher-kennedy-eberhart-1995" aria-label="Link to this section">#</a>PSO refresher (Kennedy &amp; Eberhart 1995)</h3>
+<p>Particle Swarm Optimization: population of particles in a continuous search space. Each particle has position <code class="inline-code">x_i</code> and velocity <code class="inline-code">v_i</code>. Each iteration:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>v_i &lt;- w * v_i + c1 * r1 * (p_best_i - x_i) + c2 * r2 * (g_best - x_i)
+x_i &lt;- x_i + v_i
+evaluate fitness(x_i)
+update p_best_i if improved
+update g_best if global best</code></pre>
+</figure>
+<p>Where <code class="inline-code">p_best</code> is particle&#39;s own best, <code class="inline-code">g_best</code> is swarm&#39;s best, <code class="inline-code">w, c1, c2</code> are inertia + cognitive + social weights, <code class="inline-code">r1, r2</code> are random factors.</p>
+<h3 id="pso-on-llm-outputs-lmpso" class="prose-h prose-h3"><a class="prose-h__anchor" href="#pso-on-llm-outputs-lmpso" aria-label="Link to this section">#</a>PSO on LLM outputs — LMPSO</h3>
+<p>arXiv:2504.09247 adapts PSO for LLM-generated structured outputs (math expressions, programs). Each particle is a candidate output. Velocity is a <em>prompt</em> that describes how to modify the current output toward the personal/global best. The LLM generates the new output from the velocity prompt. The &quot;inertia&quot; of the velocity is a prompt like &quot;make small incremental changes.&quot;</p>
+<p>This works well when:</p>
+<ul>
+<li>The output is structured (parseable, evaluable).</li>
+<li>Fitness is automatic (test runs, arithmetic evaluation).</li>
+<li>Population is small (~10-30 particles) so total LLM calls stay manageable.</li>
+</ul>
+<p>It does not work well when fitness needs human review — the per-iteration cost becomes prohibitive.</p>
+<h3 id="model-swarms" class="prose-h prose-h3"><a class="prose-h__anchor" href="#model-swarms" aria-label="Link to this section">#</a>Model Swarms</h3>
+<p>arXiv:2410.11163 takes PSO off the output layer and into the <em>model</em> layer. Each &quot;particle&quot; is an expert LLM (parameters). The swarm moves the parameters toward the collective best via a gradient-free update. Reported: 13.3% average gain over 12 baselines on 9 datasets, with just 200 instances per iteration.</p>
+<p>The key insight is that LLM expert models are already nearby in a shared parameter manifold (adapter weights, LoRA deltas). PSO on this low-dimensional subspace is cheap and effective.</p>
+<h3 id="aco-refresher-dorigo-1992" class="prose-h prose-h3"><a class="prose-h__anchor" href="#aco-refresher-dorigo-1992" aria-label="Link to this section">#</a>ACO refresher (Dorigo 1992)</h3>
+<p>Ant Colony Optimization: ants traverse a graph; each path has a pheromone trail. Ant move probabilities weight by pheromone strength. Ants that complete the task deposit pheromone proportional to solution quality. Pheromone decays over time.</p>
+<h3 id="amro-s-aco-for-agent-routing" class="prose-h prose-h3"><a class="prose-h__anchor" href="#amro-s-aco-for-agent-routing" aria-label="Link to this section">#</a>AMRO-S — ACO for agent routing</h3>
+<p>arXiv:2603.12933 uses ACO for multi-agent routing. Each task-type is a &quot;destination&quot;; each agent is a possible route. Pheromones strengthen routes that produce good outputs. Key contributions:</p>
+<ul>
+<li><strong>Interpretable routing evidence.</strong> Pheromone strength is a human-readable signal.</li>
+<li><strong>Quality-gated asynchronous update.</strong> Pheromones update only after quality checks pass, decoupling inference from learning.</li>
+<li><strong>4.7x speedup</strong> on the multi-agent routing benchmark.</li>
+</ul>
+<p>The quality gate matters: without it, fast-but-wrong agents accrue pheromone, and the system locks in on bad routes.</p>
+<h3 id="when-to-use-pso-aco-for-llms" class="prose-h prose-h3"><a class="prose-h__anchor" href="#when-to-use-pso-aco-for-llms" aria-label="Link to this section">#</a>When to use PSO / ACO for LLMs</h3>
+<p><strong>Use PSO when:</strong></p>
+<ul>
+<li>Search space is continuous or maps to continuous parameters (prompt embeddings, LoRA weights, numeric generation parameters).</li>
+<li>Fitness is cheap and automatic.</li>
+<li>Population can be small (10-30).</li>
+</ul>
+<p><strong>Use ACO when:</strong></p>
+<ul>
+<li>You have a routing or path-selection problem.</li>
+<li>Decisions reinforce over time (the same task types come back).</li>
+<li>You need interpretable evidence for routing decisions.</li>
+</ul>
+<p><strong>Do not use either when:</strong></p>
+<ul>
+<li>Fitness requires human review (too expensive per iteration).</li>
+<li>The search space is discrete and combinatorial in a way that PSO does not cover (use genetic algorithms instead).</li>
+<li>Real-time decisions need strict latency (PSO/ACO converge slowly relative to single-pass heuristics).</li>
+</ul>
+<h3 id="why-bio-inspired-still-wins" class="prose-h prose-h3"><a class="prose-h__anchor" href="#why-bio-inspired-still-wins" aria-label="Link to this section">#</a>Why bio-inspired still wins</h3>
+<p>Gradient-based methods need differentiable signals. LLM outputs and routing decisions are not trivially differentiable. Pseudo-gradient methods (reinforcement-learned routers, DPO-style prompt tuners) work but need expensive training.</p>
+<p>PSO and ACO need only an <em>evaluator</em> function. If you can score a candidate output or a routing decision, you can optimize over the space. That makes the bar for applicability much lower.</p>
+<h3 id="practical-limits" class="prose-h prose-h3"><a class="prose-h__anchor" href="#practical-limits" aria-label="Link to this section">#</a>Practical limits</h3>
+<ul>
+<li><strong>Population budget.</strong> N particles × T iterations × per-eval cost. For LLM evals at ~$0.02 / call, a 20-particle PSO running 50 iterations costs ~$20. Plan accordingly.</li>
+<li><strong>Exploration vs exploitation.</strong> Pheromone decay rate and PSO inertia trade off; too fast decay → forget solutions; too slow → stuck on early local optima.</li>
+<li><strong>Catastrophic drift.</strong> Both algorithms can converge and then diverge if fitness landscape shifts (new data distribution). Monitor best-fitness stability.</li>
+</ul>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="swarm-stigmergy"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">swarm-stigmergy</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> swarm stigmergy</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<p><code class="inline-code">code/main.py</code> implements:</p>
+<ul>
+<li><code class="inline-code">LMPSO</code> — PSO over numeric prompt parameters (temperature, top_k weights). Each particle&#39;s &quot;LLM generation&quot; is simulated as a scripted fitness function. Runs the algorithm for 30 iterations and shows g_best convergence.</li>
+<li><code class="inline-code">AMRO_S</code> — ACO-style routing. 3 agents, 4 task types, pheromone matrix, 100 routed tasks. Prints (task_type → agent choices) distribution over time to show trail formation.</li>
+<li>Comparison: random routing vs ACO routing on the same task stream. Measures quality and latency.</li>
+</ul>
+<p>Run:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>python3 code/main.py</code></pre>
+</figure>
+<p>Expected output:</p>
+<ul>
+<li>LMPSO: g_best fitness improves from random to near-optimal over 30 iterations.</li>
+<li>AMRO-S: pheromone table stabilizes on the right agent per task-type; ACO routing beats random by ~30-40% on quality and also reduces latency (fewer retries).</li>
+</ul>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p><code class="inline-code">outputs/skill-swarm-optimizer.md</code> helps choose between PSO, ACO, genetic algorithms, and gradient-based optimizers for LLM / agent optimization problems.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<ul>
+<li><strong>Start small.</strong> 10-20 particles, 20-50 iterations. Scale up only if the convergence curve shows clear gain.</li>
+<li><strong>Log pheromones or g_best per iteration.</strong> Debugging swarm optimizers without a trail is painful.</li>
+<li><strong>Quality-gate updates.</strong> Especially for ACO routing: fast-and-wrong agents must not accrue pheromone.</li>
+<li><strong>Reset decay on distribution shift.</strong> When your eval distribution changes, aged pheromones are stale; reset or double the decay rate temporarily.</li>
+<li><strong>Cap the per-iteration cost.</strong> Emit a cost-per-iteration metric. PSO that costs $500 / iteration and gains 0.5% is not shippable.</li>
+</ul>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li>Run <code class="inline-code">code/main.py</code>. Observe LMPSO convergence. Vary population size 5, 10, 20, 50. At what size does time-to-converge saturate?</li>
+<li>Implement a &quot;catastrophic drift&quot; experiment: after iteration 30, change the fitness function. How fast does PSO adapt? Does resetting <code class="inline-code">p_best</code> help?</li>
+<li>Add a quality gate to AMRO-S: pheromone deposit only on runs with eval score &gt; 0.7. How does this change convergence vs the un-gated version?</li>
+<li>Read LMPSO (arXiv:2504.09247). Map the paper&#39;s &quot;velocity as a prompt&quot; back to your numeric velocity. What is lost in the simulation and what is preserved?</li>
+<li>Read AMRO-S (arXiv:2603.12933). Implement the decoupled &quot;inference fast-path&quot; with asynchronous pheromone update. How does this change system latency under sustained load?</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>PSO</td>
+<td>&quot;Particle Swarm Optimization&quot;</td>
+<td>Kennedy-Eberhart 1995. Population-based gradient-free optimizer.</td>
+</tr>
+<tr>
+<td>ACO</td>
+<td>&quot;Ant Colony Optimization&quot;</td>
+<td>Dorigo 1992. Path/route optimization via pheromone trails.</td>
+</tr>
+<tr>
+<td>LMPSO</td>
+<td>&quot;PSO with LLM generation&quot;</td>
+<td>arXiv:2504.09247. Velocity is a prompt; LLM produces candidates.</td>
+</tr>
+<tr>
+<td>Model Swarms</td>
+<td>&quot;PSO on expert weights&quot;</td>
+<td>arXiv:2410.11163. Gradient-free update on model parameter subspace.</td>
+</tr>
+<tr>
+<td>AMRO-S</td>
+<td>&quot;ACO for agent routing&quot;</td>
+<td>arXiv:2603.12933. Pheromone matrix over task-type × agent.</td>
+</tr>
+<tr>
+<td>p_best / g_best</td>
+<td>&quot;Personal / global best&quot;</td>
+<td>Per-particle and swarm-wide best solutions found so far.</td>
+</tr>
+<tr>
+<td>Pheromone</td>
+<td>&quot;Routing memory&quot;</td>
+<td>Strength on an edge; decays over time; deposits on quality.</td>
+</tr>
+<tr>
+<td>Quality-gated update</td>
+<td>&quot;Only learn from good runs&quot;</td>
+<td>Pheromone deposit conditioned on quality check.</td>
+</tr>
+<tr>
+<td>Catastrophic drift</td>
+<td>&quot;Distribution shift&quot;</td>
+<td>Fitness landscape changes; old p_best and pheromones become stale.</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://ieeexplore.ieee.org/document/488968" target="_blank" rel="noopener">Kennedy &amp; Eberhart — Particle Swarm Optimization</a> — the 1995 PSO paper</li>
+<li><a href="https://www.aco-metaheuristic.org/about.html" target="_blank" rel="noopener">Dorigo — Ant Colony Optimization</a> — 1992 ACO foundations</li>
+<li><a href="https://arxiv.org/abs/2504.09247" target="_blank" rel="noopener">LMPSO — Language Model Particle Swarm Optimization</a> — PSO for structured LLM outputs</li>
+<li><a href="https://arxiv.org/abs/2410.11163" target="_blank" rel="noopener">Model Swarms — gradient-free LLM expert optimization</a> — PSO on model-weight subspace</li>
+<li><a href="https://arxiv.org/abs/2603.12933" target="_blank" rel="noopener">AMRO-S — ant-colony multi-agent routing</a> — pheromone-driven routing with quality gate</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="18-theory-of-mind-coordination.html">
+  <span class="label">← Previous</span>
+  <b>Theory of Mind and Emergent Coordination</b>
+</a>
+      <a class="pager__item pager__item--next" href="20-marl-maddpg-qmix-mappo.html">
+  <span class="label">Next →</span>
+  <b>MARL — MADDPG, QMIX, MAPPO</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>6 minutes</b> of Multi-Agent &amp; Swarms behind you.</p>
+      <a class="btn btn--solid" href="20-marl-maddpg-qmix-mappo.html">Continue to MARL — MADDPG, QMIX, MAPPO →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#problem">Problem</a></li><li class="mini__item mini__item--d2"><a href="#concept">Concept</a></li><li class="mini__item mini__item--d3"><a href="#pso-refresher-kennedy-eberhart-1995">PSO refresher (Kennedy &amp; Eberhart 1995)</a></li><li class="mini__item mini__item--d3"><a href="#pso-on-llm-outputs-lmpso">PSO on LLM outputs — LMPSO</a></li><li class="mini__item mini__item--d3"><a href="#model-swarms">Model Swarms</a></li><li class="mini__item mini__item--d3"><a href="#aco-refresher-dorigo-1992">ACO refresher (Dorigo 1992)</a></li><li class="mini__item mini__item--d3"><a href="#amro-s-aco-for-agent-routing">AMRO-S — ACO for agent routing</a></li><li class="mini__item mini__item--d3"><a href="#when-to-use-pso-aco-for-llms">When to use PSO / ACO for LLMs</a></li><li class="mini__item mini__item--d3"><a href="#why-bio-inspired-still-wins">Why bio-inspired still wins</a></li><li class="mini__item mini__item--d3"><a href="#practical-limits">Practical limits</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

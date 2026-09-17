@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Long-Running Background Agents: Durable Execution — Autonomous Systems — AIFS</title>
+<meta name="description" content="Autonomous Systems: Long-Running Background Agents: Durable Execution. 5 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Long-Running Background Agents: Durable Execution — Autonomous Systems — AIFS">
+<meta property="og:description" content="Autonomous Systems: Long-Running Background Agents: Durable Execution. 5 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"memory-consolidation":["../assets/figures/figures-frontier.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-frontier.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#FF5C00" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#FF5C00;--accent-ink:#FFFFFF"
+  data-lesson-id="autonomous-systems/12-durable-execution" data-module="autonomous-systems"
+  data-prev="11-browser-agents.html" data-next="13-cost-governors.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#FF5C00">
+        <span class="label">Phase 15</span>
+        <b>Autonomous Systems</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="autonomous-systems/01-long-horizon-agents"><a href="01-long-horizon-agents.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">The Shift from Chatbots to Long-Horizon Agents</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="autonomous-systems/02-star-family-reasoning"><a href="02-star-family-reasoning.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">STaR, V-STaR, Quiet-STaR — Self-Taught Reasoning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="autonomous-systems/03-alphaevolve-evolutionary-coding"><a href="03-alphaevolve-evolutionary-coding.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">AlphaEvolve — Evolutionary Coding Agents</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="autonomous-systems/04-darwin-godel-machine"><a href="04-darwin-godel-machine.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Darwin Godel Machine — Open-Ended Self-Modifying Agents</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="autonomous-systems/05-ai-scientist-v2"><a href="05-ai-scientist-v2.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">AI Scientist v2 — Workshop-Level Autonomous Research</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="autonomous-systems/06-automated-alignment-research"><a href="06-automated-alignment-research.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Automated Alignment Research (Anthropic AAR)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="autonomous-systems/07-recursive-self-improvement"><a href="07-recursive-self-improvement.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Recursive Self-Improvement — Capability vs Alignment</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="autonomous-systems/08-bounded-self-improvement"><a href="08-bounded-self-improvement.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Bounded Self-Improvement Designs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="autonomous-systems/09-coding-agent-landscape"><a href="09-coding-agent-landscape.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">The Autonomous Coding Agent Landscape (2026)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="autonomous-systems/10-claude-code-permission-modes"><a href="10-claude-code-permission-modes.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Permission Modes for Autonomous Agents</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="autonomous-systems/11-browser-agents"><a href="11-browser-agents.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Browser Agents and Long-Horizon Web Tasks</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="autonomous-systems/12-durable-execution"><a href="12-durable-execution.html" class="is-current">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Long-Running Background Agents: Durable Execution</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="autonomous-systems/13-cost-governors"><a href="13-cost-governors.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Action Budgets, Iteration Caps, and Cost Governors</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="autonomous-systems/14-kill-switches-canaries"><a href="14-kill-switches-canaries.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Kill Switches, Circuit Breakers, and Canary Tokens</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="autonomous-systems/15-propose-then-commit"><a href="15-propose-then-commit.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Human-in-the-Loop: Propose-Then-Commit</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="autonomous-systems/16-checkpoints-rollback"><a href="16-checkpoints-rollback.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Checkpoints and Rollback</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="autonomous-systems/17-constitutional-ai"><a href="17-constitutional-ai.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Constitutional AI and Rule Overrides</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="autonomous-systems/18-llama-guard"><a href="18-llama-guard.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Llama Guard and Input/Output Classification</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="autonomous-systems/19-anthropic-rsp"><a href="19-anthropic-rsp.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">Anthropic Responsible Scaling Policy v3.0</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="autonomous-systems/20-openai-preparedness-deepmind-fsf"><a href="20-openai-preparedness-deepmind-fsf.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">OpenAI Preparedness Framework and DeepMind Frontier Safety Framework</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="autonomous-systems/21-metr-external-evaluation"><a href="21-metr-external-evaluation.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">METR Time Horizons and External Capability Evaluation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="autonomous-systems/22-cais-caisi-societal-risk"><a href="22-cais-caisi-societal-risk.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">CAIS, CAISI, and Societal-Scale Risk</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Autonomous Systems</a></p>
+      <h1 class="page__title">Long-Running Background Agents: Durable Execution</h1>
+      <p class="page__lede">Production long-horizon agents do not run in <code class="inline-code">while True</code>. Every LLM call becomes an activity with checkpoint, retry, and replay. Temporal's OpenAI Agents SDK integration went GA March 2026. Claude Code Routines (Anthropic) runs scheduled Claude Code invocations without a persistent local process. Sessions pause on human-input, survive deploys, and resume from the latest checkpoint keyed by <code class="inline-code">thread_id</code>. Behind the new ergonomics sits an old pattern — workflow orchestration — with one new input: LLM calls as non-deterministic activities that must be deterministically replayed on recovery.</p>
+      <div class="page__meta">
+        <span class="chip">5 min read</span>
+        <span class="chip">1,093 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Learn</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (stdlib, minimal durable-execution state machine)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 15 · 10 (Permission modes), Phase 15 · 01 (Long-horizon agents)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~60 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Consider an agent that runs for four hours. It calls three tools, prompts the user twice, and makes forty LLM calls. Halfway through, the host it is running on reboots. What happens?</p>
+<ul>
+<li>In a naive <code class="inline-code">while True</code> loop: everything is lost. The run restarts from scratch. The three tool calls (with real side effects) execute again. The user is prompted again for things they already approved. Forty LLM calls are re-billed.</li>
+<li>With durable execution: the run resumes from the most recent checkpoint. Already-completed activities are not re-executed; their results are replayed from the durable log. The user does not re-approve things they already approved. The LLM calls already made are not re-billed.</li>
+</ul>
+<p>This is the same pattern workflow engines have shipped for a decade (Temporal, Cadence, Uber&#39;s Cherami). What&#39;s new is that LLM calls are now a kind of activity — non-deterministic, expensive, with side effects — and they fit this pattern cleanly.</p>
+<p>The running theme of the lesson: long-horizon reliability decays (METR observes a &quot;35-minute degradation&quot; — success rate drops roughly quadratically with horizon). Durable execution enables runs that are longer than the reliability profile supports, which is a new way to fail safely if the design is right and unsafely if the design is wrong.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="activities-workflows-and-replay" class="prose-h prose-h3"><a class="prose-h__anchor" href="#activities-workflows-and-replay" aria-label="Link to this section">#</a>Activities, workflows, and replay</h3>
+<ul>
+<li><strong>Workflow</strong>: deterministic orchestration code. Defines the sequence of activities, the branches, the waits. Must be deterministic so it can be replayed from the event log without surprising divergence.</li>
+<li><strong>Activity</strong>: a non-deterministic, potentially failing unit of work. LLM call, tool call, file write, HTTP request. Each activity is logged with its inputs and (once complete) its outputs.</li>
+<li><strong>Event log</strong>: the durable backing store. Every activity start, complete, fail, retry, and every workflow decision is recorded.</li>
+<li><strong>Replay</strong>: on recovery, the workflow code re-runs from the start; every activity that already completed returns its logged result without re-executing. Only activities that had not completed are actually run.</li>
+</ul>
+<p>This is the same shape as React re-rendering against a virtual DOM, or Git rebuilding a working tree from commits. Determinism in the orchestrator is what makes durability cheap.</p>
+<h3 id="why-llm-calls-fit-the-pattern" class="prose-h prose-h3"><a class="prose-h__anchor" href="#why-llm-calls-fit-the-pattern" aria-label="Link to this section">#</a>Why LLM calls fit the pattern</h3>
+<p>LLM calls are:</p>
+<ul>
+<li>Non-deterministic (temperature &gt; 0; even temperature 0 drifts across model versions).</li>
+<li>Expensive (money and latency).</li>
+<li>Potentially failing (rate limits, timeouts).</li>
+<li>Side-effectful (if they invoke tools).</li>
+</ul>
+<p>This is exactly the activity profile. Wrapping every LLM call as an activity gives you retry with exponential backoff, checkpointing across restarts, and a replayable trace for debugging.</p>
+<h3 id="checkpoints-keyed-by-threadid" class="prose-h prose-h3"><a class="prose-h__anchor" href="#checkpoints-keyed-by-threadid" aria-label="Link to this section">#</a>Checkpoints keyed by <code class="inline-code">thread_id</code></h3>
+<p>LangGraph, Microsoft Agent Framework, Cloudflare Durable Objects, and Claude Code Routines all converged on the same API shape: a <code class="inline-code">thread_id</code> (or equivalent) identifies the session; each state transition persists to a backend (PostgreSQL default, SQLite for dev, Redis for cache); resume reads the latest checkpoint.</p>
+<p>The backend choice matters:</p>
+<ul>
+<li><strong>PostgreSQL</strong>: durable, queryable, survives deploys. Default for LangGraph.</li>
+<li><strong>SQLite</strong>: local-dev only; loses data across hosts.</li>
+<li><strong>Redis</strong>: fast but ephemeral unless AOF/snapshot configured.</li>
+<li><strong>Cloudflare Durable Objects</strong>: transparently distributed; scoped by a unique key; survives for hours to weeks.</li>
+</ul>
+<h3 id="human-input-as-a-first-class-state" class="prose-h prose-h3"><a class="prose-h__anchor" href="#human-input-as-a-first-class-state" aria-label="Link to this section">#</a>Human-input as a first-class state</h3>
+<p>Propose-then-commit (Lesson 15) requires a durable &quot;waiting on human&quot; state. The workflow pauses, the external queue holds the pending request, and an approval resumes from exactly that point. Without durability this is best-effort; with it, an overnight approval arrives and the workflow picks up in the morning.</p>
+<h3 id="the-35-minute-degradation" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-35-minute-degradation" aria-label="Link to this section">#</a>The 35-minute degradation</h3>
+<p>METR observed that every agent class measured shows reliability decay beyond ~35 minutes of continuous operation. Doubling the task duration roughly quadruples the failure rate. Durable execution does not fix this; it lets you run longer than the reliability profile supports. The safe pattern is to combine durability with checkpoints that require fresh HITL on re-entry, and with budget kill switches (Lesson 13) that cap total compute regardless of wall-clock time.</p>
+<h3 id="when-durable-execution-is-the-wrong-answer" class="prose-h prose-h3"><a class="prose-h__anchor" href="#when-durable-execution-is-the-wrong-answer" aria-label="Link to this section">#</a>When durable execution is the wrong answer</h3>
+<ul>
+<li>Runs shorter than a few minutes with no human input. Overhead &gt; benefit.</li>
+<li>Strictly read-only information retrieval.</li>
+<li>Tasks where correctness requires end-to-end within one context window (some reasoning tasks; some one-shot generation).</li>
+</ul>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="memory-consolidation"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">memory-consolidation</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> memory consolidation</figcaption>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p><code class="inline-code">code/main.py</code> implements a minimal durable-execution engine in stdlib Python. It supports:</p>
+<ul>
+<li><code class="inline-code">@activity</code> decorator that logs inputs and outputs to a JSON event log.</li>
+<li>A workflow function that sequences activities.</li>
+<li>A <code class="inline-code">run_or_replay(workflow, event_log)</code> function that replays completed activities without re-executing them.</li>
+</ul>
+<p>The driver simulates a three-activity workflow, crashes halfway through, and shows (a) a naive retry re-executing everything versus (b) a replay running only the missing activity.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p><code class="inline-code">outputs/skill-durable-execution-review.md</code> reviews a proposed long-running agent deployment for correct durable-execution shape: activities, determinism, checkpoint backend, human-input state, and HITL-on-resume policy.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p>Run <code class="inline-code">code/main.py</code>. Observe the difference in activity-execution count between naive retry and replay. Change the crash point and show the replay count changes accordingly.</p>
+</li>
+<li><p>Convert the toy engine to use <code class="inline-code">thread_id</code> explicitly. Simulate two concurrent sessions sharing the engine and confirm their event logs do not collide.</p>
+</li>
+<li><p>Take one activity in the toy engine. Introduce a non-determinism (a wall-clock timestamp inside a workflow decision). Demonstrate the divergence on replay. Explain how real engines handle this (side-effect registration, <code class="inline-code">Workflow.now()</code> APIs).</p>
+</li>
+<li><p>Read the LangChain &quot;Runtime behind production deep agents&quot; post. List every state that the runtime persists and name which failure mode each covers.</p>
+</li>
+<li><p>Design a checkpoint policy for a 6-hour autonomous coding task. Where do you checkpoint? What does resume-on-crash look like? What requires fresh HITL?</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Workflow</td>
+<td>&quot;Agent&#39;s script&quot;</td>
+<td>Deterministic orchestration code; replayable from event log</td>
+</tr>
+<tr>
+<td>Activity</td>
+<td>&quot;A step&quot;</td>
+<td>Non-deterministic unit (LLM call, tool call); logged before and after</td>
+</tr>
+<tr>
+<td>Event log</td>
+<td>&quot;The backing store&quot;</td>
+<td>Durable record of every state transition</td>
+</tr>
+<tr>
+<td>Replay</td>
+<td>&quot;Resume&quot;</td>
+<td>Re-run workflow; completed activities return logged results without re-execution</td>
+</tr>
+<tr>
+<td>Checkpoint</td>
+<td>&quot;Save point&quot;</td>
+<td>Persisted state keyed by thread_id; latest-wins on resume</td>
+</tr>
+<tr>
+<td>thread_id</td>
+<td>&quot;Session key&quot;</td>
+<td>Identifier that scopes durable state</td>
+</tr>
+<tr>
+<td>35-minute degradation</td>
+<td>&quot;Reliability decay&quot;</td>
+<td>METR: success rate drops ~quadratically with horizon</td>
+</tr>
+<tr>
+<td>Non-determinism</td>
+<td>&quot;Drift on replay&quot;</td>
+<td>Wall clock, random, LLM output; must be registered as side effect</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://code.claude.com/docs/en/agent-sdk/agent-loop" target="_blank" rel="noopener">Anthropic — Claude Code Agent SDK: agent loop</a> — budget, turns, and resume semantics.</li>
+<li><a href="https://learn.microsoft.com/en-us/agent-framework/workflows/human-in-the-loop" target="_blank" rel="noopener">Microsoft — Agent Framework: human-in-the-loop and checkpointing</a> — RequestInfoEvent shape.</li>
+<li><a href="https://www.langchain.com/conceptual-guides/runtime-behind-production-deep-agents" target="_blank" rel="noopener">LangChain — The Runtime Behind Production Deep Agents</a> — concrete runtime requirements.</li>
+<li><a href="https://trigger.dev" target="_blank" rel="noopener">OpenAI Agents SDK + Temporal integration (Trigger.dev announcement)</a> — activity shape for LLM calls.</li>
+<li><a href="https://www.anthropic.com/research/measuring-agent-autonomy" target="_blank" rel="noopener">Anthropic — Measuring agent autonomy in practice</a> — the 35-minute degradation reference.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="11-browser-agents.html">
+  <span class="label">← Previous</span>
+  <b>Browser Agents and Long-Horizon Web Tasks</b>
+</a>
+      <a class="pager__item pager__item--next" href="13-cost-governors.html">
+  <span class="label">Next →</span>
+  <b>Action Budgets, Iteration Caps, and Cost Governors</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>5 minutes</b> of Autonomous Systems behind you.</p>
+      <a class="btn btn--solid" href="13-cost-governors.html">Continue to Action Budgets, Iteration Caps, and Cost Governors →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#activities-workflows-and-replay">Activities, workflows, and replay</a></li><li class="mini__item mini__item--d3"><a href="#why-llm-calls-fit-the-pattern">Why LLM calls fit the pattern</a></li><li class="mini__item mini__item--d3"><a href="#checkpoints-keyed-by-threadid">Checkpoints keyed by thread_id</a></li><li class="mini__item mini__item--d3"><a href="#human-input-as-a-first-class-state">Human-input as a first-class state</a></li><li class="mini__item mini__item--d3"><a href="#the-35-minute-degradation">The 35-minute degradation</a></li><li class="mini__item mini__item--d3"><a href="#when-durable-execution-is-the-wrong-answer">When durable execution is the wrong answer</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

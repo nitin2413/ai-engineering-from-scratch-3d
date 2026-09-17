@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Multi-Layer Networks and Forward Pass — Deep Learning Core — AIFS</title>
+<meta name="description" content="Deep Learning Core: Multi-Layer Networks and Forward Pass. 8 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Multi-Layer Networks and Forward Pass — Deep Learning Core — AIFS">
+<meta property="og:description" content="Deep Learning Core: Multi-Layer Networks and Forward Pass. 8 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"mlp-forward":["../assets/figures/figures-dl.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-dl.js"];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#FF4FA3" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#FF4FA3;--accent-ink:#111111"
+  data-lesson-id="deep-learning-core/02-multi-layer-networks" data-module="deep-learning-core"
+  data-prev="01-the-perceptron.html" data-next="03-backpropagation.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#FF4FA3">
+        <span class="label">Phase 03</span>
+        <b>Deep Learning Core</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="deep-learning-core/01-the-perceptron"><a href="01-the-perceptron.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">The Perceptron</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/02-multi-layer-networks"><a href="02-multi-layer-networks.html" class="is-current">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Multi-Layer Networks and Forward Pass</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/03-backpropagation"><a href="03-backpropagation.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Backpropagation from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/04-activation-functions"><a href="04-activation-functions.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Activation Functions</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/05-loss-functions"><a href="05-loss-functions.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Loss Functions</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/06-optimizers"><a href="06-optimizers.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Optimizers</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/07-regularization"><a href="07-regularization.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Regularization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/08-weight-initialization"><a href="08-weight-initialization.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Weight Initialization and Training Stability</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/09-learning-rate-schedules"><a href="09-learning-rate-schedules.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Learning Rate Schedules and Warmup</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/10-mini-framework"><a href="10-mini-framework.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Build Your Own Mini Framework</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/11-intro-to-pytorch"><a href="11-intro-to-pytorch.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Introduction to PyTorch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/12-intro-to-jax"><a href="12-intro-to-jax.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Introduction to JAX</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/13-debugging-neural-networks"><a href="13-debugging-neural-networks.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Debugging Neural Networks</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Deep Learning Core</a></p>
+      <h1 class="page__title">Multi-Layer Networks and Forward Pass</h1>
+      <p class="page__lede">One neuron draws a line. Stack them, and you can draw anything.</p>
+      <div class="page__meta">
+        <span class="chip">8 min read</span>
+        <span class="chip">1,808 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 01 (Math Foundations), Lesson 03.01 (The Perceptron)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~90 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Build a multi-layer network from scratch with Layer and Network classes that perform a complete forward pass</li>
+<li>Trace matrix dimensions through each layer of a network and identify shape mismatches</li>
+<li>Explain how stacking nonlinear activations enables a network to learn curved decision boundaries</li>
+<li>Solve the XOR problem using a 2-2-1 architecture with hand-tuned sigmoid weights</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>A single neuron is a line drawer. That&#39;s it. One straight line through your data. Every real problem in AI -- image recognition, language understanding, playing Go -- requires curves. Stacking neurons into layers is how you get curves.</p>
+<p>In 1969, Minsky and Papert proved this limitation was fatal: a single-layer network cannot learn XOR. Not &quot;struggles to learn&quot; -- mathematically cannot. The XOR truth table places [0,1] and [1,0] on one side, [0,0] and [1,1] on the other. No single line separates them.</p>
+<p>This killed neural network funding for over a decade. The fix was obvious in hindsight: stop using one layer. Stack neurons into layers. Let the first layer carve the input space into new features, and let the second layer combine those features into decisions no single line could make.</p>
+<p>That stack is the multi-layer network. It is the foundation of every deep learning model in production today. The forward pass -- data flowing from input through hidden layers to output -- is the first thing you need to build before anything else works.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="layers-input-hidden-output" class="prose-h prose-h3"><a class="prose-h__anchor" href="#layers-input-hidden-output" aria-label="Link to this section">#</a>Layers: Input, Hidden, Output</h3>
+<p>A multi-layer network has three types of layers:</p>
+<p><strong>Input layer</strong> -- not really a layer. It holds your raw data. Two features means two input nodes. No computation happens here.</p>
+<p><strong>Hidden layers</strong> -- where the work happens. Each neuron takes every output from the previous layer, applies weights and a bias, then passes the result through an activation function. &quot;Hidden&quot; because you never see these values directly in the training data.</p>
+<p><strong>Output layer</strong> -- the final answer. For binary classification, one neuron with sigmoid. For multi-class, one neuron per class.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph LR
+    subgraph Input[&quot;Input Layer&quot;]
+        x1[&quot;x1&quot;]
+        x2[&quot;x2&quot;]
+    end
+    subgraph Hidden[&quot;Hidden Layer (3 neurons)&quot;]
+        h1[&quot;h1&quot;]
+        h2[&quot;h2&quot;]
+        h3[&quot;h3&quot;]
+    end
+    subgraph Output[&quot;Output Layer&quot;]
+        y[&quot;y&quot;]
+    end
+    x1 --&gt; h1
+    x1 --&gt; h2
+    x1 --&gt; h3
+    x2 --&gt; h1
+    x2 --&gt; h2
+    x2 --&gt; h3
+    h1 --&gt; y
+    h2 --&gt; y
+    h3 --&gt; y</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>This is a 2-3-1 network. Two inputs, three hidden neurons, one output. Every connection carries a weight. Every neuron (except input) carries a bias.</p>
+<p>Each layer produces a vector of numbers called a hidden state. For text, hidden states increase dimensionality -- encoding a word as 768 numbers to capture semantic meaning. For images, they reduce dimensionality -- compressing millions of pixels into a manageable representation. The hidden state is where the learning lives.</p>
+<h3 id="neurons-and-activations" class="prose-h prose-h3"><a class="prose-h__anchor" href="#neurons-and-activations" aria-label="Link to this section">#</a>Neurons and Activations</h3>
+<p>Each neuron does three things:</p>
+<ol>
+<li>Multiply every input by its corresponding weight</li>
+<li>Sum all the products and add a bias</li>
+<li>Pass the sum through an activation function</li>
+</ol>
+<p>For now, the activation is sigmoid:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>sigmoid(z) = 1 / (1 + e^(-z))</code></pre>
+</figure>
+<p>Sigmoid squashes any number into the range (0, 1). Large positive inputs push toward 1. Large negative inputs push toward 0. Zero maps to 0.5. This smooth curve is what makes learning possible -- unlike the perceptron&#39;s hard step, sigmoid has a gradient everywhere.</p>
+<h3 id="forward-pass-how-data-flows" class="prose-h prose-h3"><a class="prose-h__anchor" href="#forward-pass-how-data-flows" aria-label="Link to this section">#</a>Forward Pass: How Data Flows</h3>
+<p>The forward pass pushes input data through the network, layer by layer, until it reaches the output. No learning happens during the forward pass. It is pure computation: multiply, add, activate, repeat.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph TD
+    X[&quot;Input: [x1, x2]&quot;] --&gt; WH[&quot;Multiply by Weight Matrix W1 (2x3)&quot;]
+    WH --&gt; BH[&quot;Add Bias Vector b1 (3,)&quot;]
+    BH --&gt; AH[&quot;Apply sigmoid to each element&quot;]
+    AH --&gt; H[&quot;Hidden Output: [h1, h2, h3]&quot;]
+    H --&gt; WO[&quot;Multiply by Weight Matrix W2 (3x1)&quot;]
+    WO --&gt; BO[&quot;Add Bias Vector b2 (1,)&quot;]
+    BO --&gt; AO[&quot;Apply sigmoid&quot;]
+    AO --&gt; Y[&quot;Output: y&quot;]</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>At each layer, three operations happen in sequence:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>z = W * input + b       (linear transformation)
+a = sigmoid(z)           (activation)</code></pre>
+</figure>
+<p>The output of one layer becomes the input to the next. That is the entire forward pass.</p>
+<h3 id="matrix-dimensions" class="prose-h prose-h3"><a class="prose-h__anchor" href="#matrix-dimensions" aria-label="Link to this section">#</a>Matrix Dimensions</h3>
+<p>Tracking dimensions is the single most important debugging skill in deep learning. Here is the 2-3-1 network:</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Operation</th>
+<th>Dimensions</th>
+<th>Result Shape</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Input</td>
+<td>x</td>
+<td>--</td>
+<td>(2,)</td>
+</tr>
+<tr>
+<td>Hidden linear</td>
+<td>W1 * x + b1</td>
+<td>W1: (3, 2), b1: (3,)</td>
+<td>(3,)</td>
+</tr>
+<tr>
+<td>Hidden activation</td>
+<td>sigmoid(z1)</td>
+<td>--</td>
+<td>(3,)</td>
+</tr>
+<tr>
+<td>Output linear</td>
+<td>W2 * h + b2</td>
+<td>W2: (1, 3), b2: (1,)</td>
+<td>(1,)</td>
+</tr>
+<tr>
+<td>Output activation</td>
+<td>sigmoid(z2)</td>
+<td>--</td>
+<td>(1,)</td>
+</tr>
+</tbody></table>
+<p>The rule: weight matrix W at layer k has shape (neurons_in_layer_k, neurons_in_layer_k_minus_1). Rows match the current layer. Columns match the previous layer. If the shapes do not line up, you have a bug.</p>
+<h3 id="universal-approximation-theorem" class="prose-h prose-h3"><a class="prose-h__anchor" href="#universal-approximation-theorem" aria-label="Link to this section">#</a>Universal Approximation Theorem</h3>
+<p>In 1989, George Cybenko proved something remarkable: a neural network with a single hidden layer and enough neurons can approximate any continuous function to any desired accuracy.</p>
+<p>This does not mean one hidden layer is always best. It means the architecture is theoretically capable. In practice, deeper networks (more layers, fewer neurons per layer) learn the same functions with far fewer total parameters than shallow-wide networks. That is why deep learning works.</p>
+<p>The intuition: each neuron in the hidden layer learns one &quot;bump&quot; or feature. Enough bumps placed in the right locations can approximate any smooth curve. More neurons, more bumps, better approximation.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph LR
+    subgraph FewNeurons[&quot;4 Hidden Neurons&quot;]
+        A[&quot;Rough approximation&quot;]
+    end
+    subgraph MoreNeurons[&quot;16 Hidden Neurons&quot;]
+        B[&quot;Close approximation&quot;]
+    end
+    subgraph ManyNeurons[&quot;64 Hidden Neurons&quot;]
+        C[&quot;Near-perfect fit&quot;]
+    end
+    FewNeurons --&gt; MoreNeurons --&gt; ManyNeurons</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<h3 id="composability" class="prose-h prose-h3"><a class="prose-h__anchor" href="#composability" aria-label="Link to this section">#</a>Composability</h3>
+<p>Neural networks are composable. You can stack them, chain them, run them in parallel. A Whisper model uses an encoder network to process audio and a separate decoder network to generate text. Modern LLMs are decoder-only. BERT is encoder-only. T5 is encoder-decoder. The architecture choice defines what the model can do.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="mlp-forward"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">mlp-forward</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> mlp forward</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<p>Pure Python. No numpy. Every matrix operation written from scratch.</p>
+<h3 id="step-1-sigmoid-activation" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-sigmoid-activation" aria-label="Link to this section">#</a>Step 1: Sigmoid Activation</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> math
+
+<span class="token keyword">def</span> <span class="token function">sigmoid</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    x <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">500.0</span><span class="token punctuation">,</span> <span class="token builtin">min</span><span class="token punctuation">(</span><span class="token number">500.0</span><span class="token punctuation">,</span> x<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token number">1.0</span> <span class="token operator">/</span> <span class="token punctuation">(</span><span class="token number">1.0</span> <span class="token operator">+</span> math<span class="token punctuation">.</span>exp<span class="token punctuation">(</span><span class="token operator">-</span>x<span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>The clamp to [-500, 500] prevents overflow. <code class="inline-code">math.exp(500)</code> is large but finite. <code class="inline-code">math.exp(1000)</code> is infinity.</p>
+<h3 id="step-2-layer-class" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-layer-class" aria-label="Link to this section">#</a>Step 2: Layer Class</h3>
+<p>The most important operation in all of deep learning is matrix multiplication. Every layer, every attention head, every forward pass -- it&#39;s matmuls all the way down. A linear layer takes an input vector, multiplies it by a weight matrix, and adds a bias vector: y = Wx + b. That single equation is 90% of the compute in a neural network.</p>
+<p>A layer holds a weight matrix and a bias vector. Its forward method takes an input vector and returns the activated output.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">Layer</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> n_inputs<span class="token punctuation">,</span> n_neurons<span class="token punctuation">,</span> weights<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">,</span> biases<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> weights <span class="token keyword">is</span> <span class="token keyword">not</span> <span class="token boolean">None</span><span class="token punctuation">:</span>
+            self<span class="token punctuation">.</span>weights <span class="token operator">=</span> weights
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            <span class="token keyword">import</span> random
+            self<span class="token punctuation">.</span>weights <span class="token operator">=</span> <span class="token punctuation">[</span>
+                <span class="token punctuation">[</span>random<span class="token punctuation">.</span>uniform<span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n_inputs<span class="token punctuation">)</span><span class="token punctuation">]</span>
+                <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n_neurons<span class="token punctuation">)</span>
+            <span class="token punctuation">]</span>
+        <span class="token keyword">if</span> biases <span class="token keyword">is</span> <span class="token keyword">not</span> <span class="token boolean">None</span><span class="token punctuation">:</span>
+            self<span class="token punctuation">.</span>biases <span class="token operator">=</span> biases
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            self<span class="token punctuation">.</span>biases <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> n_neurons
+
+    <span class="token keyword">def</span> <span class="token function">forward</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> inputs<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>last_input <span class="token operator">=</span> inputs
+        self<span class="token punctuation">.</span>last_output <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">for</span> neuron_idx <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>weights<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            z <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>
+                w <span class="token operator">*</span> x <span class="token keyword">for</span> w<span class="token punctuation">,</span> x <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>weights<span class="token punctuation">[</span>neuron_idx<span class="token punctuation">]</span><span class="token punctuation">,</span> inputs<span class="token punctuation">)</span>
+            <span class="token punctuation">)</span>
+            z <span class="token operator">+=</span> self<span class="token punctuation">.</span>biases<span class="token punctuation">[</span>neuron_idx<span class="token punctuation">]</span>
+            self<span class="token punctuation">.</span>last_output<span class="token punctuation">.</span>append<span class="token punctuation">(</span>sigmoid<span class="token punctuation">(</span>z<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> self<span class="token punctuation">.</span>last_output</code></pre>
+</figure>
+<p>The weight matrix has shape (n_neurons, n_inputs). Each row is one neuron&#39;s weights across all inputs. The forward method loops through neurons, computes the weighted sum plus bias, applies sigmoid, and collects the results.</p>
+<h3 id="step-3-network-class" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-network-class" aria-label="Link to this section">#</a>Step 3: Network Class</h3>
+<p>A network is a list of layers. The forward pass chains them: output of layer k feeds into layer k+1.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">Network</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> layers<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>layers <span class="token operator">=</span> layers
+
+    <span class="token keyword">def</span> <span class="token function">forward</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> inputs<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        current <span class="token operator">=</span> inputs
+        <span class="token keyword">for</span> layer <span class="token keyword">in</span> self<span class="token punctuation">.</span>layers<span class="token punctuation">:</span>
+            current <span class="token operator">=</span> layer<span class="token punctuation">.</span>forward<span class="token punctuation">(</span>current<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> current</code></pre>
+</figure>
+<p>That is the entire forward pass. Four lines of logic. Data goes in, flows through every layer, comes out the other side.</p>
+<h3 id="step-4-xor-with-hand-tuned-weights" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-xor-with-hand-tuned-weights" aria-label="Link to this section">#</a>Step 4: XOR with Hand-Tuned Weights</h3>
+<p>In Lesson 01, we solved XOR by combining OR, NAND, and AND perceptrons. Now do the same thing with our Layer and Network classes. The 2-2-1 architecture: two inputs, two hidden neurons, one output.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python">hidden <span class="token operator">=</span> Layer<span class="token punctuation">(</span>
+    n_inputs<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">,</span>
+    n_neurons<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">,</span>
+    weights<span class="token operator">=</span><span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">20.0</span><span class="token punctuation">,</span> <span class="token number">20.0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">20.0</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">20.0</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    biases<span class="token operator">=</span><span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">10.0</span><span class="token punctuation">,</span> <span class="token number">30.0</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">)</span>
+
+output <span class="token operator">=</span> Layer<span class="token punctuation">(</span>
+    n_inputs<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">,</span>
+    n_neurons<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span>
+    weights<span class="token operator">=</span><span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">20.0</span><span class="token punctuation">,</span> <span class="token number">20.0</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    biases<span class="token operator">=</span><span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">30.0</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">)</span>
+
+xor_net <span class="token operator">=</span> Network<span class="token punctuation">(</span><span class="token punctuation">[</span>hidden<span class="token punctuation">,</span> output<span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+xor_data <span class="token operator">=</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">]</span>
+
+<span class="token keyword">for</span> inputs<span class="token punctuation">,</span> expected <span class="token keyword">in</span> xor_data<span class="token punctuation">:</span>
+    result <span class="token operator">=</span> xor_net<span class="token punctuation">.</span>forward<span class="token punctuation">(</span>inputs<span class="token punctuation">)</span>
+    predicted <span class="token operator">=</span> <span class="token number">1</span> <span class="token keyword">if</span> result<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">>=</span> <span class="token number">0.5</span> <span class="token keyword">else</span> <span class="token number">0</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  </span><span class="token interpolation"><span class="token punctuation">{</span>inputs<span class="token punctuation">}</span></span><span class="token string"> -> </span><span class="token interpolation"><span class="token punctuation">{</span>result<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.6f</span><span class="token punctuation">}</span></span><span class="token string"> (rounded: </span><span class="token interpolation"><span class="token punctuation">{</span>predicted<span class="token punctuation">}</span></span><span class="token string">, expected: </span><span class="token interpolation"><span class="token punctuation">{</span>expected<span class="token punctuation">}</span></span><span class="token string">)"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>The large weights (20, -20) make sigmoid act like a step function. The first hidden neuron approximates OR. The second approximates NAND. The output neuron combines them into AND, which is XOR.</p>
+<h3 id="step-5-circle-classification" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-circle-classification" aria-label="Link to this section">#</a>Step 5: Circle Classification</h3>
+<p>A harder problem: classify 2D points as inside or outside a circle of radius 0.5 centered at the origin. This requires a curved decision boundary -- impossible for a single perceptron.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> random
+<span class="token keyword">import</span> math
+
+random<span class="token punctuation">.</span>seed<span class="token punctuation">(</span><span class="token number">42</span><span class="token punctuation">)</span>
+
+data <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+<span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    x <span class="token operator">=</span> random<span class="token punctuation">.</span>uniform<span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span>
+    y <span class="token operator">=</span> random<span class="token punctuation">.</span>uniform<span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span>
+    label <span class="token operator">=</span> <span class="token number">1</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>x <span class="token operator">*</span> x <span class="token operator">+</span> y <span class="token operator">*</span> y<span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">0.25</span> <span class="token keyword">else</span> <span class="token number">0</span>
+    data<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">[</span>x<span class="token punctuation">,</span> y<span class="token punctuation">]</span><span class="token punctuation">,</span> label<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+circle_net <span class="token operator">=</span> Network<span class="token punctuation">(</span><span class="token punctuation">[</span>
+    Layer<span class="token punctuation">(</span>n_inputs<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">,</span> n_neurons<span class="token operator">=</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    Layer<span class="token punctuation">(</span>n_inputs<span class="token operator">=</span><span class="token number">8</span><span class="token punctuation">,</span> n_neurons<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>With random weights, the network will not classify well. But the forward pass still runs. This is the point -- the forward pass is just computation. Learning the right weights is backpropagation, coming in Lesson 03.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python">correct <span class="token operator">=</span> <span class="token number">0</span>
+<span class="token keyword">for</span> inputs<span class="token punctuation">,</span> expected <span class="token keyword">in</span> data<span class="token punctuation">:</span>
+    result <span class="token operator">=</span> circle_net<span class="token punctuation">.</span>forward<span class="token punctuation">(</span>inputs<span class="token punctuation">)</span>
+    predicted <span class="token operator">=</span> <span class="token number">1</span> <span class="token keyword">if</span> result<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">>=</span> <span class="token number">0.5</span> <span class="token keyword">else</span> <span class="token number">0</span>
+    <span class="token keyword">if</span> predicted <span class="token operator">==</span> expected<span class="token punctuation">:</span>
+        correct <span class="token operator">+=</span> <span class="token number">1</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Accuracy with random weights: </span><span class="token interpolation"><span class="token punctuation">{</span>correct<span class="token punctuation">}</span></span><span class="token string">/</span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">len</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string"> (</span><span class="token interpolation"><span class="token punctuation">{</span><span class="token number">100</span><span class="token operator">*</span>correct<span class="token operator">/</span><span class="token builtin">len</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.1f</span><span class="token punctuation">}</span></span><span class="token string">%)"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Random weights give poor accuracy -- often worse than guessing the majority class. After training (Lesson 03), this same architecture with 8 hidden neurons will draw a curved boundary that separates inside from outside.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>PyTorch does everything above in four lines:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> torch
+<span class="token keyword">import</span> torch<span class="token punctuation">.</span>nn <span class="token keyword">as</span> nn
+
+model <span class="token operator">=</span> nn<span class="token punctuation">.</span>Sequential<span class="token punctuation">(</span>
+    nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    nn<span class="token punctuation">.</span>Sigmoid<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    nn<span class="token punctuation">.</span>Sigmoid<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">)</span>
+
+x <span class="token operator">=</span> torch<span class="token punctuation">.</span>tensor<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">,</span> <span class="token number">0.0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">,</span> <span class="token number">1.0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token number">1.0</span><span class="token punctuation">,</span> <span class="token number">0.0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token number">1.0</span><span class="token punctuation">,</span> <span class="token number">1.0</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+output <span class="token operator">=</span> model<span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>output<span class="token punctuation">)</span></code></pre>
+</figure>
+<p><code class="inline-code">nn.Linear(2, 8)</code> is your Layer class: weight matrix of shape (8, 2), bias vector of shape (8,). <code class="inline-code">nn.Sigmoid()</code> is your sigmoid function applied element-wise. <code class="inline-code">nn.Sequential</code> is your Network class: chain layers in order.</p>
+<p>The difference is speed and scale. PyTorch runs on GPUs, handles batches of millions of samples, and automatically computes gradients for backpropagation. But the forward pass logic is identical to what you just built from scratch.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces a reusable prompt for designing network architectures:</p>
+<ul>
+<li><code class="inline-code">outputs/prompt-network-architect.md</code></li>
+</ul>
+<p>Use it when you need to decide how many layers, how many neurons per layer, and which activation functions to use for a given problem.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p>Build a 2-4-2-1 network (two hidden layers) and run the forward pass on XOR data with random weights. Print the intermediate hidden layer outputs to see how the representation transforms at each layer.</p>
+</li>
+<li><p>Change the hidden layer size in the circle classifier from 8 to 2, then to 32. Run the forward pass with random weights each time. Does the number of hidden neurons change the output range or distribution? Why?</p>
+</li>
+<li><p>Implement a <code class="inline-code">count_parameters</code> method on the Network class that returns the total number of trainable weights and biases. Test it on a 784-256-128-10 network (the classic MNIST architecture). How many parameters does it have?</p>
+</li>
+<li><p>Build a forward pass for a 3-4-4-2 network. Feed it RGB color values (normalized to 0-1) and observe the two outputs. This is the architecture for a simple color classifier with two classes.</p>
+</li>
+<li><p>Replace sigmoid with a &quot;leaky step&quot; function: return 0.01 * z if z &lt; 0, else 1.0. Run the forward pass on XOR with the same hand-tuned weights from Step 4. Does it still work? Why is the smooth sigmoid preferred over hard cutoffs?</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Forward pass</td>
+<td>&quot;Running the model&quot;</td>
+<td>Pushing input through every layer -- multiply by weights, add bias, activate -- to produce an output</td>
+</tr>
+<tr>
+<td>Hidden layer</td>
+<td>&quot;The middle part&quot;</td>
+<td>Any layer between input and output whose values are not directly observed in the data</td>
+</tr>
+<tr>
+<td>Multi-layer network</td>
+<td>&quot;A deep neural network&quot;</td>
+<td>Layers of neurons stacked sequentially, where each layer&#39;s output feeds the next layer&#39;s input</td>
+</tr>
+<tr>
+<td>Activation function</td>
+<td>&quot;The nonlinearity&quot;</td>
+<td>A function applied after the linear transformation that introduces curves into the decision boundary</td>
+</tr>
+<tr>
+<td>Sigmoid</td>
+<td>&quot;The S-curve&quot;</td>
+<td>sigma(z) = 1/(1+e^(-z)), squashes any real number to (0,1), smooth and differentiable everywhere</td>
+</tr>
+<tr>
+<td>Weight matrix</td>
+<td>&quot;The parameters&quot;</td>
+<td>A matrix W of shape (current_layer_neurons, previous_layer_neurons) containing learnable connection strengths</td>
+</tr>
+<tr>
+<td>Bias vector</td>
+<td>&quot;The offset&quot;</td>
+<td>A vector added after the matrix multiply that lets neurons activate even when all inputs are zero</td>
+</tr>
+<tr>
+<td>Universal approximation</td>
+<td>&quot;Neural nets can learn anything&quot;</td>
+<td>A single hidden layer with enough neurons can approximate any continuous function -- but &quot;enough&quot; can mean billions</td>
+</tr>
+<tr>
+<td>Linear transformation</td>
+<td>&quot;The matrix multiply step&quot;</td>
+<td>z = W * x + b, the computation before activation, which maps inputs to a new space</td>
+</tr>
+<tr>
+<td>Decision boundary</td>
+<td>&quot;Where the classifier switches&quot;</td>
+<td>The surface in input space where the network output crosses the classification threshold</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li>Michael Nielsen, &quot;Neural Networks and Deep Learning&quot;, Chapter 1-2 (<a href="http://neuralnetworksanddeeplearning.com/" target="_blank" rel="noopener">http://neuralnetworksanddeeplearning.com/</a>) -- the clearest free explanation of forward passes and network structure, with interactive visualizations</li>
+<li>Cybenko, &quot;Approximation by Superpositions of a Sigmoidal Function&quot; (1989) -- the original universal approximation theorem paper, surprisingly readable</li>
+<li>3Blue1Brown, &quot;But what is a neural network?&quot; (<a href="https://www.youtube.com/watch?v=aircAruvnKk" target="_blank" rel="noopener">https://www.youtube.com/watch?v=aircAruvnKk</a>) -- 20-minute visual walkthrough of layers, weights, and forward passes that builds the right mental model</li>
+<li>Goodfellow, Bengio, Courville, &quot;Deep Learning&quot;, Chapter 6 (<a href="https://www.deeplearningbook.org/" target="_blank" rel="noopener">https://www.deeplearningbook.org/</a>) -- the standard reference for multi-layer networks, free online</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="01-the-perceptron.html">
+  <span class="label">← Previous</span>
+  <b>The Perceptron</b>
+</a>
+      <a class="pager__item pager__item--next" href="03-backpropagation.html">
+  <span class="label">Next →</span>
+  <b>Backpropagation from Scratch</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>8 minutes</b> of Deep Learning Core behind you.</p>
+      <a class="btn btn--solid" href="03-backpropagation.html">Continue to Backpropagation from Scratch →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#layers-input-hidden-output">Layers: Input, Hidden, Output</a></li><li class="mini__item mini__item--d3"><a href="#neurons-and-activations">Neurons and Activations</a></li><li class="mini__item mini__item--d3"><a href="#forward-pass-how-data-flows">Forward Pass: How Data Flows</a></li><li class="mini__item mini__item--d3"><a href="#matrix-dimensions">Matrix Dimensions</a></li><li class="mini__item mini__item--d3"><a href="#universal-approximation-theorem">Universal Approximation Theorem</a></li><li class="mini__item mini__item--d3"><a href="#composability">Composability</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-sigmoid-activation">Step 1: Sigmoid Activation</a></li><li class="mini__item mini__item--d3"><a href="#step-2-layer-class">Step 2: Layer Class</a></li><li class="mini__item mini__item--d3"><a href="#step-3-network-class">Step 3: Network Class</a></li><li class="mini__item mini__item--d3"><a href="#step-4-xor-with-hand-tuned-weights">Step 4: XOR with Hand-Tuned Weights</a></li><li class="mini__item mini__item--d3"><a href="#step-5-circle-classification">Step 5: Circle Classification</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

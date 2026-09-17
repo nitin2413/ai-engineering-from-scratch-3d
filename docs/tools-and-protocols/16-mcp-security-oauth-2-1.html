@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MCP Authorization: CIMD, Issuer Binding, PKCE, and Step-Up — Tools &amp; Protocols — AIFS</title>
+<meta name="description" content="Tools &amp; Protocols: MCP Authorization: CIMD, Issuer Binding, PKCE, and Step-Up. 9 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="MCP Authorization: CIMD, Issuer Binding, PKCE, and Step-Up — Tools &amp; Protocols — AIFS">
+<meta property="og:description" content="Tools &amp; Protocols: MCP Authorization: CIMD, Issuer Binding, PKCE, and Step-Up. 9 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"t3-scope-stepup":["../assets/figures/figures-mcp.js","../assets/figures/figures-tools3.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-mcp.js","../assets/figures/figures-tools3.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#C6FF00" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#C6FF00;--accent-ink:#111111"
+  data-lesson-id="tools-and-protocols/16-mcp-security-oauth-2-1" data-module="tools-and-protocols"
+  data-prev="15-mcp-security-tool-poisoning.html" data-next="17-mcp-gateways-and-registries.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#C6FF00">
+        <span class="label">Phase 13</span>
+        <b>Tools &amp; Protocols</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="tools-and-protocols/01-the-tool-interface"><a href="01-the-tool-interface.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">The Tool Interface — Why Agents Need Structured I/O</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/02-function-calling-deep-dive"><a href="02-function-calling-deep-dive.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Function Calling Deep Dive — OpenAI, Anthropic, Gemini</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/03-parallel-and-streaming-tool-calls"><a href="03-parallel-and-streaming-tool-calls.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Parallel Tool Calls and Streaming with Tools</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/04-structured-output"><a href="04-structured-output.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Structured Output — JSON Schema, Pydantic, Zod, Constrained Decoding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/05-tool-schema-design"><a href="05-tool-schema-design.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Tool Schema Design — Naming, Descriptions, Parameter Constraints</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/06-mcp-fundamentals"><a href="06-mcp-fundamentals.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">MCP Fundamentals: Stateless Requests and JSON-RPC</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/07-building-an-mcp-server"><a href="07-building-an-mcp-server.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Building an MCP Server: Stateless Python and TypeScript</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/08-building-an-mcp-client"><a href="08-building-an-mcp-client.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Building an MCP Client: Discovery, Routing, and Dual-Era Fallback</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/09-mcp-transports"><a href="09-mcp-transports.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">MCP Transports: stdio and Stateless Streamable HTTP</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/10-mcp-resources-and-prompts"><a href="10-mcp-resources-and-prompts.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">MCP Resources and Prompts: Addressable Context for Stateless Servers</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/11-mcp-sampling"><a href="11-mcp-sampling.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">MCP Model Input: Sampling Migration and Stateless MRTR</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/12-mcp-roots-and-elicitation"><a href="12-mcp-roots-and-elicitation.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Explicit Scope and Stateless Elicitation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/13-mcp-async-tasks"><a href="13-mcp-async-tasks.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">MCP Tasks Extension: Durable Work on a Stateless Core</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/14-mcp-apps"><a href="14-mcp-apps.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">MCP Apps on the Stateless Protocol</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/15-mcp-security-tool-poisoning"><a href="15-mcp-security-tool-poisoning.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">MCP Security: Poisoned Metadata, Routing, and MRTR State</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/16-mcp-security-oauth-2-1"><a href="16-mcp-security-oauth-2-1.html" class="is-current">
+  <span class="snav__n">16</span>
+  <span class="snav__t">MCP Authorization: CIMD, Issuer Binding, PKCE, and Step-Up</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/17-mcp-gateways-and-registries"><a href="17-mcp-gateways-and-registries.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Stateless MCP Gateways and Registry Admission</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/18-mcp-auth-production"><a href="18-mcp-auth-production.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">MCP Auth in Production: Issuer-Bound Enrollment and Tokens</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/19-a2a-protocol"><a href="19-a2a-protocol.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">A2A — Agent-to-Agent Protocol</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/20-opentelemetry-genai"><a href="20-opentelemetry-genai.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">OpenTelemetry GenAI — Tracing Tool Calls End-to-End</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/21-llm-routing-layer"><a href="21-llm-routing-layer.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">LLM Routing Layer — LiteLLM, OpenRouter, Portkey</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/22-skills-and-agent-sdks"><a href="22-skills-and-agent-sdks.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Agent Skills: Portable Contract and Runtime Boundary</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/23-capstone-tool-ecosystem"><a href="23-capstone-tool-ecosystem.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Capstone: Stateless Tool Ecosystem</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/24-skill-discovery-and-progressive-disclosure"><a href="24-skill-discovery-and-progressive-disclosure.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Skill Discovery and Progressive Disclosure</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/25-skill-invocation-and-routing"><a href="25-skill-invocation-and-routing.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Skill Invocation and Routing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/26-skill-permissions-sandboxes-and-trust"><a href="26-skill-permissions-sandboxes-and-trust.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Skill Permissions, Sandboxes, and Trust</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/27-skill-evals-packaging-and-portability"><a href="27-skill-evals-packaging-and-portability.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">Skill Evals, Packaging, and Portability</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/28-mcp-tool-contracts-and-content"><a href="28-mcp-tool-contracts-and-content.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">MCP Tool Contracts and Content</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control"><a href="29-mcp-reliability-cancellation-and-flow-control.html" class="">
+  <span class="snav__n">29</span>
+  <span class="snav__t">MCP Reliability, Cancellation, and Flow Control</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/30-mcp-registry-supply-chain-and-drift"><a href="30-mcp-registry-supply-chain-and-drift.html" class="">
+  <span class="snav__n">30</span>
+  <span class="snav__t">MCP Registry Supply Chain: Admission, Drift, and Rollback</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/31-mcp-conformance-versioning-and-operations"><a href="31-mcp-conformance-versioning-and-operations.html" class="">
+  <span class="snav__n">31</span>
+  <span class="snav__t">MCP Conformance Engineering: Versioning, Evidence, and Operations</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Tools &amp; Protocols</a></p>
+      <h1 class="page__title">MCP Authorization: CIMD, Issuer Binding, PKCE, and Step-Up</h1>
+      <p class="page__lede">A remote MCP request is stateless, but its authorization is not anonymous. Bind every credential to the issuer that created it and every token to the resource that receives it.</p>
+      <div class="page__meta">
+        <span class="chip">9 min read</span>
+        <span class="chip">1,942 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 13 · 09 (transports), Phase 13 · 15 (security)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~90 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Discover authorization servers through protected-resource metadata.</li>
+<li>Prefer Client ID Metadata Documents over deprecated Dynamic Client Registration.</li>
+<li>Declare the correct <code class="inline-code">application_type</code> when a DCR compatibility path is unavoidable.</li>
+<li>Validate authorization response <code class="inline-code">iss</code> and isolate credentials by issuer.</li>
+<li>Use PKCE, resource indicators, audience validation, and incremental scopes.</li>
+<li>Send authorized MCP 2026-07-28 requests without protocol sessions.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>A remote MCP server may read private records, write external systems, or trigger costly work. Authentication tells it who presented a credential. Authorization must also answer:</p>
+<ul>
+<li>Which authorization server issued the credential?</li>
+<li>Which MCP resource is the token for?</li>
+<li>Which client and redirect URI completed the flow?</li>
+<li>Which operations did the user approve?</li>
+<li>Does this exact request still fit that approval?</li>
+</ul>
+<p>The 2026-07-28 authorization profile hardens client enrollment and issuer handling. It prefers Client ID Metadata Documents, deprecates Dynamic Client Registration, requires the right <code class="inline-code">application_type</code> on DCR, validates RFC 9207 issuer responses, and forbids credential reuse across issuers.</p>
+<p>These rules complement the stateless core. They do not restore a core handshake or <code class="inline-code">Mcp-Session-Id</code>.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="know-the-three-roles" class="prose-h prose-h3"><a class="prose-h__anchor" href="#know-the-three-roles" aria-label="Link to this section">#</a>Know the three roles</h3>
+<ul>
+<li><strong>MCP client:</strong> sends requests on behalf of a resource owner.</li>
+<li><strong>MCP resource server:</strong> accepts the access token and serves the MCP endpoint.</li>
+<li><strong>Authorization server:</strong> authenticates the resource owner, collects consent, and issues tokens.</li>
+</ul>
+<p>The resource server and authorization server can be operated together, but keep their identifiers and validation responsibilities separate.</p>
+<h3 id="authorization-applies-to-http" class="prose-h prose-h3"><a class="prose-h__anchor" href="#authorization-applies-to-http" aria-label="Link to this section">#</a>Authorization applies to HTTP</h3>
+<p>The MCP authorization specification applies to HTTP-based transports. A local stdio server runs under the process and operating-system trust boundary. Do not add a fake browser OAuth flow to stdio merely for symmetry.</p>
+<p>For remote Streamable HTTP, send the bearer token in the <code class="inline-code">Authorization</code> header on every request. Never place it in the URL.</p>
+<h3 id="start-with-protected-resource-metadata" class="prose-h prose-h3"><a class="prose-h__anchor" href="#start-with-protected-resource-metadata" aria-label="Link to this section">#</a>Start with protected-resource metadata</h3>
+<p>The resource server publishes RFC 9728 metadata:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"resource"</span><span class="token operator">:</span> <span class="token string">"https://notes.example.com/mcp"</span><span class="token punctuation">,</span>
+  <span class="token property">"authorization_servers"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"https://auth.example.com"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"scopes_supported"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"notes:delete"</span><span class="token punctuation">,</span> <span class="token string">"notes:read"</span><span class="token punctuation">,</span> <span class="token string">"notes:write"</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<p>The client starts from the MCP resource URL, fetches this document, selects an advertised authorization server, and then fetches that server&#39;s OAuth or OpenID Connect metadata.</p>
+<p>Preserve the resource path when constructing the RFC 9728 well-known URL. For the resource <code class="inline-code">https://notes.example.com/mcp</code>, this lesson uses <code class="inline-code">https://notes.example.com/.well-known/oauth-protected-resource/mcp</code>. Dropping the <code class="inline-code">/mcp</code> suffix can select metadata for a different protected resource on the same origin.</p>
+<p>Do not guess the authorization server from a hostname. Do not follow an issuer discovered from an unvalidated error body. Keep a policy for which issuers the client is willing to trust.</p>
+<h3 id="verify-authorization-server-metadata" class="prose-h prose-h3"><a class="prose-h__anchor" href="#verify-authorization-server-metadata" aria-label="Link to this section">#</a>Verify authorization server metadata</h3>
+<p>The metadata should expose endpoints and supported controls:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"issuer"</span><span class="token operator">:</span> <span class="token string">"https://auth.example.com"</span><span class="token punctuation">,</span>
+  <span class="token property">"authorization_endpoint"</span><span class="token operator">:</span> <span class="token string">"https://auth.example.com/authorize"</span><span class="token punctuation">,</span>
+  <span class="token property">"token_endpoint"</span><span class="token operator">:</span> <span class="token string">"https://auth.example.com/token"</span><span class="token punctuation">,</span>
+  <span class="token property">"code_challenge_methods_supported"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"S256"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"authorization_response_iss_parameter_supported"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+  <span class="token property">"client_id_metadata_document_supported"</span><span class="token operator">:</span> <span class="token boolean">true</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<p>Require S256 for PKCE. Record the exact issuer string. That exact value becomes the key for registration and token storage.</p>
+<h3 id="follow-the-registration-priority" class="prose-h prose-h3"><a class="prose-h__anchor" href="#follow-the-registration-priority" aria-label="Link to this section">#</a>Follow the registration priority</h3>
+<p>Use pre-registered client information when the client already has an explicit relationship with the selected issuer. Otherwise prefer Client ID Metadata Documents when the authorization server advertises support. Use DCR only as the deprecated compatibility fallback, then prompt for client information if none of those mechanisms is available.</p>
+<h3 id="prefer-client-id-metadata-documents" class="prose-h prose-h3"><a class="prose-h__anchor" href="#prefer-client-id-metadata-documents" aria-label="Link to this section">#</a>Prefer Client ID Metadata Documents</h3>
+<p>A Client ID Metadata Document gives the authorization server an HTTPS URL that is both the client identifier and the location of its metadata:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"client_id"</span><span class="token operator">:</span> <span class="token string">"https://client.example.com/oauth/metadata.json"</span><span class="token punctuation">,</span>
+  <span class="token property">"client_name"</span><span class="token operator">:</span> <span class="token string">"Notes desktop client"</span><span class="token punctuation">,</span>
+  <span class="token property">"application_type"</span><span class="token operator">:</span> <span class="token string">"native"</span><span class="token punctuation">,</span>
+  <span class="token property">"redirect_uris"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"http://127.0.0.1:8765/callback"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"grant_types"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"authorization_code"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"response_types"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"code"</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<p>The authorization server fetches and validates the document. The <code class="inline-code">client_id</code> must be an HTTPS URL with a path, and the value inside the document must equal that URL exactly. The required document fields are <code class="inline-code">client_id</code>, <code class="inline-code">client_name</code>, and <code class="inline-code">redirect_uris</code>. <code class="inline-code">application_type</code> appears in this example but is not a CIMD requirement. Its new mandatory use is specifically the DCR path.</p>
+<p>Treat fetching the document as an SSRF-sensitive operation. Resolve and validate the destination, reject loopback, private, link-local, and otherwise disallowed addresses, re-check after redirects and DNS changes, limit redirects, bytes, and time, require JSON, and cache only according to validated HTTP cache controls. Treat <code class="inline-code">client_name</code> and other display fields as untrusted text.</p>
+<p>CIMD removes the need to mint a fresh dynamic identifier for every first contact. It does not remove redirect URI validation, issuer policy, or user consent.</p>
+<h3 id="dcr-is-a-compatibility-path" class="prose-h prose-h3"><a class="prose-h__anchor" href="#dcr-is-a-compatibility-path" aria-label="Link to this section">#</a>DCR is a compatibility path</h3>
+<p>Dynamic Client Registration remains available for older authorization servers, but it is deprecated for new MCP implementations.</p>
+<p>When using DCR, declare <code class="inline-code">application_type</code>:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"client_name"</span><span class="token operator">:</span> <span class="token string">"Notes desktop client"</span><span class="token punctuation">,</span>
+  <span class="token property">"application_type"</span><span class="token operator">:</span> <span class="token string">"native"</span><span class="token punctuation">,</span>
+  <span class="token property">"redirect_uris"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"http://127.0.0.1:8765/callback"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"grant_types"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"authorization_code"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"response_types"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"code"</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<ul>
+<li>Desktop, mobile, command-line, and loopback clients use <code class="inline-code">native</code>.</li>
+<li>Remotely hosted browser applications use <code class="inline-code">web</code> and remote HTTPS redirects.</li>
+</ul>
+<p>Omitting the field can default to <code class="inline-code">web</code> in an OpenID Connect registration implementation and make a legitimate loopback redirect fail.</p>
+<p>Keep DCR code behind an explicit fallback decision. Do not silently fall back after an arbitrary CIMD validation failure. That could turn a security failure into a weaker enrollment path.</p>
+<h3 id="bind-credentials-to-the-issuer" class="prose-h prose-h3"><a class="prose-h__anchor" href="#bind-credentials-to-the-issuer" aria-label="Link to this section">#</a>Bind credentials to the issuer</h3>
+<p>Store issuer-minted enrollment material under the exact issuer:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>issuer_credentials[issuer] = pre_registered_or_dcr_client
+tokens[(issuer, resource)] = access_token</code></pre>
+</figure>
+<p>If protected-resource discovery changes from <code class="inline-code">https://auth-one.example</code> to <code class="inline-code">https://auth-two.example</code>, re-evaluate trust. Never send the first issuer&#39;s client secret, DCR client id, registration access token, refresh token, or access token to the second. Pre-registered and DCR clients must use credentials issued for the new issuer.</p>
+<p>A CIMD client id is different because it is a self-hosted HTTPS URL, not a credential minted by an authorization server. The same CIMD URL is portable: a new trusted issuer fetches and validates the document without DCR re-registration. Authorization responses and tokens are still validated and stored under the new issuer.</p>
+<h3 id="authorization-code-with-pkce" class="prose-h prose-h3"><a class="prose-h__anchor" href="#authorization-code-with-pkce" aria-label="Link to this section">#</a>Authorization code with PKCE</h3>
+<p>The interactive flow is:</p>
+<ol>
+<li>Generate a high-entropy <code class="inline-code">code_verifier</code>.</li>
+<li>Derive the S256 <code class="inline-code">code_challenge</code>.</li>
+<li>Send the authorization request with exact <code class="inline-code">client_id</code>, <code class="inline-code">redirect_uri</code>, <code class="inline-code">scope</code>, <code class="inline-code">code_challenge</code>, and <code class="inline-code">resource</code>.</li>
+<li>Receive an authorization response containing <code class="inline-code">code</code> and, when provided, <code class="inline-code">iss</code>.</li>
+<li>Validate <code class="inline-code">iss</code> against the exact recorded issuer before using any response field.</li>
+<li>Exchange the code with <code class="inline-code">code_verifier</code>, the same redirect URI, and the same <code class="inline-code">resource</code>.</li>
+<li>Store the resulting token under <code class="inline-code">(issuer, resource)</code>.</li>
+</ol>
+<p>The <code class="inline-code">resource</code> parameter from RFC 8707 appears in both authorization and token requests. It identifies the canonical MCP server URI.</p>
+<h3 id="validate-iss-exactly" class="prose-h prose-h3"><a class="prose-h__anchor" href="#validate-iss-exactly" aria-label="Link to this section">#</a>Validate <code class="inline-code">iss</code> exactly</h3>
+<p>RFC 9207 prevents an authorization response from one issuer being confused with a response from another.</p>
+<p>When <code class="inline-code">iss</code> is present, compare it to the recorded issuer without case folding, trailing-slash changes, default-port removal, or percent-encoding normalization. On mismatch, do not act on the code or even display attacker-controlled error details from that response.</p>
+<p>An authorization server that includes <code class="inline-code">iss</code> advertises <code class="inline-code">authorization_response_iss_parameter_supported: true</code>. Current clients still validate a present <code class="inline-code">iss</code> even when that advertisement is missing.</p>
+<h3 id="validate-audience-at-the-mcp-server" class="prose-h prose-h3"><a class="prose-h__anchor" href="#validate-audience-at-the-mcp-server" aria-label="Link to this section">#</a>Validate audience at the MCP server</h3>
+<p>The resource server accepts only tokens issued for itself:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>token.issuer == configured_authorization_server
+token.audience == canonical_mcp_resource</code></pre>
+</figure>
+<p>Invalid, expired, wrong-issuer, or wrong-audience tokens receive 401. The MCP server must not accept or transit a token meant for another service.</p>
+<h3 id="request-the-smallest-current-scope" class="prose-h prose-h3"><a class="prose-h__anchor" href="#request-the-smallest-current-scope" aria-label="Link to this section">#</a>Request the smallest current scope</h3>
+<p>Start with the scope needed now. If a later tool requires more, the server returns 403 with an authoritative scope challenge:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>WWW-Authenticate: Bearer error=&quot;insufficient_scope&quot;,
+  scope=&quot;notes:delete&quot;,
+  resource_metadata=&quot;https://notes.example.com/.well-known/oauth-protected-resource/mcp&quot;</code></pre>
+</figure>
+<p>The client explains the new permission, obtains consent, performs a new authorization flow with the combined scope set, and retries the MCP request with a new JSON-RPC id.</p>
+<p>Do not assume the challenged scope is a subset of <code class="inline-code">scopes_supported</code>. The challenge is authoritative for the current operation.</p>
+<h3 id="authorization-and-the-stateless-mcp-wire" class="prose-h prose-h3"><a class="prose-h__anchor" href="#authorization-and-the-stateless-mcp-wire" aria-label="Link to this section">#</a>Authorization and the stateless MCP wire</h3>
+<p>An authorized tool call still carries the complete current request envelope:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>POST /mcp
+Authorization: Bearer &lt;access-token&gt;
+MCP-Protocol-Version: 2026-07-28
+Mcp-Method: tools/call
+Mcp-Name: notes.delete</code></pre>
+</figure>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"jsonrpc"</span><span class="token operator">:</span> <span class="token string">"2.0"</span><span class="token punctuation">,</span>
+  <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">12</span><span class="token punctuation">,</span>
+  <span class="token property">"method"</span><span class="token operator">:</span> <span class="token string">"tools/call"</span><span class="token punctuation">,</span>
+  <span class="token property">"params"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"notes.delete"</span><span class="token punctuation">,</span>
+    <span class="token property">"arguments"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token property">"id"</span><span class="token operator">:</span> <span class="token string">"note-7"</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token property">"_meta"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"io.modelcontextprotocol/protocolVersion"</span><span class="token operator">:</span> <span class="token string">"2026-07-28"</span><span class="token punctuation">,</span>
+      <span class="token property">"io.modelcontextprotocol/clientCapabilities"</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token property">"io.modelcontextprotocol/clientInfo"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"oauth-lesson-client"</span><span class="token punctuation">,</span>
+        <span class="token property">"version"</span><span class="token operator">:</span> <span class="token string">"1.0.0"</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<p>The token authorizes the principal. The request metadata negotiates protocol behavior. Neither substitutes for the other.</p>
+<p>Validate the wire in a fixed order: JSON-RPC and metadata types, header and body equality, then protocol support. A routing or version-header mismatch returns HTTP 400 with <code class="inline-code">-32020</code>. If header and body agree on an unsupported version, return HTTP 400 with <code class="inline-code">-32022</code> and <code class="inline-code">data</code> exactly <code class="inline-code">{&quot;supported&quot;:[&quot;2026-07-28&quot;],&quot;requested&quot;:&quot;&lt;actual&gt;&quot;}</code>. An unknown method returns HTTP 404 with <code class="inline-code">-32601</code>.</p>
+<p>Every request error, including 401 invalid token and 403 insufficient scope, is a JSON-RPC error envelope with the original request <code class="inline-code">id</code>. Structured recovery information belongs in optional error <code class="inline-code">data</code>; <code class="inline-code">WWW-Authenticate</code> remains an HTTP response header. A notification has no <code class="inline-code">id</code>, so it receives no JSON-RPC body. An accepted HTTP notification returns 202 with an empty body.</p>
+<p>The server implements <code class="inline-code">server/discover</code> and advertises tools, so it also implements the mandatory <code class="inline-code">tools/list</code> method. Its tool descriptors have stable names, descriptions, and object-root <code class="inline-code">inputSchema</code> values. The list is deterministic and returns <code class="inline-code">resultType</code>, server identity metadata, a bounded <code class="inline-code">ttlMs</code>, and <code class="inline-code">cacheScope</code>. Discovery and a user-independent tool list can be available before authorization. Apply normal policy and private caching if either varies by principal.</p>
+<h3 id="no-token-passthrough" class="prose-h prose-h3"><a class="prose-h__anchor" href="#no-token-passthrough" aria-label="Link to this section">#</a>No token passthrough</h3>
+<p>An MCP server must not forward the client&#39;s MCP access token to a downstream API. Obtain a separate downstream token with the right audience or use an explicit token-exchange design. Audience validation only works when services refuse tokens minted for someone else.</p>
+<h3 id="refresh-tokens" class="prose-h prose-h3"><a class="prose-h__anchor" href="#refresh-tokens" aria-label="Link to this section">#</a>Refresh tokens</h3>
+<p>Refresh tokens are optional. When issued, store them confidentially and key them by issuer and resource. Do not assume they exist. Rotate them when the authorization server supports rotation and detect reuse of invalidated values.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="t3-scope-stepup"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">t3-scope-stepup</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> t3 scope stepup</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<p><code class="inline-code">code/main.py</code> is an in-process protocol and authorization simulator. It implements protected-resource discovery, authorization server metadata, CIMD enrollment, version-gated DCR fallback, application type checks, PKCE, issuer validation, resource-bound tokens, scope step-up, <code class="inline-code">server/discover</code>, <code class="inline-code">tools/list</code>, and a stateless tool request.</p>
+<p>The model receives parsed request bodies and routing headers. It is not a complete HTTP adapter and does not parse <code class="inline-code">Content-Type</code> or <code class="inline-code">Accept</code>. Connect it to Lesson 09&#39;s Streamable HTTP adapter, which requires <code class="inline-code">Content-Type: application/json</code> and an <code class="inline-code">Accept</code> value containing both <code class="inline-code">application/json</code> and <code class="inline-code">text/event-stream</code>.</p>
+<p>Run it:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">bash</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-bash"><span class="token builtin class-name">cd</span> phases/13-tools-and-protocols/16-mcp-security-oauth-2-1
+python3 code/main.py
+python3 <span class="token parameter variable">-m</span> unittest discover code/tests <span class="token parameter variable">-v</span></code></pre>
+</figure>
+<p>The output shows discovery first, CIMD enrollment, an ordinary read, two separate scope step-ups, and issuer-keyed credential storage.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>Map the simulator objects to production components:</p>
+<ul>
+<li><code class="inline-code">ResourceServer.protected_resource_metadata</code> becomes the RFC 9728 endpoint.</li>
+<li><code class="inline-code">AuthorizationServer.metadata</code> becomes RFC 8414 or OpenID Connect discovery.</li>
+<li><code class="inline-code">Client.enroll</code> becomes CIMD resolution plus an explicit DCR compatibility branch.</li>
+<li>Issuer-minted client credentials and <code class="inline-code">tokens_by_issuer_resource</code> become encrypted records. A CIMD URL may remain portable while its authorization results remain issuer-bound.</li>
+<li><code class="inline-code">ResourceServer.handle</code> becomes middleware that validates current MCP headers, token, and tool scope before dispatch while keeping every request error in a matching JSON-RPC envelope.</li>
+</ul>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson ships <code class="inline-code">outputs/skill-oauth-scope-planner.md</code>. It now designs enrollment priority, issuer-bound credential storage, application type, PKCE, resource indicators, scope challenges, and the current stateless request boundary.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li>Add refresh-token rotation and reject reuse of the previous refresh token.</li>
+<li>Add an issuer allowlist. On issuer change, reuse only a portable CIMD URL; refuse all prior issuer-minted credentials and tokens.</li>
+<li>Add an expiry to authorization codes and confirm a late exchange fails.</li>
+<li>Build a web client variant with a remote HTTPS redirect and compare its DCR metadata to the native client.</li>
+<li>Add a second resource under the same issuer. Confirm its access token cannot be used at the first resource.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Protected-resource metadata</td>
+<td>RFC 9728 document that identifies the resource and authorization servers</td>
+</tr>
+<tr>
+<td>CIMD</td>
+<td>HTTPS metadata document whose URL is the OAuth client identifier</td>
+</tr>
+<tr>
+<td>DCR</td>
+<td>Deprecated dynamic client enrollment retained for compatibility</td>
+</tr>
+<tr>
+<td><code class="inline-code">application_type</code></td>
+<td><code class="inline-code">native</code> or <code class="inline-code">web</code>, used to validate redirect URI rules</td>
+</tr>
+<tr>
+<td>PKCE</td>
+<td>Verifier and S256 challenge that protect an intercepted authorization code</td>
+</tr>
+<tr>
+<td><code class="inline-code">iss</code></td>
+<td>RFC 9207 authorization response issuer identifier</td>
+</tr>
+<tr>
+<td>Resource indicator</td>
+<td>RFC 8707 parameter that binds a token request to an MCP resource</td>
+</tr>
+<tr>
+<td>Audience</td>
+<td>Resource for which a token is valid</td>
+</tr>
+<tr>
+<td>Step-up</td>
+<td>New consent and token issuance for an additional current-operation scope</td>
+</tr>
+<tr>
+<td>Issuer-bound credentials</td>
+<td>Registration and token records isolated by exact authorization server issuer</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization" target="_blank" rel="noopener">MCP 2026-07-28 authorization specification</a></li>
+<li><a href="https://www.rfc-editor.org/rfc/rfc9728" target="_blank" rel="noopener">RFC 9728: OAuth 2.0 Protected Resource Metadata</a></li>
+<li><a href="https://www.rfc-editor.org/rfc/rfc8707" target="_blank" rel="noopener">RFC 8707: Resource Indicators for OAuth 2.0</a></li>
+<li><a href="https://www.rfc-editor.org/rfc/rfc9207" target="_blank" rel="noopener">RFC 9207: OAuth 2.0 Authorization Server Issuer Identification</a></li>
+<li><a href="https://datatracker.ietf.org/doc/draft-ietf-oauth-client-id-metadata-document/" target="_blank" rel="noopener">OAuth Client ID Metadata Document draft</a></li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="15-mcp-security-tool-poisoning.html">
+  <span class="label">← Previous</span>
+  <b>MCP Security: Poisoned Metadata, Routing, and MRTR State</b>
+</a>
+      <a class="pager__item pager__item--next" href="17-mcp-gateways-and-registries.html">
+  <span class="label">Next →</span>
+  <b>Stateless MCP Gateways and Registry Admission</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>9 minutes</b> of Tools &amp; Protocols behind you.</p>
+      <a class="btn btn--solid" href="17-mcp-gateways-and-registries.html">Continue to Stateless MCP Gateways and Registry Admission →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#know-the-three-roles">Know the three roles</a></li><li class="mini__item mini__item--d3"><a href="#authorization-applies-to-http">Authorization applies to HTTP</a></li><li class="mini__item mini__item--d3"><a href="#start-with-protected-resource-metadata">Start with protected-resource metadata</a></li><li class="mini__item mini__item--d3"><a href="#verify-authorization-server-metadata">Verify authorization server metadata</a></li><li class="mini__item mini__item--d3"><a href="#follow-the-registration-priority">Follow the registration priority</a></li><li class="mini__item mini__item--d3"><a href="#prefer-client-id-metadata-documents">Prefer Client ID Metadata Documents</a></li><li class="mini__item mini__item--d3"><a href="#dcr-is-a-compatibility-path">DCR is a compatibility path</a></li><li class="mini__item mini__item--d3"><a href="#bind-credentials-to-the-issuer">Bind credentials to the issuer</a></li><li class="mini__item mini__item--d3"><a href="#authorization-code-with-pkce">Authorization code with PKCE</a></li><li class="mini__item mini__item--d3"><a href="#validate-iss-exactly">Validate iss exactly</a></li><li class="mini__item mini__item--d3"><a href="#validate-audience-at-the-mcp-server">Validate audience at the MCP server</a></li><li class="mini__item mini__item--d3"><a href="#request-the-smallest-current-scope">Request the smallest current scope</a></li><li class="mini__item mini__item--d3"><a href="#authorization-and-the-stateless-mcp-wire">Authorization and the stateless MCP wire</a></li><li class="mini__item mini__item--d3"><a href="#no-token-passthrough">No token passthrough</a></li><li class="mini__item mini__item--d3"><a href="#refresh-tokens">Refresh tokens</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

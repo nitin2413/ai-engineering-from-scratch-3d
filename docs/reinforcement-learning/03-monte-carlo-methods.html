@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monte Carlo Methods — Learning from Complete Episodes — Reinforcement Learning — AIFS</title>
+<meta name="description" content="Reinforcement Learning: Monte Carlo Methods — Learning from Complete Episodes. 6 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Monte Carlo Methods — Learning from Complete Episodes — Reinforcement Learning — AIFS">
+<meta property="og:description" content="Reinforcement Learning: Monte Carlo Methods — Learning from Complete Episodes. 6 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"epsilon-greedy":["../assets/figures/figures-genai-rl.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-genai-rl.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#FFB800" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#FFB800;--accent-ink:#111111"
+  data-lesson-id="reinforcement-learning/03-monte-carlo-methods" data-module="reinforcement-learning"
+  data-prev="02-dynamic-programming.html" data-next="04-q-learning-sarsa.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#FFB800">
+        <span class="label">Phase 09</span>
+        <b>Reinforcement Learning</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="reinforcement-learning/01-mdps-states-actions-rewards"><a href="01-mdps-states-actions-rewards.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">MDPs, States, Actions &amp; Rewards</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/02-dynamic-programming"><a href="02-dynamic-programming.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Dynamic Programming — Policy Iteration &amp; Value Iteration</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/03-monte-carlo-methods"><a href="03-monte-carlo-methods.html" class="is-current">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Monte Carlo Methods — Learning from Complete Episodes</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/04-q-learning-sarsa"><a href="04-q-learning-sarsa.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Temporal Difference — Q-Learning &amp; SARSA</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/05-dqn"><a href="05-dqn.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Deep Q-Networks (DQN)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/06-policy-gradients-reinforce"><a href="06-policy-gradients-reinforce.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Policy Gradient — REINFORCE from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/07-actor-critic-a2c-a3c"><a href="07-actor-critic-a2c-a3c.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Actor-Critic — A2C and A3C</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/08-ppo"><a href="08-ppo.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Proximal Policy Optimization (PPO)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/09-reward-modeling-rlhf"><a href="09-reward-modeling-rlhf.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Reward Modeling &amp; RLHF</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/10-multi-agent-rl"><a href="10-multi-agent-rl.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Multi-Agent RL</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/11-sim-to-real-transfer"><a href="11-sim-to-real-transfer.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Sim-to-Real Transfer</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="reinforcement-learning/12-rl-for-games"><a href="12-rl-for-games.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">RL for Games — AlphaZero, MuZero, and the LLM-Reasoning Era</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Reinforcement Learning</a></p>
+      <h1 class="page__title">Monte Carlo Methods — Learning from Complete Episodes</h1>
+      <p class="page__lede">Dynamic programming needs a model. Monte Carlo needs nothing but episodes. Run the policy, watch the returns, average them. The simplest idea in RL — and the one that unlocks everything downstream.</p>
+      <div class="page__meta">
+        <span class="chip">6 min read</span>
+        <span class="chip">1,270 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 9 · 01 (MDPs), Phase 9 · 02 (Dynamic Programming)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Dynamic programming is elegant, but it assumes you can query <code class="inline-code">P(s' | s, a)</code> for every state and action. Almost nothing in the real world works that way. A robot cannot analytically compute the distribution over camera pixels after a joint torque. A pricing algorithm cannot integrate over every possible customer reaction. An LLM cannot enumerate all possible continuations after a token.</p>
+<p>You need a method that only needs the ability to <em>sample</em> from the environment. Run the policy. Get a trajectory <code class="inline-code">s_0, a_0, r_1, s_1, a_1, r_2, …, s_T</code>. Use it to estimate values. That is Monte Carlo.</p>
+<p>The shift from DP to MC is philosophically important: we move from <em>known model + exact backup</em> to <em>sampled rollouts + averaged return</em>. The variance jumps, but the applicability explodes. Every RL algorithm after this lesson — TD, Q-learning, REINFORCE, PPO, GRPO — is a Monte Carlo estimator at heart, sometimes with bootstrapping layered on top.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<p><img src="assets/03-monte-carlo-methods/monte-carlo.svg" alt="Monte Carlo: rollout, compute returns, average; first-visit vs every-visit" loading="lazy"></p>
+<p><strong>The core idea, in one line:</strong> <code class="inline-code">V^π(s) = E_π[G_t | s_t = s] ≈ (1/N) Σ_i G^{(i)}(s)</code> where <code class="inline-code">G^{(i)}(s)</code> are observed returns following visits to <code class="inline-code">s</code> under policy <code class="inline-code">π</code>.</p>
+<p><strong>First-visit vs every-visit MC.</strong> Given an episode that visits state <code class="inline-code">s</code> multiple times, first-visit MC only counts the return from the first visit; every-visit MC counts all visits. Both are unbiased in the limit. First-visit is simpler to analyze (iid samples). Every-visit uses more data per episode and typically converges faster in practice.</p>
+<p><strong>Incremental mean.</strong> Instead of storing all returns, update the running average:</p>
+<p><code class="inline-code">V_n(s) = V_{n-1}(s) + (1/n) [G_n - V_{n-1}(s)]</code></p>
+<p>Reorganize: <code class="inline-code">V_new = V_old + α · (target - V_old)</code> with <code class="inline-code">α = 1/n</code>. Swap <code class="inline-code">1/n</code> for a constant step-size <code class="inline-code">α ∈ (0, 1)</code> and you get a non-stationary MC estimator that tracks changes in <code class="inline-code">π</code>. That move is the entire jump from MC to TD to every modern RL algorithm.</p>
+<p><strong>Exploration is now a problem.</strong> DP touched every state by enumeration. MC only sees states the policy visits. If <code class="inline-code">π</code> is deterministic, whole regions of the state space never get sampled, and their value estimates stay at zero forever. Three fixes, in historical order:</p>
+<ol>
+<li><strong>Exploring starts.</strong> Start each episode from a random (s, a) pair. Guarantees coverage; unrealistic in practice (you cannot &quot;reset&quot; a robot into an arbitrary state).</li>
+<li><strong>ε-greedy.</strong> Act greedy w.r.t. current Q, but with probability <code class="inline-code">ε</code> pick a random action. All state-action pairs get sampled asymptotically.</li>
+<li><strong>Off-policy MC.</strong> Collect data under a behavior policy <code class="inline-code">μ</code>, learn about target policy <code class="inline-code">π</code> via importance sampling. High variance, but it&#39;s the bridge to replay-buffer methods like DQN.</li>
+</ol>
+<p><strong>Monte Carlo Control.</strong> Evaluate → improve → evaluate, just like policy iteration, but evaluation is sampling-based:</p>
+<ol>
+<li>Run <code class="inline-code">π</code>, get an episode.</li>
+<li>Update <code class="inline-code">Q(s, a)</code> from observed returns.</li>
+<li>Make <code class="inline-code">π</code> ε-greedy w.r.t. <code class="inline-code">Q</code>.</li>
+<li>Repeat.</li>
+</ol>
+<p>Converges to <code class="inline-code">Q*</code> and <code class="inline-code">π*</code> with probability 1 under mild conditions (every pair visited infinitely often, <code class="inline-code">α</code> satisfies Robbins-Monro).</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="epsilon-greedy"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">epsilon-greedy</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> epsilon greedy</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-rollout-list-of-s-a-r" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-rollout-list-of-s-a-r" aria-label="Link to this section">#</a>Step 1: rollout → list of (s, a, r)</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">rollout</span><span class="token punctuation">(</span>env<span class="token punctuation">,</span> policy<span class="token punctuation">,</span> max_steps<span class="token operator">=</span><span class="token number">200</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    trajectory <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    s <span class="token operator">=</span> env<span class="token punctuation">.</span>reset<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>max_steps<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        a <span class="token operator">=</span> policy<span class="token punctuation">(</span>s<span class="token punctuation">)</span>
+        s_next<span class="token punctuation">,</span> r<span class="token punctuation">,</span> done <span class="token operator">=</span> env<span class="token punctuation">.</span>step<span class="token punctuation">(</span>s<span class="token punctuation">,</span> a<span class="token punctuation">)</span>
+        trajectory<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">(</span>s<span class="token punctuation">,</span> a<span class="token punctuation">,</span> r<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        s <span class="token operator">=</span> s_next
+        <span class="token keyword">if</span> done<span class="token punctuation">:</span>
+            <span class="token keyword">break</span>
+    <span class="token keyword">return</span> trajectory</code></pre>
+</figure>
+<p>No model, only <code class="inline-code">env.reset()</code> and <code class="inline-code">env.step(s, a)</code>. Same interface as a gym environment but stripped down.</p>
+<h3 id="step-2-compute-returns-reverse-sweep" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-compute-returns-reverse-sweep" aria-label="Link to this section">#</a>Step 2: compute returns (reverse sweep)</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">returns_from</span><span class="token punctuation">(</span>trajectory<span class="token punctuation">,</span> gamma<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    returns <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    G <span class="token operator">=</span> <span class="token number">0.0</span>
+    <span class="token keyword">for</span> _<span class="token punctuation">,</span> _<span class="token punctuation">,</span> r <span class="token keyword">in</span> <span class="token builtin">reversed</span><span class="token punctuation">(</span>trajectory<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        G <span class="token operator">=</span> r <span class="token operator">+</span> gamma <span class="token operator">*</span> G
+        returns<span class="token punctuation">.</span>append<span class="token punctuation">(</span>G<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token builtin">list</span><span class="token punctuation">(</span><span class="token builtin">reversed</span><span class="token punctuation">(</span>returns<span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>One pass, <code class="inline-code">O(T)</code>. The backward recurrence <code class="inline-code">G_t = r_{t+1} + γ G_{t+1}</code> avoids re-summing.</p>
+<h3 id="step-3-first-visit-mc-evaluation" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-first-visit-mc-evaluation" aria-label="Link to this section">#</a>Step 3: first-visit MC evaluation</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">mc_policy_evaluation</span><span class="token punctuation">(</span>env<span class="token punctuation">,</span> policy<span class="token punctuation">,</span> episodes<span class="token punctuation">,</span> gamma<span class="token operator">=</span><span class="token number">0.99</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    V <span class="token operator">=</span> defaultdict<span class="token punctuation">(</span><span class="token builtin">float</span><span class="token punctuation">)</span>
+    counts <span class="token operator">=</span> defaultdict<span class="token punctuation">(</span><span class="token builtin">int</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>episodes<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        trajectory <span class="token operator">=</span> rollout<span class="token punctuation">(</span>env<span class="token punctuation">,</span> policy<span class="token punctuation">)</span>
+        returns <span class="token operator">=</span> returns_from<span class="token punctuation">(</span>trajectory<span class="token punctuation">,</span> gamma<span class="token punctuation">)</span>
+        seen <span class="token operator">=</span> <span class="token builtin">set</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">for</span> t<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>s<span class="token punctuation">,</span> _<span class="token punctuation">,</span> _<span class="token punctuation">)</span><span class="token punctuation">,</span> G<span class="token punctuation">)</span> <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span><span class="token builtin">zip</span><span class="token punctuation">(</span>trajectory<span class="token punctuation">,</span> returns<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> s <span class="token keyword">in</span> seen<span class="token punctuation">:</span>
+                <span class="token keyword">continue</span>
+            seen<span class="token punctuation">.</span>add<span class="token punctuation">(</span>s<span class="token punctuation">)</span>
+            counts<span class="token punctuation">[</span>s<span class="token punctuation">]</span> <span class="token operator">+=</span> <span class="token number">1</span>
+            V<span class="token punctuation">[</span>s<span class="token punctuation">]</span> <span class="token operator">+=</span> <span class="token punctuation">(</span>G <span class="token operator">-</span> V<span class="token punctuation">[</span>s<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">/</span> counts<span class="token punctuation">[</span>s<span class="token punctuation">]</span>
+    <span class="token keyword">return</span> V</code></pre>
+</figure>
+<p>Three lines do the work: mark state as seen on first visit, increment count, update running mean.</p>
+<h3 id="step-4-greedy-mc-control-on-policy" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-greedy-mc-control-on-policy" aria-label="Link to this section">#</a>Step 4: ε-greedy MC control (on-policy)</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">mc_control</span><span class="token punctuation">(</span>env<span class="token punctuation">,</span> episodes<span class="token punctuation">,</span> gamma<span class="token operator">=</span><span class="token number">0.99</span><span class="token punctuation">,</span> epsilon<span class="token operator">=</span><span class="token number">0.1</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    Q <span class="token operator">=</span> defaultdict<span class="token punctuation">(</span><span class="token keyword">lambda</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>a<span class="token punctuation">:</span> <span class="token number">0.0</span> <span class="token keyword">for</span> a <span class="token keyword">in</span> ACTIONS<span class="token punctuation">}</span><span class="token punctuation">)</span>
+    counts <span class="token operator">=</span> defaultdict<span class="token punctuation">(</span><span class="token keyword">lambda</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>a<span class="token punctuation">:</span> <span class="token number">0</span> <span class="token keyword">for</span> a <span class="token keyword">in</span> ACTIONS<span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">policy</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> random<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&lt;</span> epsilon<span class="token punctuation">:</span>
+            <span class="token keyword">return</span> choice<span class="token punctuation">(</span>ACTIONS<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token builtin">max</span><span class="token punctuation">(</span>Q<span class="token punctuation">[</span>s<span class="token punctuation">]</span><span class="token punctuation">,</span> key<span class="token operator">=</span>Q<span class="token punctuation">[</span>s<span class="token punctuation">]</span><span class="token punctuation">.</span>get<span class="token punctuation">)</span>
+
+    <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>episodes<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        trajectory <span class="token operator">=</span> rollout<span class="token punctuation">(</span>env<span class="token punctuation">,</span> policy<span class="token punctuation">)</span>
+        returns <span class="token operator">=</span> returns_from<span class="token punctuation">(</span>trajectory<span class="token punctuation">,</span> gamma<span class="token punctuation">)</span>
+        seen <span class="token operator">=</span> <span class="token builtin">set</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span>s<span class="token punctuation">,</span> a<span class="token punctuation">,</span> _<span class="token punctuation">)</span><span class="token punctuation">,</span> G <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>trajectory<span class="token punctuation">,</span> returns<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>s<span class="token punctuation">,</span> a<span class="token punctuation">)</span> <span class="token keyword">in</span> seen<span class="token punctuation">:</span>
+                <span class="token keyword">continue</span>
+            seen<span class="token punctuation">.</span>add<span class="token punctuation">(</span><span class="token punctuation">(</span>s<span class="token punctuation">,</span> a<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            counts<span class="token punctuation">[</span>s<span class="token punctuation">]</span><span class="token punctuation">[</span>a<span class="token punctuation">]</span> <span class="token operator">+=</span> <span class="token number">1</span>
+            Q<span class="token punctuation">[</span>s<span class="token punctuation">]</span><span class="token punctuation">[</span>a<span class="token punctuation">]</span> <span class="token operator">+=</span> <span class="token punctuation">(</span>G <span class="token operator">-</span> Q<span class="token punctuation">[</span>s<span class="token punctuation">]</span><span class="token punctuation">[</span>a<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">/</span> counts<span class="token punctuation">[</span>s<span class="token punctuation">]</span><span class="token punctuation">[</span>a<span class="token punctuation">]</span>
+    <span class="token keyword">return</span> Q<span class="token punctuation">,</span> policy</code></pre>
+</figure>
+<h3 id="step-5-compare-to-dp-gold-standard" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-compare-to-dp-gold-standard" aria-label="Link to this section">#</a>Step 5: compare to DP gold standard</h3>
+<p>Your MC estimate of <code class="inline-code">V^π</code> should agree with the DP result from Lesson 02 as episodes → ∞. In practice: 50,000 episodes on 4×4 GridWorld gets you within <code class="inline-code">~0.1</code> of the DP answer.</p>
+<h2 id="pitfalls" class="prose-h prose-h2"><a class="prose-h__anchor" href="#pitfalls" aria-label="Link to this section">#</a>Pitfalls</h2>
+<ul>
+<li><strong>Infinite episodes.</strong> MC requires episodes to <em>terminate</em>. If your policy can loop forever, cap <code class="inline-code">max_steps</code> and treat the cap as implicit failure. GridWorld with a random policy routinely times out — that is normal, just make sure you count it correctly.</li>
+<li><strong>Variance.</strong> MC uses full returns. On long episodes, variance is huge — one unlucky reward at the end shifts <code class="inline-code">V(s_0)</code> by the same amount. TD methods (Lesson 04) cut this by bootstrapping.</li>
+<li><strong>State coverage.</strong> Greedy MC on a fresh Q with ties will only ever try one action. You <em>must</em> explore (ε-greedy, exploring starts, UCB).</li>
+<li><strong>Non-stationary policies.</strong> If <code class="inline-code">π</code> changes (as in MC control), old returns are from a different policy. Constant-α MC handles this; sample-average MC does not.</li>
+<li><strong>Off-policy importance sampling.</strong> The weights <code class="inline-code">π(a|s)/μ(a|s)</code> multiply across a trajectory. Variance explodes with horizon. Cap with per-decision weighted IS or switch to TD.</li>
+</ul>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>The 2026 role of Monte Carlo methods:</p>
+<table>
+<thead>
+<tr>
+<th>Use case</th>
+<th>Why MC</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Short-horizon games (blackjack, poker)</td>
+<td>Episodes terminate naturally; returns are clean.</td>
+</tr>
+<tr>
+<td>Offline evaluation of a logged policy</td>
+<td>Average discounted returns over stored trajectories.</td>
+</tr>
+<tr>
+<td>Monte Carlo Tree Search (AlphaZero)</td>
+<td>MC rollouts from tree leaves guide selection.</td>
+</tr>
+<tr>
+<td>LLM RL evaluation</td>
+<td>Compute average reward over sampled completions for a given policy.</td>
+</tr>
+<tr>
+<td>Baseline estimation in PPO</td>
+<td>The advantage target <code class="inline-code">A_t = G_t - V(s_t)</code> uses an MC <code class="inline-code">G_t</code>.</td>
+</tr>
+<tr>
+<td>Teaching RL</td>
+<td>Simplest algorithm that actually works — strip bootstrapping to see the core.</td>
+</tr>
+</tbody></table>
+<p>Modern deep-RL algorithms (PPO, SAC) interpolate between pure MC (full returns) and pure TD (one-step bootstrap) via <code class="inline-code">n</code>-step returns or GAE. Both endpoints are instances of the same estimator.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>Save as <code class="inline-code">outputs/skill-mc-evaluator.md</code>:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">markdown</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-markdown"><span class="token front-matter-block"><span class="token punctuation">---</span>
+<span class="token front-matter yaml language-yaml"><span class="token key atrule">name</span><span class="token punctuation">:</span> mc<span class="token punctuation">-</span>evaluator
+<span class="token key atrule">description</span><span class="token punctuation">:</span> Evaluate a policy via Monte Carlo rollouts and produce a convergence report with DP<span class="token punctuation">-</span>comparison if available.
+<span class="token key atrule">version</span><span class="token punctuation">:</span> 1.0.0
+<span class="token key atrule">phase</span><span class="token punctuation">:</span> <span class="token number">9</span>
+<span class="token key atrule">lesson</span><span class="token punctuation">:</span> <span class="token number">3</span>
+<span class="token key atrule">tags</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>rl<span class="token punctuation">,</span> monte<span class="token punctuation">-</span>carlo<span class="token punctuation">,</span> evaluation<span class="token punctuation">]</span></span>
+<span class="token punctuation">---</span></span>
+
+Given an environment (episodic, with reset+step API) and a policy, output:
+
+<span class="token list punctuation">1.</span> Method. First-visit vs every-visit MC. Reason.
+<span class="token list punctuation">2.</span> Episode budget. Target number, variance diagnostic, expected standard error.
+<span class="token list punctuation">3.</span> Exploration plan. ε schedule (if needed) or exploring starts.
+<span class="token list punctuation">4.</span> Gold-standard comparison. DP-optimal V* if tabular; otherwise a bound from a Q-learning / PPO baseline.
+<span class="token list punctuation">5.</span> Termination check. Max-step cap, timeouts, handling of non-terminating trajectories.
+
+Refuse to run MC on non-episodic tasks without a finite horizon cap. Refuse to report V^π estimates from fewer than 100 episodes per state for tabular tasks. Flag any policy with zero-variance actions as an exploration risk.</code></pre>
+</figure>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><strong>Easy.</strong> Implement first-visit MC evaluation of the uniform-random policy on 4×4 GridWorld. Run 10,000 episodes. Plot <code class="inline-code">V(0,0)</code> as a function of episode count against the DP answer.</li>
+<li><strong>Medium.</strong> Implement ε-greedy MC control with <code class="inline-code">ε ∈ {0.01, 0.1, 0.3}</code>. Compare mean return after 20,000 episodes. What does the curve look like? Where does the bias-variance tradeoff live?</li>
+<li><strong>Hard.</strong> Implement <em>off-policy</em> MC with importance sampling: collect data under uniform-random policy <code class="inline-code">μ</code>, estimate <code class="inline-code">V^π</code> for the deterministic optimal policy <code class="inline-code">π</code>. Compare plain IS vs per-decision IS vs weighted IS. Which has lowest variance?</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Monte Carlo</td>
+<td>&quot;Random sampling&quot;</td>
+<td>Estimate expectations by averaging over iid samples from the distribution.</td>
+</tr>
+<tr>
+<td>Return <code class="inline-code">G_t</code></td>
+<td>&quot;Future reward&quot;</td>
+<td>Sum of discounted rewards from step <code class="inline-code">t</code> to episode end: <code class="inline-code">Σ_{k≥0} γ^k r_{t+k+1}</code>.</td>
+</tr>
+<tr>
+<td>First-visit MC</td>
+<td>&quot;Count each state once&quot;</td>
+<td>Only the first visit in an episode contributes to the value estimate.</td>
+</tr>
+<tr>
+<td>Every-visit MC</td>
+<td>&quot;Use all visits&quot;</td>
+<td>Every visit contributes; slightly biased but more sample-efficient.</td>
+</tr>
+<tr>
+<td>ε-greedy</td>
+<td>&quot;Exploration noise&quot;</td>
+<td>Pick greedy action with prob <code class="inline-code">1-ε</code>; random action with prob <code class="inline-code">ε</code>.</td>
+</tr>
+<tr>
+<td>Importance sampling</td>
+<td>&quot;Correcting for sampling from the wrong distribution&quot;</td>
+<td>Reweight returns by <code class="inline-code">π(a|s)/μ(a|s)</code> products to estimate <code class="inline-code">V^π</code> from <code class="inline-code">μ</code> data.</td>
+</tr>
+<tr>
+<td>On-policy</td>
+<td>&quot;Learn from my own data&quot;</td>
+<td>Target policy = behavior policy. Vanilla MC, PPO, SARSA.</td>
+</tr>
+<tr>
+<td>Off-policy</td>
+<td>&quot;Learn from someone else&#39;s data&quot;</td>
+<td>Target policy ≠ behavior policy. Importance-sampled MC, Q-learning, DQN.</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="http://incompleteideas.net/book/RLbook2020.pdf" target="_blank" rel="noopener">Sutton &amp; Barto (2018). Ch. 5 — Monte Carlo Methods</a> — the canonical treatment.</li>
+<li><a href="https://link.springer.com/article/10.1007/BF00114726" target="_blank" rel="noopener">Singh &amp; Sutton (1996). Reinforcement Learning with Replacing Eligibility Traces</a> — first-visit vs every-visit analysis.</li>
+<li><a href="http://incompleteideas.net/papers/PSS-00.pdf" target="_blank" rel="noopener">Precup, Sutton, Singh (2000). Eligibility Traces for Off-Policy Policy Evaluation</a> — off-policy MC and variance control.</li>
+<li><a href="https://arxiv.org/abs/1404.6362" target="_blank" rel="noopener">Mahmood et al. (2014). Weighted Importance Sampling for Off-Policy Learning</a> — modern low-variance IS estimators.</li>
+<li><a href="https://dl.acm.org/doi/10.1145/203330.203343" target="_blank" rel="noopener">Tesauro (1995). TD-Gammon, A Self-Teaching Backgammon Program</a> — the first large-scale empirical demonstration of MC/TD self-play converging to superhuman play; conceptual precursor to every lesson in the second half of this phase.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="02-dynamic-programming.html">
+  <span class="label">← Previous</span>
+  <b>Dynamic Programming — Policy Iteration &amp; Value Iteration</b>
+</a>
+      <a class="pager__item pager__item--next" href="04-q-learning-sarsa.html">
+  <span class="label">Next →</span>
+  <b>Temporal Difference — Q-Learning &amp; SARSA</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>6 minutes</b> of Reinforcement Learning behind you.</p>
+      <a class="btn btn--solid" href="04-q-learning-sarsa.html">Continue to Temporal Difference — Q-Learning &amp; SARSA →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-rollout-list-of-s-a-r">Step 1: rollout → list of (s, a, r)</a></li><li class="mini__item mini__item--d3"><a href="#step-2-compute-returns-reverse-sweep">Step 2: compute returns (reverse sweep)</a></li><li class="mini__item mini__item--d3"><a href="#step-3-first-visit-mc-evaluation">Step 3: first-visit MC evaluation</a></li><li class="mini__item mini__item--d3"><a href="#step-4-greedy-mc-control-on-policy">Step 4: ε-greedy MC control (on-policy)</a></li><li class="mini__item mini__item--d3"><a href="#step-5-compare-to-dp-gold-standard">Step 5: compare to DP gold standard</a></li><li class="mini__item mini__item--d2"><a href="#pitfalls">Pitfalls</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

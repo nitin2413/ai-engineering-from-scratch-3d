@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Naive Bayes — ML Fundamentals — AIFS</title>
+<meta name="description" content="ML Fundamentals: Naive Bayes. 13 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Naive Bayes — ML Fundamentals — AIFS">
+<meta property="og:description" content="ML Fundamentals: Naive Bayes. 13 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"naive-bayes":["../assets/figures/figures-ml.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-ml.js"];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#00D4A0" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#00D4A0;--accent-ink:#111111"
+  data-lesson-id="ml-fundamentals/14-naive-bayes" data-module="ml-fundamentals"
+  data-prev="13-ml-pipelines.html" data-next="15-time-series.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#00D4A0">
+        <span class="label">Phase 02</span>
+        <b>ML Fundamentals</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="ml-fundamentals/01-what-is-machine-learning"><a href="01-what-is-machine-learning.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">What Is Machine Learning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/02-linear-regression"><a href="02-linear-regression.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Linear Regression</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/03-logistic-regression"><a href="03-logistic-regression.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Logistic Regression</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/04-decision-trees"><a href="04-decision-trees.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Decision Trees and Random Forests</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/05-support-vector-machines"><a href="05-support-vector-machines.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Support Vector Machines</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/06-knn-and-distances"><a href="06-knn-and-distances.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">K-Nearest Neighbors and Distances</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/07-unsupervised-learning"><a href="07-unsupervised-learning.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Unsupervised Learning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/08-feature-engineering"><a href="08-feature-engineering.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Feature Engineering &amp; Selection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/09-model-evaluation"><a href="09-model-evaluation.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Model Evaluation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/10-bias-variance"><a href="10-bias-variance.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Bias-Variance Tradeoff</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/11-ensemble-methods"><a href="11-ensemble-methods.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Ensemble Methods</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/12-hyperparameter-tuning"><a href="12-hyperparameter-tuning.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Hyperparameter Tuning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/13-ml-pipelines"><a href="13-ml-pipelines.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">ML Pipelines</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/14-naive-bayes"><a href="14-naive-bayes.html" class="is-current">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Naive Bayes</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/15-time-series"><a href="15-time-series.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Time Series Fundamentals</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/16-anomaly-detection"><a href="16-anomaly-detection.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Anomaly Detection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/17-imbalanced-data"><a href="17-imbalanced-data.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Handling Imbalanced Data</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/18-feature-selection"><a href="18-feature-selection.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Feature Selection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">ML Fundamentals</a></p>
+      <h1 class="page__title">Naive Bayes</h1>
+      <p class="page__lede">The &quot;naive&quot; assumption is wrong, and it works anyway. That's the beauty of it.</p>
+      <div class="page__meta">
+        <span class="chip">13 min read</span>
+        <span class="chip">2,841 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Language</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 2, Lessons 01-07 (classification, Bayes' theorem)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Implement Multinomial Naive Bayes from scratch with Laplace smoothing for text classification</li>
+<li>Explain why the naive independence assumption is mathematically wrong but produces correct class rankings in practice</li>
+<li>Compare Multinomial, Bernoulli, and Gaussian Naive Bayes variants and select the right one for a given feature type</li>
+<li>Evaluate Naive Bayes against logistic regression on high-dimensional sparse data and explain the bias-variance tradeoff at work</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>You need to classify text. Emails into spam or not-spam. Customer reviews into positive or negative. Support tickets into categories. You have thousands of features (one per word) and limited training data.</p>
+<p>Most classifiers choke here. Logistic regression needs enough samples to estimate thousands of weights reliably. Decision trees split on one word at a time and overfit wildly. KNN in 10,000 dimensions is meaningless because every point is equally far from every other point.</p>
+<p>Naive Bayes handles this. It makes a mathematically wrong assumption (that every feature is independent of every other feature given the class), and it still outperforms &quot;smarter&quot; models on text classification, especially with small training sets. It trains in a single pass through the data. It scales to millions of features. It produces probability estimates (though often poorly calibrated due to the independence assumption).</p>
+<p>Understanding why a wrong assumption leads to good predictions teaches you something fundamental about machine learning: the best model is not the most correct one, it is the one with the best bias-variance tradeoff for your data.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="bayes-theorem-quick-review" class="prose-h prose-h3"><a class="prose-h__anchor" href="#bayes-theorem-quick-review" aria-label="Link to this section">#</a>Bayes&#39; Theorem (Quick Review)</h3>
+<p>Bayes&#39; theorem flips conditional probabilities:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>P(class | features) = P(features | class) * P(class) / P(features)</code></pre>
+</figure>
+<p>We want <code class="inline-code">P(class | features)</code> -- the probability that a document belongs to a class given the words in it. We can compute this from:</p>
+<ul>
+<li><code class="inline-code">P(features | class)</code> -- the likelihood of seeing these words in documents of this class</li>
+<li><code class="inline-code">P(class)</code> -- the prior probability of the class (how common is spam in general?)</li>
+<li><code class="inline-code">P(features)</code> -- the evidence, same for all classes, so we can ignore it when comparing</li>
+</ul>
+<p>The class with the highest <code class="inline-code">P(class | features)</code> wins.</p>
+<h3 id="the-naive-independence-assumption" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-naive-independence-assumption" aria-label="Link to this section">#</a>The Naive Independence Assumption</h3>
+<p>Computing <code class="inline-code">P(features | class)</code> exactly requires estimating the joint probability of all features together. With a vocabulary of 10,000 words, you would need to estimate a distribution over 2^10,000 possible combinations. Impossible.</p>
+<p>The naive assumption: every feature is conditionally independent given the class.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>P(w1, w2, ..., wn | class) = P(w1 | class) * P(w2 | class) * ... * P(wn | class)</code></pre>
+</figure>
+<p>Instead of one impossible joint distribution, you estimate n simple per-feature distributions. Each one needs only a count.</p>
+<p>This assumption is obviously wrong. The words &quot;machine&quot; and &quot;learning&quot; are not independent in any document. But the classifier does not need correct probability estimates. It needs correct rankings -- which class has the highest probability. The independence assumption introduces systematic errors, but those errors affect all classes similarly, so the ranking stays correct.</p>
+<h3 id="why-it-still-works" class="prose-h prose-h3"><a class="prose-h__anchor" href="#why-it-still-works" aria-label="Link to this section">#</a>Why It Still Works</h3>
+<p>Three reasons:</p>
+<ol>
+<li><p><strong>Ranking over calibration.</strong> Classification only needs the top-ranked class to be correct. Even if P(spam) = 0.99999 when the true probability is 0.7, the classifier still picks spam correctly. We do not need correct probabilities. We need the correct winner.</p>
+</li>
+<li><p><strong>High bias, low variance.</strong> The independence assumption is a strong prior. It constrains the model heavily, which prevents overfitting. With limited training data, a model that is slightly wrong but stable beats a model that is theoretically right but wildly unstable. This is the bias-variance tradeoff in action.</p>
+</li>
+<li><p><strong>Feature redundancy cancels out.</strong> Correlated features provide redundant evidence. The classifier double-counts this evidence, but it double-counts it for the correct class too. If &quot;machine&quot; and &quot;learning&quot; always appear together, both provide evidence for the &quot;tech&quot; class. NB counts them twice, but it counts them twice for the right class.</p>
+</li>
+</ol>
+<p>A fourth, practical reason: Naive Bayes is extremely fast. Training is a single pass through the data counting frequencies. Prediction is a matrix multiplication. You can train on a million documents in seconds. This speed means you can iterate faster, try more feature sets, and run more experiments than with slower models.</p>
+<h3 id="the-math-step-by-step" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-math-step-by-step" aria-label="Link to this section">#</a>The Math Step by Step</h3>
+<p>Let us trace through a concrete example. Suppose we have two classes: spam and not-spam. Our vocabulary has three words: &quot;free&quot;, &quot;money&quot;, &quot;meeting&quot;.</p>
+<p>Training data:</p>
+<ul>
+<li>Spam emails mention &quot;free&quot; 80 times, &quot;money&quot; 60 times, &quot;meeting&quot; 10 times (150 total words)</li>
+<li>Not-spam emails mention &quot;free&quot; 5 times, &quot;money&quot; 10 times, &quot;meeting&quot; 100 times (115 total words)</li>
+<li>40% of emails are spam, 60% are not-spam</li>
+</ul>
+<p>With Laplace smoothing (alpha=1):</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>P(free | spam)    = (80 + 1) / (150 + 3) = 81/153 = 0.529
+P(money | spam)   = (60 + 1) / (150 + 3) = 61/153 = 0.399
+P(meeting | spam) = (10 + 1) / (150 + 3) = 11/153 = 0.072
+
+P(free | not-spam)    = (5 + 1) / (115 + 3) = 6/118 = 0.051
+P(money | not-spam)   = (10 + 1) / (115 + 3) = 11/118 = 0.093
+P(meeting | not-spam) = (100 + 1) / (115 + 3) = 101/118 = 0.856</code></pre>
+</figure>
+<p>New email contains: &quot;free&quot; (2 times), &quot;money&quot; (1 time), &quot;meeting&quot; (0 times).</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>log P(spam | email) = log(0.4) + 2*log(0.529) + 1*log(0.399) + 0*log(0.072)
+                    = -0.916 + 2*(-0.637) + (-0.919) + 0
+                    = -3.109
+
+log P(not-spam | email) = log(0.6) + 2*log(0.051) + 1*log(0.093) + 0*log(0.856)
+                        = -0.511 + 2*(-2.976) + (-2.375) + 0
+                        = -8.838</code></pre>
+</figure>
+<p>Spam wins by a large margin. The word &quot;free&quot; appearing twice is strong evidence for spam. Note that &quot;meeting&quot; not appearing contributes zero to both log sums (0 * log(P)) -- in Multinomial NB, absent words have no effect. It is Bernoulli NB that explicitly models word absence.</p>
+<h3 id="three-variants" class="prose-h prose-h3"><a class="prose-h__anchor" href="#three-variants" aria-label="Link to this section">#</a>Three Variants</h3>
+<p>Naive Bayes comes in three flavors. Each models <code class="inline-code">P(feature | class)</code> differently.</p>
+<h4 id="multinomial-naive-bayes" class="prose-h prose-h4"><a class="prose-h__anchor" href="#multinomial-naive-bayes" aria-label="Link to this section">#</a>Multinomial Naive Bayes</h4>
+<p>Models each feature as a count. Best for text data where features are word frequencies or TF-IDF values.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>P(word_i | class) = (count of word_i in class + alpha) / (total words in class + alpha * vocab_size)</code></pre>
+</figure>
+<p>The <code class="inline-code">alpha</code> is Laplace smoothing (explained below). This variant is the workhorse for text classification.</p>
+<h4 id="gaussian-naive-bayes" class="prose-h prose-h4"><a class="prose-h__anchor" href="#gaussian-naive-bayes" aria-label="Link to this section">#</a>Gaussian Naive Bayes</h4>
+<p>Models each feature as a normal distribution. Best for continuous features.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>P(x_i | class) = (1 / sqrt(2 * pi * var)) * exp(-(x_i - mean)^2 / (2 * var))</code></pre>
+</figure>
+<p>Each class gets its own mean and variance per feature. This works well when features genuinely follow a bell curve within each class.</p>
+<h4 id="bernoulli-naive-bayes" class="prose-h prose-h4"><a class="prose-h__anchor" href="#bernoulli-naive-bayes" aria-label="Link to this section">#</a>Bernoulli Naive Bayes</h4>
+<p>Models each feature as binary (present or absent). Best for short text or binary feature vectors.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>P(word_i | class) = (docs in class containing word_i + alpha) / (total docs in class + 2 * alpha)</code></pre>
+</figure>
+<p>Unlike Multinomial, Bernoulli explicitly penalizes the absence of a word. If &quot;free&quot; typically appears in spam but is absent from this email, Bernoulli counts that as evidence against spam.</p>
+<h3 id="when-to-use-each-variant" class="prose-h prose-h3"><a class="prose-h__anchor" href="#when-to-use-each-variant" aria-label="Link to this section">#</a>When to Use Each Variant</h3>
+<table>
+<thead>
+<tr>
+<th>Variant</th>
+<th>Feature Type</th>
+<th>Best For</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Multinomial</td>
+<td>Counts or frequencies</td>
+<td>Text classification, bag-of-words</td>
+<td>Email spam, topic classification</td>
+</tr>
+<tr>
+<td>Gaussian</td>
+<td>Continuous values</td>
+<td>Tabular data with normal-ish features</td>
+<td>Iris classification, sensor data</td>
+</tr>
+<tr>
+<td>Bernoulli</td>
+<td>Binary (0/1)</td>
+<td>Short text, binary feature vectors</td>
+<td>SMS spam, presence/absence features</td>
+</tr>
+</tbody></table>
+<h3 id="laplace-smoothing" class="prose-h prose-h3"><a class="prose-h__anchor" href="#laplace-smoothing" aria-label="Link to this section">#</a>Laplace Smoothing</h3>
+<p>What happens when a word appears in the test data but never appeared in the training data for a particular class?</p>
+<p>Without smoothing: <code class="inline-code">P(word | class) = 0/N = 0</code>. One zero multiplied through the entire product makes <code class="inline-code">P(class | features) = 0</code>, regardless of all other evidence. A single unseen word destroys the entire prediction, no matter how much other evidence supports it.</p>
+<p>Laplace smoothing adds a small count <code class="inline-code">alpha</code> (usually 1) to every feature count:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>P(word_i | class) = (count(word_i, class) + alpha) / (total_words_in_class + alpha * vocab_size)</code></pre>
+</figure>
+<p>With alpha=1, every word gets at least a tiny probability. The word &quot;discombobulate&quot; appearing in a test email no longer kills the spam probability. The smoothing has a Bayesian interpretation: it is equivalent to placing a uniform Dirichlet prior on the word distributions.</p>
+<p>Higher alpha means stronger smoothing (more uniform distributions). Lower alpha means the model trusts the data more. Alpha is a hyperparameter you tune.</p>
+<p>The effect of alpha:</p>
+<table>
+<thead>
+<tr>
+<th>Alpha</th>
+<th>Effect</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0.001</td>
+<td>Almost no smoothing, trust the data</td>
+<td>Very large training set, no unseen features expected</td>
+</tr>
+<tr>
+<td>0.1</td>
+<td>Light smoothing</td>
+<td>Large training set</td>
+</tr>
+<tr>
+<td>1.0</td>
+<td>Standard Laplace smoothing</td>
+<td>Default starting point</td>
+</tr>
+<tr>
+<td>10.0</td>
+<td>Heavy smoothing, flattens distributions</td>
+<td>Very small training set, many unseen features expected</td>
+</tr>
+</tbody></table>
+<h3 id="log-space-computation" class="prose-h prose-h3"><a class="prose-h__anchor" href="#log-space-computation" aria-label="Link to this section">#</a>Log-Space Computation</h3>
+<p>Multiplying hundreds of probabilities (each less than 1) causes floating-point underflow. The product becomes zero in floating point even though the true value is a very small positive number.</p>
+<p>The solution: work in log space. Instead of multiplying probabilities, add their logarithms:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>log P(class | x1, x2, ..., xn) = log P(class) + sum_i log P(xi | class)</code></pre>
+</figure>
+<p>This turns the prediction into a dot product:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>log_scores = X @ log_feature_probs.T + log_class_priors
+prediction = argmax(log_scores)</code></pre>
+</figure>
+<p>Matrix multiplication. That is why Naive Bayes prediction is so fast -- it is the same operation as a single-layer linear model.</p>
+<h3 id="naive-bayes-vs-logistic-regression" class="prose-h prose-h3"><a class="prose-h__anchor" href="#naive-bayes-vs-logistic-regression" aria-label="Link to this section">#</a>Naive Bayes vs Logistic Regression</h3>
+<p>Both are linear classifiers for text. The difference is in what they model.</p>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Naive Bayes</th>
+<th>Logistic Regression</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Type</td>
+<td>Generative (models P(X|Y))</td>
+<td>Discriminative (models P(Y|X))</td>
+</tr>
+<tr>
+<td>Training</td>
+<td>Count frequencies</td>
+<td>Optimize loss function</td>
+</tr>
+<tr>
+<td>Small data</td>
+<td>Better (strong prior helps)</td>
+<td>Worse (not enough to estimate weights)</td>
+</tr>
+<tr>
+<td>Large data</td>
+<td>Worse (wrong assumption hurts)</td>
+<td>Better (flexible boundary)</td>
+</tr>
+<tr>
+<td>Features</td>
+<td>Assumes independence</td>
+<td>Handles correlations</td>
+</tr>
+<tr>
+<td>Speed</td>
+<td>Single pass, very fast</td>
+<td>Iterative optimization</td>
+</tr>
+<tr>
+<td>Calibration</td>
+<td>Poor probabilities</td>
+<td>Better probabilities</td>
+</tr>
+</tbody></table>
+<p>Rule of thumb: start with Naive Bayes. If you have enough data and NB plateaus, switch to logistic regression.</p>
+<h3 id="classification-pipeline" class="prose-h prose-h3"><a class="prose-h__anchor" href="#classification-pipeline" aria-label="Link to this section">#</a>Classification Pipeline</h3>
+<figure class="mermaid-figure">
+  <pre class="mermaid">flowchart LR
+    A[Raw Text] --&gt; B[Tokenize]
+    B --&gt; C[Build Vocabulary]
+    C --&gt; D[Count Word Frequencies]
+    D --&gt; E[Apply Smoothing]
+    E --&gt; F[Compute Log Probabilities]
+    F --&gt; G[Predict: argmax P class given words]
+
+    style A fill:#f9f,stroke:#333
+    style G fill:#9f9,stroke:#333</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>In practice, we work in log space to avoid floating-point underflow. Instead of multiplying many small probabilities, we add their logarithms:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>log P(class | features) = log P(class) + sum_i log P(feature_i | class)</code></pre>
+</figure>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="naive-bayes"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">naive-bayes</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> naive bayes</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<p>The code in <code class="inline-code">code/naive_bayes.py</code> implements both MultinomialNB and GaussianNB from scratch.</p>
+<h3 id="multinomialnb" class="prose-h prose-h3"><a class="prose-h__anchor" href="#multinomialnb" aria-label="Link to this section">#</a>MultinomialNB</h3>
+<p>The from-scratch implementation:</p>
+<ol>
+<li><p><strong>fit(X, y)</strong>: For each class, count the frequency of each feature. Add Laplace smoothing. Compute log probabilities. Store class priors (log of class frequencies).</p>
+</li>
+<li><p><strong>predict_log_proba(X)</strong>: For each sample, compute log P(class) + sum of log P(feature_i | class) for all classes. This is a matrix multiplication: X @ log_probs.T + log_priors.</p>
+</li>
+<li><p><strong>predict(X)</strong>: Return the class with highest log probability.</p>
+</li>
+</ol>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">MultinomialNB</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> alpha<span class="token operator">=</span><span class="token number">1.0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>alpha <span class="token operator">=</span> alpha
+
+    <span class="token keyword">def</span> <span class="token function">fit</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> X<span class="token punctuation">,</span> y<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        classes <span class="token operator">=</span> np<span class="token punctuation">.</span>unique<span class="token punctuation">(</span>y<span class="token punctuation">)</span>
+        n_classes <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>classes<span class="token punctuation">)</span>
+        n_features <span class="token operator">=</span> X<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span>
+
+        self<span class="token punctuation">.</span>classes_ <span class="token operator">=</span> classes
+        self<span class="token punctuation">.</span>class_log_prior_ <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span>n_classes<span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>feature_log_prob_ <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token punctuation">(</span>n_classes<span class="token punctuation">,</span> n_features<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+        <span class="token keyword">for</span> i<span class="token punctuation">,</span> c <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>classes<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            X_c <span class="token operator">=</span> X<span class="token punctuation">[</span>y <span class="token operator">==</span> c<span class="token punctuation">]</span>
+            self<span class="token punctuation">.</span>class_log_prior_<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> np<span class="token punctuation">.</span>log<span class="token punctuation">(</span>X_c<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">/</span> X<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+            counts <span class="token operator">=</span> X_c<span class="token punctuation">.</span><span class="token builtin">sum</span><span class="token punctuation">(</span>axis<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">+</span> self<span class="token punctuation">.</span>alpha
+            self<span class="token punctuation">.</span>feature_log_prob_<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> np<span class="token punctuation">.</span>log<span class="token punctuation">(</span>counts <span class="token operator">/</span> counts<span class="token punctuation">.</span><span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+        <span class="token keyword">return</span> self</code></pre>
+</figure>
+<p>The key insight: after fitting, prediction is just matrix multiplication plus a bias. This is why Naive Bayes is so fast.</p>
+<h3 id="gaussiannb" class="prose-h prose-h3"><a class="prose-h__anchor" href="#gaussiannb" aria-label="Link to this section">#</a>GaussianNB</h3>
+<p>For continuous features, we estimate mean and variance per class per feature:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">GaussianNB</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">pass</span>
+
+    <span class="token keyword">def</span> <span class="token function">fit</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> X<span class="token punctuation">,</span> y<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        classes <span class="token operator">=</span> np<span class="token punctuation">.</span>unique<span class="token punctuation">(</span>y<span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>classes_ <span class="token operator">=</span> classes
+        self<span class="token punctuation">.</span>means_ <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>classes<span class="token punctuation">)</span><span class="token punctuation">,</span> X<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>vars_ <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>classes<span class="token punctuation">)</span><span class="token punctuation">,</span> X<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>priors_ <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>classes<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+        <span class="token keyword">for</span> i<span class="token punctuation">,</span> c <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>classes<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            X_c <span class="token operator">=</span> X<span class="token punctuation">[</span>y <span class="token operator">==</span> c<span class="token punctuation">]</span>
+            self<span class="token punctuation">.</span>means_<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> X_c<span class="token punctuation">.</span>mean<span class="token punctuation">(</span>axis<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span>
+            self<span class="token punctuation">.</span>vars_<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> X_c<span class="token punctuation">.</span>var<span class="token punctuation">(</span>axis<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1e-9</span>
+            self<span class="token punctuation">.</span>priors_<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> X_c<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">/</span> X<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+
+        <span class="token keyword">return</span> self</code></pre>
+</figure>
+<p>Prediction uses the Gaussian PDF per feature, multiplied across features (added in log space).</p>
+<h3 id="demo-text-classification" class="prose-h prose-h3"><a class="prose-h__anchor" href="#demo-text-classification" aria-label="Link to this section">#</a>Demo: Text Classification</h3>
+<p>The code generates synthetic bag-of-words data simulating two classes (tech articles vs sports articles). Each class has a different word frequency distribution. MultinomialNB classifies them using word counts.</p>
+<p>The synthetic data works like this: we create 200 &quot;words&quot; (feature columns). Words 0-39 have high frequency in tech articles and low in sports. Words 80-119 have high frequency in sports and low in tech. Words 40-79 are medium frequency in both. This creates a realistic scenario where some words are strong class indicators and others are noise.</p>
+<h3 id="demo-continuous-features" class="prose-h prose-h3"><a class="prose-h__anchor" href="#demo-continuous-features" aria-label="Link to this section">#</a>Demo: Continuous Features</h3>
+<p>The code generates Iris-like data (3 classes, 4 features, Gaussian clusters). GaussianNB classifies using per-class mean and variance. Each class has a different center (mean vector) and different spread (variance), mimicking real-world data where measurements differ systematically between categories.</p>
+<p>The code also demonstrates:</p>
+<ul>
+<li><strong>Smoothing comparison:</strong> Training MultinomialNB with different alpha values to show the effect of smoothing strength on accuracy.</li>
+<li><strong>Training size experiment:</strong> How NB accuracy improves as training data grows from 20 to 1600 samples. NB reaches decent accuracy even with very few samples -- this is its main advantage.</li>
+<li><strong>Confusion matrix:</strong> Per-class precision, recall, and F1 score to show where NB makes mistakes.</li>
+</ul>
+<h3 id="prediction-speed" class="prose-h prose-h3"><a class="prose-h__anchor" href="#prediction-speed" aria-label="Link to this section">#</a>Prediction Speed</h3>
+<p>Naive Bayes prediction is a matrix multiplication. For n samples with d features and k classes:</p>
+<ul>
+<li>MultinomialNB: one matrix multiply (n x d) @ (d x k) = O(n * d * k)</li>
+<li>GaussianNB: n * k Gaussian PDF evaluations, each over d features = O(n * d * k)</li>
+</ul>
+<p>Both are linear in every dimension. Compare this to KNN (which requires distance computation to all training points) or SVM with RBF kernel (which requires kernel evaluation against all support vectors). NB is faster by orders of magnitude at prediction time.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>With sklearn, both variants are one-liners:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>naive_bayes <span class="token keyword">import</span> GaussianNB<span class="token punctuation">,</span> MultinomialNB
+
+gnb <span class="token operator">=</span> GaussianNB<span class="token punctuation">(</span><span class="token punctuation">)</span>
+gnb<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X_train<span class="token punctuation">,</span> y_train<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"GaussianNB accuracy: </span><span class="token interpolation"><span class="token punctuation">{</span>gnb<span class="token punctuation">.</span>score<span class="token punctuation">(</span>X_test<span class="token punctuation">,</span> y_test<span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.3f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+mnb <span class="token operator">=</span> MultinomialNB<span class="token punctuation">(</span>alpha<span class="token operator">=</span><span class="token number">1.0</span><span class="token punctuation">)</span>
+mnb<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X_train_counts<span class="token punctuation">,</span> y_train<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"MultinomialNB accuracy: </span><span class="token interpolation"><span class="token punctuation">{</span>mnb<span class="token punctuation">.</span>score<span class="token punctuation">(</span>X_test_counts<span class="token punctuation">,</span> y_test<span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.3f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>For text classification with sklearn:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>feature_extraction<span class="token punctuation">.</span>text <span class="token keyword">import</span> CountVectorizer
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>naive_bayes <span class="token keyword">import</span> MultinomialNB
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>pipeline <span class="token keyword">import</span> Pipeline
+
+text_clf <span class="token operator">=</span> Pipeline<span class="token punctuation">(</span><span class="token punctuation">[</span>
+    <span class="token punctuation">(</span><span class="token string">"vectorizer"</span><span class="token punctuation">,</span> CountVectorizer<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">(</span><span class="token string">"classifier"</span><span class="token punctuation">,</span> MultinomialNB<span class="token punctuation">(</span>alpha<span class="token operator">=</span><span class="token number">1.0</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+text_clf<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>train_texts<span class="token punctuation">,</span> train_labels<span class="token punctuation">)</span>
+accuracy <span class="token operator">=</span> text_clf<span class="token punctuation">.</span>score<span class="token punctuation">(</span>test_texts<span class="token punctuation">,</span> test_labels<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>The code in <code class="inline-code">naive_bayes.py</code> compares from-scratch implementations against sklearn on the same data to verify correctness.</p>
+<h3 id="tf-idf-with-naive-bayes" class="prose-h prose-h3"><a class="prose-h__anchor" href="#tf-idf-with-naive-bayes" aria-label="Link to this section">#</a>TF-IDF with Naive Bayes</h3>
+<p>Raw word counts give every word equal weight per occurrence. But common words like &quot;the&quot; and &quot;is&quot; appear frequently in every class -- they carry no information. TF-IDF (Term Frequency - Inverse Document Frequency) downweights common words and upweights rare, discriminative words.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>feature_extraction<span class="token punctuation">.</span>text <span class="token keyword">import</span> TfidfVectorizer
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>naive_bayes <span class="token keyword">import</span> MultinomialNB
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>pipeline <span class="token keyword">import</span> Pipeline
+
+text_clf <span class="token operator">=</span> Pipeline<span class="token punctuation">(</span><span class="token punctuation">[</span>
+    <span class="token punctuation">(</span><span class="token string">"tfidf"</span><span class="token punctuation">,</span> TfidfVectorizer<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">(</span><span class="token string">"classifier"</span><span class="token punctuation">,</span> MultinomialNB<span class="token punctuation">(</span>alpha<span class="token operator">=</span><span class="token number">0.1</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>TF-IDF values are non-negative, so they work with MultinomialNB. The combination of TF-IDF + MultinomialNB is one of the strongest baselines for text classification. It frequently beats more complex models on datasets with fewer than 10,000 training samples.</p>
+<h3 id="bernoullinb-for-short-text" class="prose-h prose-h3"><a class="prose-h__anchor" href="#bernoullinb-for-short-text" aria-label="Link to this section">#</a>BernoulliNB for Short Text</h3>
+<p>For short text (tweets, SMS, chat messages), BernoulliNB can outperform MultinomialNB. Short texts have low word counts, so the frequency information that MultinomialNB relies on is noisy. BernoulliNB only cares about presence or absence, which is more reliable with short text.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>naive_bayes <span class="token keyword">import</span> BernoulliNB
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>feature_extraction<span class="token punctuation">.</span>text <span class="token keyword">import</span> CountVectorizer
+
+text_clf <span class="token operator">=</span> Pipeline<span class="token punctuation">(</span><span class="token punctuation">[</span>
+    <span class="token punctuation">(</span><span class="token string">"vectorizer"</span><span class="token punctuation">,</span> CountVectorizer<span class="token punctuation">(</span>binary<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">(</span><span class="token string">"classifier"</span><span class="token punctuation">,</span> BernoulliNB<span class="token punctuation">(</span>alpha<span class="token operator">=</span><span class="token number">1.0</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>The <code class="inline-code">binary=True</code> flag in CountVectorizer converts all counts to 0/1. Without it, BernoulliNB still works but is seeing counts that it was not designed for.</p>
+<h3 id="calibrating-nb-probabilities" class="prose-h prose-h3"><a class="prose-h__anchor" href="#calibrating-nb-probabilities" aria-label="Link to this section">#</a>Calibrating NB Probabilities</h3>
+<p>NB probabilities are poorly calibrated. When NB says P(spam) = 0.95, the true probability might be 0.7. If you need reliable probability estimates (for example, to set a threshold or to combine with other models), use sklearn&#39;s CalibratedClassifierCV:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>calibration <span class="token keyword">import</span> CalibratedClassifierCV
+
+calibrated_nb <span class="token operator">=</span> CalibratedClassifierCV<span class="token punctuation">(</span>MultinomialNB<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> cv<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">,</span> method<span class="token operator">=</span><span class="token string">"sigmoid"</span><span class="token punctuation">)</span>
+calibrated_nb<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X_train<span class="token punctuation">,</span> y_train<span class="token punctuation">)</span>
+proba <span class="token operator">=</span> calibrated_nb<span class="token punctuation">.</span>predict_proba<span class="token punctuation">(</span>X_test<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>This fits a logistic regression on top of NB&#39;s raw scores using cross-validation. The resulting probabilities are much closer to the true class frequencies.</p>
+<h3 id="common-gotchas" class="prose-h prose-h3"><a class="prose-h__anchor" href="#common-gotchas" aria-label="Link to this section">#</a>Common Gotchas</h3>
+<ol>
+<li><p><strong>Negative feature values.</strong> MultinomialNB requires non-negative features. If you have negative values (like TF-IDF with certain settings or standardized features), use GaussianNB instead, or shift the features to be positive.</p>
+</li>
+<li><p><strong>Zero variance features.</strong> GaussianNB divides by variance. If a feature has zero variance for a class (all values identical), the probability computation breaks. The code adds a small smoothing term (1e-9) to all variances to prevent this.</p>
+</li>
+<li><p><strong>Class imbalance.</strong> If 99% of emails are not-spam, the prior P(not-spam) = 0.99 is so strong that it overwhelms the likelihood evidence. You can set class priors manually or use class_prior parameter in sklearn.</p>
+</li>
+<li><p><strong>Feature scaling.</strong> MultinomialNB does not need scaling (it works on counts). GaussianNB does not need scaling either (it estimates per-feature statistics). This is an advantage over logistic regression and SVM, which are sensitive to feature scales.</p>
+</li>
+</ol>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces:</p>
+<ul>
+<li><code class="inline-code">outputs/skill-naive-bayes-chooser.md</code> -- a decision skill for picking the right NB variant</li>
+<li><code class="inline-code">code/naive_bayes.py</code> -- MultinomialNB and GaussianNB from scratch, with sklearn comparison</li>
+</ul>
+<h3 id="when-naive-bayes-fails" class="prose-h prose-h3"><a class="prose-h__anchor" href="#when-naive-bayes-fails" aria-label="Link to this section">#</a>When Naive Bayes Fails</h3>
+<p>NB fails when the independence assumption causes incorrect rankings (not just incorrect probabilities). This happens when:</p>
+<ol>
+<li><p><strong>Strong feature interactions.</strong> If the class depends on the combination of two features but not either alone (XOR-like patterns), NB will miss it entirely. Each feature alone provides no evidence, and NB cannot combine them nonlinearly.</p>
+</li>
+<li><p><strong>Highly correlated features with opposing evidence.</strong> If feature A says &quot;spam&quot; and feature B says &quot;not-spam&quot;, but A and B are perfectly correlated (they always agree in reality), NB will see conflicting evidence where there is none.</p>
+</li>
+<li><p><strong>Very large training sets.</strong> With enough data, discriminative models like logistic regression learn the true decision boundary and outperform NB. The independence assumption that helped with small data now holds the model back.</p>
+</li>
+</ol>
+<p>In practice, these failure modes are rare for text classification. Text features are numerous, individually weak, and the independence assumption&#39;s errors tend to cancel out. For tabular data with few strongly correlated features, consider logistic regression or tree-based models first.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p><strong>Smoothing experiment.</strong> Train MultinomialNB on text data with alpha values of 0.01, 0.1, 1.0, 10.0, and 100.0. Plot accuracy vs alpha. Where does performance peak? Why does very high alpha hurt?</p>
+</li>
+<li><p><strong>Feature independence test.</strong> Take a real text dataset. Pick two words that are obviously correlated (&quot;machine&quot; and &quot;learning&quot;). Compute P(word1 | class) * P(word2 | class) and compare to P(word1 AND word2 | class). How wrong is the independence assumption? Does it affect classification accuracy?</p>
+</li>
+<li><p><strong>Bernoulli implementation.</strong> Extend the code with a BernoulliNB class. Convert bag-of-words to binary (present/absent) and compare accuracy against MultinomialNB on text data. When does Bernoulli win?</p>
+</li>
+<li><p><strong>NB vs Logistic Regression.</strong> Train both on text data. Start with 100 training samples and increase to 10,000. Plot accuracy vs training set size for both. At what point does Logistic Regression overtake Naive Bayes?</p>
+</li>
+<li><p><strong>Spam filter.</strong> Build a complete spam classifier: tokenize raw email text, build vocabulary, create bag-of-words features, train MultinomialNB, evaluate with precision and recall (not just accuracy -- why?).</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Naive Bayes</td>
+<td>&quot;Simple probabilistic classifier&quot;</td>
+<td>A classifier that applies Bayes&#39; theorem with the assumption that features are conditionally independent given the class</td>
+</tr>
+<tr>
+<td>Conditional independence</td>
+<td>&quot;Features don&#39;t affect each other&quot;</td>
+<td>P(A, B | C) = P(A | C) * P(B | C) -- knowing B tells you nothing new about A once you know C</td>
+</tr>
+<tr>
+<td>Laplace smoothing</td>
+<td>&quot;Add-one smoothing&quot;</td>
+<td>Adding a small count to every feature to prevent zero probabilities from dominating the prediction</td>
+</tr>
+<tr>
+<td>Prior</td>
+<td>&quot;What you believed before seeing data&quot;</td>
+<td>P(class) -- the probability of each class before observing any features</td>
+</tr>
+<tr>
+<td>Likelihood</td>
+<td>&quot;How well the data fits&quot;</td>
+<td>P(features | class) -- the probability of observing these features if the class is known</td>
+</tr>
+<tr>
+<td>Posterior</td>
+<td>&quot;What you believe after seeing data&quot;</td>
+<td>P(class | features) -- the updated probability of the class after observing the features</td>
+</tr>
+<tr>
+<td>Generative model</td>
+<td>&quot;Models how data is generated&quot;</td>
+<td>A model that learns P(X | Y) and P(Y), then uses Bayes&#39; theorem to get P(Y | X)</td>
+</tr>
+<tr>
+<td>Discriminative model</td>
+<td>&quot;Models the decision boundary&quot;</td>
+<td>A model that directly learns P(Y | X) without modeling how X is generated</td>
+</tr>
+<tr>
+<td>Log probability</td>
+<td>&quot;Avoid underflow&quot;</td>
+<td>Working with log P instead of P to prevent the product of many small numbers from becoming zero in floating point</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://scikit-learn.org/stable/modules/naive_bayes.html" target="_blank" rel="noopener">scikit-learn Naive Bayes docs</a> -- all three variants with mathematical details</li>
+<li><a href="https://www.cs.cmu.edu/~knigam/papers/multinomial-aaaiws98.pdf" target="_blank" rel="noopener">McCallum and Nigam, A Comparison of Event Models for Naive Bayes Text Classification (1998)</a> -- the classic comparison of Multinomial vs Bernoulli for text</li>
+<li><a href="https://people.csail.mit.edu/jrennie/papers/icml03-nb.pdf" target="_blank" rel="noopener">Rennie et al., Tackling the Poor Assumptions of Naive Bayes Text Classifiers (2003)</a> -- improvements to NB for text</li>
+<li><a href="https://ai.stanford.edu/~ang/papers/nips01-discriminativegenerative.pdf" target="_blank" rel="noopener">Ng and Jordan, On Discriminative vs. Generative Classifiers (2001)</a> -- proves NB converges faster than LR with less data</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="13-ml-pipelines.html">
+  <span class="label">← Previous</span>
+  <b>ML Pipelines</b>
+</a>
+      <a class="pager__item pager__item--next" href="15-time-series.html">
+  <span class="label">Next →</span>
+  <b>Time Series Fundamentals</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>13 minutes</b> of ML Fundamentals behind you.</p>
+      <a class="btn btn--solid" href="15-time-series.html">Continue to Time Series Fundamentals →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#bayes-theorem-quick-review">Bayes' Theorem (Quick Review)</a></li><li class="mini__item mini__item--d3"><a href="#the-naive-independence-assumption">The Naive Independence Assumption</a></li><li class="mini__item mini__item--d3"><a href="#why-it-still-works">Why It Still Works</a></li><li class="mini__item mini__item--d3"><a href="#the-math-step-by-step">The Math Step by Step</a></li><li class="mini__item mini__item--d3"><a href="#three-variants">Three Variants</a></li><li class="mini__item mini__item--d3"><a href="#when-to-use-each-variant">When to Use Each Variant</a></li><li class="mini__item mini__item--d3"><a href="#laplace-smoothing">Laplace Smoothing</a></li><li class="mini__item mini__item--d3"><a href="#log-space-computation">Log-Space Computation</a></li><li class="mini__item mini__item--d3"><a href="#naive-bayes-vs-logistic-regression">Naive Bayes vs Logistic Regression</a></li><li class="mini__item mini__item--d3"><a href="#classification-pipeline">Classification Pipeline</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#multinomialnb">MultinomialNB</a></li><li class="mini__item mini__item--d3"><a href="#gaussiannb">GaussianNB</a></li><li class="mini__item mini__item--d3"><a href="#demo-text-classification">Demo: Text Classification</a></li><li class="mini__item mini__item--d3"><a href="#demo-continuous-features">Demo: Continuous Features</a></li><li class="mini__item mini__item--d3"><a href="#prediction-speed">Prediction Speed</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d3"><a href="#tf-idf-with-naive-bayes">TF-IDF with Naive Bayes</a></li><li class="mini__item mini__item--d3"><a href="#bernoullinb-for-short-text">BernoulliNB for Short Text</a></li><li class="mini__item mini__item--d3"><a href="#calibrating-nb-probabilities">Calibrating NB Probabilities</a></li><li class="mini__item mini__item--d3"><a href="#common-gotchas">Common Gotchas</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d3"><a href="#when-naive-bayes-fails">When Naive Bayes Fails</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

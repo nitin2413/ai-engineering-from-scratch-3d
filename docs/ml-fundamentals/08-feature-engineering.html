@@ -1,0 +1,817 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Feature Engineering &amp; Selection — ML Fundamentals — AIFS</title>
+<meta name="description" content="ML Fundamentals: Feature Engineering &amp; Selection. 5 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Feature Engineering &amp; Selection — ML Fundamentals — AIFS">
+<meta property="og:description" content="ML Fundamentals: Feature Engineering &amp; Selection. 5 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"feature-scaling":["../assets/figures/figures-ml.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-ml.js"];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#00D4A0" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#00D4A0;--accent-ink:#111111"
+  data-lesson-id="ml-fundamentals/08-feature-engineering" data-module="ml-fundamentals"
+  data-prev="07-unsupervised-learning.html" data-next="09-model-evaluation.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#00D4A0">
+        <span class="label">Phase 02</span>
+        <b>ML Fundamentals</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="ml-fundamentals/01-what-is-machine-learning"><a href="01-what-is-machine-learning.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">What Is Machine Learning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/02-linear-regression"><a href="02-linear-regression.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Linear Regression</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/03-logistic-regression"><a href="03-logistic-regression.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Logistic Regression</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/04-decision-trees"><a href="04-decision-trees.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Decision Trees and Random Forests</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/05-support-vector-machines"><a href="05-support-vector-machines.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Support Vector Machines</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/06-knn-and-distances"><a href="06-knn-and-distances.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">K-Nearest Neighbors and Distances</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/07-unsupervised-learning"><a href="07-unsupervised-learning.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Unsupervised Learning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/08-feature-engineering"><a href="08-feature-engineering.html" class="is-current">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Feature Engineering &amp; Selection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/09-model-evaluation"><a href="09-model-evaluation.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Model Evaluation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/10-bias-variance"><a href="10-bias-variance.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Bias-Variance Tradeoff</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/11-ensemble-methods"><a href="11-ensemble-methods.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Ensemble Methods</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/12-hyperparameter-tuning"><a href="12-hyperparameter-tuning.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Hyperparameter Tuning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/13-ml-pipelines"><a href="13-ml-pipelines.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">ML Pipelines</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/14-naive-bayes"><a href="14-naive-bayes.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Naive Bayes</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/15-time-series"><a href="15-time-series.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Time Series Fundamentals</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/16-anomaly-detection"><a href="16-anomaly-detection.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Anomaly Detection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/17-imbalanced-data"><a href="17-imbalanced-data.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Handling Imbalanced Data</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/18-feature-selection"><a href="18-feature-selection.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Feature Selection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">ML Fundamentals</a></p>
+      <h1 class="page__title">Feature Engineering &amp; Selection</h1>
+      <p class="page__lede">A good feature is worth a thousand data points.</p>
+      <div class="page__meta">
+        <span class="chip">5 min read</span>
+        <span class="chip">1,131 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 1 (Statistics for ML, Linear Algebra), Phase 2 Lessons 1-7</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~90 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Implement numerical transforms (standardization, min-max scaling, log transform, binning) and explain when each is appropriate</li>
+<li>Build one-hot, label, and target encoding for categorical features and identify the data leakage risk in target encoding</li>
+<li>Construct a TF-IDF vectorizer from scratch and explain why it outperforms raw word counts for text classification</li>
+<li>Apply filter-based feature selection (variance threshold, correlation, mutual information) to reduce dimensionality</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>You have a dataset. You pick an algorithm. You train it. The results are mediocre. You try a fancier algorithm. Still mediocre. You spend a week tuning hyperparameters. Marginal improvement.</p>
+<p>Then someone transforms the raw data into better features and a simple logistic regression beats your tuned gradient-boosted ensemble.</p>
+<p>This happens constantly. In classical ML, the representation of the data matters more than the choice of algorithm. A house price model with &quot;square footage&quot; and &quot;number of bedrooms&quot; will beat a model with &quot;address as a raw string&quot; no matter how sophisticated the learner is. The algorithm can only work with what you give it.</p>
+<p>Feature engineering is the process of transforming raw data into representations that make patterns easier for models to find. Feature selection is the process of throwing away features that add noise without adding signal. Together, they are the highest-leverage activity in classical ML.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="the-feature-pipeline" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-feature-pipeline" aria-label="Link to this section">#</a>The Feature Pipeline</h3>
+<figure class="mermaid-figure">
+  <pre class="mermaid">flowchart LR
+    A[Raw Data] --&gt; B[Handle Missing Values]
+    B --&gt; C[Numerical Transforms]
+    B --&gt; D[Categorical Encoding]
+    B --&gt; E[Text Features]
+    C --&gt; F[Feature Interactions]
+    D --&gt; F
+    E --&gt; F
+    F --&gt; G[Feature Selection]
+    G --&gt; H[Model-Ready Data]</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<h3 id="numerical-features" class="prose-h prose-h3"><a class="prose-h__anchor" href="#numerical-features" aria-label="Link to this section">#</a>Numerical Features</h3>
+<p>Raw numbers are rarely model-ready. Common transforms:</p>
+<p><strong>Scaling:</strong> Put features on the same range so distance-based algorithms (K-Means, KNN, SVM) treat all features equally. Min-max scaling maps to [0, 1]. Standardization (z-score) maps to mean=0, std=1.</p>
+<p><strong>Log transform:</strong> Compresses right-skewed distributions (income, population, word counts). Turns multiplicative relationships into additive ones.</p>
+<p><strong>Binning:</strong> Converts continuous values into categories. Useful when the relationship between feature and target is non-linear but step-wise (e.g., age groups).</p>
+<p><strong>Polynomial features:</strong> Creates x^2, x^3, x1*x2 terms. Lets linear models capture non-linear relationships at the cost of more features.</p>
+<h3 id="categorical-features" class="prose-h prose-h3"><a class="prose-h__anchor" href="#categorical-features" aria-label="Link to this section">#</a>Categorical Features</h3>
+<p>Models need numbers. Categories need encoding.</p>
+<p><strong>One-hot encoding:</strong> Creates a binary column for each category. &quot;color = red/blue/green&quot; becomes three columns: is_red, is_blue, is_green. Works well for low-cardinality features but explodes with many categories.</p>
+<p><strong>Label encoding:</strong> Maps each category to an integer: red=0, blue=1, green=2. Introduces false ordering (the model might think green &gt; blue &gt; red). Only appropriate for tree-based models that split on individual values.</p>
+<p><strong>Target encoding:</strong> Replaces each category with the mean of the target variable for that category. Powerful but dangerous: high risk of data leakage. Must be computed only on training data and applied to test data.</p>
+<h3 id="text-features" class="prose-h prose-h3"><a class="prose-h__anchor" href="#text-features" aria-label="Link to this section">#</a>Text Features</h3>
+<p><strong>Count vectorizer:</strong> Counts how many times each word appears in a document. &quot;the cat sat on the mat&quot; becomes {the: 2, cat: 1, sat: 1, on: 1, mat: 1}.</p>
+<p><strong>TF-IDF:</strong> Term Frequency-Inverse Document Frequency. Weighs words by how unique they are across documents. Common words like &quot;the&quot; get low weight. Rare, distinctive words get high weight.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>TF(word, doc) = count(word in doc) / total words in doc
+IDF(word) = log(total docs / docs containing word)
+TF-IDF = TF * IDF</code></pre>
+</figure>
+<h3 id="missing-values" class="prose-h prose-h3"><a class="prose-h__anchor" href="#missing-values" aria-label="Link to this section">#</a>Missing Values</h3>
+<p>Real data has holes. Strategies:</p>
+<ul>
+<li><strong>Drop rows:</strong> Only when missing data is rare and random</li>
+<li><strong>Mean/median imputation:</strong> Simple, preserves distribution shape (median is more robust to outliers)</li>
+<li><strong>Mode imputation:</strong> For categorical features</li>
+<li><strong>Indicator column:</strong> Add a binary column &quot;was_this_missing&quot; before imputing. The fact that data is missing can itself be informative</li>
+<li><strong>Forward/backward fill:</strong> For time series data</li>
+</ul>
+<h3 id="feature-interaction" class="prose-h prose-h3"><a class="prose-h__anchor" href="#feature-interaction" aria-label="Link to this section">#</a>Feature Interaction</h3>
+<p>Sometimes the relationship is in the combination. &quot;Height&quot; and &quot;weight&quot; alone are less predictive than &quot;BMI = weight / height^2&quot;. Feature interactions multiply the feature space, so use domain knowledge to pick the right ones.</p>
+<h3 id="feature-selection" class="prose-h prose-h3"><a class="prose-h__anchor" href="#feature-selection" aria-label="Link to this section">#</a>Feature Selection</h3>
+<p>More features is not always better. Irrelevant features add noise, increase training time, and can cause overfitting.</p>
+<p><strong>Filter methods (pre-model):</strong></p>
+<ul>
+<li>Correlation: remove features highly correlated with each other (redundant)</li>
+<li>Mutual information: measures how much knowing a feature reduces uncertainty about the target</li>
+<li>Variance threshold: remove features that barely vary</li>
+</ul>
+<p><strong>Wrapper methods (model-based):</strong></p>
+<ul>
+<li>L1 regularization (Lasso): drives irrelevant feature weights to exactly zero</li>
+<li>Recursive feature elimination: train, remove least important feature, repeat</li>
+</ul>
+<p><strong>Why selection matters:</strong> A model with 10 good features will usually outperform a model with 10 good features and 90 noisy ones. The noisy features give the model opportunities to overfit on training data patterns that do not generalize.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="feature-scaling"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">feature-scaling</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> feature scaling</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-numerical-transforms-from-scratch" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-numerical-transforms-from-scratch" aria-label="Link to this section">#</a>Step 1: Numerical transforms from scratch</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> math
+
+
+<span class="token keyword">def</span> <span class="token function">min_max_scale</span><span class="token punctuation">(</span>values<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    min_val <span class="token operator">=</span> <span class="token builtin">min</span><span class="token punctuation">(</span>values<span class="token punctuation">)</span>
+    max_val <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span>values<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> max_val <span class="token operator">==</span> min_val<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token builtin">len</span><span class="token punctuation">(</span>values<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token punctuation">(</span>v <span class="token operator">-</span> min_val<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token punctuation">(</span>max_val <span class="token operator">-</span> min_val<span class="token punctuation">)</span> <span class="token keyword">for</span> v <span class="token keyword">in</span> values<span class="token punctuation">]</span>
+
+
+<span class="token keyword">def</span> <span class="token function">standardize</span><span class="token punctuation">(</span>values<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    n <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>values<span class="token punctuation">)</span>
+    mean <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>values<span class="token punctuation">)</span> <span class="token operator">/</span> n
+    variance <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token punctuation">(</span>v <span class="token operator">-</span> mean<span class="token punctuation">)</span> <span class="token operator">**</span> <span class="token number">2</span> <span class="token keyword">for</span> v <span class="token keyword">in</span> values<span class="token punctuation">)</span> <span class="token operator">/</span> n
+    std <span class="token operator">=</span> math<span class="token punctuation">.</span>sqrt<span class="token punctuation">(</span>variance<span class="token punctuation">)</span> <span class="token keyword">if</span> variance <span class="token operator">></span> <span class="token number">0</span> <span class="token keyword">else</span> <span class="token number">1.0</span>
+    <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token punctuation">(</span>v <span class="token operator">-</span> mean<span class="token punctuation">)</span> <span class="token operator">/</span> std <span class="token keyword">for</span> v <span class="token keyword">in</span> values<span class="token punctuation">]</span>
+
+
+<span class="token keyword">def</span> <span class="token function">log_transform</span><span class="token punctuation">(</span>values<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token punctuation">[</span>math<span class="token punctuation">.</span>log<span class="token punctuation">(</span>v <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token keyword">for</span> v <span class="token keyword">in</span> values<span class="token punctuation">]</span>
+
+
+<span class="token keyword">def</span> <span class="token function">bin_values</span><span class="token punctuation">(</span>values<span class="token punctuation">,</span> n_bins<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    min_val <span class="token operator">=</span> <span class="token builtin">min</span><span class="token punctuation">(</span>values<span class="token punctuation">)</span>
+    max_val <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span>values<span class="token punctuation">)</span>
+    bin_width <span class="token operator">=</span> <span class="token punctuation">(</span>max_val <span class="token operator">-</span> min_val<span class="token punctuation">)</span> <span class="token operator">/</span> n_bins
+    <span class="token keyword">if</span> bin_width <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token builtin">len</span><span class="token punctuation">(</span>values<span class="token punctuation">)</span>
+    result <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> v <span class="token keyword">in</span> values<span class="token punctuation">:</span>
+        bin_idx <span class="token operator">=</span> <span class="token builtin">int</span><span class="token punctuation">(</span><span class="token punctuation">(</span>v <span class="token operator">-</span> min_val<span class="token punctuation">)</span> <span class="token operator">/</span> bin_width<span class="token punctuation">)</span>
+        bin_idx <span class="token operator">=</span> <span class="token builtin">min</span><span class="token punctuation">(</span>bin_idx<span class="token punctuation">,</span> n_bins <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span>
+        result<span class="token punctuation">.</span>append<span class="token punctuation">(</span>bin_idx<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> result
+
+
+<span class="token keyword">def</span> <span class="token function">polynomial_features</span><span class="token punctuation">(</span>row<span class="token punctuation">,</span> degree<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    n <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>row<span class="token punctuation">)</span>
+    result <span class="token operator">=</span> <span class="token builtin">list</span><span class="token punctuation">(</span>row<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> degree <span class="token operator">>=</span> <span class="token number">2</span><span class="token punctuation">:</span>
+        <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            result<span class="token punctuation">.</span>append<span class="token punctuation">(</span>row<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">**</span> <span class="token number">2</span><span class="token punctuation">)</span>
+        <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> n<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                result<span class="token punctuation">.</span>append<span class="token punctuation">(</span>row<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">*</span> row<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> result</code></pre>
+</figure>
+<h3 id="step-2-categorical-encoding-from-scratch" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-categorical-encoding-from-scratch" aria-label="Link to this section">#</a>Step 2: Categorical encoding from scratch</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">one_hot_encode</span><span class="token punctuation">(</span>values<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    categories <span class="token operator">=</span> <span class="token builtin">sorted</span><span class="token punctuation">(</span><span class="token builtin">set</span><span class="token punctuation">(</span>values<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    cat_to_idx <span class="token operator">=</span> <span class="token punctuation">{</span>cat<span class="token punctuation">:</span> i <span class="token keyword">for</span> i<span class="token punctuation">,</span> cat <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>categories<span class="token punctuation">)</span><span class="token punctuation">}</span>
+    n_cats <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>categories<span class="token punctuation">)</span>
+
+    encoded <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> v <span class="token keyword">in</span> values<span class="token punctuation">:</span>
+        row <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">*</span> n_cats
+        row<span class="token punctuation">[</span>cat_to_idx<span class="token punctuation">[</span>v<span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">1</span>
+        encoded<span class="token punctuation">.</span>append<span class="token punctuation">(</span>row<span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> encoded<span class="token punctuation">,</span> categories
+
+
+<span class="token keyword">def</span> <span class="token function">label_encode</span><span class="token punctuation">(</span>values<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    categories <span class="token operator">=</span> <span class="token builtin">sorted</span><span class="token punctuation">(</span><span class="token builtin">set</span><span class="token punctuation">(</span>values<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    cat_to_int <span class="token operator">=</span> <span class="token punctuation">{</span>cat<span class="token punctuation">:</span> i <span class="token keyword">for</span> i<span class="token punctuation">,</span> cat <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>categories<span class="token punctuation">)</span><span class="token punctuation">}</span>
+    <span class="token keyword">return</span> <span class="token punctuation">[</span>cat_to_int<span class="token punctuation">[</span>v<span class="token punctuation">]</span> <span class="token keyword">for</span> v <span class="token keyword">in</span> values<span class="token punctuation">]</span><span class="token punctuation">,</span> cat_to_int
+
+
+<span class="token keyword">def</span> <span class="token function">target_encode</span><span class="token punctuation">(</span>feature_values<span class="token punctuation">,</span> target_values<span class="token punctuation">,</span> smoothing<span class="token operator">=</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    global_mean <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>target_values<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>target_values<span class="token punctuation">)</span>
+
+    category_stats <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+    <span class="token keyword">for</span> feat<span class="token punctuation">,</span> target <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>feature_values<span class="token punctuation">,</span> target_values<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> feat <span class="token keyword">not</span> <span class="token keyword">in</span> category_stats<span class="token punctuation">:</span>
+            category_stats<span class="token punctuation">[</span>feat<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"sum"</span><span class="token punctuation">:</span> <span class="token number">0.0</span><span class="token punctuation">,</span> <span class="token string">"count"</span><span class="token punctuation">:</span> <span class="token number">0</span><span class="token punctuation">}</span>
+        category_stats<span class="token punctuation">[</span>feat<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">"sum"</span><span class="token punctuation">]</span> <span class="token operator">+=</span> target
+        category_stats<span class="token punctuation">[</span>feat<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">"count"</span><span class="token punctuation">]</span> <span class="token operator">+=</span> <span class="token number">1</span>
+
+    encoding <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+    <span class="token keyword">for</span> cat<span class="token punctuation">,</span> stats <span class="token keyword">in</span> category_stats<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        cat_mean <span class="token operator">=</span> stats<span class="token punctuation">[</span><span class="token string">"sum"</span><span class="token punctuation">]</span> <span class="token operator">/</span> stats<span class="token punctuation">[</span><span class="token string">"count"</span><span class="token punctuation">]</span>
+        weight <span class="token operator">=</span> stats<span class="token punctuation">[</span><span class="token string">"count"</span><span class="token punctuation">]</span> <span class="token operator">/</span> <span class="token punctuation">(</span>stats<span class="token punctuation">[</span><span class="token string">"count"</span><span class="token punctuation">]</span> <span class="token operator">+</span> smoothing<span class="token punctuation">)</span>
+        encoding<span class="token punctuation">[</span>cat<span class="token punctuation">]</span> <span class="token operator">=</span> weight <span class="token operator">*</span> cat_mean <span class="token operator">+</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> weight<span class="token punctuation">)</span> <span class="token operator">*</span> global_mean
+
+    <span class="token keyword">return</span> <span class="token punctuation">[</span>encoding<span class="token punctuation">[</span>v<span class="token punctuation">]</span> <span class="token keyword">for</span> v <span class="token keyword">in</span> feature_values<span class="token punctuation">]</span><span class="token punctuation">,</span> encoding</code></pre>
+</figure>
+<h3 id="step-3-text-features-from-scratch" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-text-features-from-scratch" aria-label="Link to this section">#</a>Step 3: Text features from scratch</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">count_vectorize</span><span class="token punctuation">(</span>documents<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    vocab <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+    idx <span class="token operator">=</span> <span class="token number">0</span>
+    <span class="token keyword">for</span> doc <span class="token keyword">in</span> documents<span class="token punctuation">:</span>
+        <span class="token keyword">for</span> word <span class="token keyword">in</span> doc<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> word <span class="token keyword">not</span> <span class="token keyword">in</span> vocab<span class="token punctuation">:</span>
+                vocab<span class="token punctuation">[</span>word<span class="token punctuation">]</span> <span class="token operator">=</span> idx
+                idx <span class="token operator">+=</span> <span class="token number">1</span>
+
+    vectors <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> doc <span class="token keyword">in</span> documents<span class="token punctuation">:</span>
+        vec <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token builtin">len</span><span class="token punctuation">(</span>vocab<span class="token punctuation">)</span>
+        <span class="token keyword">for</span> word <span class="token keyword">in</span> doc<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            vec<span class="token punctuation">[</span>vocab<span class="token punctuation">[</span>word<span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">+=</span> <span class="token number">1</span>
+        vectors<span class="token punctuation">.</span>append<span class="token punctuation">(</span>vec<span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> vectors<span class="token punctuation">,</span> vocab
+
+
+<span class="token keyword">def</span> <span class="token function">tfidf</span><span class="token punctuation">(</span>documents<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    n_docs <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>documents<span class="token punctuation">)</span>
+
+    vocab <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+    idx <span class="token operator">=</span> <span class="token number">0</span>
+    <span class="token keyword">for</span> doc <span class="token keyword">in</span> documents<span class="token punctuation">:</span>
+        <span class="token keyword">for</span> word <span class="token keyword">in</span> doc<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> word <span class="token keyword">not</span> <span class="token keyword">in</span> vocab<span class="token punctuation">:</span>
+                vocab<span class="token punctuation">[</span>word<span class="token punctuation">]</span> <span class="token operator">=</span> idx
+                idx <span class="token operator">+=</span> <span class="token number">1</span>
+
+    doc_freq <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+    <span class="token keyword">for</span> doc <span class="token keyword">in</span> documents<span class="token punctuation">:</span>
+        seen <span class="token operator">=</span> <span class="token builtin">set</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">for</span> word <span class="token keyword">in</span> doc<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> word <span class="token keyword">not</span> <span class="token keyword">in</span> seen<span class="token punctuation">:</span>
+                doc_freq<span class="token punctuation">[</span>word<span class="token punctuation">]</span> <span class="token operator">=</span> doc_freq<span class="token punctuation">.</span>get<span class="token punctuation">(</span>word<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span>
+                seen<span class="token punctuation">.</span>add<span class="token punctuation">(</span>word<span class="token punctuation">)</span>
+
+    vectors <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> doc <span class="token keyword">in</span> documents<span class="token punctuation">:</span>
+        words <span class="token operator">=</span> doc<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        word_count <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>words<span class="token punctuation">)</span>
+        tf_map <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+        <span class="token keyword">for</span> word <span class="token keyword">in</span> words<span class="token punctuation">:</span>
+            tf_map<span class="token punctuation">[</span>word<span class="token punctuation">]</span> <span class="token operator">=</span> tf_map<span class="token punctuation">.</span>get<span class="token punctuation">(</span>word<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span>
+
+        vec <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token builtin">len</span><span class="token punctuation">(</span>vocab<span class="token punctuation">)</span>
+        <span class="token keyword">for</span> word<span class="token punctuation">,</span> count <span class="token keyword">in</span> tf_map<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            tf <span class="token operator">=</span> count <span class="token operator">/</span> word_count
+            idf <span class="token operator">=</span> math<span class="token punctuation">.</span>log<span class="token punctuation">(</span>n_docs <span class="token operator">/</span> doc_freq<span class="token punctuation">[</span>word<span class="token punctuation">]</span><span class="token punctuation">)</span>
+            vec<span class="token punctuation">[</span>vocab<span class="token punctuation">[</span>word<span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">=</span> tf <span class="token operator">*</span> idf
+        vectors<span class="token punctuation">.</span>append<span class="token punctuation">(</span>vec<span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> vectors<span class="token punctuation">,</span> vocab</code></pre>
+</figure>
+<h3 id="step-4-missing-value-imputation-from-scratch" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-missing-value-imputation-from-scratch" aria-label="Link to this section">#</a>Step 4: Missing value imputation from scratch</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">impute_mean</span><span class="token punctuation">(</span>values<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    present <span class="token operator">=</span> <span class="token punctuation">[</span>v <span class="token keyword">for</span> v <span class="token keyword">in</span> values <span class="token keyword">if</span> v <span class="token keyword">is</span> <span class="token keyword">not</span> <span class="token boolean">None</span><span class="token punctuation">]</span>
+    <span class="token keyword">if</span> <span class="token keyword">not</span> present<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token builtin">len</span><span class="token punctuation">(</span>values<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">0.0</span>
+    mean <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>present<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>present<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token punctuation">[</span>v <span class="token keyword">if</span> v <span class="token keyword">is</span> <span class="token keyword">not</span> <span class="token boolean">None</span> <span class="token keyword">else</span> mean <span class="token keyword">for</span> v <span class="token keyword">in</span> values<span class="token punctuation">]</span><span class="token punctuation">,</span> mean
+
+
+<span class="token keyword">def</span> <span class="token function">impute_median</span><span class="token punctuation">(</span>values<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    present <span class="token operator">=</span> <span class="token builtin">sorted</span><span class="token punctuation">(</span>v <span class="token keyword">for</span> v <span class="token keyword">in</span> values <span class="token keyword">if</span> v <span class="token keyword">is</span> <span class="token keyword">not</span> <span class="token boolean">None</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> <span class="token keyword">not</span> present<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token builtin">len</span><span class="token punctuation">(</span>values<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">0.0</span>
+    n <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>present<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> n <span class="token operator">%</span> <span class="token number">2</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+        median <span class="token operator">=</span> <span class="token punctuation">(</span>present<span class="token punctuation">[</span>n <span class="token operator">//</span> <span class="token number">2</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">+</span> present<span class="token punctuation">[</span>n <span class="token operator">//</span> <span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token number">2</span>
+    <span class="token keyword">else</span><span class="token punctuation">:</span>
+        median <span class="token operator">=</span> present<span class="token punctuation">[</span>n <span class="token operator">//</span> <span class="token number">2</span><span class="token punctuation">]</span>
+    <span class="token keyword">return</span> <span class="token punctuation">[</span>v <span class="token keyword">if</span> v <span class="token keyword">is</span> <span class="token keyword">not</span> <span class="token boolean">None</span> <span class="token keyword">else</span> median <span class="token keyword">for</span> v <span class="token keyword">in</span> values<span class="token punctuation">]</span><span class="token punctuation">,</span> median
+
+
+<span class="token keyword">def</span> <span class="token function">impute_mode</span><span class="token punctuation">(</span>values<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    present <span class="token operator">=</span> <span class="token punctuation">[</span>v <span class="token keyword">for</span> v <span class="token keyword">in</span> values <span class="token keyword">if</span> v <span class="token keyword">is</span> <span class="token keyword">not</span> <span class="token boolean">None</span><span class="token punctuation">]</span>
+    <span class="token keyword">if</span> <span class="token keyword">not</span> present<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> values<span class="token punctuation">,</span> <span class="token boolean">None</span>
+    counts <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+    <span class="token keyword">for</span> v <span class="token keyword">in</span> present<span class="token punctuation">:</span>
+        counts<span class="token punctuation">[</span>v<span class="token punctuation">]</span> <span class="token operator">=</span> counts<span class="token punctuation">.</span>get<span class="token punctuation">(</span>v<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span>
+    mode <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span>counts<span class="token punctuation">,</span> key<span class="token operator">=</span>counts<span class="token punctuation">.</span>get<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token punctuation">[</span>v <span class="token keyword">if</span> v <span class="token keyword">is</span> <span class="token keyword">not</span> <span class="token boolean">None</span> <span class="token keyword">else</span> mode <span class="token keyword">for</span> v <span class="token keyword">in</span> values<span class="token punctuation">]</span><span class="token punctuation">,</span> mode
+
+
+<span class="token keyword">def</span> <span class="token function">add_missing_indicator</span><span class="token punctuation">(</span>values<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token number">0</span> <span class="token keyword">if</span> v <span class="token keyword">is</span> <span class="token keyword">not</span> <span class="token boolean">None</span> <span class="token keyword">else</span> <span class="token number">1</span> <span class="token keyword">for</span> v <span class="token keyword">in</span> values<span class="token punctuation">]</span></code></pre>
+</figure>
+<h3 id="step-5-feature-selection-from-scratch" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-feature-selection-from-scratch" aria-label="Link to this section">#</a>Step 5: Feature selection from scratch</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">correlation</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> y<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    n <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+    mean_x <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span> <span class="token operator">/</span> n
+    mean_y <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>y<span class="token punctuation">)</span> <span class="token operator">/</span> n
+    cov <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token punctuation">(</span>xi <span class="token operator">-</span> mean_x<span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token punctuation">(</span>yi <span class="token operator">-</span> mean_y<span class="token punctuation">)</span> <span class="token keyword">for</span> xi<span class="token punctuation">,</span> yi <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> y<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">/</span> n
+    std_x <span class="token operator">=</span> math<span class="token punctuation">.</span>sqrt<span class="token punctuation">(</span><span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token punctuation">(</span>xi <span class="token operator">-</span> mean_x<span class="token punctuation">)</span> <span class="token operator">**</span> <span class="token number">2</span> <span class="token keyword">for</span> xi <span class="token keyword">in</span> x<span class="token punctuation">)</span> <span class="token operator">/</span> n<span class="token punctuation">)</span>
+    std_y <span class="token operator">=</span> math<span class="token punctuation">.</span>sqrt<span class="token punctuation">(</span><span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token punctuation">(</span>yi <span class="token operator">-</span> mean_y<span class="token punctuation">)</span> <span class="token operator">**</span> <span class="token number">2</span> <span class="token keyword">for</span> yi <span class="token keyword">in</span> y<span class="token punctuation">)</span> <span class="token operator">/</span> n<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> std_x <span class="token operator">==</span> <span class="token number">0</span> <span class="token keyword">or</span> std_y <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token number">0.0</span>
+    <span class="token keyword">return</span> cov <span class="token operator">/</span> <span class="token punctuation">(</span>std_x <span class="token operator">*</span> std_y<span class="token punctuation">)</span>
+
+
+<span class="token keyword">def</span> <span class="token function">mutual_information</span><span class="token punctuation">(</span>feature<span class="token punctuation">,</span> target<span class="token punctuation">,</span> n_bins<span class="token operator">=</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    feat_min <span class="token operator">=</span> <span class="token builtin">min</span><span class="token punctuation">(</span>feature<span class="token punctuation">)</span>
+    feat_max <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span>feature<span class="token punctuation">)</span>
+    bin_width <span class="token operator">=</span> <span class="token punctuation">(</span>feat_max <span class="token operator">-</span> feat_min<span class="token punctuation">)</span> <span class="token operator">/</span> n_bins <span class="token keyword">if</span> feat_max <span class="token operator">!=</span> feat_min <span class="token keyword">else</span> <span class="token number">1.0</span>
+    feat_binned <span class="token operator">=</span> <span class="token punctuation">[</span>
+        <span class="token builtin">min</span><span class="token punctuation">(</span><span class="token builtin">int</span><span class="token punctuation">(</span><span class="token punctuation">(</span>f <span class="token operator">-</span> feat_min<span class="token punctuation">)</span> <span class="token operator">/</span> bin_width<span class="token punctuation">)</span><span class="token punctuation">,</span> n_bins <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token keyword">for</span> f <span class="token keyword">in</span> feature
+    <span class="token punctuation">]</span>
+
+    n <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>feature<span class="token punctuation">)</span>
+    target_classes <span class="token operator">=</span> <span class="token builtin">sorted</span><span class="token punctuation">(</span><span class="token builtin">set</span><span class="token punctuation">(</span>target<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    feat_bins <span class="token operator">=</span> <span class="token builtin">sorted</span><span class="token punctuation">(</span><span class="token builtin">set</span><span class="token punctuation">(</span>feat_binned<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    p_feat <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+    <span class="token keyword">for</span> b <span class="token keyword">in</span> feat_bins<span class="token punctuation">:</span>
+        p_feat<span class="token punctuation">[</span>b<span class="token punctuation">]</span> <span class="token operator">=</span> feat_binned<span class="token punctuation">.</span>count<span class="token punctuation">(</span>b<span class="token punctuation">)</span> <span class="token operator">/</span> n
+
+    p_target <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+    <span class="token keyword">for</span> t <span class="token keyword">in</span> target_classes<span class="token punctuation">:</span>
+        p_target<span class="token punctuation">[</span>t<span class="token punctuation">]</span> <span class="token operator">=</span> target<span class="token punctuation">.</span>count<span class="token punctuation">(</span>t<span class="token punctuation">)</span> <span class="token operator">/</span> n
+
+    mi <span class="token operator">=</span> <span class="token number">0.0</span>
+    <span class="token keyword">for</span> b <span class="token keyword">in</span> feat_bins<span class="token punctuation">:</span>
+        <span class="token keyword">for</span> t <span class="token keyword">in</span> target_classes<span class="token punctuation">:</span>
+            joint_count <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>
+                <span class="token number">1</span> <span class="token keyword">for</span> fb<span class="token punctuation">,</span> tv <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>feat_binned<span class="token punctuation">,</span> target<span class="token punctuation">)</span> <span class="token keyword">if</span> fb <span class="token operator">==</span> b <span class="token keyword">and</span> tv <span class="token operator">==</span> t
+            <span class="token punctuation">)</span>
+            p_joint <span class="token operator">=</span> joint_count <span class="token operator">/</span> n
+            <span class="token keyword">if</span> p_joint <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">:</span>
+                mi <span class="token operator">+=</span> p_joint <span class="token operator">*</span> math<span class="token punctuation">.</span>log<span class="token punctuation">(</span>p_joint <span class="token operator">/</span> <span class="token punctuation">(</span>p_feat<span class="token punctuation">[</span>b<span class="token punctuation">]</span> <span class="token operator">*</span> p_target<span class="token punctuation">[</span>t<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> mi
+
+
+<span class="token keyword">def</span> <span class="token function">variance_threshold</span><span class="token punctuation">(</span>features<span class="token punctuation">,</span> threshold<span class="token operator">=</span><span class="token number">0.01</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    n_features <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>features<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    n_samples <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>features<span class="token punctuation">)</span>
+    selected <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n_features<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        col <span class="token operator">=</span> <span class="token punctuation">[</span>features<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n_samples<span class="token punctuation">)</span><span class="token punctuation">]</span>
+        mean <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>col<span class="token punctuation">)</span> <span class="token operator">/</span> n_samples
+        var <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token punctuation">(</span>v <span class="token operator">-</span> mean<span class="token punctuation">)</span> <span class="token operator">**</span> <span class="token number">2</span> <span class="token keyword">for</span> v <span class="token keyword">in</span> col<span class="token punctuation">)</span> <span class="token operator">/</span> n_samples
+        <span class="token keyword">if</span> var <span class="token operator">>=</span> threshold<span class="token punctuation">:</span>
+            selected<span class="token punctuation">.</span>append<span class="token punctuation">(</span>j<span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> selected
+
+
+<span class="token keyword">def</span> <span class="token function">remove_correlated</span><span class="token punctuation">(</span>features<span class="token punctuation">,</span> threshold<span class="token operator">=</span><span class="token number">0.9</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    n_features <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>features<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    n_samples <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>features<span class="token punctuation">)</span>
+
+    to_remove <span class="token operator">=</span> <span class="token builtin">set</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n_features<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> i <span class="token keyword">in</span> to_remove<span class="token punctuation">:</span>
+            <span class="token keyword">continue</span>
+        col_i <span class="token operator">=</span> <span class="token punctuation">[</span>features<span class="token punctuation">[</span>r<span class="token punctuation">]</span><span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token keyword">for</span> r <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n_samples<span class="token punctuation">)</span><span class="token punctuation">]</span>
+        <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> n_features<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> j <span class="token keyword">in</span> to_remove<span class="token punctuation">:</span>
+                <span class="token keyword">continue</span>
+            col_j <span class="token operator">=</span> <span class="token punctuation">[</span>features<span class="token punctuation">[</span>r<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token keyword">for</span> r <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n_samples<span class="token punctuation">)</span><span class="token punctuation">]</span>
+            corr <span class="token operator">=</span> <span class="token builtin">abs</span><span class="token punctuation">(</span>correlation<span class="token punctuation">(</span>col_i<span class="token punctuation">,</span> col_j<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token keyword">if</span> corr <span class="token operator">>=</span> threshold<span class="token punctuation">:</span>
+                to_remove<span class="token punctuation">.</span>add<span class="token punctuation">(</span>j<span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> <span class="token punctuation">[</span>i <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n_features<span class="token punctuation">)</span> <span class="token keyword">if</span> i <span class="token keyword">not</span> <span class="token keyword">in</span> to_remove<span class="token punctuation">]</span></code></pre>
+</figure>
+<h3 id="step-6-full-pipeline-and-demo" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-6-full-pipeline-and-demo" aria-label="Link to this section">#</a>Step 6: Full pipeline and demo</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> random
+
+
+<span class="token keyword">def</span> <span class="token function">make_housing_data</span><span class="token punctuation">(</span>n<span class="token operator">=</span><span class="token number">200</span><span class="token punctuation">,</span> seed<span class="token operator">=</span><span class="token number">42</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    random<span class="token punctuation">.</span>seed<span class="token punctuation">(</span>seed<span class="token punctuation">)</span>
+    data <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        sqft <span class="token operator">=</span> random<span class="token punctuation">.</span>uniform<span class="token punctuation">(</span><span class="token number">500</span><span class="token punctuation">,</span> <span class="token number">5000</span><span class="token punctuation">)</span>
+        bedrooms <span class="token operator">=</span> random<span class="token punctuation">.</span>choice<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+        age <span class="token operator">=</span> random<span class="token punctuation">.</span>uniform<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">50</span><span class="token punctuation">)</span>
+        neighborhood <span class="token operator">=</span> random<span class="token punctuation">.</span>choice<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">"downtown"</span><span class="token punctuation">,</span> <span class="token string">"suburbs"</span><span class="token punctuation">,</span> <span class="token string">"rural"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+        has_pool <span class="token operator">=</span> random<span class="token punctuation">.</span>choice<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token boolean">True</span><span class="token punctuation">,</span> <span class="token boolean">False</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+        sqft_with_missing <span class="token operator">=</span> sqft <span class="token keyword">if</span> random<span class="token punctuation">.</span>random<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">0.05</span> <span class="token keyword">else</span> <span class="token boolean">None</span>
+        age_with_missing <span class="token operator">=</span> age <span class="token keyword">if</span> random<span class="token punctuation">.</span>random<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">0.08</span> <span class="token keyword">else</span> <span class="token boolean">None</span>
+
+        price <span class="token operator">=</span> <span class="token punctuation">(</span>
+            <span class="token number">50</span> <span class="token operator">*</span> sqft
+            <span class="token operator">+</span> <span class="token number">20000</span> <span class="token operator">*</span> bedrooms
+            <span class="token operator">-</span> <span class="token number">1000</span> <span class="token operator">*</span> age
+            <span class="token operator">+</span> <span class="token punctuation">(</span><span class="token number">50000</span> <span class="token keyword">if</span> neighborhood <span class="token operator">==</span> <span class="token string">"downtown"</span> <span class="token keyword">else</span> <span class="token number">10000</span> <span class="token keyword">if</span> neighborhood <span class="token operator">==</span> <span class="token string">"suburbs"</span> <span class="token keyword">else</span> <span class="token number">0</span><span class="token punctuation">)</span>
+            <span class="token operator">+</span> <span class="token punctuation">(</span><span class="token number">15000</span> <span class="token keyword">if</span> has_pool <span class="token keyword">else</span> <span class="token number">0</span><span class="token punctuation">)</span>
+            <span class="token operator">+</span> random<span class="token punctuation">.</span>gauss<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">20000</span><span class="token punctuation">)</span>
+        <span class="token punctuation">)</span>
+
+        data<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">{</span>
+            <span class="token string">"sqft"</span><span class="token punctuation">:</span> sqft_with_missing<span class="token punctuation">,</span>
+            <span class="token string">"bedrooms"</span><span class="token punctuation">:</span> bedrooms<span class="token punctuation">,</span>
+            <span class="token string">"age"</span><span class="token punctuation">:</span> age_with_missing<span class="token punctuation">,</span>
+            <span class="token string">"neighborhood"</span><span class="token punctuation">:</span> neighborhood<span class="token punctuation">,</span>
+            <span class="token string">"has_pool"</span><span class="token punctuation">:</span> has_pool<span class="token punctuation">,</span>
+            <span class="token string">"price"</span><span class="token punctuation">:</span> price<span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> data
+
+
+<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">"__main__"</span><span class="token punctuation">:</span>
+    data <span class="token operator">=</span> make_housing_data<span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"=== Raw Data Sample ==="</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> row <span class="token keyword">in</span> data<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  </span><span class="token interpolation"><span class="token punctuation">{</span>row<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    sqft_raw <span class="token operator">=</span> <span class="token punctuation">[</span>d<span class="token punctuation">[</span><span class="token string">"sqft"</span><span class="token punctuation">]</span> <span class="token keyword">for</span> d <span class="token keyword">in</span> data<span class="token punctuation">]</span>
+    age_raw <span class="token operator">=</span> <span class="token punctuation">[</span>d<span class="token punctuation">[</span><span class="token string">"age"</span><span class="token punctuation">]</span> <span class="token keyword">for</span> d <span class="token keyword">in</span> data<span class="token punctuation">]</span>
+    prices <span class="token operator">=</span> <span class="token punctuation">[</span>d<span class="token punctuation">[</span><span class="token string">"price"</span><span class="token punctuation">]</span> <span class="token keyword">for</span> d <span class="token keyword">in</span> data<span class="token punctuation">]</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n=== Missing Value Handling ==="</span><span class="token punctuation">)</span>
+    sqft_missing <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token keyword">for</span> v <span class="token keyword">in</span> sqft_raw <span class="token keyword">if</span> v <span class="token keyword">is</span> <span class="token boolean">None</span><span class="token punctuation">)</span>
+    age_missing <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token keyword">for</span> v <span class="token keyword">in</span> age_raw <span class="token keyword">if</span> v <span class="token keyword">is</span> <span class="token boolean">None</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  sqft missing: </span><span class="token interpolation"><span class="token punctuation">{</span>sqft_missing<span class="token punctuation">}</span></span><span class="token string">/</span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">len</span><span class="token punctuation">(</span>sqft_raw<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  age missing: </span><span class="token interpolation"><span class="token punctuation">{</span>age_missing<span class="token punctuation">}</span></span><span class="token string">/</span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">len</span><span class="token punctuation">(</span>age_raw<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    sqft_indicator <span class="token operator">=</span> add_missing_indicator<span class="token punctuation">(</span>sqft_raw<span class="token punctuation">)</span>
+    age_indicator <span class="token operator">=</span> add_missing_indicator<span class="token punctuation">(</span>age_raw<span class="token punctuation">)</span>
+    sqft_imputed<span class="token punctuation">,</span> sqft_fill <span class="token operator">=</span> impute_median<span class="token punctuation">(</span>sqft_raw<span class="token punctuation">)</span>
+    age_imputed<span class="token punctuation">,</span> age_fill <span class="token operator">=</span> impute_mean<span class="token punctuation">(</span>age_raw<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  sqft filled with median: </span><span class="token interpolation"><span class="token punctuation">{</span>sqft_fill<span class="token punctuation">:</span><span class="token format-spec">.0f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  age filled with mean: </span><span class="token interpolation"><span class="token punctuation">{</span>age_fill<span class="token punctuation">:</span><span class="token format-spec">.1f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n=== Numerical Transforms ==="</span><span class="token punctuation">)</span>
+    sqft_scaled <span class="token operator">=</span> standardize<span class="token punctuation">(</span>sqft_imputed<span class="token punctuation">)</span>
+    age_scaled <span class="token operator">=</span> min_max_scale<span class="token punctuation">(</span>age_imputed<span class="token punctuation">)</span>
+    sqft_log <span class="token operator">=</span> log_transform<span class="token punctuation">(</span>sqft_imputed<span class="token punctuation">)</span>
+    age_binned <span class="token operator">=</span> bin_values<span class="token punctuation">(</span>age_imputed<span class="token punctuation">,</span> n_bins<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  sqft standardized: mean=</span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">sum</span><span class="token punctuation">(</span>sqft_scaled<span class="token punctuation">)</span><span class="token operator">/</span><span class="token builtin">len</span><span class="token punctuation">(</span>sqft_scaled<span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">, std=</span><span class="token interpolation"><span class="token punctuation">{</span>math<span class="token punctuation">.</span>sqrt<span class="token punctuation">(</span><span class="token builtin">sum</span><span class="token punctuation">(</span>v<span class="token operator">**</span><span class="token number">2</span> <span class="token keyword">for</span> v <span class="token keyword">in</span> sqft_scaled<span class="token punctuation">)</span><span class="token operator">/</span><span class="token builtin">len</span><span class="token punctuation">(</span>sqft_scaled<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  age min-max: [</span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">min</span><span class="token punctuation">(</span>age_scaled<span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.2f</span><span class="token punctuation">}</span></span><span class="token string">, </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">max</span><span class="token punctuation">(</span>age_scaled<span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.2f</span><span class="token punctuation">}</span></span><span class="token string">]"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  age bins: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">sorted</span><span class="token punctuation">(</span><span class="token builtin">set</span><span class="token punctuation">(</span>age_binned<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n=== Categorical Encoding ==="</span><span class="token punctuation">)</span>
+    neighborhoods <span class="token operator">=</span> <span class="token punctuation">[</span>d<span class="token punctuation">[</span><span class="token string">"neighborhood"</span><span class="token punctuation">]</span> <span class="token keyword">for</span> d <span class="token keyword">in</span> data<span class="token punctuation">]</span>
+
+    ohe<span class="token punctuation">,</span> ohe_cats <span class="token operator">=</span> one_hot_encode<span class="token punctuation">(</span>neighborhoods<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  One-hot categories: </span><span class="token interpolation"><span class="token punctuation">{</span>ohe_cats<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Sample encoding: </span><span class="token interpolation"><span class="token punctuation">{</span>neighborhoods<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">}</span></span><span class="token string"> -> </span><span class="token interpolation"><span class="token punctuation">{</span>ohe<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    le<span class="token punctuation">,</span> le_map <span class="token operator">=</span> label_encode<span class="token punctuation">(</span>neighborhoods<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Label encoding map: </span><span class="token interpolation"><span class="token punctuation">{</span>le_map<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    te<span class="token punctuation">,</span> te_map <span class="token operator">=</span> target_encode<span class="token punctuation">(</span>neighborhoods<span class="token punctuation">,</span> prices<span class="token punctuation">,</span> smoothing<span class="token operator">=</span><span class="token number">10</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Target encoding: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token punctuation">(</span><span class="token punctuation">{</span>k<span class="token punctuation">:</span> <span class="token builtin">round</span><span class="token punctuation">(</span>v<span class="token punctuation">)</span> <span class="token keyword">for</span> k<span class="token punctuation">,</span> v <span class="token keyword">in</span> te_map<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n=== Text Features ==="</span><span class="token punctuation">)</span>
+    descriptions <span class="token operator">=</span> <span class="token punctuation">[</span>
+        <span class="token string">"large modern house with pool"</span><span class="token punctuation">,</span>
+        <span class="token string">"small cozy cottage near downtown"</span><span class="token punctuation">,</span>
+        <span class="token string">"spacious family home with large yard"</span><span class="token punctuation">,</span>
+        <span class="token string">"modern apartment downtown with view"</span><span class="token punctuation">,</span>
+        <span class="token string">"rustic cabin in rural area"</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span>
+    cv<span class="token punctuation">,</span> cv_vocab <span class="token operator">=</span> count_vectorize<span class="token punctuation">(</span>descriptions<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Vocabulary size: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">len</span><span class="token punctuation">(</span>cv_vocab<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Doc 0 non-zero features: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token keyword">for</span> v <span class="token keyword">in</span> cv<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token keyword">if</span> v <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    tf<span class="token punctuation">,</span> tf_vocab <span class="token operator">=</span> tfidf<span class="token punctuation">(</span>descriptions<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  TF-IDF vocabulary size: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">len</span><span class="token punctuation">(</span>tf_vocab<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    top_words <span class="token operator">=</span> <span class="token builtin">sorted</span><span class="token punctuation">(</span>tf_vocab<span class="token punctuation">.</span>keys<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> key<span class="token operator">=</span><span class="token keyword">lambda</span> w<span class="token punctuation">:</span> tf<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">[</span>tf_vocab<span class="token punctuation">[</span>w<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">,</span> reverse<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">3</span><span class="token punctuation">]</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Doc 0 top TF-IDF words: </span><span class="token interpolation"><span class="token punctuation">{</span>top_words<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n=== Polynomial Features ==="</span><span class="token punctuation">)</span>
+    sample_row <span class="token operator">=</span> <span class="token punctuation">[</span>sqft_scaled<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> age_scaled<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">]</span>
+    poly <span class="token operator">=</span> polynomial_features<span class="token punctuation">(</span>sample_row<span class="token punctuation">,</span> degree<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Input: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token punctuation">[</span><span class="token builtin">round</span><span class="token punctuation">(</span>v<span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span> <span class="token keyword">for</span> v <span class="token keyword">in</span> sample_row<span class="token punctuation">]</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Polynomial: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token punctuation">[</span><span class="token builtin">round</span><span class="token punctuation">(</span>v<span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span> <span class="token keyword">for</span> v <span class="token keyword">in</span> poly<span class="token punctuation">]</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Features: [x1, x2, x1^2, x2^2, x1*x2]"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n=== Feature Selection ==="</span><span class="token punctuation">)</span>
+    feature_matrix <span class="token operator">=</span> <span class="token punctuation">[</span>
+        <span class="token punctuation">[</span>sqft_scaled<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> age_scaled<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token builtin">float</span><span class="token punctuation">(</span>sqft_indicator<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token builtin">float</span><span class="token punctuation">(</span>age_indicator<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+        <span class="token operator">+</span> ohe<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+        <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">]</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Total features: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">len</span><span class="token punctuation">(</span>feature_matrix<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    surviving_var <span class="token operator">=</span> variance_threshold<span class="token punctuation">(</span>feature_matrix<span class="token punctuation">,</span> threshold<span class="token operator">=</span><span class="token number">0.01</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  After variance threshold (0.01): </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">len</span><span class="token punctuation">(</span>surviving_var<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string"> features kept"</span></span><span class="token punctuation">)</span>
+
+    surviving_corr <span class="token operator">=</span> remove_correlated<span class="token punctuation">(</span>feature_matrix<span class="token punctuation">,</span> threshold<span class="token operator">=</span><span class="token number">0.9</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  After correlation filter (0.9): </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token builtin">len</span><span class="token punctuation">(</span>surviving_corr<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string"> features kept"</span></span><span class="token punctuation">)</span>
+
+    binary_prices <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">1</span> <span class="token keyword">if</span> p <span class="token operator">></span> <span class="token builtin">sum</span><span class="token punctuation">(</span>prices<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>prices<span class="token punctuation">)</span> <span class="token keyword">else</span> <span class="token number">0</span> <span class="token keyword">for</span> p <span class="token keyword">in</span> prices<span class="token punctuation">]</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n  Mutual information with target:"</span><span class="token punctuation">)</span>
+    feature_names <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">"sqft"</span><span class="token punctuation">,</span> <span class="token string">"age"</span><span class="token punctuation">,</span> <span class="token string">"sqft_missing"</span><span class="token punctuation">,</span> <span class="token string">"age_missing"</span><span class="token punctuation">]</span> <span class="token operator">+</span> <span class="token punctuation">[</span><span class="token string-interpolation"><span class="token string">f"neigh_</span><span class="token interpolation"><span class="token punctuation">{</span>c<span class="token punctuation">}</span></span><span class="token string">"</span></span> <span class="token keyword">for</span> c <span class="token keyword">in</span> ohe_cats<span class="token punctuation">]</span>
+    <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>feature_matrix<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        col <span class="token operator">=</span> <span class="token punctuation">[</span>feature_matrix<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>feature_matrix<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+        mi <span class="token operator">=</span> mutual_information<span class="token punctuation">(</span>col<span class="token punctuation">,</span> binary_prices<span class="token punctuation">,</span> n_bins<span class="token operator">=</span><span class="token number">10</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"    </span><span class="token interpolation"><span class="token punctuation">{</span>feature_names<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">}</span></span><span class="token string">: MI=</span><span class="token interpolation"><span class="token punctuation">{</span>mi<span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n  Correlation with price:"</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>feature_matrix<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        col <span class="token operator">=</span> <span class="token punctuation">[</span>feature_matrix<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>feature_matrix<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+        corr <span class="token operator">=</span> correlation<span class="token punctuation">(</span>col<span class="token punctuation">,</span> prices<span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"    </span><span class="token interpolation"><span class="token punctuation">{</span>feature_names<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">}</span></span><span class="token string">: r=</span><span class="token interpolation"><span class="token punctuation">{</span>corr<span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>With scikit-learn, these transforms are composable pipelines:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>preprocessing <span class="token keyword">import</span> StandardScaler<span class="token punctuation">,</span> OneHotEncoder<span class="token punctuation">,</span> PolynomialFeatures
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>impute <span class="token keyword">import</span> SimpleImputer
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>feature_extraction<span class="token punctuation">.</span>text <span class="token keyword">import</span> TfidfVectorizer
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>feature_selection <span class="token keyword">import</span> mutual_info_classif<span class="token punctuation">,</span> VarianceThreshold
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>compose <span class="token keyword">import</span> ColumnTransformer
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>pipeline <span class="token keyword">import</span> Pipeline
+
+numeric_pipe <span class="token operator">=</span> Pipeline<span class="token punctuation">(</span><span class="token punctuation">[</span>
+    <span class="token punctuation">(</span><span class="token string">"imputer"</span><span class="token punctuation">,</span> SimpleImputer<span class="token punctuation">(</span>strategy<span class="token operator">=</span><span class="token string">"median"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">(</span><span class="token string">"scaler"</span><span class="token punctuation">,</span> StandardScaler<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+categorical_pipe <span class="token operator">=</span> Pipeline<span class="token punctuation">(</span><span class="token punctuation">[</span>
+    <span class="token punctuation">(</span><span class="token string">"encoder"</span><span class="token punctuation">,</span> OneHotEncoder<span class="token punctuation">(</span>sparse_output<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+preprocessor <span class="token operator">=</span> ColumnTransformer<span class="token punctuation">(</span><span class="token punctuation">[</span>
+    <span class="token punctuation">(</span><span class="token string">"num"</span><span class="token punctuation">,</span> numeric_pipe<span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token string">"sqft"</span><span class="token punctuation">,</span> <span class="token string">"age"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">(</span><span class="token string">"cat"</span><span class="token punctuation">,</span> categorical_pipe<span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token string">"neighborhood"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>The from-scratch versions show exactly what happens inside each transform. The library versions add edge-case handling, sparse matrix support, and pipeline composition, but the math is the same.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces:</p>
+<ul>
+<li><code class="inline-code">outputs/prompt-feature-engineer.md</code> - a prompt for systematically engineering features from raw data</li>
+</ul>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li>Add robust scaling (using median and interquartile range instead of mean and standard deviation) to the numerical transforms. Compare it to standard scaling on data with extreme outliers.</li>
+<li>Implement leave-one-out target encoding: for each row, compute the target mean excluding that row&#39;s own target value. Show how this reduces overfitting compared to naive target encoding.</li>
+<li>Build an automated feature selection pipeline that combines variance threshold, correlation filtering, and mutual information ranking. Apply it to the housing dataset and compare model performance (use a simple linear regression) with all features vs selected features.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Feature engineering</td>
+<td>&quot;Making new columns&quot;</td>
+<td>Transforming raw data into representations that expose patterns to the model</td>
+</tr>
+<tr>
+<td>Standardization</td>
+<td>&quot;Making it normal&quot;</td>
+<td>Subtracting the mean and dividing by standard deviation so the feature has mean=0 and std=1</td>
+</tr>
+<tr>
+<td>One-hot encoding</td>
+<td>&quot;Making dummy variables&quot;</td>
+<td>Creating one binary column per category, where exactly one column is 1 for each row</td>
+</tr>
+<tr>
+<td>Target encoding</td>
+<td>&quot;Using the answer to encode&quot;</td>
+<td>Replacing each category with the average target value for that category, with smoothing to prevent overfitting</td>
+</tr>
+<tr>
+<td>TF-IDF</td>
+<td>&quot;Fancy word counts&quot;</td>
+<td>Term Frequency times Inverse Document Frequency: words weighted by how distinctive they are across the corpus</td>
+</tr>
+<tr>
+<td>Imputation</td>
+<td>&quot;Filling in blanks&quot;</td>
+<td>Replacing missing values with estimated values (mean, median, mode, or model-predicted)</td>
+</tr>
+<tr>
+<td>Feature selection</td>
+<td>&quot;Throwing out bad columns&quot;</td>
+<td>Removing features that add noise or redundancy, keeping only those with signal about the target</td>
+</tr>
+<tr>
+<td>Mutual information</td>
+<td>&quot;How much one thing tells you about another&quot;</td>
+<td>A measure of the reduction in uncertainty about variable Y gained by observing variable X</td>
+</tr>
+<tr>
+<td>Data leakage</td>
+<td>&quot;Accidentally cheating&quot;</td>
+<td>Using information during training that would not be available at prediction time, giving falsely optimistic results</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="http://www.feat.engineering/" target="_blank" rel="noopener">Feature Engineering and Selection (Max Kuhn &amp; Kjell Johnson)</a> - free online book covering the full landscape of feature engineering</li>
+<li><a href="https://scikit-learn.org/stable/modules/preprocessing.html" target="_blank" rel="noopener">scikit-learn Preprocessing Guide</a> - practical reference for all standard transforms</li>
+<li><a href="https://dl.acm.org/doi/10.1145/507533.507538" target="_blank" rel="noopener">Target Encoding Done Right (Micci-Barreca, 2001)</a> - the original paper on target encoding with smoothing</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="07-unsupervised-learning.html">
+  <span class="label">← Previous</span>
+  <b>Unsupervised Learning</b>
+</a>
+      <a class="pager__item pager__item--next" href="09-model-evaluation.html">
+  <span class="label">Next →</span>
+  <b>Model Evaluation</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>5 minutes</b> of ML Fundamentals behind you.</p>
+      <a class="btn btn--solid" href="09-model-evaluation.html">Continue to Model Evaluation →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#the-feature-pipeline">The Feature Pipeline</a></li><li class="mini__item mini__item--d3"><a href="#numerical-features">Numerical Features</a></li><li class="mini__item mini__item--d3"><a href="#categorical-features">Categorical Features</a></li><li class="mini__item mini__item--d3"><a href="#text-features">Text Features</a></li><li class="mini__item mini__item--d3"><a href="#missing-values">Missing Values</a></li><li class="mini__item mini__item--d3"><a href="#feature-interaction">Feature Interaction</a></li><li class="mini__item mini__item--d3"><a href="#feature-selection">Feature Selection</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-numerical-transforms-from-scratch">Step 1: Numerical transforms from scratch</a></li><li class="mini__item mini__item--d3"><a href="#step-2-categorical-encoding-from-scratch">Step 2: Categorical encoding from scratch</a></li><li class="mini__item mini__item--d3"><a href="#step-3-text-features-from-scratch">Step 3: Text features from scratch</a></li><li class="mini__item mini__item--d3"><a href="#step-4-missing-value-imputation-from-scratch">Step 4: Missing value imputation from scratch</a></li><li class="mini__item mini__item--d3"><a href="#step-5-feature-selection-from-scratch">Step 5: Feature selection from scratch</a></li><li class="mini__item mini__item--d3"><a href="#step-6-full-pipeline-and-demo">Step 6: Full pipeline and demo</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

@@ -1,0 +1,779 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Introduction to JAX — Deep Learning Core — AIFS</title>
+<meta name="description" content="Deep Learning Core: Introduction to JAX. 9 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Introduction to JAX — Deep Learning Core — AIFS">
+<meta property="og:description" content="Deep Learning Core: Introduction to JAX. 9 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"batchnorm-effect":["../assets/figures/figures-dl.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-dl.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#FF4FA3" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#FF4FA3;--accent-ink:#111111"
+  data-lesson-id="deep-learning-core/12-intro-to-jax" data-module="deep-learning-core"
+  data-prev="11-intro-to-pytorch.html" data-next="13-debugging-neural-networks.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#FF4FA3">
+        <span class="label">Phase 03</span>
+        <b>Deep Learning Core</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="deep-learning-core/01-the-perceptron"><a href="01-the-perceptron.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">The Perceptron</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/02-multi-layer-networks"><a href="02-multi-layer-networks.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Multi-Layer Networks and Forward Pass</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/03-backpropagation"><a href="03-backpropagation.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Backpropagation from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/04-activation-functions"><a href="04-activation-functions.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Activation Functions</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/05-loss-functions"><a href="05-loss-functions.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Loss Functions</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/06-optimizers"><a href="06-optimizers.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Optimizers</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/07-regularization"><a href="07-regularization.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Regularization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/08-weight-initialization"><a href="08-weight-initialization.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Weight Initialization and Training Stability</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/09-learning-rate-schedules"><a href="09-learning-rate-schedules.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Learning Rate Schedules and Warmup</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/10-mini-framework"><a href="10-mini-framework.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Build Your Own Mini Framework</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/11-intro-to-pytorch"><a href="11-intro-to-pytorch.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Introduction to PyTorch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/12-intro-to-jax"><a href="12-intro-to-jax.html" class="is-current">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Introduction to JAX</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="deep-learning-core/13-debugging-neural-networks"><a href="13-debugging-neural-networks.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Debugging Neural Networks</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Deep Learning Core</a></p>
+      <h1 class="page__title">Introduction to JAX</h1>
+      <p class="page__lede">PyTorch mutates tensors. TensorFlow builds graphs. JAX compiles pure functions. That last one changes how you think about deep learning.</p>
+      <div class="page__meta">
+        <span class="chip">9 min read</span>
+        <span class="chip">2,074 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 03 Lessons 01-10, basic NumPy</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~90 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Write pure-function neural network code using JAX&#39;s functional API (jax.numpy, jax.grad, jax.jit, jax.vmap)</li>
+<li>Explain the key design difference between PyTorch&#39;s eager mutation and JAX&#39;s functional compilation model</li>
+<li>Apply jit compilation and vmap vectorization to accelerate training loops compared to naive Python</li>
+<li>Train a simple network in JAX and contrast the explicit state management with PyTorch&#39;s object-oriented approach</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>You know how to build neural networks in PyTorch. You define an <code class="inline-code">nn.Module</code>, call <code class="inline-code">.backward()</code>, step the optimizer. It works. Millions of people use it.</p>
+<p>But PyTorch has a constraint baked into its DNA: it traces operations eagerly, one at a time, in Python. Every <code class="inline-code">tensor + tensor</code> is a separate kernel launch. Every training step re-interprets the same Python code. This works fine until you need to train a 540-billion-parameter model across 2,048 TPUs. Then the overhead kills you.</p>
+<p>Google DeepMind trains Gemini on JAX. Anthropic trained Claude on JAX. These are not small operations -- they are the largest neural network training runs on Earth. They chose JAX because it treats your training loop as a compilable program, not a sequence of Python calls.</p>
+<p>JAX is NumPy with three superpowers: automatic differentiation, JIT compilation to XLA, and automatic vectorization. You write a function that processes one example. JAX gives you a function that processes a batch, computes gradients, compiles to machine code, and runs across multiple devices. All without changing the original function.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="the-jax-philosophy" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-jax-philosophy" aria-label="Link to this section">#</a>The JAX Philosophy</h3>
+<p>JAX is a functional framework. No classes, no mutable state, no <code class="inline-code">.backward()</code> method. Instead:</p>
+<table>
+<thead>
+<tr>
+<th>PyTorch</th>
+<th>JAX</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code class="inline-code">nn.Module</code> class with state</td>
+<td>Pure function: <code class="inline-code">f(params, x) -&gt; y</code></td>
+</tr>
+<tr>
+<td><code class="inline-code">loss.backward()</code></td>
+<td><code class="inline-code">jax.grad(loss_fn)(params, x, y)</code></td>
+</tr>
+<tr>
+<td>Eager execution</td>
+<td>JIT compilation via XLA</td>
+</tr>
+<tr>
+<td><code class="inline-code">for x in batch:</code> manual loop</td>
+<td><code class="inline-code">jax.vmap(f)</code> auto-vectorization</td>
+</tr>
+<tr>
+<td><code class="inline-code">DataParallel</code> / <code class="inline-code">FSDP</code></td>
+<td><code class="inline-code">jax.pmap(f)</code> auto-parallelism</td>
+</tr>
+<tr>
+<td>Mutable <code class="inline-code">model.parameters()</code></td>
+<td>Immutable pytree of arrays</td>
+</tr>
+</tbody></table>
+<p>This is not a style preference. It is a compiler constraint. JIT compilation requires pure functions -- same inputs always produce same outputs, no side effects. That restriction is what makes 100x speedups possible.</p>
+<h3 id="jax-numpy-the-familiar-surface" class="prose-h prose-h3"><a class="prose-h__anchor" href="#jax-numpy-the-familiar-surface" aria-label="Link to this section">#</a>jax.numpy: The Familiar Surface</h3>
+<p>JAX reimplements the NumPy API on accelerators:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> jax<span class="token punctuation">.</span>numpy <span class="token keyword">as</span> jnp
+
+a <span class="token operator">=</span> jnp<span class="token punctuation">.</span>array<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">1.0</span><span class="token punctuation">,</span> <span class="token number">2.0</span><span class="token punctuation">,</span> <span class="token number">3.0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+b <span class="token operator">=</span> jnp<span class="token punctuation">.</span>array<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">4.0</span><span class="token punctuation">,</span> <span class="token number">5.0</span><span class="token punctuation">,</span> <span class="token number">6.0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+c <span class="token operator">=</span> jnp<span class="token punctuation">.</span>dot<span class="token punctuation">(</span>a<span class="token punctuation">,</span> b<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Same function names. Same broadcasting rules. Same slicing semantics. But the arrays live on GPU/TPU, and every operation is traceable by the compiler.</p>
+<p>One critical difference: JAX arrays are immutable. No <code class="inline-code">a[0] = 5</code>. Instead: <code class="inline-code">a = a.at[0].set(5)</code>. This feels awkward for a week, then it clicks -- immutability is what makes transformations like <code class="inline-code">grad</code>, <code class="inline-code">jit</code>, and <code class="inline-code">vmap</code> composable.</p>
+<h3 id="jax-grad-functional-autodiff" class="prose-h prose-h3"><a class="prose-h__anchor" href="#jax-grad-functional-autodiff" aria-label="Link to this section">#</a>jax.grad: Functional Autodiff</h3>
+<p>PyTorch attaches gradients to tensors (<code class="inline-code">.grad</code>). JAX attaches gradients to functions.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> jax
+
+<span class="token keyword">def</span> <span class="token function">f</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> x <span class="token operator">**</span> <span class="token number">2</span>
+
+df <span class="token operator">=</span> jax<span class="token punctuation">.</span>grad<span class="token punctuation">(</span>f<span class="token punctuation">)</span>
+df<span class="token punctuation">(</span><span class="token number">3.0</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p><code class="inline-code">jax.grad</code> takes a function and returns a new function that computes the gradient. No <code class="inline-code">.backward()</code> call. No computation graph stored on tensors. The gradient is just another function you can call, compose, or JIT-compile.</p>
+<p>This composes arbitrarily:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python">d2f <span class="token operator">=</span> jax<span class="token punctuation">.</span>grad<span class="token punctuation">(</span>jax<span class="token punctuation">.</span>grad<span class="token punctuation">(</span>f<span class="token punctuation">)</span><span class="token punctuation">)</span>
+d2f<span class="token punctuation">(</span><span class="token number">3.0</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Second derivatives. Third derivatives. Jacobians. Hessians. All by composing <code class="inline-code">grad</code>. PyTorch can do this too (<code class="inline-code">torch.autograd.functional.hessian</code>), but it is bolted on. In JAX, it is the foundation.</p>
+<p>The constraint: <code class="inline-code">grad</code> only works on pure functions. No print statements inside (they run during tracing, not execution). No mutation of external state. No random number generation without explicit key management.</p>
+<h3 id="jit-compile-to-xla" class="prose-h prose-h3"><a class="prose-h__anchor" href="#jit-compile-to-xla" aria-label="Link to this section">#</a>jit: Compile to XLA</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token decorator annotation punctuation">@jax<span class="token punctuation">.</span>jit</span>
+<span class="token keyword">def</span> <span class="token function">train_step</span><span class="token punctuation">(</span>params<span class="token punctuation">,</span> x<span class="token punctuation">,</span> y<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    loss <span class="token operator">=</span> loss_fn<span class="token punctuation">(</span>params<span class="token punctuation">,</span> x<span class="token punctuation">,</span> y<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> loss
+
+fast_step <span class="token operator">=</span> jax<span class="token punctuation">.</span>jit<span class="token punctuation">(</span>train_step<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>On the first call, JAX traces the function -- it records which operations happen, without executing them. Then it hands that trace to XLA (Accelerated Linear Algebra), Google&#39;s compiler for TPUs and GPUs. XLA fuses operations, eliminates redundant memory copies, and generates optimized machine code.</p>
+<p>Subsequent calls skip Python entirely. The compiled code runs on the accelerator at C++ speed.</p>
+<p>When JIT helps:</p>
+<ul>
+<li>Training steps (same computation repeated thousands of times)</li>
+<li>Inference (same model, different inputs)</li>
+<li>Any function called more than once with similar-shaped inputs</li>
+</ul>
+<p>When JIT hurts:</p>
+<ul>
+<li>Functions with Python control flow that depends on values (<code class="inline-code">if x &gt; 0</code> where x is a traced array)</li>
+<li>One-shot computations (compilation overhead exceeds runtime)</li>
+<li>Debugging (tracing hides the actual execution)</li>
+</ul>
+<p>The control flow restriction is real. <code class="inline-code">jax.lax.cond</code> replaces <code class="inline-code">if/else</code>. <code class="inline-code">jax.lax.scan</code> replaces <code class="inline-code">for</code> loops. These are not optional -- they are the price of compilation.</p>
+<h3 id="vmap-automatic-vectorization" class="prose-h prose-h3"><a class="prose-h__anchor" href="#vmap-automatic-vectorization" aria-label="Link to this section">#</a>vmap: Automatic Vectorization</h3>
+<p>You write a function that processes one example:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">predict</span><span class="token punctuation">(</span>params<span class="token punctuation">,</span> x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> jnp<span class="token punctuation">.</span>dot<span class="token punctuation">(</span>params<span class="token punctuation">[</span><span class="token string">'w'</span><span class="token punctuation">]</span><span class="token punctuation">,</span> x<span class="token punctuation">)</span> <span class="token operator">+</span> params<span class="token punctuation">[</span><span class="token string">'b'</span><span class="token punctuation">]</span></code></pre>
+</figure>
+<p><code class="inline-code">vmap</code> lifts it to process a batch:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python">batch_predict <span class="token operator">=</span> jax<span class="token punctuation">.</span>vmap<span class="token punctuation">(</span>predict<span class="token punctuation">,</span> in_axes<span class="token operator">=</span><span class="token punctuation">(</span><span class="token boolean">None</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p><code class="inline-code">in_axes=(None, 0)</code> means: do not batch over <code class="inline-code">params</code> (shared), batch over axis 0 of <code class="inline-code">x</code>. No manual <code class="inline-code">for</code> loop. No reshaping. No batch dimension threading. JAX figures out the batch dimension and vectorizes the entire computation.</p>
+<p>This is not syntactic sugar. <code class="inline-code">vmap</code> generates fused vectorized code that runs 10-100x faster than a Python loop. And it composes with <code class="inline-code">jit</code> and <code class="inline-code">grad</code>:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python">per_example_grads <span class="token operator">=</span> jax<span class="token punctuation">.</span>vmap<span class="token punctuation">(</span>jax<span class="token punctuation">.</span>grad<span class="token punctuation">(</span>loss_fn<span class="token punctuation">)</span><span class="token punctuation">,</span> in_axes<span class="token operator">=</span><span class="token punctuation">(</span><span class="token boolean">None</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Per-example gradients. One line. This is nearly impossible in PyTorch without hacks.</p>
+<h3 id="pmap-data-parallelism-across-devices" class="prose-h prose-h3"><a class="prose-h__anchor" href="#pmap-data-parallelism-across-devices" aria-label="Link to this section">#</a>pmap: Data Parallelism Across Devices</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python">parallel_step <span class="token operator">=</span> jax<span class="token punctuation">.</span>pmap<span class="token punctuation">(</span>train_step<span class="token punctuation">,</span> axis_name<span class="token operator">=</span><span class="token string">'devices'</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p><code class="inline-code">pmap</code> replicates the function across all available devices (GPUs/TPUs) and splits the batch. Inside the function, <code class="inline-code">jax.lax.pmean</code> and <code class="inline-code">jax.lax.psum</code> synchronize gradients across devices.</p>
+<p>Google trains Gemini across thousands of TPU v5e chips using <code class="inline-code">pmap</code> (and its successor <code class="inline-code">shard_map</code>). The programming model: write the single-device version, wrap with <code class="inline-code">pmap</code>, done.</p>
+<h3 id="pytrees-the-universal-data-structure" class="prose-h prose-h3"><a class="prose-h__anchor" href="#pytrees-the-universal-data-structure" aria-label="Link to this section">#</a>Pytrees: The Universal Data Structure</h3>
+<p>JAX operates on &quot;pytrees&quot; -- nested combinations of lists, tuples, dicts, and arrays. Your model parameters are a pytree:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python">params <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">'layer1'</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">'w'</span><span class="token punctuation">:</span> jnp<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token number">784</span><span class="token punctuation">,</span> <span class="token number">256</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">'b'</span><span class="token punctuation">:</span> jnp<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token number">256</span><span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token string">'layer2'</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">'w'</span><span class="token punctuation">:</span> jnp<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token number">256</span><span class="token punctuation">,</span> <span class="token number">128</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">'b'</span><span class="token punctuation">:</span> jnp<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token number">128</span><span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token string">'layer3'</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">'w'</span><span class="token punctuation">:</span> jnp<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token number">128</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>  <span class="token string">'b'</span><span class="token punctuation">:</span> jnp<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<p>Every JAX transformation -- <code class="inline-code">grad</code>, <code class="inline-code">jit</code>, <code class="inline-code">vmap</code> -- knows how to traverse pytrees. <code class="inline-code">jax.tree.map(f, tree)</code> applies <code class="inline-code">f</code> to every leaf. This is how optimizers update all parameters at once:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python">params <span class="token operator">=</span> jax<span class="token punctuation">.</span>tree<span class="token punctuation">.</span><span class="token builtin">map</span><span class="token punctuation">(</span><span class="token keyword">lambda</span> p<span class="token punctuation">,</span> g<span class="token punctuation">:</span> p <span class="token operator">-</span> lr <span class="token operator">*</span> g<span class="token punctuation">,</span> params<span class="token punctuation">,</span> grads<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>No <code class="inline-code">.parameters()</code> method. No parameter registration. The tree structure is the model.</p>
+<h3 id="functional-vs-object-oriented" class="prose-h prose-h3"><a class="prose-h__anchor" href="#functional-vs-object-oriented" aria-label="Link to this section">#</a>Functional vs Object-Oriented</h3>
+<p>PyTorch stores state inside objects:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">Model</span><span class="token punctuation">(</span>nn<span class="token punctuation">.</span>Module<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>linear <span class="token operator">=</span> nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">784</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">forward</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> self<span class="token punctuation">.</span>linear<span class="token punctuation">(</span>x<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>JAX uses pure functions with explicit state:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">predict</span><span class="token punctuation">(</span>params<span class="token punctuation">,</span> x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> jnp<span class="token punctuation">.</span>dot<span class="token punctuation">(</span>x<span class="token punctuation">,</span> params<span class="token punctuation">[</span><span class="token string">'w'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">+</span> params<span class="token punctuation">[</span><span class="token string">'b'</span><span class="token punctuation">]</span></code></pre>
+</figure>
+<p>The params are passed in. Nothing is stored. Nothing is mutated. This makes every function testable, composable, and compilable. It also means you manage the params yourself -- or use a library like Flax or Equinox.</p>
+<h3 id="the-jax-ecosystem" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-jax-ecosystem" aria-label="Link to this section">#</a>The JAX Ecosystem</h3>
+<p>JAX gives you primitives. Libraries give you ergonomics:</p>
+<table>
+<thead>
+<tr>
+<th>Library</th>
+<th>Role</th>
+<th>Style</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Flax</strong> (Google)</td>
+<td>Neural network layers</td>
+<td><code class="inline-code">nn.Module</code> with explicit state</td>
+</tr>
+<tr>
+<td><strong>Equinox</strong> (Patrick Kidger)</td>
+<td>Neural network layers</td>
+<td>Pytree-based, Pythonic</td>
+</tr>
+<tr>
+<td><strong>Optax</strong> (DeepMind)</td>
+<td>Optimizers + LR schedules</td>
+<td>Composable gradient transforms</td>
+</tr>
+<tr>
+<td><strong>Orbax</strong> (Google)</td>
+<td>Checkpointing</td>
+<td>Save/restore pytrees</td>
+</tr>
+<tr>
+<td><strong>CLU</strong> (Google)</td>
+<td>Metrics + logging</td>
+<td>Training loop utilities</td>
+</tr>
+</tbody></table>
+<p>Optax is the standard optimizer library. It separates the gradient transformation (Adam, SGD, clipping) from the parameter update, making it trivial to compose:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python">optimizer <span class="token operator">=</span> optax<span class="token punctuation">.</span>chain<span class="token punctuation">(</span>
+    optax<span class="token punctuation">.</span>clip_by_global_norm<span class="token punctuation">(</span><span class="token number">1.0</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    optax<span class="token punctuation">.</span>adam<span class="token punctuation">(</span>learning_rate<span class="token operator">=</span><span class="token number">1e-3</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">)</span></code></pre>
+</figure>
+<h3 id="when-to-use-jax-vs-pytorch" class="prose-h prose-h3"><a class="prose-h__anchor" href="#when-to-use-jax-vs-pytorch" aria-label="Link to this section">#</a>When to Use JAX vs PyTorch</h3>
+<table>
+<thead>
+<tr>
+<th>Factor</th>
+<th>JAX</th>
+<th>PyTorch</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>TPU support</td>
+<td>First-class (Google built both)</td>
+<td>Community-maintained (torch_xla)</td>
+</tr>
+<tr>
+<td>GPU support</td>
+<td>Good (CUDA via XLA)</td>
+<td>Best-in-class (native CUDA)</td>
+</tr>
+<tr>
+<td>Debugging</td>
+<td>Hard (tracing + compilation)</td>
+<td>Easy (eager, line-by-line)</td>
+</tr>
+<tr>
+<td>Ecosystem</td>
+<td>Research-focused (Flax, Equinox)</td>
+<td>Massive (HuggingFace, torchvision, etc.)</td>
+</tr>
+<tr>
+<td>Hiring</td>
+<td>Niche (Google/DeepMind/Anthropic)</td>
+<td>Mainstream (everywhere)</td>
+</tr>
+<tr>
+<td>Large-scale training</td>
+<td>Superior (XLA, pmap, mesh)</td>
+<td>Good (FSDP, DeepSpeed)</td>
+</tr>
+<tr>
+<td>Prototyping speed</td>
+<td>Slower (functional overhead)</td>
+<td>Faster (mutate and go)</td>
+</tr>
+<tr>
+<td>Production inference</td>
+<td>TensorFlow Serving, Vertex AI</td>
+<td>TorchServe, Triton, ONNX</td>
+</tr>
+<tr>
+<td>Who uses it</td>
+<td>DeepMind (Gemini), Anthropic (Claude)</td>
+<td>Meta (Llama), OpenAI (GPT), Stability AI</td>
+</tr>
+</tbody></table>
+<p>The honest answer: use PyTorch unless you have a specific reason to use JAX. Those reasons are -- TPU access, need for per-example gradients, multi-device training at massive scale, or working at Google/DeepMind/Anthropic.</p>
+<h3 id="random-numbers-in-jax" class="prose-h prose-h3"><a class="prose-h__anchor" href="#random-numbers-in-jax" aria-label="Link to this section">#</a>Random Numbers in JAX</h3>
+<p>JAX does not have a global random state. Every random operation requires an explicit PRNG key:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python">key <span class="token operator">=</span> jax<span class="token punctuation">.</span>random<span class="token punctuation">.</span>PRNGKey<span class="token punctuation">(</span><span class="token number">42</span><span class="token punctuation">)</span>
+key1<span class="token punctuation">,</span> key2 <span class="token operator">=</span> jax<span class="token punctuation">.</span>random<span class="token punctuation">.</span>split<span class="token punctuation">(</span>key<span class="token punctuation">)</span>
+w <span class="token operator">=</span> jax<span class="token punctuation">.</span>random<span class="token punctuation">.</span>normal<span class="token punctuation">(</span>key1<span class="token punctuation">,</span> shape<span class="token operator">=</span><span class="token punctuation">(</span><span class="token number">784</span><span class="token punctuation">,</span> <span class="token number">256</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>This is annoying at first. But it guarantees reproducibility across devices and compilations -- a property that PyTorch&#39;s <code class="inline-code">torch.manual_seed</code> cannot guarantee in multi-GPU settings.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="batchnorm-effect"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">batchnorm-effect</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> batchnorm effect</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-setup-and-data" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-setup-and-data" aria-label="Link to this section">#</a>Step 1: Setup and Data</h3>
+<p>We will train a 3-layer MLP on MNIST using JAX and Optax. 784 inputs, two hidden layers of 256 and 128 neurons, 10 output classes.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> jax
+<span class="token keyword">import</span> jax<span class="token punctuation">.</span>numpy <span class="token keyword">as</span> jnp
+<span class="token keyword">from</span> jax <span class="token keyword">import</span> random
+<span class="token keyword">import</span> optax
+
+<span class="token keyword">def</span> <span class="token function">get_mnist_data</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>datasets <span class="token keyword">import</span> fetch_openml
+    mnist <span class="token operator">=</span> fetch_openml<span class="token punctuation">(</span><span class="token string">'mnist_784'</span><span class="token punctuation">,</span> version<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span> as_frame<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">,</span> parser<span class="token operator">=</span><span class="token string">'auto'</span><span class="token punctuation">)</span>
+    X <span class="token operator">=</span> mnist<span class="token punctuation">.</span>data<span class="token punctuation">.</span>astype<span class="token punctuation">(</span><span class="token string">'float32'</span><span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token number">255.0</span>
+    y <span class="token operator">=</span> mnist<span class="token punctuation">.</span>target<span class="token punctuation">.</span>astype<span class="token punctuation">(</span><span class="token string">'int'</span><span class="token punctuation">)</span>
+    X_train<span class="token punctuation">,</span> X_test <span class="token operator">=</span> X<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">60000</span><span class="token punctuation">]</span><span class="token punctuation">,</span> X<span class="token punctuation">[</span><span class="token number">60000</span><span class="token punctuation">:</span><span class="token punctuation">]</span>
+    y_train<span class="token punctuation">,</span> y_test <span class="token operator">=</span> y<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">60000</span><span class="token punctuation">]</span><span class="token punctuation">,</span> y<span class="token punctuation">[</span><span class="token number">60000</span><span class="token punctuation">:</span><span class="token punctuation">]</span>
+    <span class="token keyword">return</span> X_train<span class="token punctuation">,</span> y_train<span class="token punctuation">,</span> X_test<span class="token punctuation">,</span> y_test</code></pre>
+</figure>
+<h3 id="step-2-initialize-parameters" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-initialize-parameters" aria-label="Link to this section">#</a>Step 2: Initialize Parameters</h3>
+<p>No class. Just a function that returns a pytree:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">init_params</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    k1<span class="token punctuation">,</span> k2<span class="token punctuation">,</span> k3 <span class="token operator">=</span> random<span class="token punctuation">.</span>split<span class="token punctuation">(</span>key<span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span>
+    scale1 <span class="token operator">=</span> jnp<span class="token punctuation">.</span>sqrt<span class="token punctuation">(</span><span class="token number">2.0</span> <span class="token operator">/</span> <span class="token number">784</span><span class="token punctuation">)</span>
+    scale2 <span class="token operator">=</span> jnp<span class="token punctuation">.</span>sqrt<span class="token punctuation">(</span><span class="token number">2.0</span> <span class="token operator">/</span> <span class="token number">256</span><span class="token punctuation">)</span>
+    scale3 <span class="token operator">=</span> jnp<span class="token punctuation">.</span>sqrt<span class="token punctuation">(</span><span class="token number">2.0</span> <span class="token operator">/</span> <span class="token number">128</span><span class="token punctuation">)</span>
+    params <span class="token operator">=</span> <span class="token punctuation">{</span>
+        <span class="token string">'layer1'</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+            <span class="token string">'w'</span><span class="token punctuation">:</span> scale1 <span class="token operator">*</span> random<span class="token punctuation">.</span>normal<span class="token punctuation">(</span>k1<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token number">784</span><span class="token punctuation">,</span> <span class="token number">256</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            <span class="token string">'b'</span><span class="token punctuation">:</span> jnp<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token number">256</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token string">'layer2'</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+            <span class="token string">'w'</span><span class="token punctuation">:</span> scale2 <span class="token operator">*</span> random<span class="token punctuation">.</span>normal<span class="token punctuation">(</span>k2<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token number">256</span><span class="token punctuation">,</span> <span class="token number">128</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            <span class="token string">'b'</span><span class="token punctuation">:</span> jnp<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token number">128</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token string">'layer3'</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+            <span class="token string">'w'</span><span class="token punctuation">:</span> scale3 <span class="token operator">*</span> random<span class="token punctuation">.</span>normal<span class="token punctuation">(</span>k3<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token number">128</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            <span class="token string">'b'</span><span class="token punctuation">:</span> jnp<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> params</code></pre>
+</figure>
+<p>He-initialization, done manually. Three PRNG keys split from one seed. Every weight is an immutable array in a nested dict.</p>
+<h3 id="step-3-forward-pass" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-forward-pass" aria-label="Link to this section">#</a>Step 3: Forward Pass</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">forward</span><span class="token punctuation">(</span>params<span class="token punctuation">,</span> x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    x <span class="token operator">=</span> jnp<span class="token punctuation">.</span>dot<span class="token punctuation">(</span>x<span class="token punctuation">,</span> params<span class="token punctuation">[</span><span class="token string">'layer1'</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">'w'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">+</span> params<span class="token punctuation">[</span><span class="token string">'layer1'</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">'b'</span><span class="token punctuation">]</span>
+    x <span class="token operator">=</span> jax<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>relu<span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+    x <span class="token operator">=</span> jnp<span class="token punctuation">.</span>dot<span class="token punctuation">(</span>x<span class="token punctuation">,</span> params<span class="token punctuation">[</span><span class="token string">'layer2'</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">'w'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">+</span> params<span class="token punctuation">[</span><span class="token string">'layer2'</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">'b'</span><span class="token punctuation">]</span>
+    x <span class="token operator">=</span> jax<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>relu<span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+    x <span class="token operator">=</span> jnp<span class="token punctuation">.</span>dot<span class="token punctuation">(</span>x<span class="token punctuation">,</span> params<span class="token punctuation">[</span><span class="token string">'layer3'</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">'w'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">+</span> params<span class="token punctuation">[</span><span class="token string">'layer3'</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">'b'</span><span class="token punctuation">]</span>
+    <span class="token keyword">return</span> x
+
+<span class="token keyword">def</span> <span class="token function">loss_fn</span><span class="token punctuation">(</span>params<span class="token punctuation">,</span> x<span class="token punctuation">,</span> y<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    logits <span class="token operator">=</span> forward<span class="token punctuation">(</span>params<span class="token punctuation">,</span> x<span class="token punctuation">)</span>
+    one_hot <span class="token operator">=</span> jax<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>one_hot<span class="token punctuation">(</span>y<span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token operator">-</span>jnp<span class="token punctuation">.</span>mean<span class="token punctuation">(</span>jnp<span class="token punctuation">.</span><span class="token builtin">sum</span><span class="token punctuation">(</span>jax<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>log_softmax<span class="token punctuation">(</span>logits<span class="token punctuation">)</span> <span class="token operator">*</span> one_hot<span class="token punctuation">,</span> axis<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Pure functions. Params in, prediction out. No <code class="inline-code">self</code>, no stored state. <code class="inline-code">loss_fn</code> computes cross-entropy from scratch -- softmax, log, negative mean.</p>
+<h3 id="step-4-jit-compiled-training-step" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-jit-compiled-training-step" aria-label="Link to this section">#</a>Step 4: JIT-Compiled Training Step</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token decorator annotation punctuation">@jax<span class="token punctuation">.</span>jit</span>
+<span class="token keyword">def</span> <span class="token function">train_step</span><span class="token punctuation">(</span>params<span class="token punctuation">,</span> opt_state<span class="token punctuation">,</span> x<span class="token punctuation">,</span> y<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    loss<span class="token punctuation">,</span> grads <span class="token operator">=</span> jax<span class="token punctuation">.</span>value_and_grad<span class="token punctuation">(</span>loss_fn<span class="token punctuation">)</span><span class="token punctuation">(</span>params<span class="token punctuation">,</span> x<span class="token punctuation">,</span> y<span class="token punctuation">)</span>
+    updates<span class="token punctuation">,</span> opt_state <span class="token operator">=</span> optimizer<span class="token punctuation">.</span>update<span class="token punctuation">(</span>grads<span class="token punctuation">,</span> opt_state<span class="token punctuation">,</span> params<span class="token punctuation">)</span>
+    params <span class="token operator">=</span> optax<span class="token punctuation">.</span>apply_updates<span class="token punctuation">(</span>params<span class="token punctuation">,</span> updates<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> params<span class="token punctuation">,</span> opt_state<span class="token punctuation">,</span> loss
+
+<span class="token decorator annotation punctuation">@jax<span class="token punctuation">.</span>jit</span>
+<span class="token keyword">def</span> <span class="token function">accuracy</span><span class="token punctuation">(</span>params<span class="token punctuation">,</span> x<span class="token punctuation">,</span> y<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    logits <span class="token operator">=</span> forward<span class="token punctuation">(</span>params<span class="token punctuation">,</span> x<span class="token punctuation">)</span>
+    preds <span class="token operator">=</span> jnp<span class="token punctuation">.</span>argmax<span class="token punctuation">(</span>logits<span class="token punctuation">,</span> axis<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> jnp<span class="token punctuation">.</span>mean<span class="token punctuation">(</span>preds <span class="token operator">==</span> y<span class="token punctuation">)</span></code></pre>
+</figure>
+<p><code class="inline-code">jax.value_and_grad</code> returns both the loss value and the gradients in one pass. The <code class="inline-code">@jax.jit</code> decorator compiles both functions to XLA. After the first call, each training step runs without touching Python.</p>
+<h3 id="step-5-training-loop" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-training-loop" aria-label="Link to this section">#</a>Step 5: Training Loop</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python">optimizer <span class="token operator">=</span> optax<span class="token punctuation">.</span>adam<span class="token punctuation">(</span>learning_rate<span class="token operator">=</span><span class="token number">1e-3</span><span class="token punctuation">)</span>
+
+X_train<span class="token punctuation">,</span> y_train<span class="token punctuation">,</span> X_test<span class="token punctuation">,</span> y_test <span class="token operator">=</span> get_mnist_data<span class="token punctuation">(</span><span class="token punctuation">)</span>
+X_train<span class="token punctuation">,</span> X_test <span class="token operator">=</span> jnp<span class="token punctuation">.</span>array<span class="token punctuation">(</span>X_train<span class="token punctuation">)</span><span class="token punctuation">,</span> jnp<span class="token punctuation">.</span>array<span class="token punctuation">(</span>X_test<span class="token punctuation">)</span>
+y_train<span class="token punctuation">,</span> y_test <span class="token operator">=</span> jnp<span class="token punctuation">.</span>array<span class="token punctuation">(</span>y_train<span class="token punctuation">)</span><span class="token punctuation">,</span> jnp<span class="token punctuation">.</span>array<span class="token punctuation">(</span>y_test<span class="token punctuation">)</span>
+
+key <span class="token operator">=</span> random<span class="token punctuation">.</span>PRNGKey<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+params <span class="token operator">=</span> init_params<span class="token punctuation">(</span>key<span class="token punctuation">)</span>
+opt_state <span class="token operator">=</span> optimizer<span class="token punctuation">.</span>init<span class="token punctuation">(</span>params<span class="token punctuation">)</span>
+
+batch_size <span class="token operator">=</span> <span class="token number">128</span>
+n_epochs <span class="token operator">=</span> <span class="token number">10</span>
+
+<span class="token keyword">for</span> epoch <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n_epochs<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    key<span class="token punctuation">,</span> subkey <span class="token operator">=</span> random<span class="token punctuation">.</span>split<span class="token punctuation">(</span>key<span class="token punctuation">)</span>
+    perm <span class="token operator">=</span> random<span class="token punctuation">.</span>permutation<span class="token punctuation">(</span>subkey<span class="token punctuation">,</span> <span class="token builtin">len</span><span class="token punctuation">(</span>X_train<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    X_shuffled <span class="token operator">=</span> X_train<span class="token punctuation">[</span>perm<span class="token punctuation">]</span>
+    y_shuffled <span class="token operator">=</span> y_train<span class="token punctuation">[</span>perm<span class="token punctuation">]</span>
+
+    epoch_loss <span class="token operator">=</span> <span class="token number">0.0</span>
+    n_batches <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>X_train<span class="token punctuation">)</span> <span class="token operator">//</span> batch_size
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n_batches<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        start <span class="token operator">=</span> i <span class="token operator">*</span> batch_size
+        xb <span class="token operator">=</span> X_shuffled<span class="token punctuation">[</span>start<span class="token punctuation">:</span>start <span class="token operator">+</span> batch_size<span class="token punctuation">]</span>
+        yb <span class="token operator">=</span> y_shuffled<span class="token punctuation">[</span>start<span class="token punctuation">:</span>start <span class="token operator">+</span> batch_size<span class="token punctuation">]</span>
+        params<span class="token punctuation">,</span> opt_state<span class="token punctuation">,</span> loss <span class="token operator">=</span> train_step<span class="token punctuation">(</span>params<span class="token punctuation">,</span> opt_state<span class="token punctuation">,</span> xb<span class="token punctuation">,</span> yb<span class="token punctuation">)</span>
+        epoch_loss <span class="token operator">+=</span> loss
+
+    train_acc <span class="token operator">=</span> accuracy<span class="token punctuation">(</span>params<span class="token punctuation">,</span> X_train<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">5000</span><span class="token punctuation">]</span><span class="token punctuation">,</span> y_train<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">5000</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    test_acc <span class="token operator">=</span> accuracy<span class="token punctuation">(</span>params<span class="token punctuation">,</span> X_test<span class="token punctuation">,</span> y_test<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Epoch </span><span class="token interpolation"><span class="token punctuation">{</span>epoch <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">:</span><span class="token format-spec">2d</span><span class="token punctuation">}</span></span><span class="token string"> | Loss: </span><span class="token interpolation"><span class="token punctuation">{</span>epoch_loss <span class="token operator">/</span> n_batches<span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string"> | "</span></span>
+          <span class="token string-interpolation"><span class="token string">f"Train Acc: </span><span class="token interpolation"><span class="token punctuation">{</span>train_acc<span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string"> | Test Acc: </span><span class="token interpolation"><span class="token punctuation">{</span>test_acc<span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>10 epochs. ~97% test accuracy. The first epoch is slow (JIT compilation). Epochs 2-10 are fast.</p>
+<p>Notice what is missing: no <code class="inline-code">.zero_grad()</code>, no <code class="inline-code">.backward()</code>, no <code class="inline-code">.step()</code>. The entire update is one composed function call. Gradients are computed, transformed by Adam, and applied to parameters -- all inside <code class="inline-code">train_step</code>.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<h3 id="flax-the-google-standard" class="prose-h prose-h3"><a class="prose-h__anchor" href="#flax-the-google-standard" aria-label="Link to this section">#</a>Flax: The Google Standard</h3>
+<p>Flax is the most common JAX neural network library. It adds <code class="inline-code">nn.Module</code> back, but with explicit state management:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> flax<span class="token punctuation">.</span>linen <span class="token keyword">as</span> nn
+
+<span class="token keyword">class</span> <span class="token class-name">MLP</span><span class="token punctuation">(</span>nn<span class="token punctuation">.</span>Module<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token decorator annotation punctuation">@nn<span class="token punctuation">.</span>compact</span>
+    <span class="token keyword">def</span> <span class="token function">__call__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        x <span class="token operator">=</span> nn<span class="token punctuation">.</span>Dense<span class="token punctuation">(</span><span class="token number">256</span><span class="token punctuation">)</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+        x <span class="token operator">=</span> nn<span class="token punctuation">.</span>relu<span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+        x <span class="token operator">=</span> nn<span class="token punctuation">.</span>Dense<span class="token punctuation">(</span><span class="token number">128</span><span class="token punctuation">)</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+        x <span class="token operator">=</span> nn<span class="token punctuation">.</span>relu<span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+        x <span class="token operator">=</span> nn<span class="token punctuation">.</span>Dense<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> x
+
+model <span class="token operator">=</span> MLP<span class="token punctuation">(</span><span class="token punctuation">)</span>
+params <span class="token operator">=</span> model<span class="token punctuation">.</span>init<span class="token punctuation">(</span>jax<span class="token punctuation">.</span>random<span class="token punctuation">.</span>PRNGKey<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span> jnp<span class="token punctuation">.</span>ones<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">784</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+logits <span class="token operator">=</span> model<span class="token punctuation">.</span><span class="token builtin">apply</span><span class="token punctuation">(</span>params<span class="token punctuation">,</span> x_batch<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Same structure as PyTorch, but <code class="inline-code">params</code> is separate from the model. <code class="inline-code">model.init()</code> creates params. <code class="inline-code">model.apply(params, x)</code> runs the forward pass. The model object has no state.</p>
+<h3 id="equinox-the-pythonic-alternative" class="prose-h prose-h3"><a class="prose-h__anchor" href="#equinox-the-pythonic-alternative" aria-label="Link to this section">#</a>Equinox: The Pythonic Alternative</h3>
+<p>Equinox (by Patrick Kidger) represents models as pytrees:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> equinox <span class="token keyword">as</span> eqx
+
+model <span class="token operator">=</span> eqx<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>MLP<span class="token punctuation">(</span>
+    in_size<span class="token operator">=</span><span class="token number">784</span><span class="token punctuation">,</span> out_size<span class="token operator">=</span><span class="token number">10</span><span class="token punctuation">,</span> width_size<span class="token operator">=</span><span class="token number">256</span><span class="token punctuation">,</span> depth<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">,</span>
+    activation<span class="token operator">=</span>jax<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>relu<span class="token punctuation">,</span> key<span class="token operator">=</span>jax<span class="token punctuation">.</span>random<span class="token punctuation">.</span>PRNGKey<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span>
+logits <span class="token operator">=</span> model<span class="token punctuation">(</span>x<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>The model itself is a pytree. No <code class="inline-code">.apply()</code> needed. Parameters are just the model&#39;s leaves. This is closer to how JAX thinks.</p>
+<h3 id="optax-composable-optimizers" class="prose-h prose-h3"><a class="prose-h__anchor" href="#optax-composable-optimizers" aria-label="Link to this section">#</a>Optax: Composable Optimizers</h3>
+<p>Optax decouples the gradient transformation from the update:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python">schedule <span class="token operator">=</span> optax<span class="token punctuation">.</span>warmup_cosine_decay_schedule<span class="token punctuation">(</span>
+    init_value<span class="token operator">=</span><span class="token number">0.0</span><span class="token punctuation">,</span> peak_value<span class="token operator">=</span><span class="token number">1e-3</span><span class="token punctuation">,</span>
+    warmup_steps<span class="token operator">=</span><span class="token number">1000</span><span class="token punctuation">,</span> decay_steps<span class="token operator">=</span><span class="token number">50000</span>
+<span class="token punctuation">)</span>
+
+optimizer <span class="token operator">=</span> optax<span class="token punctuation">.</span>chain<span class="token punctuation">(</span>
+    optax<span class="token punctuation">.</span>clip_by_global_norm<span class="token punctuation">(</span><span class="token number">1.0</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    optax<span class="token punctuation">.</span>adamw<span class="token punctuation">(</span>learning_rate<span class="token operator">=</span>schedule<span class="token punctuation">,</span> weight_decay<span class="token operator">=</span><span class="token number">0.01</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Gradient clipping, learning rate warmup, weight decay -- all composed as a chain of transforms. Each transform sees the gradients, modifies them, and passes them to the next. No monolithic optimizer class.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p><strong>Installation:</strong></p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">bash</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-bash">pip <span class="token function">install</span> jax jaxlib optax flax</code></pre>
+</figure>
+<p>For GPU support:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">bash</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-bash">pip <span class="token function">install</span> jax<span class="token punctuation">[</span>cuda12<span class="token punctuation">]</span></code></pre>
+</figure>
+<p>For TPU (Google Cloud):</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">bash</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-bash">pip <span class="token function">install</span> jax<span class="token punctuation">[</span>tpu<span class="token punctuation">]</span> <span class="token parameter variable">-f</span> https://storage.googleapis.com/jax-releases/libtpu_releases.html</code></pre>
+</figure>
+<p><strong>Performance gotchas:</strong></p>
+<ul>
+<li>First JIT call is slow (compilation). Warm up before benchmarking.</li>
+<li>Avoid Python loops over JAX arrays inside JIT. Use <code class="inline-code">jax.lax.scan</code> or <code class="inline-code">jax.lax.fori_loop</code>.</li>
+<li><code class="inline-code">jax.debug.print()</code> works inside JIT. Regular <code class="inline-code">print()</code> does not.</li>
+<li>Profile with <code class="inline-code">jax.profiler</code> or TensorBoard. XLA compilation can hide bottlenecks.</li>
+<li>JAX pre-allocates 75% of GPU memory by default. Set <code class="inline-code">XLA_PYTHON_CLIENT_PREALLOCATE=false</code> to disable.</li>
+</ul>
+<p><strong>Checkpointing:</strong></p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> orbax<span class="token punctuation">.</span>checkpoint <span class="token keyword">as</span> ocp
+checkpointer <span class="token operator">=</span> ocp<span class="token punctuation">.</span>PyTreeCheckpointer<span class="token punctuation">(</span><span class="token punctuation">)</span>
+checkpointer<span class="token punctuation">.</span>save<span class="token punctuation">(</span><span class="token string">'/tmp/model'</span><span class="token punctuation">,</span> params<span class="token punctuation">)</span>
+restored <span class="token operator">=</span> checkpointer<span class="token punctuation">.</span>restore<span class="token punctuation">(</span><span class="token string">'/tmp/model'</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p><strong>This lesson produces:</strong></p>
+<ul>
+<li><code class="inline-code">outputs/prompt-jax-optimizer.md</code> -- a prompt for choosing the right JAX optimizer configuration</li>
+<li><code class="inline-code">outputs/skill-jax-patterns.md</code> -- a skill covering functional patterns in JAX</li>
+</ul>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p>Add dropout to the MLP. In JAX, dropout requires a PRNG key -- thread a key through the forward pass and split it for each dropout layer. Compare test accuracy with and without.</p>
+</li>
+<li><p>Use <code class="inline-code">jax.vmap</code> to compute per-example gradients for a batch of 32 MNIST images. Compute the gradient norm for each example. Which examples have the largest gradients, and why?</p>
+</li>
+<li><p>Replace the manual forward function with a generic <code class="inline-code">mlp_forward(params, x)</code> that works for any number of layers. Use <code class="inline-code">jax.tree.leaves</code> to determine the depth automatically.</p>
+</li>
+<li><p>Benchmark the training step with and without <code class="inline-code">@jax.jit</code>. Time 100 steps of each. How large is the speedup on your hardware? What is the compilation overhead on the first call?</p>
+</li>
+<li><p>Implement gradient clipping by composing <code class="inline-code">optax.chain(optax.clip_by_global_norm(1.0), optax.adam(1e-3))</code>. Train with and without clipping. Plot the gradient norm over training to see the effect.</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>XLA</td>
+<td>&quot;The thing that makes JAX fast&quot;</td>
+<td>Accelerated Linear Algebra -- a compiler that fuses operations and generates optimized GPU/TPU kernels from a computation graph</td>
+</tr>
+<tr>
+<td>JIT</td>
+<td>&quot;Just-in-time compilation&quot;</td>
+<td>JAX traces the function on first call, compiles to XLA, then runs the compiled version on subsequent calls</td>
+</tr>
+<tr>
+<td>Pure function</td>
+<td>&quot;No side effects&quot;</td>
+<td>A function where the output depends only on inputs -- no global state, no mutation, no randomness without explicit keys</td>
+</tr>
+<tr>
+<td>vmap</td>
+<td>&quot;Auto-batching&quot;</td>
+<td>Transforms a function that processes one example into one that processes a batch, without rewriting</td>
+</tr>
+<tr>
+<td>pmap</td>
+<td>&quot;Auto-parallelism&quot;</td>
+<td>Replicates a function across multiple devices and splits the input batch</td>
+</tr>
+<tr>
+<td>Pytree</td>
+<td>&quot;Nested dict of arrays&quot;</td>
+<td>Any nested structure of lists, tuples, dicts, and arrays that JAX can traverse and transform</td>
+</tr>
+<tr>
+<td>Tracing</td>
+<td>&quot;Recording the computation&quot;</td>
+<td>JAX executes the function with abstract values to build a computation graph, without computing real results</td>
+</tr>
+<tr>
+<td>Functional autodiff</td>
+<td>&quot;grad of a function&quot;</td>
+<td>Computing derivatives by transforming functions, not by attaching gradient storage to tensors</td>
+</tr>
+<tr>
+<td>Optax</td>
+<td>&quot;JAX&#39;s optimizer library&quot;</td>
+<td>A composable library of gradient transformations -- Adam, SGD, clipping, scheduling -- that chain together</td>
+</tr>
+<tr>
+<td>Flax</td>
+<td>&quot;JAX&#39;s nn.Module&quot;</td>
+<td>Google&#39;s neural network library for JAX, adding layer abstractions while keeping state explicit</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li>JAX documentation: <a href="https://jax.readthedocs.io/" target="_blank" rel="noopener">https://jax.readthedocs.io/</a> -- the official docs, with excellent tutorials on grad, jit, and vmap</li>
+<li>&quot;JAX: composable transformations of Python+NumPy programs&quot; (Bradbury et al., 2018) -- the original paper explaining the design philosophy</li>
+<li>Flax documentation: <a href="https://flax.readthedocs.io/" target="_blank" rel="noopener">https://flax.readthedocs.io/</a> -- Google&#39;s neural network library for JAX</li>
+<li>Patrick Kidger, &quot;Equinox: neural networks in JAX via callable PyTrees and filtered transformations&quot; (2021) -- the Pythonic alternative to Flax</li>
+<li>DeepMind, &quot;Optax: composable gradient transformation and optimisation&quot; -- the standard optimizer library</li>
+<li>&quot;You Don&#39;t Know JAX&quot; (Colin Raffel, 2020) -- a practical guide to JAX gotchas and patterns, from one of the T5 authors</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="11-intro-to-pytorch.html">
+  <span class="label">← Previous</span>
+  <b>Introduction to PyTorch</b>
+</a>
+      <a class="pager__item pager__item--next" href="13-debugging-neural-networks.html">
+  <span class="label">Next →</span>
+  <b>Debugging Neural Networks</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>9 minutes</b> of Deep Learning Core behind you.</p>
+      <a class="btn btn--solid" href="13-debugging-neural-networks.html">Continue to Debugging Neural Networks →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#the-jax-philosophy">The JAX Philosophy</a></li><li class="mini__item mini__item--d3"><a href="#jax-numpy-the-familiar-surface">jax.numpy: The Familiar Surface</a></li><li class="mini__item mini__item--d3"><a href="#jax-grad-functional-autodiff">jax.grad: Functional Autodiff</a></li><li class="mini__item mini__item--d3"><a href="#jit-compile-to-xla">jit: Compile to XLA</a></li><li class="mini__item mini__item--d3"><a href="#vmap-automatic-vectorization">vmap: Automatic Vectorization</a></li><li class="mini__item mini__item--d3"><a href="#pmap-data-parallelism-across-devices">pmap: Data Parallelism Across Devices</a></li><li class="mini__item mini__item--d3"><a href="#pytrees-the-universal-data-structure">Pytrees: The Universal Data Structure</a></li><li class="mini__item mini__item--d3"><a href="#functional-vs-object-oriented">Functional vs Object-Oriented</a></li><li class="mini__item mini__item--d3"><a href="#the-jax-ecosystem">The JAX Ecosystem</a></li><li class="mini__item mini__item--d3"><a href="#when-to-use-jax-vs-pytorch">When to Use JAX vs PyTorch</a></li><li class="mini__item mini__item--d3"><a href="#random-numbers-in-jax">Random Numbers in JAX</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-setup-and-data">Step 1: Setup and Data</a></li><li class="mini__item mini__item--d3"><a href="#step-2-initialize-parameters">Step 2: Initialize Parameters</a></li><li class="mini__item mini__item--d3"><a href="#step-3-forward-pass">Step 3: Forward Pass</a></li><li class="mini__item mini__item--d3"><a href="#step-4-jit-compiled-training-step">Step 4: JIT-Compiled Training Step</a></li><li class="mini__item mini__item--d3"><a href="#step-5-training-loop">Step 5: Training Loop</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d3"><a href="#flax-the-google-standard">Flax: The Google Standard</a></li><li class="mini__item mini__item--d3"><a href="#equinox-the-pythonic-alternative">Equinox: The Pythonic Alternative</a></li><li class="mini__item mini__item--d3"><a href="#optax-composable-optimizers">Optax: Composable Optimizers</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

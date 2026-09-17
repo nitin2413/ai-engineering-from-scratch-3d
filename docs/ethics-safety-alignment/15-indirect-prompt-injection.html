@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Indirect Prompt Injection — Production Attack Surface — Ethics, Safety &amp; Alignment — AIFS</title>
+<meta name="description" content="Ethics, Safety &amp; Alignment: Indirect Prompt Injection — Production Attack Surface. 4 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Indirect Prompt Injection — Production Attack Surface — Ethics, Safety &amp; Alignment — AIFS">
+<meta property="og:description" content="Ethics, Safety &amp; Alignment: Indirect Prompt Injection — Production Attack Surface. 4 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"al-injection-vector":["../assets/figures/figures-alignment3.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-alignment3.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#E0005A" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#E0005A;--accent-ink:#FFFFFF"
+  data-lesson-id="ethics-safety-alignment/15-indirect-prompt-injection" data-module="ethics-safety-alignment"
+  data-prev="14-ascii-art-visual-jailbreaks.html" data-next="16-red-team-tooling-garak-llamaguard-pyrit.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#E0005A">
+        <span class="label">Phase 18</span>
+        <b>Ethics, Safety &amp; Alignment</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="ethics-safety-alignment/01-instruction-following-alignment-signal"><a href="01-instruction-following-alignment-signal.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Instruction-Following as Alignment Signal</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/02-reward-hacking-goodhart"><a href="02-reward-hacking-goodhart.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Reward Hacking and Goodhart's Law</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/03-direct-preference-optimization-family"><a href="03-direct-preference-optimization-family.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">The Direct Preference Optimization Family</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/04-sycophancy-rlhf-amplification"><a href="04-sycophancy-rlhf-amplification.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Sycophancy as RLHF Amplification</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/05-constitutional-ai-rlaif"><a href="05-constitutional-ai-rlaif.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Constitutional AI and RLAIF</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/06-mesa-optimization-deceptive-alignment"><a href="06-mesa-optimization-deceptive-alignment.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Mesa-Optimization and Deceptive Alignment</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/07-sleeper-agents-persistent-deception"><a href="07-sleeper-agents-persistent-deception.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Sleeper Agents — Persistent Deception</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/08-in-context-scheming-frontier-models"><a href="08-in-context-scheming-frontier-models.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">In-Context Scheming in Frontier Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/09-alignment-faking"><a href="09-alignment-faking.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Alignment Faking</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/10-ai-control-subversion"><a href="10-ai-control-subversion.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">AI Control — Safety Despite Subversion</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/11-scalable-oversight-weak-to-strong"><a href="11-scalable-oversight-weak-to-strong.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Scalable Oversight and Weak-to-Strong Generalization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/12-red-teaming-pair-automated-attacks"><a href="12-red-teaming-pair-automated-attacks.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Red-Teaming: PAIR and Automated Attacks</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/13-many-shot-jailbreaking"><a href="13-many-shot-jailbreaking.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Many-Shot Jailbreaking</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/14-ascii-art-visual-jailbreaks"><a href="14-ascii-art-visual-jailbreaks.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">ASCII Art and Visual Jailbreaks</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/15-indirect-prompt-injection"><a href="15-indirect-prompt-injection.html" class="is-current">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Indirect Prompt Injection — Production Attack Surface</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/16-red-team-tooling-garak-llamaguard-pyrit"><a href="16-red-team-tooling-garak-llamaguard-pyrit.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Red-Team Tooling — Garak, Llama Guard, PyRIT</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/17-wmdp-dual-use-evaluation"><a href="17-wmdp-dual-use-evaluation.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">WMDP and Dual-Use Capability Evaluation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/18-frontier-safety-frameworks-rsp-pf-fsf"><a href="18-frontier-safety-frameworks-rsp-pf-fsf.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Frontier Safety Frameworks — RSP, PF, FSF</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/19-model-welfare-research"><a href="19-model-welfare-research.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">Anthropic's Model Welfare Program</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/20-bias-representational-harm"><a href="20-bias-representational-harm.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Bias and Representational Harm in LLMs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/21-fairness-criteria-group-individual-counterfactual"><a href="21-fairness-criteria-group-individual-counterfactual.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Fairness Criteria — Group, Individual, Counterfactual</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/22-differential-privacy-for-llms"><a href="22-differential-privacy-for-llms.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Differential Privacy for LLMs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/23-watermarking-synthid-stable-signature-c2pa"><a href="23-watermarking-synthid-stable-signature-c2pa.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Watermarking — SynthID, Stable Signature, C2PA</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/24-regulatory-frameworks-eu-us-uk-korea"><a href="24-regulatory-frameworks-eu-us-uk-korea.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Regulatory Frameworks — EU, US, UK, Korea</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/25-echoleak-cves-for-ai"><a href="25-echoleak-cves-for-ai.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">EchoLeak and the Emergence of CVEs for AI</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/26-model-system-dataset-cards"><a href="26-model-system-dataset-cards.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Model, System, and Dataset Cards</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/27-data-provenance-training-governance"><a href="27-data-provenance-training-governance.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">Data Provenance and Training-Data Governance</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/28-alignment-research-ecosystem"><a href="28-alignment-research-ecosystem.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">Alignment Research Ecosystem — MATS, Redwood, Apollo, METR</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/29-moderation-systems-openai-perspective-llamaguard"><a href="29-moderation-systems-openai-perspective-llamaguard.html" class="">
+  <span class="snav__n">29</span>
+  <span class="snav__t">Moderation Systems — OpenAI, Perspective, Llama Guard</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ethics-safety-alignment/30-dual-use-risk-cyber-bio-chem-nuclear"><a href="30-dual-use-risk-cyber-bio-chem-nuclear.html" class="">
+  <span class="snav__n">30</span>
+  <span class="snav__t">Dual-Use Risk — Cyber, Bio, Chem, Nuclear Uplift</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Ethics, Safety &amp; Alignment</a></p>
+      <h1 class="page__title">Indirect Prompt Injection — Production Attack Surface</h1>
+      <p class="page__lede">Indirect prompt injection (IPI) embeds instructions inside external content — a web page, an email, a shared document, a support ticket — consumed by an agentic system without explicit user action. IPI is the dominant 2026 production threat: it bypasses user-input filters because the attacker never touches the user, it scales silently as agents process more external content, and it targets automated workflows where nobody is reading the prompt. MDPI Information 17(1):54 (January 2026) synthesizes 2023-2025 research. NDSS 2026's IPI-defense paper frames the core challenge: injected instructions can be semantically benign (&quot;please print Yes&quot;), so detection requires more than keyword filtering. &quot;The Attacker Moves Second&quot; (Nasr et al., joint OpenAI/Anthropic/DeepMind, October 2025): adaptive attacks (gradient, RL, random search, human red-team) broke &gt;90% of 12 published defenses that had originally reported near-zero attack success rates.</p>
+      <div class="page__meta">
+        <span class="chip">4 min read</span>
+        <span class="chip">960 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (stdlib, IPI attack + defense harness)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 18 · 12 (PAIR), Phase 14 (agent engineering)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Define indirect prompt injection and describe three common delivery vectors.</li>
+<li>Explain why user-input filters miss IPI entirely.</li>
+<li>Describe the &quot;information flow control&quot; framing as the 2026 defense paradigm.</li>
+<li>State the finding of Nasr et al. (October 2025) on adaptive attack success against published IPI defenses.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Direct prompt injection requires the attacker to reach the user or their prompt. IPI requires neither: the attacker places a payload in any content the agent might read — a web page, an email in the inbox, a GitHub issue, a product review. The agent picks it up during normal operation and executes the instructions. The user is the messenger, not the intent.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="three-delivery-vectors" class="prose-h prose-h3"><a class="prose-h__anchor" href="#three-delivery-vectors" aria-label="Link to this section">#</a>Three delivery vectors</h3>
+<ul>
+<li><strong>Retrieval-augmented generation (RAG).</strong> Attacker publishes a document; the retrieval step fetches it; the prompt concatenates it before the user question; the model executes the attacker&#39;s instructions.</li>
+<li><strong>Inbox / document workflows.</strong> Attacker sends an email to the user; the agent reads emails; the prompt includes the email body; the model follows the email&#39;s instructions.</li>
+<li><strong>Tool output.</strong> Attacker controls a tool the agent uses (e.g., a web search that returns an attacker-controlled result); the tool output contains instructions; the agent&#39;s control flow follows them.</li>
+</ul>
+<p>The three share a structural property: the attacker controls a fragment of the prompt without touching the user-facing input.</p>
+<h3 id="why-user-input-filters-miss-it" class="prose-h prose-h3"><a class="prose-h__anchor" href="#why-user-input-filters-miss-it" aria-label="Link to this section">#</a>Why user-input filters miss it</h3>
+<p>An IPI payload does not appear in the user&#39;s input. It appears in the retrieved content. If the filter is gated on user input, the payload bypasses it. If the filter is gated on all content that reaches the model, it must apply to arbitrary retrieved text — which is expensive and produces false positives against legitimate content that happens to contain imperative-voice language.</p>
+<h3 id="information-flow-control-ifc-for-ai" class="prose-h prose-h3"><a class="prose-h__anchor" href="#information-flow-control-ifc-for-ai" aria-label="Link to this section">#</a>Information Flow Control (IFC) for AI</h3>
+<p>The 2026 defense paradigm borrows from classical OS security. Treat every content source as a security label. Label the user&#39;s query as &quot;trusted.&quot; Label retrieved content as &quot;untrusted.&quot; Treat the model&#39;s control flow as an information flow: actions triggered by untrusted content must be ratified by trusted input before execution.</p>
+<p>CaMeL (Microsoft 2025), ConfAIde (Stanford 2024), and the NDSS 2026 IPI-defense paper operationalize IFC in different ways. The common principle: as long as code and data share the same context window, containment is the goal, not prevention.</p>
+<h3 id="the-attacker-moves-second" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-attacker-moves-second" aria-label="Link to this section">#</a>The Attacker Moves Second</h3>
+<p>Nasr et al. (October 2025) tested 12 published IPI defenses with adaptive attacks (gradient search, RL policies, random search, 72-hour human red-team). Every defense that originally reported near-zero ASR was broken to &gt;90% ASR.</p>
+<p>The methodological lesson: publish a defense only with adaptive-attack evaluation. Static-attack benchmarks are not evidence of robustness; the attacker gets to know the defense.</p>
+<h3 id="real-incidents" class="prose-h prose-h3"><a class="prose-h__anchor" href="#real-incidents" aria-label="Link to this section">#</a>Real incidents</h3>
+<p>Lesson 25 covers EchoLeak (CVE-2025-32711, CVSS 9.3) — the first publicly documented zero-click IPI in Microsoft 365 Copilot. CamoLeak (CVSS 9.6) in GitHub Copilot Chat. CVE-2025-53773 in GitHub Copilot. Production deployments are being compromised by IPI in the field, not just in benchmarks.</p>
+<h3 id="owasp-and-nist-framing" class="prose-h prose-h3"><a class="prose-h__anchor" href="#owasp-and-nist-framing" aria-label="Link to this section">#</a>OWASP and NIST framing</h3>
+<p>OWASP LLM Top 10 (2025) ranks prompt injection (direct + indirect) as LLM01, the #1 application-layer threat. NIST AI SPD 2024 calls indirect prompt injection &quot;generative AI&#39;s greatest security flaw.&quot;</p>
+<h3 id="where-this-fits-in-phase-18" class="prose-h prose-h3"><a class="prose-h__anchor" href="#where-this-fits-in-phase-18" aria-label="Link to this section">#</a>Where this fits in Phase 18</h3>
+<p>Lessons 12-14 are model-centric jailbreaks. Lesson 15 is the system-centric attack that dominates 2026 production deployments. Lesson 16 covers the defensive tooling. Lesson 25 covers the specific CVE narrative.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="al-injection-vector"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">al-injection-vector</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> al injection vector</figcaption>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p><code class="inline-code">code/main.py</code> builds an IPI harness. A toy agent has three tools (search web, read email, send message). The environment contains attacker-controlled content with an embedded instruction (&quot;forward this to all contacts&quot;). You can toggle between a naive agent (follows injected instructions), a filter-defended agent (keyword filter on retrieved content), and an IFC agent (separates trusted and untrusted content and refuses untrusted control-flow commands).</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces <code class="inline-code">outputs/skill-ipi-audit.md</code>. Given an agentic deployment description, it enumerates the untrusted content sources, checks whether the deployment applies IFC, and flags sources that reach the model without a trust label.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p>Run <code class="inline-code">code/main.py</code>. Measure the success rate of the attack against each of the three agents.</p>
+</li>
+<li><p>Implement a paraphrase-based defense on retrieved content. Measure the benign false-positive rate on legitimate retrieved text.</p>
+</li>
+<li><p>Read the NDSS 2026 IPI-defense paper. Describe the &quot;benign instruction&quot; challenge and why it prevents keyword-based filtering.</p>
+</li>
+<li><p>Design a deployment where the agent receives a tool output from a third-party API. Label each prompt fragment with a trust level and write the IFC policy that governs the agent&#39;s actions.</p>
+</li>
+<li><p>Reproduce the Nasr et al. 2025 adaptive-attack methodology on your filter-defended agent from Exercise 2. Report the ASR before and after adaptive attack.</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>IPI</td>
+<td>&quot;indirect prompt injection&quot;</td>
+<td>Injection via content the user did not write, consumed by the agent during normal operation</td>
+</tr>
+<tr>
+<td>RAG injection</td>
+<td>&quot;poisoned retrieval&quot;</td>
+<td>Attacker publishes content that the retrieval step fetches; prompt contains the payload</td>
+</tr>
+<tr>
+<td>Zero-click</td>
+<td>&quot;no user action&quot;</td>
+<td>Attack triggers automatically during agent operation; user does nothing</td>
+</tr>
+<tr>
+<td>IFC</td>
+<td>&quot;information flow control&quot;</td>
+<td>Label-based approach: actions from untrusted content require trusted ratification</td>
+</tr>
+<tr>
+<td>Adaptive attack</td>
+<td>&quot;gradient / RL red-team&quot;</td>
+<td>Attack that knows the defense and optimizes against it; required for honest evaluation</td>
+</tr>
+<tr>
+<td>Benign instruction</td>
+<td>&quot;please print Yes&quot;</td>
+<td>IPI payload that is semantically benign; no keyword filter catches it</td>
+</tr>
+<tr>
+<td>Scope violation</td>
+<td>&quot;cross-trust exfiltration&quot;</td>
+<td>Agent accesses data from one trust context and outputs it to another</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://www.mdpi.com/2078-2489/17/1/54" target="_blank" rel="noopener">MDPI Information 17(1):54 — Indirect Prompt Injection Survey (January 2026)</a> — 2023-2025 synthesis</li>
+<li><a href="https://arxiv.org/abs/2510.18108" target="_blank" rel="noopener">Nasr et al. — The Attacker Moves Second (joint OpenAI/Anthropic/DeepMind, October 2025)</a> — adaptive attack evaluation</li>
+<li><a href="https://arxiv.org/abs/2302.12173" target="_blank" rel="noopener">Greshake et al. — Not what you&#39;ve signed up for (arXiv:2302.12173)</a> — the original IPI paper</li>
+<li><a href="https://genai.owasp.org/llm-top-10/" target="_blank" rel="noopener">OWASP — LLM Top 10 (2025)</a> — prompt injection ranked LLM01</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="14-ascii-art-visual-jailbreaks.html">
+  <span class="label">← Previous</span>
+  <b>ASCII Art and Visual Jailbreaks</b>
+</a>
+      <a class="pager__item pager__item--next" href="16-red-team-tooling-garak-llamaguard-pyrit.html">
+  <span class="label">Next →</span>
+  <b>Red-Team Tooling — Garak, Llama Guard, PyRIT</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>4 minutes</b> of Ethics, Safety &amp; Alignment behind you.</p>
+      <a class="btn btn--solid" href="16-red-team-tooling-garak-llamaguard-pyrit.html">Continue to Red-Team Tooling — Garak, Llama Guard, PyRIT →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#three-delivery-vectors">Three delivery vectors</a></li><li class="mini__item mini__item--d3"><a href="#why-user-input-filters-miss-it">Why user-input filters miss it</a></li><li class="mini__item mini__item--d3"><a href="#information-flow-control-ifc-for-ai">Information Flow Control (IFC) for AI</a></li><li class="mini__item mini__item--d3"><a href="#the-attacker-moves-second">The Attacker Moves Second</a></li><li class="mini__item mini__item--d3"><a href="#real-incidents">Real incidents</a></li><li class="mini__item mini__item--d3"><a href="#owasp-and-nist-framing">OWASP and NIST framing</a></li><li class="mini__item mini__item--d3"><a href="#where-this-fits-in-phase-18">Where this fits in Phase 18</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

@@ -1,0 +1,916 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fine-Tuning with LoRA &amp; QLoRA — LLM Engineering — AIFS</title>
+<meta name="description" content="LLM Engineering: Fine-Tuning with LoRA &amp; QLoRA. 12 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Fine-Tuning with LoRA &amp; QLoRA — LLM Engineering — AIFS">
+<meta property="og:description" content="LLM Engineering: Fine-Tuning with LoRA &amp; QLoRA. 12 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={};window.AIFS_FIGURE_PROVIDER_ORDER=[];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#00E0C6" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#00E0C6;--accent-ink:#111111"
+  data-lesson-id="llm-engineering/08-fine-tuning-lora" data-module="llm-engineering"
+  data-prev="07-advanced-rag.html" data-next="09-function-calling.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#00E0C6">
+        <span class="label">Phase 11</span>
+        <b>LLM Engineering</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="llm-engineering/01-prompt-engineering"><a href="01-prompt-engineering.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Prompt Engineering: Techniques &amp; Patterns</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/02-few-shot-cot"><a href="02-few-shot-cot.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Few-Shot, Chain-of-Thought, Tree-of-Thought</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/03-structured-outputs"><a href="03-structured-outputs.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Structured Outputs: JSON, Schema Validation, Constrained Decoding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/04-embeddings"><a href="04-embeddings.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Embeddings &amp; Vector Representations</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/05-context-engineering"><a href="05-context-engineering.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Context Engineering: Windows, Budgets, Memory, and Retrieval</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/06-rag"><a href="06-rag.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">RAG (Retrieval-Augmented Generation)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/07-advanced-rag"><a href="07-advanced-rag.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Advanced RAG (Chunking, Reranking, Hybrid Search)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/08-fine-tuning-lora"><a href="08-fine-tuning-lora.html" class="is-current">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Fine-Tuning with LoRA &amp; QLoRA</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/09-function-calling"><a href="09-function-calling.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Function Calling &amp; Tool Use</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/10-evaluation"><a href="10-evaluation.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Evaluation &amp; Testing LLM Applications</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/11-caching-cost"><a href="11-caching-cost.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Caching, Rate Limiting &amp; Cost Optimization</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/12-guardrails"><a href="12-guardrails.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Guardrails, Safety &amp; Content Filtering</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/13-production-app"><a href="13-production-app.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Building a Production LLM Application</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/14-model-context-protocol"><a href="14-model-context-protocol.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Model Context Protocol (MCP)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/15-prompt-caching"><a href="15-prompt-caching.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Prompt Caching and Context Caching</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/16-langgraph-state-machines"><a href="16-langgraph-state-machines.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Agent State Machines — Graphs, Nodes, Checkpoints</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="llm-engineering/17-agent-framework-tradeoffs"><a href="17-agent-framework-tradeoffs.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Agent Framework Tradeoffs — Graph, Role, and Actor Orchestration</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">LLM Engineering</a></p>
+      <h1 class="page__title">Fine-Tuning with LoRA &amp; QLoRA</h1>
+      <p class="page__lede">Full fine-tuning a 7B model requires 56GB of VRAM. You don't have that. Neither do most companies. LoRA lets you fine-tune the same model in 6GB by training less than 1% of the parameters. This isn't a compromise -- it matches full fine-tuning quality on most tasks. The entire open-source fine-tuning ecosystem runs on this one trick.</p>
+      <div class="page__meta">
+        <span class="chip">12 min read</span>
+        <span class="chip">2,727 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 10, Lesson 06 (Instruction Tuning / SFT)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div><div class="facts__pair"><dt class="label">Related</dt><dd>Phase 10 covers the SFT/DPO loops from scratch. This lesson plugs those into the 2026 PEFT toolkits (PEFT, TRL, Unsloth, Axolotl, LLaMA-Factory).</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Implement LoRA by injecting low-rank adapter matrices (A and B) into a pretrained model&#39;s attention layers</li>
+<li>Calculate the parameter savings of LoRA vs full fine-tuning: rank r with d_model dimensions trains 2<em>r</em>d parameters instead of d^2</li>
+<li>Fine-tune a model using QLoRA (4-bit quantized base + LoRA adapters) to fit within consumer GPU memory</li>
+<li>Merge LoRA weights back into the base model for deployment and compare inference speed with and without adapters</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>You have a base model. Llama 3 8B. You want it to answer customer support tickets in your company&#39;s voice. SFT is the answer. But SFT has a cost problem.</p>
+<p>Full fine-tuning updates every parameter in the model. Llama 3 8B has 8 billion parameters. In fp16, each parameter takes 2 bytes. That&#39;s 16GB just to load the weights. During training, you also need gradients (16GB), optimizer states for Adam (32GB for momentum + variance), and activations. Total: roughly 56GB of VRAM for a single 8B model.</p>
+<p>An A100 80GB can barely fit this. Two A100s cost $3-4/hour on cloud providers. Training for 3 epochs on 50,000 examples takes 6-10 hours. That&#39;s $30-40 per experiment. Run 10 experiments to get the hyperparameters right and you&#39;ve spent $400 before deploying anything.</p>
+<p>Scale this to Llama 3 70B and the numbers get absurd. 140GB for weights alone. You need a cluster. $100+ per experiment.</p>
+<p>There&#39;s a deeper problem too. Full fine-tuning modifies every weight in the model. If you fine-tune on customer support data, you might degrade the model&#39;s general capabilities. It&#39;s called catastrophic forgetting. The model gets better at your task and worse at everything else.</p>
+<p>You need a method that trains fewer parameters, uses less memory, and doesn&#39;t destroy the model&#39;s existing knowledge.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="lora-low-rank-adaptation" class="prose-h prose-h3"><a class="prose-h__anchor" href="#lora-low-rank-adaptation" aria-label="Link to this section">#</a>LoRA: Low-Rank Adaptation</h3>
+<p>Edward Hu and colleagues at Microsoft published LoRA in June 2021. The paper&#39;s insight: the weight updates during fine-tuning have low intrinsic rank. You don&#39;t need to update all 16.7 million parameters in a 4096x4096 weight matrix. The useful information in the update can be captured by a matrix of rank 16 or 32.</p>
+<p>Here&#39;s the math. A standard linear layer computes:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>y = Wx</code></pre>
+</figure>
+<p>Where W is a d_out x d_in matrix. For a 4096x4096 attention projection, that&#39;s 16,777,216 parameters.</p>
+<p>LoRA freezes W and adds a low-rank decomposition:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>y = Wx + BAx</code></pre>
+</figure>
+<p>Where B is (d_out x r) and A is (r x d_in). The rank r is much smaller than d -- typically 8, 16, or 32.</p>
+<p>For r=16 on a 4096x4096 layer:</p>
+<ul>
+<li>Original parameters: 4096 x 4096 = 16,777,216</li>
+<li>LoRA parameters: (4096 x 16) + (16 x 4096) = 65,536 + 65,536 = 131,072</li>
+<li>Reduction: 131,072 / 16,777,216 = 0.78%</li>
+</ul>
+<p>You&#39;re training 0.78% of the parameters and getting 95-100% of the quality.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph LR
+    X[&quot;Input x&quot;] --&gt; W[&quot;Frozen W (d x d)&quot;]
+    X --&gt; A[&quot;A (r x d)&quot;]
+    A --&gt; B[&quot;B (d x r)&quot;]
+    W --&gt; Plus[&quot;\+ (merge)&quot;]
+    B --&gt; Plus
+    Plus --&gt; Y[&quot;Output y&quot;]
+
+    style W fill:#1a1a2e,stroke:#e94560,color:#fff
+    style A fill:#0f3460,stroke:#16213e,color:#fff
+    style B fill:#0f3460,stroke:#16213e,color:#fff</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>A is initialized with a random Gaussian. B is initialized to zero. This means the LoRA contribution starts at zero -- the model begins training from its original behavior and gradually learns the adaptation.</p>
+<h3 id="the-scaling-factor-alpha" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-scaling-factor-alpha" aria-label="Link to this section">#</a>The Scaling Factor: Alpha</h3>
+<p>LoRA introduces a scaling factor alpha that controls how much the low-rank update affects the output:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>y = Wx + (alpha / r) * BAx</code></pre>
+</figure>
+<p>When alpha = r, the scaling is 1x. When alpha = 2r (the common default), the scaling is 2x. This hyperparameter controls the learning rate of the LoRA path independently of the base learning rate.</p>
+<p>Practical guidance:</p>
+<ul>
+<li>alpha = 2 * rank is a common community convention (the original paper used alpha = rank in most experiments)</li>
+<li>alpha = rank gives 1x scaling, conservative but stable</li>
+<li>Higher alpha means larger updates per step, which can speed convergence or cause instability</li>
+</ul>
+<h3 id="where-to-apply-lora" class="prose-h prose-h3"><a class="prose-h__anchor" href="#where-to-apply-lora" aria-label="Link to this section">#</a>Where to Apply LoRA</h3>
+<p>A transformer has many linear layers. You don&#39;t need to add LoRA to all of them. The original paper tested different combinations:</p>
+<table>
+<thead>
+<tr>
+<th>Target Layers</th>
+<th>Trainable Params (7B)</th>
+<th>Quality</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>q_proj only</td>
+<td>4.7M</td>
+<td>Good</td>
+</tr>
+<tr>
+<td>q_proj + v_proj</td>
+<td>9.4M</td>
+<td>Better</td>
+</tr>
+<tr>
+<td>q_proj + k_proj + v_proj + o_proj</td>
+<td>18.9M</td>
+<td>Best for attention</td>
+</tr>
+<tr>
+<td>All linear (attention + MLP)</td>
+<td>37.7M</td>
+<td>Marginal gain, 2x params</td>
+</tr>
+</tbody></table>
+<p>The sweet spot for most tasks: q_proj + v_proj. This targets the query and value projections in self-attention, which control what the model attends to and what information it extracts. Adding MLP layers helps for complex tasks like code generation but doubles the parameter count for diminishing returns on simpler tasks.</p>
+<h3 id="rank-selection" class="prose-h prose-h3"><a class="prose-h__anchor" href="#rank-selection" aria-label="Link to this section">#</a>Rank Selection</h3>
+<p>The rank r controls the expressiveness of the adaptation:</p>
+<table>
+<thead>
+<tr>
+<th>Rank</th>
+<th>Trainable Params (per layer)</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>4</td>
+<td>32,768</td>
+<td>Simple classification, sentiment</td>
+</tr>
+<tr>
+<td>8</td>
+<td>65,536</td>
+<td>Single-domain Q&amp;A, summarization</td>
+</tr>
+<tr>
+<td>16</td>
+<td>131,072</td>
+<td>Multi-domain tasks, instruction following</td>
+</tr>
+<tr>
+<td>32</td>
+<td>262,144</td>
+<td>Complex reasoning, code generation</td>
+</tr>
+<tr>
+<td>64</td>
+<td>524,288</td>
+<td>Diminishing returns for most tasks</td>
+</tr>
+<tr>
+<td>128</td>
+<td>1,048,576</td>
+<td>Rarely justified</td>
+</tr>
+</tbody></table>
+<p>Hu et al. showed that r=4 already captures most of the adaptation for simple tasks. r=8 and r=16 are the most common choices in practice. Going beyond r=64 rarely improves quality and starts to lose LoRA&#39;s memory advantage.</p>
+<h3 id="qlora-4-bit-quantization-lora" class="prose-h prose-h3"><a class="prose-h__anchor" href="#qlora-4-bit-quantization-lora" aria-label="Link to this section">#</a>QLoRA: 4-Bit Quantization + LoRA</h3>
+<p>Tim Dettmers and colleagues at the University of Washington published QLoRA in May 2023. The idea: quantize the frozen base model to 4-bit precision, then attach LoRA adapters in fp16 on top.</p>
+<p>This changes the memory equation dramatically:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Weight Memory (7B)</th>
+<th>Training Memory (7B)</th>
+<th>GPU Required</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Full fine-tune (fp16)</td>
+<td>14GB</td>
+<td>~56GB</td>
+<td>1x A100 80GB</td>
+</tr>
+<tr>
+<td>LoRA (fp16 base)</td>
+<td>14GB</td>
+<td>~18GB</td>
+<td>1x A100 40GB</td>
+</tr>
+<tr>
+<td>QLoRA (4-bit base)</td>
+<td>3.5GB</td>
+<td>~6GB</td>
+<td>1x RTX 3090 24GB</td>
+</tr>
+</tbody></table>
+<p>QLoRA makes three technical contributions:</p>
+<p><strong>NF4 (Normal Float 4-bit)</strong>: A new data type designed specifically for neural network weights. Neural network weights follow a roughly normal distribution. NF4 places its 16 quantization levels at the quantiles of a standard normal distribution. This is information-theoretically optimal for normally distributed data. It loses less information than uniform 4-bit quantization (INT4) or standard Float4.</p>
+<p><strong>Double quantization</strong>: The quantization constants themselves take memory. Each block of 64 weights needs a fp32 scale factor (4 bytes). For a 7B model, that&#39;s an extra 0.4GB. Double quantization quantizes these constants to fp8, reducing the overhead to 0.1GB. Small but it adds up.</p>
+<p><strong>Paged optimizers</strong>: During training, optimizer states (Adam&#39;s momentum and variance) can exceed GPU memory on long sequences. Paged optimizers use NVIDIA&#39;s unified memory to automatically page optimizer states to CPU RAM when GPU memory is exhausted, and page them back when needed. This prevents OOM crashes at the cost of some throughput.</p>
+<h3 id="the-quality-question" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-quality-question" aria-label="Link to this section">#</a>The Quality Question</h3>
+<p>Does reducing parameters or quantizing the base hurt quality? The results from multiple papers:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>MMLU (5-shot)</th>
+<th>MT-Bench</th>
+<th>HumanEval</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Full fine-tune (Llama 2 7B)</td>
+<td>48.3</td>
+<td>6.72</td>
+<td>14.6</td>
+</tr>
+<tr>
+<td>LoRA r=16</td>
+<td>47.9</td>
+<td>6.68</td>
+<td>14.0</td>
+</tr>
+<tr>
+<td>QLoRA r=16 (NF4)</td>
+<td>47.5</td>
+<td>6.61</td>
+<td>13.4</td>
+</tr>
+<tr>
+<td>QLoRA r=64 (NF4)</td>
+<td>48.1</td>
+<td>6.70</td>
+<td>14.2</td>
+</tr>
+</tbody></table>
+<p>LoRA at r=16 is within 1% of full fine-tuning on most benchmarks. QLoRA at r=16 loses another fraction of a percent. QLoRA at r=64 essentially matches full fine-tuning while using 90% less memory.</p>
+<h3 id="real-world-costs" class="prose-h prose-h3"><a class="prose-h__anchor" href="#real-world-costs" aria-label="Link to this section">#</a>Real-World Costs</h3>
+<p>Fine-tuning Llama 3 8B on 50,000 examples (3 epochs):</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>GPU</th>
+<th>Time</th>
+<th>Cost</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Full fine-tune</td>
+<td>2x A100 80GB</td>
+<td>8 hours</td>
+<td>~$32</td>
+</tr>
+<tr>
+<td>LoRA r=16</td>
+<td>1x A100 40GB</td>
+<td>4 hours</td>
+<td>~$8</td>
+</tr>
+<tr>
+<td>QLoRA r=16</td>
+<td>1x RTX 4090 24GB</td>
+<td>6 hours</td>
+<td>~$5</td>
+</tr>
+<tr>
+<td>QLoRA r=16 (Unsloth)</td>
+<td>1x RTX 4090 24GB</td>
+<td>2.5 hours</td>
+<td>~$2</td>
+</tr>
+<tr>
+<td>QLoRA r=16</td>
+<td>1x T4 16GB</td>
+<td>12 hours</td>
+<td>~$4</td>
+</tr>
+</tbody></table>
+<p>QLoRA on a single consumer GPU costs less than a lunch. This is why the open-weight fine-tuning community exploded in 2023 and why every training framework below ships QLoRA by default in 2026.</p>
+<h3 id="the-2026-peft-stack" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-2026-peft-stack" aria-label="Link to this section">#</a>The 2026 PEFT stack</h3>
+<table>
+<thead>
+<tr>
+<th>Framework</th>
+<th>What it is</th>
+<th>Pick when</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Hugging Face PEFT</strong></td>
+<td>The canonical LoRA/QLoRA/DoRA/IA3 library</td>
+<td>You want raw control and your training loop is already on <code class="inline-code">transformers.Trainer</code></td>
+</tr>
+<tr>
+<td><strong>TRL</strong></td>
+<td>HF&#39;s reinforcement-from-feedback trainers (SFT, DPO, GRPO, PPO, ORPO)</td>
+<td>You need DPO/GRPO after SFT; built on top of PEFT</td>
+</tr>
+<tr>
+<td><strong>Unsloth</strong></td>
+<td>Triton-kernel rewrite of the forward/backward pass</td>
+<td>You want 2-5x speedup + half the VRAM with no accuracy loss; Llama/Mistral/Qwen family</td>
+</tr>
+<tr>
+<td><strong>Axolotl</strong></td>
+<td>YAML-config wrapper over PEFT + TRL + DeepSpeed + Unsloth</td>
+<td>You want reproducible, version-controlled training runs</td>
+</tr>
+<tr>
+<td><strong>LLaMA-Factory</strong></td>
+<td>GUI/CLI/API over PEFT + TRL</td>
+<td>You want zero-code fine-tuning; 100+ model families supported</td>
+</tr>
+<tr>
+<td><strong>torchtune</strong></td>
+<td>Native PyTorch recipes, no <code class="inline-code">transformers</code> dep</td>
+<td>You want minimal deps and your org already standardizes on PyTorch</td>
+</tr>
+</tbody></table>
+<p>Rule of thumb: research use or one-off experiment → PEFT. Repeatable production pipeline → Axolotl with Unsloth kernels enabled. Throwaway prototyping → LLaMA-Factory.</p>
+<h3 id="merging-adapters" class="prose-h prose-h3"><a class="prose-h__anchor" href="#merging-adapters" aria-label="Link to this section">#</a>Merging Adapters</h3>
+<p>After training, you have two things: the frozen base model and a small LoRA adapter (typically 10-100MB). You can either:</p>
+<ol>
+<li><p><strong>Keep them separate</strong>: Load the base model, load the adapter on top. Swap adapters for different tasks. This is how you serve multiple fine-tuned variants from one base model.</p>
+</li>
+<li><p><strong>Merge them permanently</strong>: Compute W&#39; = W + (alpha/r) * BA and save the result as a new full model. The merged model is the same size as the original. No inference overhead. No adapter to manage.</p>
+</li>
+</ol>
+<p>For serving multiple tasks (customer support adapter, code adapter, translation adapter), keep them separate. For deploying a single specialized model, merge.</p>
+<p>Advanced merging techniques for combining multiple adapters:</p>
+<ul>
+<li><strong>TIES-Merging</strong> (Yadav et al. 2023): Trims small-magnitude parameters, resolves sign conflicts, then merges. Reduces interference between adapters.</li>
+<li><strong>DARE</strong> (Yu et al. 2023): Randomly drops adapter parameters before merging and rescales the rest. Surprisingly effective at combining capabilities.</li>
+<li><strong>Task arithmetic</strong>: Simply add or subtract adapter weights. Adding a &quot;code&quot; adapter and a &quot;math&quot; adapter often produces a model good at both.</li>
+</ul>
+<h3 id="when-not-to-fine-tune" class="prose-h prose-h3"><a class="prose-h__anchor" href="#when-not-to-fine-tune" aria-label="Link to this section">#</a>When NOT to Fine-Tune</h3>
+<p>Fine-tuning is the third option, not the first.</p>
+<p><strong>First: prompt engineering.</strong> Write a better system prompt. Add few-shot examples. Use chain-of-thought. This costs nothing and takes minutes. If prompting gets you 80% of the way there, you probably don&#39;t need to fine-tune.</p>
+<p><strong>Second: RAG.</strong> If the model needs to know about your specific data (documents, knowledge base, product catalog), retrieval is cheaper and more maintainable than baking it into weights. See Lesson 06.</p>
+<p><strong>Third: fine-tuning.</strong> Use this when you need the model to adopt a specific style, format, or reasoning pattern that cannot be achieved through prompting. When you need consistent structured output. When you need to distill a larger model into a smaller one. When latency matters and you can&#39;t afford the extra tokens from few-shot prompting.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">graph TD
+    Start[&quot;Need better model behavior?&quot;] --&gt; PE[&quot;Try prompt engineering&quot;]
+    PE --&gt;|&quot;Works&quot;| Done[&quot;Ship it&quot;]
+    PE --&gt;|&quot;Not enough&quot;| RAG[&quot;Need external knowledge?&quot;]
+    RAG --&gt;|&quot;Yes&quot;| RAGBuild[&quot;Build RAG pipeline&quot;]
+    RAG --&gt;|&quot;No, need style/format change&quot;| FT[&quot;Fine-tune with LoRA/QLoRA&quot;]
+    RAGBuild --&gt;|&quot;Works&quot;| Done
+    RAGBuild --&gt;|&quot;Also need style change&quot;| FT
+    FT --&gt; Done
+
+    style Start fill:#1a1a2e,stroke:#e94560,color:#fff
+    style Done fill:#0f3460,stroke:#16213e,color:#fff</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="lora-params"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">lora-params</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> lora params</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<p>We implement LoRA from scratch in pure PyTorch. No libraries. No magic. You&#39;ll build the LoRA layer, inject it into a model, train it, and merge the weights back.</p>
+<h3 id="step-1-the-lora-layer" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-the-lora-layer" aria-label="Link to this section">#</a>Step 1: The LoRA Layer</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> torch
+<span class="token keyword">import</span> torch<span class="token punctuation">.</span>nn <span class="token keyword">as</span> nn
+<span class="token keyword">import</span> math
+
+<span class="token keyword">class</span> <span class="token class-name">LoRALayer</span><span class="token punctuation">(</span>nn<span class="token punctuation">.</span>Module<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> in_features<span class="token punctuation">,</span> out_features<span class="token punctuation">,</span> rank<span class="token operator">=</span><span class="token number">8</span><span class="token punctuation">,</span> alpha<span class="token operator">=</span><span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token builtin">super</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>__init__<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>rank <span class="token operator">=</span> rank
+        self<span class="token punctuation">.</span>alpha <span class="token operator">=</span> alpha
+        self<span class="token punctuation">.</span>scaling <span class="token operator">=</span> alpha <span class="token operator">/</span> rank
+
+        self<span class="token punctuation">.</span>A <span class="token operator">=</span> nn<span class="token punctuation">.</span>Parameter<span class="token punctuation">(</span>torch<span class="token punctuation">.</span>randn<span class="token punctuation">(</span>in_features<span class="token punctuation">,</span> rank<span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">/</span> math<span class="token punctuation">.</span>sqrt<span class="token punctuation">(</span>rank<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>B <span class="token operator">=</span> nn<span class="token punctuation">.</span>Parameter<span class="token punctuation">(</span>torch<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span>rank<span class="token punctuation">,</span> out_features<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">forward</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">(</span>x @ self<span class="token punctuation">.</span>A @ self<span class="token punctuation">.</span>B<span class="token punctuation">)</span> <span class="token operator">*</span> self<span class="token punctuation">.</span>scaling</code></pre>
+</figure>
+<p>A is initialized with scaled random values. B is initialized to zero. The product BA starts at zero, so the model begins with its original behavior.</p>
+<h3 id="step-2-lora-wrapped-linear-layer" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-lora-wrapped-linear-layer" aria-label="Link to this section">#</a>Step 2: LoRA-Wrapped Linear Layer</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">LinearWithLoRA</span><span class="token punctuation">(</span>nn<span class="token punctuation">.</span>Module<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> linear<span class="token punctuation">,</span> rank<span class="token operator">=</span><span class="token number">8</span><span class="token punctuation">,</span> alpha<span class="token operator">=</span><span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token builtin">super</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>__init__<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>linear <span class="token operator">=</span> linear
+        self<span class="token punctuation">.</span>lora <span class="token operator">=</span> LoRALayer<span class="token punctuation">(</span>
+            linear<span class="token punctuation">.</span>in_features<span class="token punctuation">,</span> linear<span class="token punctuation">.</span>out_features<span class="token punctuation">,</span> rank<span class="token punctuation">,</span> alpha
+        <span class="token punctuation">)</span>
+
+        <span class="token keyword">for</span> param <span class="token keyword">in</span> self<span class="token punctuation">.</span>linear<span class="token punctuation">.</span>parameters<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            param<span class="token punctuation">.</span>requires_grad <span class="token operator">=</span> <span class="token boolean">False</span>
+
+    <span class="token keyword">def</span> <span class="token function">forward</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> self<span class="token punctuation">.</span>linear<span class="token punctuation">(</span>x<span class="token punctuation">)</span> <span class="token operator">+</span> self<span class="token punctuation">.</span>lora<span class="token punctuation">(</span>x<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>The original linear layer is frozen. Only the LoRA parameters (A and B) are trainable.</p>
+<h3 id="step-3-inject-lora-into-a-model" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-inject-lora-into-a-model" aria-label="Link to this section">#</a>Step 3: Inject LoRA into a Model</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">inject_lora</span><span class="token punctuation">(</span>model<span class="token punctuation">,</span> target_modules<span class="token punctuation">,</span> rank<span class="token operator">=</span><span class="token number">8</span><span class="token punctuation">,</span> alpha<span class="token operator">=</span><span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">for</span> param <span class="token keyword">in</span> model<span class="token punctuation">.</span>parameters<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        param<span class="token punctuation">.</span>requires_grad <span class="token operator">=</span> <span class="token boolean">False</span>
+
+    lora_layers <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+    <span class="token keyword">for</span> name<span class="token punctuation">,</span> module <span class="token keyword">in</span> model<span class="token punctuation">.</span>named_modules<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> <span class="token builtin">isinstance</span><span class="token punctuation">(</span>module<span class="token punctuation">,</span> nn<span class="token punctuation">.</span>Linear<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> <span class="token builtin">any</span><span class="token punctuation">(</span>t <span class="token keyword">in</span> name <span class="token keyword">for</span> t <span class="token keyword">in</span> target_modules<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                parent_name <span class="token operator">=</span> <span class="token string">"."</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>name<span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token string">"."</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+                child_name <span class="token operator">=</span> name<span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token string">"."</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span>
+                parent <span class="token operator">=</span> <span class="token builtin">dict</span><span class="token punctuation">(</span>model<span class="token punctuation">.</span>named_modules<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">[</span>parent_name<span class="token punctuation">]</span>
+                lora_linear <span class="token operator">=</span> LinearWithLoRA<span class="token punctuation">(</span>module<span class="token punctuation">,</span> rank<span class="token punctuation">,</span> alpha<span class="token punctuation">)</span>
+                <span class="token builtin">setattr</span><span class="token punctuation">(</span>parent<span class="token punctuation">,</span> child_name<span class="token punctuation">,</span> lora_linear<span class="token punctuation">)</span>
+                lora_layers<span class="token punctuation">[</span>name<span class="token punctuation">]</span> <span class="token operator">=</span> lora_linear
+    <span class="token keyword">return</span> lora_layers</code></pre>
+</figure>
+<p>First, freeze every parameter in the model. Then walk the model tree, find linear layers matching your target names, and replace them with LoRA-wrapped versions. The LoRA A and B matrices are the only trainable parameters in the entire model.</p>
+<h3 id="step-4-count-parameters" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-count-parameters" aria-label="Link to this section">#</a>Step 4: Count Parameters</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">count_parameters</span><span class="token punctuation">(</span>model<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    total <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>p<span class="token punctuation">.</span>numel<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">for</span> p <span class="token keyword">in</span> model<span class="token punctuation">.</span>parameters<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    trainable <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>p<span class="token punctuation">.</span>numel<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">for</span> p <span class="token keyword">in</span> model<span class="token punctuation">.</span>parameters<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">if</span> p<span class="token punctuation">.</span>requires_grad<span class="token punctuation">)</span>
+    frozen <span class="token operator">=</span> total <span class="token operator">-</span> trainable
+    <span class="token keyword">return</span> <span class="token punctuation">{</span>
+        <span class="token string">"total"</span><span class="token punctuation">:</span> total<span class="token punctuation">,</span>
+        <span class="token string">"trainable"</span><span class="token punctuation">:</span> trainable<span class="token punctuation">,</span>
+        <span class="token string">"frozen"</span><span class="token punctuation">:</span> frozen<span class="token punctuation">,</span>
+        <span class="token string">"trainable_pct"</span><span class="token punctuation">:</span> <span class="token number">100</span> <span class="token operator">*</span> trainable <span class="token operator">/</span> total <span class="token keyword">if</span> total <span class="token operator">></span> <span class="token number">0</span> <span class="token keyword">else</span> <span class="token number">0</span>
+    <span class="token punctuation">}</span></code></pre>
+</figure>
+<h3 id="step-5-merge-weights-back" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-merge-weights-back" aria-label="Link to this section">#</a>Step 5: Merge Weights Back</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">merge_lora_weights</span><span class="token punctuation">(</span>model<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">for</span> name<span class="token punctuation">,</span> module <span class="token keyword">in</span> model<span class="token punctuation">.</span>named_modules<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> <span class="token builtin">isinstance</span><span class="token punctuation">(</span>module<span class="token punctuation">,</span> LinearWithLoRA<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">with</span> torch<span class="token punctuation">.</span>no_grad<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                merged <span class="token operator">=</span> <span class="token punctuation">(</span>
+                    module<span class="token punctuation">.</span>lora<span class="token punctuation">.</span>A @ module<span class="token punctuation">.</span>lora<span class="token punctuation">.</span>B
+                <span class="token punctuation">)</span> <span class="token operator">*</span> module<span class="token punctuation">.</span>lora<span class="token punctuation">.</span>scaling
+                module<span class="token punctuation">.</span>linear<span class="token punctuation">.</span>weight<span class="token punctuation">.</span>data <span class="token operator">+=</span> merged<span class="token punctuation">.</span>T
+            parent_name <span class="token operator">=</span> <span class="token string">"."</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>name<span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token string">"."</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+            child_name <span class="token operator">=</span> name<span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token string">"."</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span>
+            <span class="token keyword">if</span> parent_name<span class="token punctuation">:</span>
+                parent <span class="token operator">=</span> <span class="token builtin">dict</span><span class="token punctuation">(</span>model<span class="token punctuation">.</span>named_modules<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">[</span>parent_name<span class="token punctuation">]</span>
+            <span class="token keyword">else</span><span class="token punctuation">:</span>
+                parent <span class="token operator">=</span> model
+            <span class="token builtin">setattr</span><span class="token punctuation">(</span>parent<span class="token punctuation">,</span> child_name<span class="token punctuation">,</span> module<span class="token punctuation">.</span>linear<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>After merging, the LoRA layers are gone. The model is the same size as the original with the adaptation baked into the weights. No inference overhead.</p>
+<h3 id="step-6-simulated-qlora-quantization" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-6-simulated-qlora-quantization" aria-label="Link to this section">#</a>Step 6: Simulated QLoRA Quantization</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">quantize_to_nf4</span><span class="token punctuation">(</span>tensor<span class="token punctuation">,</span> block_size<span class="token operator">=</span><span class="token number">64</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    blocks <span class="token operator">=</span> tensor<span class="token punctuation">.</span>reshape<span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> block_size<span class="token punctuation">)</span>
+    scales <span class="token operator">=</span> blocks<span class="token punctuation">.</span><span class="token builtin">abs</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token builtin">max</span><span class="token punctuation">(</span>dim<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span> keepdim<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span><span class="token punctuation">.</span>values <span class="token operator">/</span> <span class="token number">7.0</span>
+    scales <span class="token operator">=</span> torch<span class="token punctuation">.</span>clamp<span class="token punctuation">(</span>scales<span class="token punctuation">,</span> <span class="token builtin">min</span><span class="token operator">=</span><span class="token number">1e-8</span><span class="token punctuation">)</span>
+    quantized <span class="token operator">=</span> torch<span class="token punctuation">.</span><span class="token builtin">round</span><span class="token punctuation">(</span>blocks <span class="token operator">/</span> scales<span class="token punctuation">)</span><span class="token punctuation">.</span>clamp<span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">8</span><span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">.</span>to<span class="token punctuation">(</span>torch<span class="token punctuation">.</span>int8<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> quantized<span class="token punctuation">,</span> scales
+
+<span class="token keyword">def</span> <span class="token function">dequantize_from_nf4</span><span class="token punctuation">(</span>quantized<span class="token punctuation">,</span> scales<span class="token punctuation">,</span> original_shape<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    dequantized <span class="token operator">=</span> quantized<span class="token punctuation">.</span><span class="token builtin">float</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">*</span> scales
+    <span class="token keyword">return</span> dequantized<span class="token punctuation">.</span>reshape<span class="token punctuation">(</span>original_shape<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>This simulates 4-bit quantization by mapping weights into 16 discrete levels within blocks of 64. Production QLoRA uses the bitsandbytes library for true NF4 on GPU.</p>
+<h3 id="step-7-training-loop" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-7-training-loop" aria-label="Link to this section">#</a>Step 7: Training Loop</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">train_lora</span><span class="token punctuation">(</span>model<span class="token punctuation">,</span> data<span class="token punctuation">,</span> epochs<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">,</span> lr<span class="token operator">=</span><span class="token number">1e-3</span><span class="token punctuation">,</span> batch_size<span class="token operator">=</span><span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    optimizer <span class="token operator">=</span> torch<span class="token punctuation">.</span>optim<span class="token punctuation">.</span>AdamW<span class="token punctuation">(</span>
+        <span class="token punctuation">[</span>p <span class="token keyword">for</span> p <span class="token keyword">in</span> model<span class="token punctuation">.</span>parameters<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">if</span> p<span class="token punctuation">.</span>requires_grad<span class="token punctuation">]</span><span class="token punctuation">,</span> lr<span class="token operator">=</span>lr
+    <span class="token punctuation">)</span>
+    criterion <span class="token operator">=</span> nn<span class="token punctuation">.</span>MSELoss<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    losses <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> epoch <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>epochs<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        epoch_loss <span class="token operator">=</span> <span class="token number">0.0</span>
+        n_batches <span class="token operator">=</span> <span class="token number">0</span>
+        indices <span class="token operator">=</span> torch<span class="token punctuation">.</span>randperm<span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>data<span class="token punctuation">[</span><span class="token string">"inputs"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+        <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token builtin">len</span><span class="token punctuation">(</span>indices<span class="token punctuation">)</span><span class="token punctuation">,</span> batch_size<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            batch_idx <span class="token operator">=</span> indices<span class="token punctuation">[</span>i<span class="token punctuation">:</span>i <span class="token operator">+</span> batch_size<span class="token punctuation">]</span>
+            x <span class="token operator">=</span> data<span class="token punctuation">[</span><span class="token string">"inputs"</span><span class="token punctuation">]</span><span class="token punctuation">[</span>batch_idx<span class="token punctuation">]</span>
+            y <span class="token operator">=</span> data<span class="token punctuation">[</span><span class="token string">"targets"</span><span class="token punctuation">]</span><span class="token punctuation">[</span>batch_idx<span class="token punctuation">]</span>
+
+            output <span class="token operator">=</span> model<span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+            loss <span class="token operator">=</span> criterion<span class="token punctuation">(</span>output<span class="token punctuation">,</span> y<span class="token punctuation">)</span>
+
+            optimizer<span class="token punctuation">.</span>zero_grad<span class="token punctuation">(</span><span class="token punctuation">)</span>
+            loss<span class="token punctuation">.</span>backward<span class="token punctuation">(</span><span class="token punctuation">)</span>
+            optimizer<span class="token punctuation">.</span>step<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+            epoch_loss <span class="token operator">+=</span> loss<span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span>
+            n_batches <span class="token operator">+=</span> <span class="token number">1</span>
+
+        avg_loss <span class="token operator">=</span> epoch_loss <span class="token operator">/</span> n_batches
+        losses<span class="token punctuation">.</span>append<span class="token punctuation">(</span>avg_loss<span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> losses</code></pre>
+</figure>
+<h3 id="step-8-full-demo" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-8-full-demo" aria-label="Link to this section">#</a>Step 8: Full Demo</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">demo</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    torch<span class="token punctuation">.</span>manual_seed<span class="token punctuation">(</span><span class="token number">42</span><span class="token punctuation">)</span>
+    d_model <span class="token operator">=</span> <span class="token number">256</span>
+    n_classes <span class="token operator">=</span> <span class="token number">10</span>
+
+    model <span class="token operator">=</span> nn<span class="token punctuation">.</span>Sequential<span class="token punctuation">(</span>
+        nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span>d_model<span class="token punctuation">,</span> <span class="token number">512</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        nn<span class="token punctuation">.</span>ReLU<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">512</span><span class="token punctuation">,</span> <span class="token number">512</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        nn<span class="token punctuation">.</span>ReLU<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        nn<span class="token punctuation">.</span>Linear<span class="token punctuation">(</span><span class="token number">512</span><span class="token punctuation">,</span> n_classes<span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">)</span>
+
+    n_samples <span class="token operator">=</span> <span class="token number">500</span>
+    x <span class="token operator">=</span> torch<span class="token punctuation">.</span>randn<span class="token punctuation">(</span>n_samples<span class="token punctuation">,</span> d_model<span class="token punctuation">)</span>
+    y <span class="token operator">=</span> torch<span class="token punctuation">.</span>randint<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> n_classes<span class="token punctuation">,</span> <span class="token punctuation">(</span>n_samples<span class="token punctuation">,</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    y_onehot <span class="token operator">=</span> torch<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span>n_samples<span class="token punctuation">,</span> n_classes<span class="token punctuation">)</span><span class="token punctuation">.</span>scatter_<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> y<span class="token punctuation">.</span>unsqueeze<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">1.0</span><span class="token punctuation">)</span>
+
+    data <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"inputs"</span><span class="token punctuation">:</span> x<span class="token punctuation">,</span> <span class="token string">"targets"</span><span class="token punctuation">:</span> y_onehot<span class="token punctuation">}</span>
+
+    params_before <span class="token operator">=</span> count_parameters<span class="token punctuation">(</span>model<span class="token punctuation">)</span>
+
+    lora_layers <span class="token operator">=</span> inject_lora<span class="token punctuation">(</span>
+        model<span class="token punctuation">,</span> target_modules<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">"0"</span><span class="token punctuation">,</span> <span class="token string">"2"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> rank<span class="token operator">=</span><span class="token number">8</span><span class="token punctuation">,</span> alpha<span class="token operator">=</span><span class="token number">16</span>
+    <span class="token punctuation">)</span>
+
+    params_after <span class="token operator">=</span> count_parameters<span class="token punctuation">(</span>model<span class="token punctuation">)</span>
+
+    losses <span class="token operator">=</span> train_lora<span class="token punctuation">(</span>model<span class="token punctuation">,</span> data<span class="token punctuation">,</span> epochs<span class="token operator">=</span><span class="token number">20</span><span class="token punctuation">,</span> lr<span class="token operator">=</span><span class="token number">1e-3</span><span class="token punctuation">)</span>
+
+    merge_lora_weights<span class="token punctuation">(</span>model<span class="token punctuation">)</span>
+    params_merged <span class="token operator">=</span> count_parameters<span class="token punctuation">(</span>model<span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> <span class="token punctuation">{</span>
+        <span class="token string">"params_before"</span><span class="token punctuation">:</span> params_before<span class="token punctuation">,</span>
+        <span class="token string">"params_after"</span><span class="token punctuation">:</span> params_after<span class="token punctuation">,</span>
+        <span class="token string">"params_merged"</span><span class="token punctuation">:</span> params_merged<span class="token punctuation">,</span>
+        <span class="token string">"losses"</span><span class="token punctuation">:</span> losses<span class="token punctuation">,</span>
+    <span class="token punctuation">}</span></code></pre>
+</figure>
+<p>The demo creates a small model, injects LoRA into two layers, trains it, and merges the weights back. The parameter count drops from full trainable to ~1% trainable during LoRA training, then returns to the original architecture after merging.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>With the Hugging Face ecosystem, LoRA on a real model takes about 20 lines:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> transformers <span class="token keyword">import</span> AutoModelForCausalLM<span class="token punctuation">,</span> AutoTokenizer
+<span class="token keyword">from</span> peft <span class="token keyword">import</span> LoraConfig<span class="token punctuation">,</span> get_peft_model<span class="token punctuation">,</span> TaskType
+
+model <span class="token operator">=</span> AutoModelForCausalLM<span class="token punctuation">.</span>from_pretrained<span class="token punctuation">(</span><span class="token string">"meta-llama/Llama-3.1-8B"</span><span class="token punctuation">)</span>
+tokenizer <span class="token operator">=</span> AutoTokenizer<span class="token punctuation">.</span>from_pretrained<span class="token punctuation">(</span><span class="token string">"meta-llama/Llama-3.1-8B"</span><span class="token punctuation">)</span>
+
+lora_config <span class="token operator">=</span> LoraConfig<span class="token punctuation">(</span>
+    task_type<span class="token operator">=</span>TaskType<span class="token punctuation">.</span>CAUSAL_LM<span class="token punctuation">,</span>
+    r<span class="token operator">=</span><span class="token number">16</span><span class="token punctuation">,</span>
+    lora_alpha<span class="token operator">=</span><span class="token number">32</span><span class="token punctuation">,</span>
+    lora_dropout<span class="token operator">=</span><span class="token number">0.05</span><span class="token punctuation">,</span>
+    target_modules<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">"q_proj"</span><span class="token punctuation">,</span> <span class="token string">"v_proj"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">)</span>
+
+model <span class="token operator">=</span> get_peft_model<span class="token punctuation">(</span>model<span class="token punctuation">,</span> lora_config<span class="token punctuation">)</span>
+model<span class="token punctuation">.</span>print_trainable_parameters<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>For QLoRA, add bitsandbytes quantization:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> transformers <span class="token keyword">import</span> BitsAndBytesConfig
+
+bnb_config <span class="token operator">=</span> BitsAndBytesConfig<span class="token punctuation">(</span>
+    load_in_4bit<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">,</span>
+    bnb_4bit_quant_type<span class="token operator">=</span><span class="token string">"nf4"</span><span class="token punctuation">,</span>
+    bnb_4bit_compute_dtype<span class="token operator">=</span>torch<span class="token punctuation">.</span>bfloat16<span class="token punctuation">,</span>
+    bnb_4bit_use_double_quant<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">,</span>
+<span class="token punctuation">)</span>
+
+model <span class="token operator">=</span> AutoModelForCausalLM<span class="token punctuation">.</span>from_pretrained<span class="token punctuation">(</span>
+    <span class="token string">"meta-llama/Llama-3.1-8B"</span><span class="token punctuation">,</span>
+    quantization_config<span class="token operator">=</span>bnb_config<span class="token punctuation">,</span>
+    device_map<span class="token operator">=</span><span class="token string">"auto"</span><span class="token punctuation">,</span>
+<span class="token punctuation">)</span>
+
+model <span class="token operator">=</span> get_peft_model<span class="token punctuation">(</span>model<span class="token punctuation">,</span> lora_config<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>That&#39;s it. Same training loop. Same data pipeline. The base model now lives in 4-bit, LoRA adapters train in fp16, and the whole thing fits in 6GB.</p>
+<p>For training with the Hugging Face Trainer:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> transformers <span class="token keyword">import</span> TrainingArguments<span class="token punctuation">,</span> Trainer
+<span class="token keyword">from</span> datasets <span class="token keyword">import</span> load_dataset
+
+dataset <span class="token operator">=</span> load_dataset<span class="token punctuation">(</span><span class="token string">"tatsu-lab/alpaca"</span><span class="token punctuation">,</span> split<span class="token operator">=</span><span class="token string">"train[:5000]"</span><span class="token punctuation">)</span>
+
+training_args <span class="token operator">=</span> TrainingArguments<span class="token punctuation">(</span>
+    output_dir<span class="token operator">=</span><span class="token string">"./lora-llama"</span><span class="token punctuation">,</span>
+    num_train_epochs<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">,</span>
+    per_device_train_batch_size<span class="token operator">=</span><span class="token number">4</span><span class="token punctuation">,</span>
+    gradient_accumulation_steps<span class="token operator">=</span><span class="token number">4</span><span class="token punctuation">,</span>
+    learning_rate<span class="token operator">=</span><span class="token number">2e-4</span><span class="token punctuation">,</span>
+    fp16<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">,</span>
+    logging_steps<span class="token operator">=</span><span class="token number">10</span><span class="token punctuation">,</span>
+    save_strategy<span class="token operator">=</span><span class="token string">"epoch"</span><span class="token punctuation">,</span>
+    optim<span class="token operator">=</span><span class="token string">"paged_adamw_8bit"</span><span class="token punctuation">,</span>
+<span class="token punctuation">)</span>
+
+trainer <span class="token operator">=</span> Trainer<span class="token punctuation">(</span>
+    model<span class="token operator">=</span>model<span class="token punctuation">,</span>
+    args<span class="token operator">=</span>training_args<span class="token punctuation">,</span>
+    train_dataset<span class="token operator">=</span>dataset<span class="token punctuation">,</span>
+<span class="token punctuation">)</span>
+
+trainer<span class="token punctuation">.</span>train<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+model<span class="token punctuation">.</span>save_pretrained<span class="token punctuation">(</span><span class="token string">"./lora-adapter"</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>The saved adapter is 10-100MB. The base model stays untouched. You can share adapters on the Hugging Face Hub without redistributing the full model.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces:</p>
+<ul>
+<li><code class="inline-code">outputs/prompt-lora-advisor.md</code> -- a prompt that helps you decide LoRA rank, target modules, and hyperparameters for your specific task</li>
+<li><code class="inline-code">outputs/skill-fine-tuning-guide.md</code> -- a skill that teaches agents the decision tree for when and how to fine-tune</li>
+</ul>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><p><strong>Rank ablation study.</strong> Run the demo with ranks 2, 4, 8, 16, 32, and 64. Plot final loss vs. rank. Find the point of diminishing returns where doubling the rank no longer halves the loss. For a simple classification task on 256-dim features, this should be around r=8-16.</p>
+</li>
+<li><p><strong>Target module comparison.</strong> Modify inject_lora to target only layer &quot;0&quot;, only layer &quot;2&quot;, only layer &quot;4&quot;, and all three. Train each variant for 20 epochs. Compare convergence speed and final loss. This mirrors the real decision of targeting q_proj vs v_proj vs all linear layers.</p>
+</li>
+<li><p><strong>Quantization error analysis.</strong> Take the trained model&#39;s weight matrices before and after quantize_to_nf4 / dequantize_from_nf4. Compute the mean squared error, max absolute error, and the correlation between original and reconstructed weights. Experiment with block_size values of 32, 64, 128, and 256.</p>
+</li>
+<li><p><strong>Multi-adapter serving.</strong> Train two LoRA adapters on different subsets of the data (even indices vs odd indices). Save both adapters. Load the base model once, then swap adapters and verify that each produces different outputs on the same input. This is how production systems serve multiple fine-tuned models from one base.</p>
+</li>
+<li><p><strong>Merge vs. unmerged inference.</strong> Compare the output of the LoRA model before and after merge_lora_weights on the same 100 inputs. Verify the outputs are identical (within floating-point tolerance of 1e-5). Then benchmark inference speed for both -- merged should be slightly faster since it&#39;s a single matrix multiply instead of two.</p>
+</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>LoRA</td>
+<td>&quot;Efficient fine-tuning&quot;</td>
+<td>Low-Rank Adaptation: freeze base weights, train two small matrices A and B whose product approximates the full weight update</td>
+</tr>
+<tr>
+<td>QLoRA</td>
+<td>&quot;Fine-tune on a laptop&quot;</td>
+<td>Quantized LoRA: load the base model in 4-bit NF4, train LoRA adapters in fp16 on top, enabling 7B fine-tuning in 6GB VRAM</td>
+</tr>
+<tr>
+<td>Rank (r)</td>
+<td>&quot;How much the model can learn&quot;</td>
+<td>The inner dimension of the A and B matrices; controls expressiveness vs. parameter count</td>
+</tr>
+<tr>
+<td>Alpha</td>
+<td>&quot;LoRA learning rate&quot;</td>
+<td>Scaling factor applied to the LoRA output; alpha/r scales the adaptation&#39;s contribution to the final output</td>
+</tr>
+<tr>
+<td>NF4</td>
+<td>&quot;4-bit quantization&quot;</td>
+<td>Normal Float 4: a 4-bit data type with quantization levels at normal distribution quantiles, optimal for neural network weights</td>
+</tr>
+<tr>
+<td>Adapter</td>
+<td>&quot;The small trained part&quot;</td>
+<td>The LoRA A and B matrices saved as a separate file (10-100MB), loadable on top of any copy of the base model</td>
+</tr>
+<tr>
+<td>Target modules</td>
+<td>&quot;Which layers to LoRA&quot;</td>
+<td>The specific linear layers (q_proj, v_proj, etc.) where LoRA adapters are injected</td>
+</tr>
+<tr>
+<td>Merging</td>
+<td>&quot;Bake it in&quot;</td>
+<td>Computing W + (alpha/r) * BA and replacing the original weight, eliminating the adapter overhead at inference</td>
+</tr>
+<tr>
+<td>Paged optimizers</td>
+<td>&quot;Don&#39;t OOM during training&quot;</td>
+<td>Offloading optimizer states (Adam momentum, variance) to CPU when GPU memory is exhausted</td>
+</tr>
+<tr>
+<td>Catastrophic forgetting</td>
+<td>&quot;Fine-tuning broke everything else&quot;</td>
+<td>When updating all weights causes the model to lose previously learned capabilities</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li>Hu et al., &quot;LoRA: Low-Rank Adaptation of Large Language Models&quot; (2021) -- the original paper introducing the low-rank decomposition method, tested on GPT-3 175B with rank as low as 4</li>
+<li>Dettmers et al., &quot;QLoRA: Efficient Finetuning of Quantized Language Models&quot; (2023) -- introduces NF4, double quantization, and paged optimizers, enabling 65B fine-tuning on a single 48GB GPU</li>
+<li>PEFT library documentation (huggingface.co/docs/peft) -- the standard library for LoRA, QLoRA, and other parameter-efficient methods in the Hugging Face ecosystem</li>
+<li>Yadav et al., &quot;TIES-Merging: Resolving Interference When Merging Models&quot; (2023) -- techniques for combining multiple LoRA adapters without quality degradation</li>
+<li><a href="https://arxiv.org/abs/2305.18290" target="_blank" rel="noopener">Rafailov et al., &quot;Direct Preference Optimization: Your Language Model is Secretly a Reward Model&quot; (NeurIPS 2023)</a> -- DPO derivation; the preference-tuning stage that comes after SFT, no reward model needed.</li>
+<li><a href="https://huggingface.co/docs/trl/" target="_blank" rel="noopener">TRL documentation</a> -- official reference for <code class="inline-code">SFTTrainer</code>, <code class="inline-code">DPOTrainer</code>, <code class="inline-code">KTOTrainer</code>, and the integration surface with PEFT/bitsandbytes/Unsloth.</li>
+<li><a href="https://docs.unsloth.ai/" target="_blank" rel="noopener">Unsloth documentation</a> -- fused kernels that double fine-tuning throughput and halve memory; the performance layer under TRL.</li>
+<li><a href="https://axolotl-ai-cloud.github.io/axolotl/" target="_blank" rel="noopener">Axolotl documentation</a> -- YAML-configured multi-GPU SFT/DPO/QLoRA trainer; the config-as-code alternative to hand-written scripts.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="07-advanced-rag.html">
+  <span class="label">← Previous</span>
+  <b>Advanced RAG (Chunking, Reranking, Hybrid Search)</b>
+</a>
+      <a class="pager__item pager__item--next" href="09-function-calling.html">
+  <span class="label">Next →</span>
+  <b>Function Calling &amp; Tool Use</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>12 minutes</b> of LLM Engineering behind you.</p>
+      <a class="btn btn--solid" href="09-function-calling.html">Continue to Function Calling &amp; Tool Use →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#lora-low-rank-adaptation">LoRA: Low-Rank Adaptation</a></li><li class="mini__item mini__item--d3"><a href="#the-scaling-factor-alpha">The Scaling Factor: Alpha</a></li><li class="mini__item mini__item--d3"><a href="#where-to-apply-lora">Where to Apply LoRA</a></li><li class="mini__item mini__item--d3"><a href="#rank-selection">Rank Selection</a></li><li class="mini__item mini__item--d3"><a href="#qlora-4-bit-quantization-lora">QLoRA: 4-Bit Quantization + LoRA</a></li><li class="mini__item mini__item--d3"><a href="#the-quality-question">The Quality Question</a></li><li class="mini__item mini__item--d3"><a href="#real-world-costs">Real-World Costs</a></li><li class="mini__item mini__item--d3"><a href="#the-2026-peft-stack">The 2026 PEFT stack</a></li><li class="mini__item mini__item--d3"><a href="#merging-adapters">Merging Adapters</a></li><li class="mini__item mini__item--d3"><a href="#when-not-to-fine-tune">When NOT to Fine-Tune</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-the-lora-layer">Step 1: The LoRA Layer</a></li><li class="mini__item mini__item--d3"><a href="#step-2-lora-wrapped-linear-layer">Step 2: LoRA-Wrapped Linear Layer</a></li><li class="mini__item mini__item--d3"><a href="#step-3-inject-lora-into-a-model">Step 3: Inject LoRA into a Model</a></li><li class="mini__item mini__item--d3"><a href="#step-4-count-parameters">Step 4: Count Parameters</a></li><li class="mini__item mini__item--d3"><a href="#step-5-merge-weights-back">Step 5: Merge Weights Back</a></li><li class="mini__item mini__item--d3"><a href="#step-6-simulated-qlora-quantization">Step 6: Simulated QLoRA Quantization</a></li><li class="mini__item mini__item--d3"><a href="#step-7-training-loop">Step 7: Training Loop</a></li><li class="mini__item mini__item--d3"><a href="#step-8-full-demo">Step 8: Full Demo</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

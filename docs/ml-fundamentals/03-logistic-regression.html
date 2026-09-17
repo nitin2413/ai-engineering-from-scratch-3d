@@ -1,0 +1,783 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Logistic Regression — ML Fundamentals — AIFS</title>
+<meta name="description" content="ML Fundamentals: Logistic Regression. 6 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Logistic Regression — ML Fundamentals — AIFS">
+<meta property="og:description" content="ML Fundamentals: Logistic Regression. 6 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"logistic-sigmoid":["../assets/figures/figures-ml.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-ml.js"];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#00D4A0" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#00D4A0;--accent-ink:#111111"
+  data-lesson-id="ml-fundamentals/03-logistic-regression" data-module="ml-fundamentals"
+  data-prev="02-linear-regression.html" data-next="04-decision-trees.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#00D4A0">
+        <span class="label">Phase 02</span>
+        <b>ML Fundamentals</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="ml-fundamentals/01-what-is-machine-learning"><a href="01-what-is-machine-learning.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">What Is Machine Learning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/02-linear-regression"><a href="02-linear-regression.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Linear Regression</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/03-logistic-regression"><a href="03-logistic-regression.html" class="is-current">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Logistic Regression</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/04-decision-trees"><a href="04-decision-trees.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Decision Trees and Random Forests</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/05-support-vector-machines"><a href="05-support-vector-machines.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Support Vector Machines</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/06-knn-and-distances"><a href="06-knn-and-distances.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">K-Nearest Neighbors and Distances</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/07-unsupervised-learning"><a href="07-unsupervised-learning.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Unsupervised Learning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/08-feature-engineering"><a href="08-feature-engineering.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Feature Engineering &amp; Selection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/09-model-evaluation"><a href="09-model-evaluation.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Model Evaluation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/10-bias-variance"><a href="10-bias-variance.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Bias-Variance Tradeoff</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/11-ensemble-methods"><a href="11-ensemble-methods.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Ensemble Methods</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/12-hyperparameter-tuning"><a href="12-hyperparameter-tuning.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Hyperparameter Tuning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/13-ml-pipelines"><a href="13-ml-pipelines.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">ML Pipelines</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/14-naive-bayes"><a href="14-naive-bayes.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Naive Bayes</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/15-time-series"><a href="15-time-series.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Time Series Fundamentals</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/16-anomaly-detection"><a href="16-anomaly-detection.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Anomaly Detection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/17-imbalanced-data"><a href="17-imbalanced-data.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Handling Imbalanced Data</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="ml-fundamentals/18-feature-selection"><a href="18-feature-selection.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Feature Selection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">ML Fundamentals</a></p>
+      <h1 class="page__title">Logistic Regression</h1>
+      <p class="page__lede">Logistic regression bends a straight line into an S-curve to answer yes-or-no questions with probabilities.</p>
+      <div class="page__meta">
+        <span class="chip">6 min read</span>
+        <span class="chip">1,281 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 2 Lesson 1-2 (What Is ML, Linear Regression)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~90 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Implement logistic regression from scratch using the sigmoid function and binary cross-entropy loss</li>
+<li>Compute and interpret precision, recall, F1 score, and the confusion matrix for binary classification</li>
+<li>Explain why MSE fails for classification and why binary cross-entropy produces a convex cost surface</li>
+<li>Build a softmax regression model for multi-class classification and evaluate threshold tuning tradeoffs</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>You want to predict whether a tumor is malignant or benign given its size. You try linear regression. It outputs numbers like 0.3 or 1.7 or -0.5. What do those mean? Is 1.7 &quot;very malignant&quot;? Is -0.5 &quot;very benign&quot;? Linear regression outputs unbounded numbers. Classification needs bounded probabilities between 0 and 1, and a clear decision: yes or no.</p>
+<p>Logistic regression solves this. It takes the same linear combination (wx + b) and passes it through the sigmoid function, which squashes any number into the range (0, 1). The output is a probability. You set a threshold (usually 0.5) and make a decision.</p>
+<p>This is one of the most widely used algorithms in practice. Despite its name, logistic regression is a classification algorithm, not a regression algorithm. The name comes from the logistic (sigmoid) function it uses.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="why-linear-regression-fails-for-classification" class="prose-h prose-h3"><a class="prose-h__anchor" href="#why-linear-regression-fails-for-classification" aria-label="Link to this section">#</a>Why Linear Regression Fails for Classification</h3>
+<p>Imagine predicting pass/fail (1/0) based on study hours. Linear regression fits a line through the data:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>hours:  1   2   3   4   5   6   7   8   9   10
+actual: 0   0   0   0   1   1   1   1   1   1</code></pre>
+</figure>
+<p>A linear fit might produce predictions like -0.2 at hour 1 and 1.3 at hour 10. These values are not probabilities. They go below 0 and above 1. Worse, a single outlier (someone who studied 50 hours) would drag the entire line, changing predictions for everyone.</p>
+<p>Classification needs a function that:</p>
+<ul>
+<li>Outputs values between 0 and 1 (probabilities)</li>
+<li>Creates a sharp transition (a decision boundary)</li>
+<li>Is not distorted by outliers far from the boundary</li>
+</ul>
+<h3 id="the-sigmoid-function" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-sigmoid-function" aria-label="Link to this section">#</a>The Sigmoid Function</h3>
+<p>The sigmoid function does exactly this:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>sigmoid(z) = 1 / (1 + e^(-z))</code></pre>
+</figure>
+<p>Properties:</p>
+<ul>
+<li>When z is large and positive, sigmoid(z) approaches 1</li>
+<li>When z is large and negative, sigmoid(z) approaches 0</li>
+<li>When z = 0, sigmoid(z) = 0.5</li>
+<li>The output is always between 0 and 1</li>
+<li>The function is smooth and differentiable everywhere</li>
+</ul>
+<p>The derivative has a convenient form: sigmoid&#39;(z) = sigmoid(z) * (1 - sigmoid(z)). This makes gradient computation efficient.</p>
+<h3 id="logistic-regression-linear-model-sigmoid" class="prose-h prose-h3"><a class="prose-h__anchor" href="#logistic-regression-linear-model-sigmoid" aria-label="Link to this section">#</a>Logistic Regression = Linear Model + Sigmoid</h3>
+<p>The model computes z = wx + b (same as linear regression), then applies sigmoid:</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">flowchart LR
+    X[Input features x] --&gt; L[&quot;Linear: z = wx + b&quot;]
+    L --&gt; S[&quot;Sigmoid: p = 1/(1+e^-z)&quot;]
+    S --&gt; D{&quot;p &gt;= 0.5?&quot;}
+    D --&gt;|Yes| P[Predict 1]
+    D --&gt;|No| N[Predict 0]</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>The output p is interpreted as P(y=1 | x), the probability that the input belongs to class 1. The decision boundary is where wx + b = 0, which makes sigmoid output exactly 0.5.</p>
+<h3 id="binary-cross-entropy-loss" class="prose-h prose-h3"><a class="prose-h__anchor" href="#binary-cross-entropy-loss" aria-label="Link to this section">#</a>Binary Cross-Entropy Loss</h3>
+<p>You cannot use MSE for logistic regression. MSE with a sigmoid creates a non-convex cost surface with many local minima. Instead, use binary cross-entropy (log loss):</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>Loss = -(1/n) * sum(y * log(p) + (1-y) * log(1-p))</code></pre>
+</figure>
+<p>Why this works:</p>
+<ul>
+<li>When y=1 and p is close to 1: log(1) = 0, so loss is near 0 (correct, low cost)</li>
+<li>When y=1 and p is close to 0: log(0) approaches negative infinity, so loss is huge (wrong, high cost)</li>
+<li>When y=0 and p is close to 0: log(1) = 0, so loss is near 0 (correct, low cost)</li>
+<li>When y=0 and p is close to 1: log(0) approaches negative infinity, so loss is huge (wrong, high cost)</li>
+</ul>
+<p>This loss function is convex for logistic regression, guaranteeing a single global minimum.</p>
+<h3 id="gradient-descent-for-logistic-regression" class="prose-h prose-h3"><a class="prose-h__anchor" href="#gradient-descent-for-logistic-regression" aria-label="Link to this section">#</a>Gradient Descent for Logistic Regression</h3>
+<p>The gradients for binary cross-entropy with sigmoid have a clean form:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>dL/dw = (1/n) * sum((p - y) * x)
+dL/db = (1/n) * sum(p - y)</code></pre>
+</figure>
+<p>These look identical to the linear regression gradients. The difference is that p = sigmoid(wx + b) instead of p = wx + b. The sigmoid introduces the nonlinearity, but the gradient update rule stays the same.</p>
+<figure class="mermaid-figure">
+  <pre class="mermaid">flowchart TD
+    A[Initialize w=0, b=0] --&gt; B[Forward pass: z = wx+b, p = sigmoid z]
+    B --&gt; C[Compute loss: binary cross-entropy]
+    C --&gt; D[&quot;Compute gradients: dw = (1/n) * sum((p-y)*x)&quot;]
+    D --&gt; E[Update: w = w - lr*dw, b = b - lr*db]
+    E --&gt; F{Converged?}
+    F --&gt;|No| B
+    F --&gt;|Yes| G[Model trained]</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<h3 id="the-decision-boundary" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-decision-boundary" aria-label="Link to this section">#</a>The Decision Boundary</h3>
+<p>For a 2D input (two features), the decision boundary is the line where:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>w1*x1 + w2*x2 + b = 0</code></pre>
+</figure>
+<p>Points on one side get classified as 1, points on the other side as 0. Logistic regression always produces a linear decision boundary. If you need a curved boundary, you either add polynomial features or use a nonlinear model.</p>
+<h3 id="multi-class-classification-with-softmax" class="prose-h prose-h3"><a class="prose-h__anchor" href="#multi-class-classification-with-softmax" aria-label="Link to this section">#</a>Multi-Class Classification with Softmax</h3>
+<p>Binary logistic regression handles two classes. For k classes, use the softmax function:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>softmax(z_i) = e^(z_i) / sum(e^(z_j) for all j)</code></pre>
+</figure>
+<p>Each class has its own weight vector. The model computes a score z_i for each class, then softmax converts scores to probabilities that sum to 1. The predicted class is the one with the highest probability.</p>
+<p>The loss function becomes categorical cross-entropy:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>Loss = -(1/n) * sum(sum(y_k * log(p_k)))</code></pre>
+</figure>
+<p>where y_k is 1 for the true class and 0 for all others (one-hot encoding).</p>
+<h3 id="evaluation-metrics" class="prose-h prose-h3"><a class="prose-h__anchor" href="#evaluation-metrics" aria-label="Link to this section">#</a>Evaluation Metrics</h3>
+<p>Accuracy alone is not enough. For a dataset with 95% negative and 5% positive, a model that always predicts negative gets 95% accuracy but is useless.</p>
+<p><strong>Confusion Matrix</strong>:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Predicted Positive</th>
+<th>Predicted Negative</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Actually Positive</td>
+<td>True Positive (TP)</td>
+<td>False Negative (FN)</td>
+</tr>
+<tr>
+<td>Actually Negative</td>
+<td>False Positive (FP)</td>
+<td>True Negative (TN)</td>
+</tr>
+</tbody></table>
+<p><strong>Precision</strong>: Of all predicted positives, how many are actually positive?</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>Precision = TP / (TP + FP)</code></pre>
+</figure>
+<p><strong>Recall</strong> (Sensitivity): Of all actual positives, how many did we catch?</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>Recall = TP / (TP + FN)</code></pre>
+</figure>
+<p><strong>F1 Score</strong>: Harmonic mean of precision and recall. Balances both metrics.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>F1 = 2 * (Precision * Recall) / (Precision + Recall)</code></pre>
+</figure>
+<p>When to prioritize:</p>
+<ul>
+<li><strong>Precision</strong>: when false positives are costly (spam filter, you do not want to block legitimate email)</li>
+<li><strong>Recall</strong>: when false negatives are costly (cancer screening, you do not want to miss a tumor)</li>
+<li><strong>F1</strong>: when you need a single balanced metric</li>
+</ul>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="logistic-sigmoid"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">logistic-sigmoid</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> logistic sigmoid</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-sigmoid-function-and-data-generation" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-sigmoid-function-and-data-generation" aria-label="Link to this section">#</a>Step 1: Sigmoid function and data generation</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> random
+<span class="token keyword">import</span> math
+
+<span class="token keyword">def</span> <span class="token function">sigmoid</span><span class="token punctuation">(</span>z<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    z <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">500</span><span class="token punctuation">,</span> <span class="token builtin">min</span><span class="token punctuation">(</span><span class="token number">500</span><span class="token punctuation">,</span> z<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token number">1.0</span> <span class="token operator">/</span> <span class="token punctuation">(</span><span class="token number">1.0</span> <span class="token operator">+</span> math<span class="token punctuation">.</span>exp<span class="token punctuation">(</span><span class="token operator">-</span>z<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+
+random<span class="token punctuation">.</span>seed<span class="token punctuation">(</span><span class="token number">42</span><span class="token punctuation">)</span>
+N <span class="token operator">=</span> <span class="token number">200</span>
+X <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+y <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+
+<span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>N <span class="token operator">//</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    X<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">[</span>random<span class="token punctuation">.</span>gauss<span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span> random<span class="token punctuation">.</span>gauss<span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    y<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+
+<span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>N <span class="token operator">//</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    X<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">[</span>random<span class="token punctuation">.</span>gauss<span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span> random<span class="token punctuation">.</span>gauss<span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    y<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+
+combined <span class="token operator">=</span> <span class="token builtin">list</span><span class="token punctuation">(</span><span class="token builtin">zip</span><span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">)</span><span class="token punctuation">)</span>
+random<span class="token punctuation">.</span>shuffle<span class="token punctuation">(</span>combined<span class="token punctuation">)</span>
+X<span class="token punctuation">,</span> y <span class="token operator">=</span> <span class="token builtin">zip</span><span class="token punctuation">(</span><span class="token operator">*</span>combined<span class="token punctuation">)</span>
+X <span class="token operator">=</span> <span class="token builtin">list</span><span class="token punctuation">(</span>X<span class="token punctuation">)</span>
+y <span class="token operator">=</span> <span class="token builtin">list</span><span class="token punctuation">(</span>y<span class="token punctuation">)</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Generated </span><span class="token interpolation"><span class="token punctuation">{</span>N<span class="token punctuation">}</span></span><span class="token string"> samples (2 classes, 2 features)"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Class 0 center: (2, 2), Class 1 center: (5, 5)"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"First 5 samples:"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Features: [</span><span class="token interpolation"><span class="token punctuation">{</span>X<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.2f</span><span class="token punctuation">}</span></span><span class="token string">, </span><span class="token interpolation"><span class="token punctuation">{</span>X<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.2f</span><span class="token punctuation">}</span></span><span class="token string">], Label: </span><span class="token interpolation"><span class="token punctuation">{</span>y<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h3 id="step-2-logistic-regression-from-scratch" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-logistic-regression-from-scratch" aria-label="Link to this section">#</a>Step 2: Logistic regression from scratch</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">LogisticRegression</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> n_features<span class="token punctuation">,</span> learning_rate<span class="token operator">=</span><span class="token number">0.01</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>weights <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> n_features
+        self<span class="token punctuation">.</span>bias <span class="token operator">=</span> <span class="token number">0.0</span>
+        self<span class="token punctuation">.</span>lr <span class="token operator">=</span> learning_rate
+        self<span class="token punctuation">.</span>loss_history <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">def</span> <span class="token function">predict_proba</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        z <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>w <span class="token operator">*</span> xi <span class="token keyword">for</span> w<span class="token punctuation">,</span> xi <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>weights<span class="token punctuation">,</span> x<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">+</span> self<span class="token punctuation">.</span>bias
+        <span class="token keyword">return</span> sigmoid<span class="token punctuation">(</span>z<span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">predict</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> x<span class="token punctuation">,</span> threshold<span class="token operator">=</span><span class="token number">0.5</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token number">1</span> <span class="token keyword">if</span> self<span class="token punctuation">.</span>predict_proba<span class="token punctuation">(</span>x<span class="token punctuation">)</span> <span class="token operator">>=</span> threshold <span class="token keyword">else</span> <span class="token number">0</span>
+
+    <span class="token keyword">def</span> <span class="token function">compute_loss</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> X<span class="token punctuation">,</span> y<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        n <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>y<span class="token punctuation">)</span>
+        total <span class="token operator">=</span> <span class="token number">0.0</span>
+        <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            p <span class="token operator">=</span> self<span class="token punctuation">.</span>predict_proba<span class="token punctuation">(</span>X<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span>
+            p <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span><span class="token number">1e-15</span><span class="token punctuation">,</span> <span class="token builtin">min</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> <span class="token number">1e-15</span><span class="token punctuation">,</span> p<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            total <span class="token operator">+=</span> y<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">*</span> math<span class="token punctuation">.</span>log<span class="token punctuation">(</span>p<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> y<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">*</span> math<span class="token punctuation">.</span>log<span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> p<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token operator">-</span>total <span class="token operator">/</span> n
+
+    <span class="token keyword">def</span> <span class="token function">fit</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> X<span class="token punctuation">,</span> y<span class="token punctuation">,</span> epochs<span class="token operator">=</span><span class="token number">1000</span><span class="token punctuation">,</span> print_every<span class="token operator">=</span><span class="token number">200</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        n <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>y<span class="token punctuation">)</span>
+        n_features <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>X<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+        <span class="token keyword">for</span> epoch <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>epochs<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            dw <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> n_features
+            db <span class="token operator">=</span> <span class="token number">0.0</span>
+            <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                p <span class="token operator">=</span> self<span class="token punctuation">.</span>predict_proba<span class="token punctuation">(</span>X<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span>
+                error <span class="token operator">=</span> p <span class="token operator">-</span> y<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+                <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n_features<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                    dw<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">+=</span> error <span class="token operator">*</span> X<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span>
+                db <span class="token operator">+=</span> error
+            <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n_features<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                self<span class="token punctuation">.</span>weights<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">-=</span> self<span class="token punctuation">.</span>lr <span class="token operator">*</span> <span class="token punctuation">(</span>dw<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">/</span> n<span class="token punctuation">)</span>
+            self<span class="token punctuation">.</span>bias <span class="token operator">-=</span> self<span class="token punctuation">.</span>lr <span class="token operator">*</span> <span class="token punctuation">(</span>db <span class="token operator">/</span> n<span class="token punctuation">)</span>
+            loss <span class="token operator">=</span> self<span class="token punctuation">.</span>compute_loss<span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">)</span>
+            self<span class="token punctuation">.</span>loss_history<span class="token punctuation">.</span>append<span class="token punctuation">(</span>loss<span class="token punctuation">)</span>
+            <span class="token keyword">if</span> epoch <span class="token operator">%</span> print_every <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+                <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Epoch </span><span class="token interpolation"><span class="token punctuation">{</span>epoch<span class="token punctuation">:</span><span class="token format-spec">4d</span><span class="token punctuation">}</span></span><span class="token string"> | Loss: </span><span class="token interpolation"><span class="token punctuation">{</span>loss<span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string"> | w: [</span><span class="token interpolation"><span class="token punctuation">{</span>self<span class="token punctuation">.</span>weights<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.3f</span><span class="token punctuation">}</span></span><span class="token string">, </span><span class="token interpolation"><span class="token punctuation">{</span>self<span class="token punctuation">.</span>weights<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.3f</span><span class="token punctuation">}</span></span><span class="token string">] | b: </span><span class="token interpolation"><span class="token punctuation">{</span>self<span class="token punctuation">.</span>bias<span class="token punctuation">:</span><span class="token format-spec">.3f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> self
+
+    <span class="token keyword">def</span> <span class="token function">accuracy</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> X<span class="token punctuation">,</span> y<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        correct <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>y<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">if</span> self<span class="token punctuation">.</span>predict<span class="token punctuation">(</span>X<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">==</span> y<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> correct <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>y<span class="token punctuation">)</span>
+
+
+split <span class="token operator">=</span> <span class="token builtin">int</span><span class="token punctuation">(</span><span class="token number">0.8</span> <span class="token operator">*</span> N<span class="token punctuation">)</span>
+X_train<span class="token punctuation">,</span> X_test <span class="token operator">=</span> X<span class="token punctuation">[</span><span class="token punctuation">:</span>split<span class="token punctuation">]</span><span class="token punctuation">,</span> X<span class="token punctuation">[</span>split<span class="token punctuation">:</span><span class="token punctuation">]</span>
+y_train<span class="token punctuation">,</span> y_test <span class="token operator">=</span> y<span class="token punctuation">[</span><span class="token punctuation">:</span>split<span class="token punctuation">]</span><span class="token punctuation">,</span> y<span class="token punctuation">[</span>split<span class="token punctuation">:</span><span class="token punctuation">]</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n=== Training Logistic Regression ==="</span><span class="token punctuation">)</span>
+model <span class="token operator">=</span> LogisticRegression<span class="token punctuation">(</span>n_features<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">,</span> learning_rate<span class="token operator">=</span><span class="token number">0.1</span><span class="token punctuation">)</span>
+model<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X_train<span class="token punctuation">,</span> y_train<span class="token punctuation">,</span> epochs<span class="token operator">=</span><span class="token number">1000</span><span class="token punctuation">,</span> print_every<span class="token operator">=</span><span class="token number">200</span><span class="token punctuation">)</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"\nTrain accuracy: </span><span class="token interpolation"><span class="token punctuation">{</span>model<span class="token punctuation">.</span>accuracy<span class="token punctuation">(</span>X_train<span class="token punctuation">,</span> y_train<span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Test accuracy:  </span><span class="token interpolation"><span class="token punctuation">{</span>model<span class="token punctuation">.</span>accuracy<span class="token punctuation">(</span>X_test<span class="token punctuation">,</span> y_test<span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Weights: [</span><span class="token interpolation"><span class="token punctuation">{</span>model<span class="token punctuation">.</span>weights<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">, </span><span class="token interpolation"><span class="token punctuation">{</span>model<span class="token punctuation">.</span>weights<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">]"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Bias: </span><span class="token interpolation"><span class="token punctuation">{</span>model<span class="token punctuation">.</span>bias<span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h3 id="step-3-confusion-matrix-and-metrics-from-scratch" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-confusion-matrix-and-metrics-from-scratch" aria-label="Link to this section">#</a>Step 3: Confusion matrix and metrics from scratch</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">ClassificationMetrics</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> y_true<span class="token punctuation">,</span> y_pred<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>tp <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token keyword">for</span> t<span class="token punctuation">,</span> p <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>y_true<span class="token punctuation">,</span> y_pred<span class="token punctuation">)</span> <span class="token keyword">if</span> t <span class="token operator">==</span> <span class="token number">1</span> <span class="token keyword">and</span> p <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>tn <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token keyword">for</span> t<span class="token punctuation">,</span> p <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>y_true<span class="token punctuation">,</span> y_pred<span class="token punctuation">)</span> <span class="token keyword">if</span> t <span class="token operator">==</span> <span class="token number">0</span> <span class="token keyword">and</span> p <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>fp <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token keyword">for</span> t<span class="token punctuation">,</span> p <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>y_true<span class="token punctuation">,</span> y_pred<span class="token punctuation">)</span> <span class="token keyword">if</span> t <span class="token operator">==</span> <span class="token number">0</span> <span class="token keyword">and</span> p <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>fn <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token keyword">for</span> t<span class="token punctuation">,</span> p <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>y_true<span class="token punctuation">,</span> y_pred<span class="token punctuation">)</span> <span class="token keyword">if</span> t <span class="token operator">==</span> <span class="token number">1</span> <span class="token keyword">and</span> p <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">accuracy</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        total <span class="token operator">=</span> self<span class="token punctuation">.</span>tp <span class="token operator">+</span> self<span class="token punctuation">.</span>tn <span class="token operator">+</span> self<span class="token punctuation">.</span>fp <span class="token operator">+</span> self<span class="token punctuation">.</span>fn
+        <span class="token keyword">return</span> <span class="token punctuation">(</span>self<span class="token punctuation">.</span>tp <span class="token operator">+</span> self<span class="token punctuation">.</span>tn<span class="token punctuation">)</span> <span class="token operator">/</span> total <span class="token keyword">if</span> total <span class="token operator">></span> <span class="token number">0</span> <span class="token keyword">else</span> <span class="token number">0</span>
+
+    <span class="token keyword">def</span> <span class="token function">precision</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        denom <span class="token operator">=</span> self<span class="token punctuation">.</span>tp <span class="token operator">+</span> self<span class="token punctuation">.</span>fp
+        <span class="token keyword">return</span> self<span class="token punctuation">.</span>tp <span class="token operator">/</span> denom <span class="token keyword">if</span> denom <span class="token operator">></span> <span class="token number">0</span> <span class="token keyword">else</span> <span class="token number">0</span>
+
+    <span class="token keyword">def</span> <span class="token function">recall</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        denom <span class="token operator">=</span> self<span class="token punctuation">.</span>tp <span class="token operator">+</span> self<span class="token punctuation">.</span>fn
+        <span class="token keyword">return</span> self<span class="token punctuation">.</span>tp <span class="token operator">/</span> denom <span class="token keyword">if</span> denom <span class="token operator">></span> <span class="token number">0</span> <span class="token keyword">else</span> <span class="token number">0</span>
+
+    <span class="token keyword">def</span> <span class="token function">f1</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        p <span class="token operator">=</span> self<span class="token punctuation">.</span>precision<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        r <span class="token operator">=</span> self<span class="token punctuation">.</span>recall<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token number">2</span> <span class="token operator">*</span> p <span class="token operator">*</span> r <span class="token operator">/</span> <span class="token punctuation">(</span>p <span class="token operator">+</span> r<span class="token punctuation">)</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>p <span class="token operator">+</span> r<span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">0</span> <span class="token keyword">else</span> <span class="token number">0</span>
+
+    <span class="token keyword">def</span> <span class="token function">print_confusion_matrix</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"\n  Confusion Matrix:"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"                  Predicted"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"                  Pos   Neg"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Actual Pos     </span><span class="token interpolation"><span class="token punctuation">{</span>self<span class="token punctuation">.</span>tp<span class="token punctuation">:</span><span class="token format-spec">4d</span><span class="token punctuation">}</span></span><span class="token string">  </span><span class="token interpolation"><span class="token punctuation">{</span>self<span class="token punctuation">.</span>fn<span class="token punctuation">:</span><span class="token format-spec">4d</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Actual Neg     </span><span class="token interpolation"><span class="token punctuation">{</span>self<span class="token punctuation">.</span>fp<span class="token punctuation">:</span><span class="token format-spec">4d</span><span class="token punctuation">}</span></span><span class="token string">  </span><span class="token interpolation"><span class="token punctuation">{</span>self<span class="token punctuation">.</span>tn<span class="token punctuation">:</span><span class="token format-spec">4d</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">print_report</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>print_confusion_matrix<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"\n  Accuracy:  </span><span class="token interpolation"><span class="token punctuation">{</span>self<span class="token punctuation">.</span>accuracy<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Precision: </span><span class="token interpolation"><span class="token punctuation">{</span>self<span class="token punctuation">.</span>precision<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Recall:    </span><span class="token interpolation"><span class="token punctuation">{</span>self<span class="token punctuation">.</span>recall<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  F1 Score:  </span><span class="token interpolation"><span class="token punctuation">{</span>self<span class="token punctuation">.</span>f1<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+
+y_pred_test <span class="token operator">=</span> <span class="token punctuation">[</span>model<span class="token punctuation">.</span>predict<span class="token punctuation">(</span>x<span class="token punctuation">)</span> <span class="token keyword">for</span> x <span class="token keyword">in</span> X_test<span class="token punctuation">]</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n=== Classification Report (Test Set) ==="</span><span class="token punctuation">)</span>
+metrics <span class="token operator">=</span> ClassificationMetrics<span class="token punctuation">(</span>y_test<span class="token punctuation">,</span> y_pred_test<span class="token punctuation">)</span>
+metrics<span class="token punctuation">.</span>print_report<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h3 id="step-4-decision-boundary-analysis" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-decision-boundary-analysis" aria-label="Link to this section">#</a>Step 4: Decision boundary analysis</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n=== Decision Boundary ==="</span><span class="token punctuation">)</span>
+w1<span class="token punctuation">,</span> w2 <span class="token operator">=</span> model<span class="token punctuation">.</span>weights
+b <span class="token operator">=</span> model<span class="token punctuation">.</span>bias
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Decision boundary: </span><span class="token interpolation"><span class="token punctuation">{</span>w1<span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">*x1 + </span><span class="token interpolation"><span class="token punctuation">{</span>w2<span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">*x2 + </span><span class="token interpolation"><span class="token punctuation">{</span>b<span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string"> = 0"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">if</span> <span class="token builtin">abs</span><span class="token punctuation">(</span>w2<span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">1e-10</span><span class="token punctuation">:</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Solved for x2:     x2 = </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token operator">-</span>w1<span class="token operator">/</span>w2<span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">*x1 + </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token operator">-</span>b<span class="token operator">/</span>w2<span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\nSample predictions near the boundary:"</span><span class="token punctuation">)</span>
+test_points <span class="token operator">=</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">[</span><span class="token number">3.0</span><span class="token punctuation">,</span> <span class="token number">3.0</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token punctuation">[</span><span class="token number">3.5</span><span class="token punctuation">,</span> <span class="token number">3.5</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token punctuation">[</span><span class="token number">4.0</span><span class="token punctuation">,</span> <span class="token number">4.0</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token punctuation">[</span><span class="token number">2.5</span><span class="token punctuation">,</span> <span class="token number">2.5</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token punctuation">[</span><span class="token number">5.0</span><span class="token punctuation">,</span> <span class="token number">5.0</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">]</span>
+<span class="token keyword">for</span> point <span class="token keyword">in</span> test_points<span class="token punctuation">:</span>
+    prob <span class="token operator">=</span> model<span class="token punctuation">.</span>predict_proba<span class="token punctuation">(</span>point<span class="token punctuation">)</span>
+    pred <span class="token operator">=</span> model<span class="token punctuation">.</span>predict<span class="token punctuation">(</span>point<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  [</span><span class="token interpolation"><span class="token punctuation">{</span>point<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">}</span></span><span class="token string">, </span><span class="token interpolation"><span class="token punctuation">{</span>point<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">}</span></span><span class="token string">] -> prob=</span><span class="token interpolation"><span class="token punctuation">{</span>prob<span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">, class=</span><span class="token interpolation"><span class="token punctuation">{</span>pred<span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h3 id="step-5-multi-class-with-softmax" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-multi-class-with-softmax" aria-label="Link to this section">#</a>Step 5: Multi-class with softmax</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">SoftmaxRegression</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> n_features<span class="token punctuation">,</span> n_classes<span class="token punctuation">,</span> learning_rate<span class="token operator">=</span><span class="token number">0.01</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>n_features <span class="token operator">=</span> n_features
+        self<span class="token punctuation">.</span>n_classes <span class="token operator">=</span> n_classes
+        self<span class="token punctuation">.</span>lr <span class="token operator">=</span> learning_rate
+        self<span class="token punctuation">.</span>weights <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> n_features <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n_classes<span class="token punctuation">)</span><span class="token punctuation">]</span>
+        self<span class="token punctuation">.</span>biases <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> n_classes
+
+    <span class="token keyword">def</span> <span class="token function">softmax</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> scores<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        max_score <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span>scores<span class="token punctuation">)</span>
+        exp_scores <span class="token operator">=</span> <span class="token punctuation">[</span>math<span class="token punctuation">.</span>exp<span class="token punctuation">(</span>s <span class="token operator">-</span> max_score<span class="token punctuation">)</span> <span class="token keyword">for</span> s <span class="token keyword">in</span> scores<span class="token punctuation">]</span>
+        total <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>exp_scores<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token punctuation">[</span>e <span class="token operator">/</span> total <span class="token keyword">for</span> e <span class="token keyword">in</span> exp_scores<span class="token punctuation">]</span>
+
+    <span class="token keyword">def</span> <span class="token function">predict_proba</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        scores <span class="token operator">=</span> <span class="token punctuation">[</span>
+            <span class="token builtin">sum</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>weights<span class="token punctuation">[</span>k<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">*</span> x<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>n_features<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">+</span> self<span class="token punctuation">.</span>biases<span class="token punctuation">[</span>k<span class="token punctuation">]</span>
+            <span class="token keyword">for</span> k <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>n_classes<span class="token punctuation">)</span>
+        <span class="token punctuation">]</span>
+        <span class="token keyword">return</span> self<span class="token punctuation">.</span>softmax<span class="token punctuation">(</span>scores<span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">predict</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        probs <span class="token operator">=</span> self<span class="token punctuation">.</span>predict_proba<span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> probs<span class="token punctuation">.</span>index<span class="token punctuation">(</span><span class="token builtin">max</span><span class="token punctuation">(</span>probs<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">fit</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> X<span class="token punctuation">,</span> y<span class="token punctuation">,</span> epochs<span class="token operator">=</span><span class="token number">1000</span><span class="token punctuation">,</span> print_every<span class="token operator">=</span><span class="token number">200</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        n <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>y<span class="token punctuation">)</span>
+        <span class="token keyword">for</span> epoch <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>epochs<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            grad_w <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> self<span class="token punctuation">.</span>n_features <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>n_classes<span class="token punctuation">)</span><span class="token punctuation">]</span>
+            grad_b <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> self<span class="token punctuation">.</span>n_classes
+            total_loss <span class="token operator">=</span> <span class="token number">0.0</span>
+            <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                probs <span class="token operator">=</span> self<span class="token punctuation">.</span>predict_proba<span class="token punctuation">(</span>X<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span>
+                <span class="token keyword">for</span> k <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>n_classes<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                    target <span class="token operator">=</span> <span class="token number">1.0</span> <span class="token keyword">if</span> y<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">==</span> k <span class="token keyword">else</span> <span class="token number">0.0</span>
+                    error <span class="token operator">=</span> probs<span class="token punctuation">[</span>k<span class="token punctuation">]</span> <span class="token operator">-</span> target
+                    <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>n_features<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                        grad_w<span class="token punctuation">[</span>k<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">+=</span> error <span class="token operator">*</span> X<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span>
+                    grad_b<span class="token punctuation">[</span>k<span class="token punctuation">]</span> <span class="token operator">+=</span> error
+                true_prob <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span>probs<span class="token punctuation">[</span>y<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">1e-15</span><span class="token punctuation">)</span>
+                total_loss <span class="token operator">-=</span> math<span class="token punctuation">.</span>log<span class="token punctuation">(</span>true_prob<span class="token punctuation">)</span>
+            <span class="token keyword">for</span> k <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>n_classes<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>n_features<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                    self<span class="token punctuation">.</span>weights<span class="token punctuation">[</span>k<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">-=</span> self<span class="token punctuation">.</span>lr <span class="token operator">*</span> <span class="token punctuation">(</span>grad_w<span class="token punctuation">[</span>k<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">/</span> n<span class="token punctuation">)</span>
+                self<span class="token punctuation">.</span>biases<span class="token punctuation">[</span>k<span class="token punctuation">]</span> <span class="token operator">-=</span> self<span class="token punctuation">.</span>lr <span class="token operator">*</span> <span class="token punctuation">(</span>grad_b<span class="token punctuation">[</span>k<span class="token punctuation">]</span> <span class="token operator">/</span> n<span class="token punctuation">)</span>
+            <span class="token keyword">if</span> epoch <span class="token operator">%</span> print_every <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+                <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  Epoch </span><span class="token interpolation"><span class="token punctuation">{</span>epoch<span class="token punctuation">:</span><span class="token format-spec">4d</span><span class="token punctuation">}</span></span><span class="token string"> | Loss: </span><span class="token interpolation"><span class="token punctuation">{</span>total_loss <span class="token operator">/</span> n<span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> self
+
+    <span class="token keyword">def</span> <span class="token function">accuracy</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> X<span class="token punctuation">,</span> y<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        correct <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>y<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">if</span> self<span class="token punctuation">.</span>predict<span class="token punctuation">(</span>X<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">==</span> y<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> correct <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>y<span class="token punctuation">)</span>
+
+
+random<span class="token punctuation">.</span>seed<span class="token punctuation">(</span><span class="token number">42</span><span class="token punctuation">)</span>
+X_3class <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+y_3class <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+
+centers <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+<span class="token keyword">for</span> label<span class="token punctuation">,</span> <span class="token punctuation">(</span>cx<span class="token punctuation">,</span> cy<span class="token punctuation">)</span> <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>centers<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">50</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        X_3class<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">[</span>random<span class="token punctuation">.</span>gauss<span class="token punctuation">(</span>cx<span class="token punctuation">,</span> <span class="token number">0.8</span><span class="token punctuation">)</span><span class="token punctuation">,</span> random<span class="token punctuation">.</span>gauss<span class="token punctuation">(</span>cy<span class="token punctuation">,</span> <span class="token number">0.8</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+        y_3class<span class="token punctuation">.</span>append<span class="token punctuation">(</span>label<span class="token punctuation">)</span>
+
+combined <span class="token operator">=</span> <span class="token builtin">list</span><span class="token punctuation">(</span><span class="token builtin">zip</span><span class="token punctuation">(</span>X_3class<span class="token punctuation">,</span> y_3class<span class="token punctuation">)</span><span class="token punctuation">)</span>
+random<span class="token punctuation">.</span>shuffle<span class="token punctuation">(</span>combined<span class="token punctuation">)</span>
+X_3class<span class="token punctuation">,</span> y_3class <span class="token operator">=</span> <span class="token builtin">zip</span><span class="token punctuation">(</span><span class="token operator">*</span>combined<span class="token punctuation">)</span>
+X_3class <span class="token operator">=</span> <span class="token builtin">list</span><span class="token punctuation">(</span>X_3class<span class="token punctuation">)</span>
+y_3class <span class="token operator">=</span> <span class="token builtin">list</span><span class="token punctuation">(</span>y_3class<span class="token punctuation">)</span>
+
+split_3 <span class="token operator">=</span> <span class="token builtin">int</span><span class="token punctuation">(</span><span class="token number">0.8</span> <span class="token operator">*</span> <span class="token builtin">len</span><span class="token punctuation">(</span>X_3class<span class="token punctuation">)</span><span class="token punctuation">)</span>
+X_train_3 <span class="token operator">=</span> X_3class<span class="token punctuation">[</span><span class="token punctuation">:</span>split_3<span class="token punctuation">]</span>
+y_train_3 <span class="token operator">=</span> y_3class<span class="token punctuation">[</span><span class="token punctuation">:</span>split_3<span class="token punctuation">]</span>
+X_test_3 <span class="token operator">=</span> X_3class<span class="token punctuation">[</span>split_3<span class="token punctuation">:</span><span class="token punctuation">]</span>
+y_test_3 <span class="token operator">=</span> y_3class<span class="token punctuation">[</span>split_3<span class="token punctuation">:</span><span class="token punctuation">]</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n=== Multi-class Softmax Regression (3 classes) ==="</span><span class="token punctuation">)</span>
+softmax_model <span class="token operator">=</span> SoftmaxRegression<span class="token punctuation">(</span>n_features<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">,</span> n_classes<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">,</span> learning_rate<span class="token operator">=</span><span class="token number">0.1</span><span class="token punctuation">)</span>
+softmax_model<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X_train_3<span class="token punctuation">,</span> y_train_3<span class="token punctuation">,</span> epochs<span class="token operator">=</span><span class="token number">1000</span><span class="token punctuation">,</span> print_every<span class="token operator">=</span><span class="token number">200</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"\nTrain accuracy: </span><span class="token interpolation"><span class="token punctuation">{</span>softmax_model<span class="token punctuation">.</span>accuracy<span class="token punctuation">(</span>X_train_3<span class="token punctuation">,</span> y_train_3<span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Test accuracy:  </span><span class="token interpolation"><span class="token punctuation">{</span>softmax_model<span class="token punctuation">.</span>accuracy<span class="token punctuation">(</span>X_test_3<span class="token punctuation">,</span> y_test_3<span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\nSample predictions:"</span><span class="token punctuation">)</span>
+<span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    probs <span class="token operator">=</span> softmax_model<span class="token punctuation">.</span>predict_proba<span class="token punctuation">(</span>X_test_3<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span>
+    pred <span class="token operator">=</span> softmax_model<span class="token punctuation">.</span>predict<span class="token punctuation">(</span>X_test_3<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"  True: </span><span class="token interpolation"><span class="token punctuation">{</span>y_test_3<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">}</span></span><span class="token string">, Predicted: </span><span class="token interpolation"><span class="token punctuation">{</span>pred<span class="token punctuation">}</span></span><span class="token string">, Probs: [</span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">', '</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f'</span><span class="token interpolation"><span class="token punctuation">{</span>p<span class="token punctuation">:</span><span class="token format-spec">.3f</span><span class="token punctuation">}</span></span><span class="token string">'</span></span> <span class="token keyword">for</span> p <span class="token keyword">in</span> probs<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">]"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h3 id="step-6-threshold-tuning" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-6-threshold-tuning" aria-label="Link to this section">#</a>Step 6: Threshold tuning</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n=== Threshold Tuning ==="</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Default threshold: 0.5. Adjusting the threshold trades precision for recall.\n"</span><span class="token punctuation">)</span>
+
+thresholds <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.3</span><span class="token punctuation">,</span> <span class="token number">0.4</span><span class="token punctuation">,</span> <span class="token number">0.5</span><span class="token punctuation">,</span> <span class="token number">0.6</span><span class="token punctuation">,</span> <span class="token number">0.7</span><span class="token punctuation">]</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'Threshold'</span><span class="token punctuation">:</span><span class="token format-spec">>10</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'Accuracy'</span><span class="token punctuation">:</span><span class="token format-spec">>10</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'Precision'</span><span class="token punctuation">:</span><span class="token format-spec">>10</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'Recall'</span><span class="token punctuation">:</span><span class="token format-spec">>10</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">'F1'</span><span class="token punctuation">:</span><span class="token format-spec">>10</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"-"</span> <span class="token operator">*</span> <span class="token number">52</span><span class="token punctuation">)</span>
+
+<span class="token keyword">for</span> t <span class="token keyword">in</span> thresholds<span class="token punctuation">:</span>
+    y_pred_t <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">1</span> <span class="token keyword">if</span> model<span class="token punctuation">.</span>predict_proba<span class="token punctuation">(</span>x<span class="token punctuation">)</span> <span class="token operator">>=</span> t <span class="token keyword">else</span> <span class="token number">0</span> <span class="token keyword">for</span> x <span class="token keyword">in</span> X_test<span class="token punctuation">]</span>
+    m <span class="token operator">=</span> ClassificationMetrics<span class="token punctuation">(</span>y_test<span class="token punctuation">,</span> y_pred_t<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>t<span class="token punctuation">:</span><span class="token format-spec">>10.1f</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span>m<span class="token punctuation">.</span>accuracy<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">>10.4f</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span>m<span class="token punctuation">.</span>precision<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">>10.4f</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span>m<span class="token punctuation">.</span>recall<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">>10.4f</span><span class="token punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">{</span>m<span class="token punctuation">.</span>f1<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">>10.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>Now the same thing with scikit-learn.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>linear_model <span class="token keyword">import</span> LogisticRegression <span class="token keyword">as</span> SklearnLR
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>metrics <span class="token keyword">import</span> accuracy_score<span class="token punctuation">,</span> precision_score<span class="token punctuation">,</span> recall_score<span class="token punctuation">,</span> f1_score
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>metrics <span class="token keyword">import</span> confusion_matrix<span class="token punctuation">,</span> classification_report
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>model_selection <span class="token keyword">import</span> train_test_split
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>preprocessing <span class="token keyword">import</span> StandardScaler
+<span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+
+np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>seed<span class="token punctuation">(</span><span class="token number">42</span><span class="token punctuation">)</span>
+X_0 <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>randn<span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">]</span>
+X_1 <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>randn<span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token punctuation">[</span><span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">]</span>
+X_sk <span class="token operator">=</span> np<span class="token punctuation">.</span>vstack<span class="token punctuation">(</span><span class="token punctuation">[</span>X_0<span class="token punctuation">,</span> X_1<span class="token punctuation">]</span><span class="token punctuation">)</span>
+y_sk <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token number">100</span> <span class="token operator">+</span> <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token number">100</span><span class="token punctuation">)</span>
+
+X_tr<span class="token punctuation">,</span> X_te<span class="token punctuation">,</span> y_tr<span class="token punctuation">,</span> y_te <span class="token operator">=</span> train_test_split<span class="token punctuation">(</span>X_sk<span class="token punctuation">,</span> y_sk<span class="token punctuation">,</span> test_size<span class="token operator">=</span><span class="token number">0.2</span><span class="token punctuation">,</span> random_state<span class="token operator">=</span><span class="token number">42</span><span class="token punctuation">)</span>
+
+scaler <span class="token operator">=</span> StandardScaler<span class="token punctuation">(</span><span class="token punctuation">)</span>
+X_tr_sc <span class="token operator">=</span> scaler<span class="token punctuation">.</span>fit_transform<span class="token punctuation">(</span>X_tr<span class="token punctuation">)</span>
+X_te_sc <span class="token operator">=</span> scaler<span class="token punctuation">.</span>transform<span class="token punctuation">(</span>X_te<span class="token punctuation">)</span>
+
+lr <span class="token operator">=</span> SklearnLR<span class="token punctuation">(</span><span class="token punctuation">)</span>
+lr<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X_tr_sc<span class="token punctuation">,</span> y_tr<span class="token punctuation">)</span>
+y_pred <span class="token operator">=</span> lr<span class="token punctuation">.</span>predict<span class="token punctuation">(</span>X_te_sc<span class="token punctuation">)</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"=== Scikit-learn Logistic Regression ==="</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Accuracy:  </span><span class="token interpolation"><span class="token punctuation">{</span>accuracy_score<span class="token punctuation">(</span>y_te<span class="token punctuation">,</span> y_pred<span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Precision: </span><span class="token interpolation"><span class="token punctuation">{</span>precision_score<span class="token punctuation">(</span>y_te<span class="token punctuation">,</span> y_pred<span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Recall:    </span><span class="token interpolation"><span class="token punctuation">{</span>recall_score<span class="token punctuation">(</span>y_te<span class="token punctuation">,</span> y_pred<span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"F1:        </span><span class="token interpolation"><span class="token punctuation">{</span>f1_score<span class="token punctuation">(</span>y_te<span class="token punctuation">,</span> y_pred<span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"\nConfusion Matrix:\n</span><span class="token interpolation"><span class="token punctuation">{</span>confusion_matrix<span class="token punctuation">(</span>y_te<span class="token punctuation">,</span> y_pred<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"\nClassification Report:\n</span><span class="token interpolation"><span class="token punctuation">{</span>classification_report<span class="token punctuation">(</span>y_te<span class="token punctuation">,</span> y_pred<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Your from-scratch implementation produces the same decision boundary and metrics. Scikit-learn adds solver options (liblinear, lbfgs, saga), automatic regularization, multi-class strategies (one-vs-rest, multinomial), and numerical stability optimizations.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces:</p>
+<ul>
+<li><code class="inline-code">code/logistic_regression.py</code> - logistic regression from scratch with metrics</li>
+</ul>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li>Generate a dataset that is NOT linearly separable (e.g., two concentric circles). Train logistic regression and observe its failure. Then add polynomial features (x1^2, x2^2, x1*x2) and train again. Show that the accuracy improves.</li>
+<li>Implement a multi-class confusion matrix for the 3-class softmax model. Compute per-class precision and recall. Which class is hardest to classify?</li>
+<li>Build an ROC curve from scratch. For 100 threshold values from 0 to 1, compute the true positive rate and false positive rate. Calculate the AUC (area under the curve) using the trapezoidal rule.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Logistic regression</td>
+<td>&quot;Regression for classification&quot;</td>
+<td>A linear model followed by a sigmoid function that outputs class probabilities</td>
+</tr>
+<tr>
+<td>Sigmoid function</td>
+<td>&quot;The S-curve&quot;</td>
+<td>The function 1/(1+e^(-z)) that maps any real number to the range (0, 1)</td>
+</tr>
+<tr>
+<td>Binary cross-entropy</td>
+<td>&quot;Log loss&quot;</td>
+<td>The loss function -[y*log(p) + (1-y)*log(1-p)] that penalizes confident wrong predictions severely</td>
+</tr>
+<tr>
+<td>Decision boundary</td>
+<td>&quot;The dividing line&quot;</td>
+<td>The surface where the model&#39;s output probability equals 0.5, separating predicted classes</td>
+</tr>
+<tr>
+<td>Softmax</td>
+<td>&quot;Multi-class sigmoid&quot;</td>
+<td>A function that converts a vector of scores into probabilities that sum to 1</td>
+</tr>
+<tr>
+<td>Precision</td>
+<td>&quot;How many selected are relevant&quot;</td>
+<td>TP / (TP + FP), the fraction of positive predictions that are actually positive</td>
+</tr>
+<tr>
+<td>Recall</td>
+<td>&quot;How many relevant are selected&quot;</td>
+<td>TP / (TP + FN), the fraction of actual positives that the model correctly identifies</td>
+</tr>
+<tr>
+<td>F1 score</td>
+<td>&quot;Balanced accuracy&quot;</td>
+<td>The harmonic mean of precision and recall: 2<em>P</em>R / (P+R)</td>
+</tr>
+<tr>
+<td>Confusion matrix</td>
+<td>&quot;The error breakdown&quot;</td>
+<td>A table showing TP, TN, FP, FN counts for each class pair</td>
+</tr>
+<tr>
+<td>Threshold</td>
+<td>&quot;The cutoff&quot;</td>
+<td>The probability value above which the model predicts class 1 (default 0.5, tunable)</td>
+</tr>
+<tr>
+<td>One-hot encoding</td>
+<td>&quot;Binary columns for categories&quot;</td>
+<td>Representing class k as a vector of zeros with a 1 at position k</td>
+</tr>
+<tr>
+<td>Categorical cross-entropy</td>
+<td>&quot;Multi-class log loss&quot;</td>
+<td>The extension of binary cross-entropy to k classes using one-hot encoded labels</td>
+</tr>
+</tbody></table>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="02-linear-regression.html">
+  <span class="label">← Previous</span>
+  <b>Linear Regression</b>
+</a>
+      <a class="pager__item pager__item--next" href="04-decision-trees.html">
+  <span class="label">Next →</span>
+  <b>Decision Trees and Random Forests</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>6 minutes</b> of ML Fundamentals behind you.</p>
+      <a class="btn btn--solid" href="04-decision-trees.html">Continue to Decision Trees and Random Forests →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#why-linear-regression-fails-for-classification">Why Linear Regression Fails for Classification</a></li><li class="mini__item mini__item--d3"><a href="#the-sigmoid-function">The Sigmoid Function</a></li><li class="mini__item mini__item--d3"><a href="#logistic-regression-linear-model-sigmoid">Logistic Regression = Linear Model + Sigmoid</a></li><li class="mini__item mini__item--d3"><a href="#binary-cross-entropy-loss">Binary Cross-Entropy Loss</a></li><li class="mini__item mini__item--d3"><a href="#gradient-descent-for-logistic-regression">Gradient Descent for Logistic Regression</a></li><li class="mini__item mini__item--d3"><a href="#the-decision-boundary">The Decision Boundary</a></li><li class="mini__item mini__item--d3"><a href="#multi-class-classification-with-softmax">Multi-Class Classification with Softmax</a></li><li class="mini__item mini__item--d3"><a href="#evaluation-metrics">Evaluation Metrics</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-sigmoid-function-and-data-generation">Step 1: Sigmoid function and data generation</a></li><li class="mini__item mini__item--d3"><a href="#step-2-logistic-regression-from-scratch">Step 2: Logistic regression from scratch</a></li><li class="mini__item mini__item--d3"><a href="#step-3-confusion-matrix-and-metrics-from-scratch">Step 3: Confusion matrix and metrics from scratch</a></li><li class="mini__item mini__item--d3"><a href="#step-4-decision-boundary-analysis">Step 4: Decision boundary analysis</a></li><li class="mini__item mini__item--d3"><a href="#step-5-multi-class-with-softmax">Step 5: Multi-class with softmax</a></li><li class="mini__item mini__item--d3"><a href="#step-6-threshold-tuning">Step 6: Threshold tuning</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

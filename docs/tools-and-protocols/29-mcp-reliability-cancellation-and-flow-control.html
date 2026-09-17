@@ -1,0 +1,796 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MCP Reliability, Cancellation, and Flow Control — Tools &amp; Protocols — AIFS</title>
+<meta name="description" content="Tools &amp; Protocols: MCP Reliability, Cancellation, and Flow Control. 12 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="MCP Reliability, Cancellation, and Flow Control — Tools &amp; Protocols — AIFS">
+<meta property="og:description" content="Tools &amp; Protocols: MCP Reliability, Cancellation, and Flow Control. 12 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"mcp-reliability-race":["../assets/figures/figures-mcp.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-mcp.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#C6FF00" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#C6FF00;--accent-ink:#111111"
+  data-lesson-id="tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control" data-module="tools-and-protocols"
+  data-prev="28-mcp-tool-contracts-and-content.html" data-next="30-mcp-registry-supply-chain-and-drift.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#C6FF00">
+        <span class="label">Phase 13</span>
+        <b>Tools &amp; Protocols</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="tools-and-protocols/01-the-tool-interface"><a href="01-the-tool-interface.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">The Tool Interface — Why Agents Need Structured I/O</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/02-function-calling-deep-dive"><a href="02-function-calling-deep-dive.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Function Calling Deep Dive — OpenAI, Anthropic, Gemini</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/03-parallel-and-streaming-tool-calls"><a href="03-parallel-and-streaming-tool-calls.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Parallel Tool Calls and Streaming with Tools</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/04-structured-output"><a href="04-structured-output.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Structured Output — JSON Schema, Pydantic, Zod, Constrained Decoding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/05-tool-schema-design"><a href="05-tool-schema-design.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Tool Schema Design — Naming, Descriptions, Parameter Constraints</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/06-mcp-fundamentals"><a href="06-mcp-fundamentals.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">MCP Fundamentals: Stateless Requests and JSON-RPC</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/07-building-an-mcp-server"><a href="07-building-an-mcp-server.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Building an MCP Server: Stateless Python and TypeScript</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/08-building-an-mcp-client"><a href="08-building-an-mcp-client.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Building an MCP Client: Discovery, Routing, and Dual-Era Fallback</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/09-mcp-transports"><a href="09-mcp-transports.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">MCP Transports: stdio and Stateless Streamable HTTP</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/10-mcp-resources-and-prompts"><a href="10-mcp-resources-and-prompts.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">MCP Resources and Prompts: Addressable Context for Stateless Servers</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/11-mcp-sampling"><a href="11-mcp-sampling.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">MCP Model Input: Sampling Migration and Stateless MRTR</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/12-mcp-roots-and-elicitation"><a href="12-mcp-roots-and-elicitation.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Explicit Scope and Stateless Elicitation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/13-mcp-async-tasks"><a href="13-mcp-async-tasks.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">MCP Tasks Extension: Durable Work on a Stateless Core</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/14-mcp-apps"><a href="14-mcp-apps.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">MCP Apps on the Stateless Protocol</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/15-mcp-security-tool-poisoning"><a href="15-mcp-security-tool-poisoning.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">MCP Security: Poisoned Metadata, Routing, and MRTR State</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/16-mcp-security-oauth-2-1"><a href="16-mcp-security-oauth-2-1.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">MCP Authorization: CIMD, Issuer Binding, PKCE, and Step-Up</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/17-mcp-gateways-and-registries"><a href="17-mcp-gateways-and-registries.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Stateless MCP Gateways and Registry Admission</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/18-mcp-auth-production"><a href="18-mcp-auth-production.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">MCP Auth in Production: Issuer-Bound Enrollment and Tokens</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/19-a2a-protocol"><a href="19-a2a-protocol.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">A2A — Agent-to-Agent Protocol</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/20-opentelemetry-genai"><a href="20-opentelemetry-genai.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">OpenTelemetry GenAI — Tracing Tool Calls End-to-End</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/21-llm-routing-layer"><a href="21-llm-routing-layer.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">LLM Routing Layer — LiteLLM, OpenRouter, Portkey</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/22-skills-and-agent-sdks"><a href="22-skills-and-agent-sdks.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Agent Skills: Portable Contract and Runtime Boundary</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/23-capstone-tool-ecosystem"><a href="23-capstone-tool-ecosystem.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Capstone: Stateless Tool Ecosystem</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/24-skill-discovery-and-progressive-disclosure"><a href="24-skill-discovery-and-progressive-disclosure.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Skill Discovery and Progressive Disclosure</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/25-skill-invocation-and-routing"><a href="25-skill-invocation-and-routing.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Skill Invocation and Routing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/26-skill-permissions-sandboxes-and-trust"><a href="26-skill-permissions-sandboxes-and-trust.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Skill Permissions, Sandboxes, and Trust</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/27-skill-evals-packaging-and-portability"><a href="27-skill-evals-packaging-and-portability.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">Skill Evals, Packaging, and Portability</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/28-mcp-tool-contracts-and-content"><a href="28-mcp-tool-contracts-and-content.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">MCP Tool Contracts and Content</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control"><a href="29-mcp-reliability-cancellation-and-flow-control.html" class="is-current">
+  <span class="snav__n">29</span>
+  <span class="snav__t">MCP Reliability, Cancellation, and Flow Control</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/30-mcp-registry-supply-chain-and-drift"><a href="30-mcp-registry-supply-chain-and-drift.html" class="">
+  <span class="snav__n">30</span>
+  <span class="snav__t">MCP Registry Supply Chain: Admission, Drift, and Rollback</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="tools-and-protocols/31-mcp-conformance-versioning-and-operations"><a href="31-mcp-conformance-versioning-and-operations.html" class="">
+  <span class="snav__n">31</span>
+  <span class="snav__t">MCP Conformance Engineering: Versioning, Evidence, and Operations</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Tools &amp; Protocols</a></p>
+      <h1 class="page__title">MCP Reliability, Cancellation, and Flow Control</h1>
+      <p class="page__lede">A request ID correlates a message. It does not make a side effect safe, stop a worker, or protect a stream from a slow consumer.</p>
+      <div class="page__meta">
+        <span class="chip">12 min read</span>
+        <span class="chip">2,594 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 13, Lessons 09 and 13</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~120 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Implement the correct cancellation signal for stdio and Streamable HTTP.</li>
+<li>Resolve completion and cancellation races without sending messages after cancellation.</li>
+<li>Separate request cancellation from durable <code class="inline-code">tasks/cancel</code> semantics.</li>
+<li>Build retry decisions from side effects and explicit idempotency keys.</li>
+<li>Bound progress queues while preserving final responses.</li>
+<li>Recover streams through reconnect, refetch, and jittered backoff.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>The happy path hides the most expensive distributed-systems bugs.</p>
+<p>A client calls a tool. The server starts work. Progress arrives. A proxy buffers the stream. The client reaches its timeout and disconnects. The server finishes one millisecond later. The client retries with a new JSON-RPC id. The mutation runs twice.</p>
+<p>Every component behaved locally. The system failed globally.</p>
+<p>MCP defines message and transport behavior, but your application still owns:</p>
+<ul>
+<li>time budgets;</li>
+<li>business idempotency;</li>
+<li>bounded queues;</li>
+<li>retry classification;</li>
+<li>durable task state;</li>
+<li>reconnect and refetch policy.</li>
+</ul>
+<p>This lesson builds those decisions into a deterministic simulator. There are
+no sleeps, sockets, or random failures. You control cancellation event order
+directly. One synchronized thread test forces two ledger clients to compete
+for the same idempotency key.</p>
+<h2 id="request-cancellation-is-transport-specific" class="prose-h prose-h2"><a class="prose-h__anchor" href="#request-cancellation-is-transport-specific" aria-label="Link to this section">#</a>Request Cancellation Is Transport-Specific</h2>
+<p>The intent is the same on every transport: the client no longer needs an in-flight result. The wire signal is different.</p>
+<h3 id="stdio" class="prose-h prose-h3"><a class="prose-h__anchor" href="#stdio" aria-label="Link to this section">#</a>stdio</h3>
+<p>stdio uses one shared bidirectional channel. A client sends a notification:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"jsonrpc"</span><span class="token operator">:</span> <span class="token string">"2.0"</span><span class="token punctuation">,</span>
+  <span class="token property">"method"</span><span class="token operator">:</span> <span class="token string">"notifications/cancelled"</span><span class="token punctuation">,</span>
+  <span class="token property">"params"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"requestId"</span><span class="token operator">:</span> <span class="token number">41</span><span class="token punctuation">,</span>
+    <span class="token property">"reason"</span><span class="token operator">:</span> <span class="token string">"User closed the operation"</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<p>The notification is fire-and-forget. The server emits no JSON-RPC response to it.</p>
+<p>The server should stop work, free resources, and avoid sending a response for the cancelled request. It may ignore cancellation when the request is unknown, already finished, or cannot be stopped safely.</p>
+<p>Malformed, unknown, and already completed cancellation notifications are ignored. Turning those races into new errors would create more races.</p>
+<h3 id="streamable-http" class="prose-h prose-h3"><a class="prose-h__anchor" href="#streamable-http" aria-label="Link to this section">#</a>Streamable HTTP</h3>
+<p>Modern Streamable HTTP gives each request its own HTTP response or SSE response stream. The client cancels by closing that request&#39;s response stream.</p>
+<p>Do not POST <code class="inline-code">notifications/cancelled</code> for an ordinary HTTP request. Stream closure is the cancellation signal.</p>
+<p>Once the server observes the disconnect, it should stop work and must not send more messages for that request.</p>
+<h3 id="server-sent-cancellation-is-narrow" class="prose-h prose-h3"><a class="prose-h__anchor" href="#server-sent-cancellation-is-narrow" aria-label="Link to this section">#</a>Server-sent cancellation is narrow</h3>
+<p>A server does not use <code class="inline-code">notifications/cancelled</code> to cancel arbitrary client calls. On stdio, server-sent cancellation is reserved for terminating a <code class="inline-code">subscriptions/listen</code> request. Keep that path separate from ordinary client-request cancellation.</p>
+<h2 id="cancellation-is-a-race" class="prose-h prose-h2"><a class="prose-h__anchor" href="#cancellation-is-a-race" aria-label="Link to this section">#</a>Cancellation Is a Race</h2>
+<p>Two event orders are both valid.</p>
+<h3 id="cancellation-wins" class="prose-h prose-h3"><a class="prose-h__anchor" href="#cancellation-wins" aria-label="Link to this section">#</a>Cancellation wins</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>request starts
+client sends cancellation signal
+server marks request cancelled
+worker reaches completion
+server suppresses the response</code></pre>
+</figure>
+<h3 id="completion-wins" class="prose-h prose-h3"><a class="prose-h__anchor" href="#completion-wins" aria-label="Link to this section">#</a>Completion wins</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>request starts
+worker commits the result
+server sends the response
+cancellation arrives late
+server ignores the late notification</code></pre>
+</figure>
+<p>The client must also ignore a late response for a request it already abandoned. Network latency means neither side can prove which event the other side observed first.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="mcp-reliability-race"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">mcp-reliability-race</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> mcp reliability race</figcaption>
+</figure>
+<p>The lesson&#39;s <code class="inline-code">RequestCoordinator</code> stores one terminal state. <code class="inline-code">complete()</code> returns no response after cancellation. A late cancellation cannot change a completed record.</p>
+<h2 id="timeouts-need-two-clocks" class="prose-h prose-h2"><a class="prose-h__anchor" href="#timeouts-need-two-clocks" aria-label="Link to this section">#</a>Timeouts Need Two Clocks</h2>
+<p>A single inactivity timer is not enough.</p>
+<p>Use two limits:</p>
+<ol>
+<li><strong>Idle timeout.</strong> How long the request may produce no useful activity.</li>
+<li><strong>Maximum timeout.</strong> The absolute wall-clock budget from request start.</li>
+</ol>
+<p>Progress may reset the idle clock. It must never remove the maximum deadline.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>start: 0 ms
+progress: 400 ms
+progress: 800 ms
+progress: 1200 ms
+idle timeout: 500 ms
+maximum timeout: 2000 ms</code></pre>
+</figure>
+<p>At 1500 ms, the request is still active because the latest progress is only 300 ms old. At 2000 ms, the maximum deadline cancels it even if another progress event arrived at 1999 ms.</p>
+<p>Progress is optional. A server can accept a progress token and emit no updates. Never turn the presence of a token into an infinite timeout.</p>
+<p>MCP progress values must increase. Notifications stop after completion or cancellation. Rate-limit progress so a fast worker cannot flood the transport.</p>
+<h2 id="request-cancellation-is-not-tasks-cancel" class="prose-h prose-h2"><a class="prose-h__anchor" href="#request-cancellation-is-not-tasks-cancel" aria-label="Link to this section">#</a>Request Cancellation Is Not <code class="inline-code">tasks/cancel</code></h2>
+<p>These mechanisms solve different lifetimes.</p>
+<table>
+<thead>
+<tr>
+<th>Mechanism</th>
+<th>Target</th>
+<th>Signal</th>
+<th>What success means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Request cancellation on stdio</td>
+<td>One in-flight RPC</td>
+<td><code class="inline-code">notifications/cancelled</code></td>
+<td>Client abandoned the request; server should stop if practical</td>
+</tr>
+<tr>
+<td>Request cancellation on HTTP</td>
+<td>One in-flight response stream</td>
+<td>Close the stream</td>
+<td>Client abandoned the request; server should stop if practical</td>
+</tr>
+<tr>
+<td><code class="inline-code">tasks/cancel</code></td>
+<td>One durable Task</td>
+<td>Ordinary MCP request</td>
+<td>Server acknowledged cancellation intent</td>
+</tr>
+</tbody></table>
+<p>A successful <code class="inline-code">tasks/cancel</code> result does not prove the worker stopped. The task may remain <code class="inline-code">working</code> until a worker checkpoint observes the flag. Work may complete before that checkpoint.</p>
+<p>Do not erase durable task state when the HTTP connection closes. The reason to create a Task is that its lifecycle outlives one request and one connection.</p>
+<h2 id="a-new-json-rpc-id-is-not-idempotency" class="prose-h prose-h2"><a class="prose-h__anchor" href="#a-new-json-rpc-id-is-not-idempotency" aria-label="Link to this section">#</a>A New JSON-RPC ID Is Not Idempotency</h2>
+<p>JSON-RPC ids correlate requests and responses. They do not identify a business operation.</p>
+<p>Suppose a client submits a charge with id <code class="inline-code">41</code>, loses the response, and retries with id <code class="inline-code">42</code>. The server sees two different messages. Without an application key, it cannot know they represent one checkout.</p>
+<p>An idempotency key identifies the business intent:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">json</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"charge_account"</span><span class="token punctuation">,</span>
+  <span class="token property">"arguments"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"account"</span><span class="token operator">:</span> <span class="token string">"acct-7"</span><span class="token punctuation">,</span>
+    <span class="token property">"cents"</span><span class="token operator">:</span> <span class="token number">1200</span><span class="token punctuation">,</span>
+    <span class="token property">"idempotencyKey"</span><span class="token operator">:</span> <span class="token string">"checkout-7"</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+</figure>
+<p>The server stores:</p>
+<ul>
+<li>the key;</li>
+<li>a fingerprint of operation arguments;</li>
+<li>the committed result.</li>
+</ul>
+<p>The same key and same arguments return the stored result. The same key with different arguments is rejected. This prevents accidental key reuse from mutating a different business operation.</p>
+<h3 id="the-ledger-boundary-must-be-atomic-and-durable" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-ledger-boundary-must-be-atomic-and-durable" aria-label="Link to this section">#</a>The ledger boundary must be atomic and durable</h3>
+<p>This sequence is unsafe:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>check key
+run mutation
+store result</code></pre>
+</figure>
+<p>Two workers can both observe a missing key and both run the mutation. A crash
+after the effect but before the store creates the same ambiguity on retry.</p>
+<p>The lesson uses a file-backed SQLite ledger. <code class="inline-code">BEGIN IMMEDIATE</code> serializes the
+key check, simulated business effect, execution counter, and stored result into
+one transaction. Two independent ledger connections racing with the same key
+therefore observe one committed result and one execution. Closing and reopening
+the ledger keeps that record.</p>
+<p>Every return value is reconstructed from stored JSON. The caller never receives
+the mutable object held by the ledger, so changing a returned dictionary cannot
+corrupt later replay results.</p>
+<p>The simulator&#39;s business effect is the receipt and execution counter inside the
+same SQLite transaction. A real payment, deployment, or external API call is
+not made atomic merely by writing a local table. Production needs a durable
+shared database transaction, a transactional outbox, or an upstream provider
+that enforces the same idempotency key. A process lock alone does not protect
+multiple replicas or survive a restart.</p>
+<h3 id="retry-matrix" class="prose-h prose-h3"><a class="prose-h__anchor" href="#retry-matrix" aria-label="Link to this section">#</a>Retry matrix</h3>
+<p>Classify retries before implementing them.</p>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Example</th>
+<th>Retry rule</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Safe</td>
+<td>Deterministic read with no side effect</td>
+<td>Retry with a new JSON-RPC id after the failure boundary is understood</td>
+</tr>
+<tr>
+<td>Conditional</td>
+<td>Mutation with a durable idempotency key</td>
+<td>Retry with the same key and identical arguments</td>
+</tr>
+<tr>
+<td>Unsafe</td>
+<td>Mutation without business deduplication</td>
+<td>Do not retry automatically; reconcile first</td>
+</tr>
+</tbody></table>
+<p>Tool annotations such as <code class="inline-code">readOnlyHint</code> and <code class="inline-code">idempotentHint</code> remain untrusted hints. The application contract and server implementation decide retry safety.</p>
+<h2 id="backpressure-is-part-of-correctness" class="prose-h prose-h2"><a class="prose-h__anchor" href="#backpressure-is-part-of-correctness" aria-label="Link to this section">#</a>Backpressure Is Part of Correctness</h2>
+<p>An SSE producer can generate progress faster than a client, proxy, or network can consume it. An unbounded queue converts slowness into memory exhaustion.</p>
+<p>Use a bounded queue and define what can be lost.</p>
+<p>Progress is replaceable. A later progress value supersedes an earlier one for the same token. A final JSON-RPC response is not replaceable.</p>
+<p>The lesson buffer applies this policy:</p>
+<ol>
+<li>Coalesce adjacent progress for the same token.</li>
+<li>Drop the oldest progress when capacity is reached.</li>
+<li>Mark the stream as needing authoritative refetch.</li>
+<li>Preserve the final response.</li>
+<li>Refuse a state where preserving the final response would require dropping another final response.</li>
+</ol>
+<p>This is bounded loss with explicit recovery. Silent loss is not a strategy.</p>
+<h3 id="proxy-buffering" class="prose-h prose-h3"><a class="prose-h__anchor" href="#proxy-buffering" aria-label="Link to this section">#</a>Proxy buffering</h3>
+<p>A server can stream correctly while a reverse proxy holds events in a buffer.</p>
+<p>For an SSE response, send:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">http</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-http"><span class="token header"><span class="token header-name keyword">Content-Type</span><span class="token punctuation">:</span> <span class="token header-value">text/event-stream</span></span>
+<span class="token header"><span class="token header-name keyword">Cache-Control</span><span class="token punctuation">:</span> <span class="token header-value">no-cache</span></span>
+<span class="token header"><span class="token header-name keyword">X-Accel-Buffering</span><span class="token punctuation">:</span> <span class="token header-value">no</span></span></code></pre>
+</figure>
+<p>The 2026 Streamable HTTP specification recommends <code class="inline-code">X-Accel-Buffering: no</code> so compatible proxies deliver events immediately.</p>
+<p>For quiet long-lived streams, periodically emit an SSE comment:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>:</code></pre>
+</figure>
+<p>The client ignores comment lines. Intermediaries see traffic and are less likely to close an idle connection.</p>
+<p>Keepalive is not progress. Do not reset an operation&#39;s semantic idle timeout merely because a transport comment arrived.</p>
+<h2 id="reconnect-means-refetch" class="prose-h prose-h2"><a class="prose-h__anchor" href="#reconnect-means-refetch" aria-label="Link to this section">#</a>Reconnect Means Refetch</h2>
+<p>Modern Streamable HTTP does not support resumable SSE through <code class="inline-code">Last-Event-ID</code>.</p>
+<p>After a <code class="inline-code">subscriptions/listen</code> stream drops:</p>
+<ol>
+<li>Open a new listen request with a new JSON-RPC id.</li>
+<li>Restore the desired subscription filter.</li>
+<li>Refetch affected tools, resources, prompts, or Tasks from authoritative methods.</li>
+<li>Deduplicate application state by stable identifiers.</li>
+<li>Do not replay an unsafe mutation just because its response was lost.</li>
+</ol>
+<p>The sample recovery plan explicitly sets <code class="inline-code">sendLastEventId</code> to false and lists resources to refetch.</p>
+<h3 id="prevent-a-reconnect-herd" class="prose-h prose-h3"><a class="prose-h__anchor" href="#prevent-a-reconnect-herd" aria-label="Link to this section">#</a>Prevent a reconnect herd</h3>
+<p>If 10,000 clients reconnect at exactly one second, the recovering server fails again.</p>
+<p>Use exponential backoff with jitter and a cap. The lesson computes deterministic jitter from client id and attempt number so tests remain reproducible:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>attempt 0: up to 250 ms
+attempt 1: up to 500 ms
+attempt 2: up to 1000 ms
+...
+cap: 8000 ms</code></pre>
+</figure>
+<p>Production can use cryptographically secure or runtime randomness. The invariant is distribution, not a specific formula.</p>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<p><code class="inline-code">code/main.py</code> builds five small reliability components.</p>
+<h3 id="requestcoordinator" class="prose-h prose-h3"><a class="prose-h__anchor" href="#requestcoordinator" aria-label="Link to this section">#</a><code class="inline-code">RequestCoordinator</code></h3>
+<ul>
+<li>starts an in-flight request with idle and maximum deadlines;</li>
+<li>emits monotonic progress notifications;</li>
+<li>produces the correct stdio or HTTP cancellation signal;</li>
+<li>ignores invalid cancellation notifications;</li>
+<li>makes cancellation and completion terminal races explicit;</li>
+<li>reserves server-sent cancellation for stdio subscriptions.</li>
+</ul>
+<h3 id="mutationledger" class="prose-h prose-h3"><a class="prose-h__anchor" href="#mutationledger" aria-label="Link to this section">#</a><code class="inline-code">MutationLedger</code></h3>
+<ul>
+<li>proves that two JSON-RPC ids execute twice without a business key;</li>
+<li>uses a file-backed SQLite transaction for the key check, simulated effect,
+execution counter, and result commit;</li>
+<li>deduplicates matching arguments under one idempotency key across independent
+ledger connections;</li>
+<li>rejects one key reused with different arguments;</li>
+<li>returns defensive copies and preserves committed records across reopen.</li>
+</ul>
+<h3 id="durabletaskservice" class="prose-h prose-h3"><a class="prose-h__anchor" href="#durabletaskservice" aria-label="Link to this section">#</a><code class="inline-code">DurableTaskService</code></h3>
+<ul>
+<li>acknowledges a cancellation request;</li>
+<li>keeps the task <code class="inline-code">working</code> until a worker checkpoint;</li>
+<li>demonstrates why acknowledgement is not final status.</li>
+</ul>
+<h3 id="boundedssebuffer" class="prose-h prose-h3"><a class="prose-h__anchor" href="#boundedssebuffer" aria-label="Link to this section">#</a><code class="inline-code">BoundedSseBuffer</code></h3>
+<ul>
+<li>coalesces or drops progress under pressure;</li>
+<li>records that authoritative refetch is required;</li>
+<li>never drops the final response.</li>
+</ul>
+<h3 id="recovery-helpers" class="prose-h prose-h3"><a class="prose-h__anchor" href="#recovery-helpers" aria-label="Link to this section">#</a>Recovery helpers</h3>
+<ul>
+<li>return proxy-safe SSE headers and keepalive comments;</li>
+<li>create a reconnect and refetch plan;</li>
+<li>spread retries with deterministic exponential backoff and jitter.</li>
+</ul>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>From the repository root:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">bash</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-bash"><span class="token builtin class-name">cd</span> phases/13-tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control/code
+python3 main.py
+python3 <span class="token parameter variable">-m</span> unittest discover tests <span class="token parameter variable">-v</span></code></pre>
+</figure>
+<p>The demo runs both sides of the central race, executes a transactionally
+deduplicated mutation in a temporary file-backed ledger, overloads a bounded
+progress buffer, and shows a durable Task moving from acknowledged cancellation
+to worker-observed cancellation.</p>
+<h2 id="interactive-lab" class="prose-h prose-h2"><a class="prose-h__anchor" href="#interactive-lab" aria-label="Link to this section">#</a>Interactive Lab</h2>
+<p>Run four event orderings without adding sleeps.</p>
+<ol>
+<li>Start request <code class="inline-code">A</code>, cancel it, then call <code class="inline-code">complete()</code>.</li>
+<li>Start request <code class="inline-code">B</code>, complete it, then deliver cancellation.</li>
+<li>Start request <code class="inline-code">C</code>, emit progress before every idle deadline, then cross the maximum deadline.</li>
+<li>Start request <code class="inline-code">D</code> over Streamable HTTP and close its response stream.</li>
+</ol>
+<p>Record for each scenario:</p>
+<ul>
+<li>the terminal request state;</li>
+<li>whether a final response exists;</li>
+<li>the cancellation signal placed on the wire;</li>
+<li>which event the client should ignore.</li>
+</ul>
+<p>Then change <code class="inline-code">D</code> to stdio. The operation is identical, but the cancellation signal must change.</p>
+<h2 id="practice-lab" class="prose-h prose-h2"><a class="prose-h__anchor" href="#practice-lab" aria-label="Link to this section">#</a>Practice Lab</h2>
+<p>Add a <code class="inline-code">reserve_inventory</code> mutation to <code class="inline-code">MutationLedger</code>.</p>
+<p>Requirements:</p>
+<ol>
+<li>The key binds SKU, quantity, tenant, and operation name.</li>
+<li>A retry with the same key and same arguments returns the first reservation.</li>
+<li>A retry with changed quantity fails without another reservation.</li>
+<li>An execution that committed but lost its response can be reconciled by key.</li>
+<li>The result records no secret or payment data.</li>
+<li>Automatic retry is disabled when the client did not provide a key.</li>
+<li>Add a simulated subscription drop and refetch the inventory record before deciding what to do next.</li>
+<li>Start two ledger connections at a barrier and submit the same key
+concurrently. Assert one reservation was committed.</li>
+<li>Mutate the first returned reservation object. Replay the key and prove the
+stored result did not change.</li>
+<li>Close and reopen the ledger file, then reconcile the reservation by key.</li>
+</ol>
+<p>Keep the lab honest: if inventory lives in another service, explain whether
+that service accepts the same idempotency key or whether a transactional outbox
+bridges the local commit to the remote effect.</p>
+<h2 id="shipped-artifact" class="prose-h prose-h2"><a class="prose-h__anchor" href="#shipped-artifact" aria-label="Link to this section">#</a>Shipped Artifact</h2>
+<p><code class="inline-code">outputs/skill-mcp-reliability-reviewer.md</code> is a flat reliability review skill. Give it an MCP operation, transport, timeout policy, retry behavior, queue policy, and recovery plan. It returns a race table, retry classification, idempotency boundary, flow-control checks, and failure fixtures.</p>
+<h2 id="verify-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#verify-it" aria-label="Link to this section">#</a>Verify It</h2>
+<p>The lesson is complete when these statements are true:</p>
+<ul>
+<li>stdio cancellation sends <code class="inline-code">notifications/cancelled</code> and receives no response.</li>
+<li>Streamable HTTP cancellation closes the request stream and sends no cancellation POST.</li>
+<li>Cancel-before-complete suppresses the final response.</li>
+<li>Complete-before-cancel preserves the response and ignores the late cancellation.</li>
+<li>Progress can reset idle timeout but never maximum timeout.</li>
+<li>A new JSON-RPC id alone executes the mutation again.</li>
+<li>One idempotency key and identical arguments execute once under a concurrent
+two-connection race.</li>
+<li>A committed record survives reopen and replay returns a defensive copy.</li>
+<li>Mutating one returned result cannot alter the stored result.</li>
+<li>The bounded buffer stays within capacity and preserves the final response.</li>
+<li>Reconnect uses a new request, does not send <code class="inline-code">Last-Event-ID</code>, and refetches affected state.</li>
+<li><code class="inline-code">tasks/cancel</code> acknowledgement leaves the task non-terminal until the worker observes it.</li>
+</ul>
+<h2 id="production-failure-modes" class="prose-h prose-h2"><a class="prose-h__anchor" href="#production-failure-modes" aria-label="Link to this section">#</a>Production Failure Modes</h2>
+<table>
+<thead>
+<tr>
+<th>Failure</th>
+<th>Observable symptom</th>
+<th>Correct response</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>HTTP client POSTs cancellation notification</td>
+<td>Server and client disagree about request lifetime</td>
+<td>Close the request&#39;s SSE response stream</td>
+</tr>
+<tr>
+<td>Server responds after accepted cancellation</td>
+<td>Client receives an unusable late result</td>
+<td>Stop work and suppress further messages when cancellation wins</td>
+</tr>
+<tr>
+<td>Progress resets every deadline</td>
+<td>Hung work survives forever</td>
+<td>Keep a separate absolute maximum timeout</td>
+</tr>
+<tr>
+<td>New RPC id treated as deduplication</td>
+<td>Charge, deployment, or deletion runs twice</td>
+<td>Add a durable application idempotency key</td>
+</tr>
+<tr>
+<td>Key check and effect are separate</td>
+<td>Concurrent workers both observe a missing key</td>
+<td>Commit key claim, effect record, and result atomically</td>
+</tr>
+<tr>
+<td>In-memory ledger used across replicas</td>
+<td>Restart or another worker forgets prior commits</td>
+<td>Use shared durable storage or upstream idempotency</td>
+</tr>
+<tr>
+<td>Stored mutable result returned directly</td>
+<td>Caller mutation corrupts later replays</td>
+<td>Serialize committed results and return defensive copies</td>
+</tr>
+<tr>
+<td>Key reused with changed arguments</td>
+<td>One key aliases two business intents</td>
+<td>Store and compare an argument fingerprint</td>
+</tr>
+<tr>
+<td>Unbounded progress queue</td>
+<td>Memory rises with a slow consumer</td>
+<td>Coalesce and drop replaceable progress within a bound</td>
+</tr>
+<tr>
+<td>Final response dropped under pressure</td>
+<td>Client cannot know the request outcome</td>
+<td>Reserve capacity or evict progress, never the final response</td>
+</tr>
+<tr>
+<td>Proxy buffers SSE</td>
+<td>Progress arrives in bursts or after timeout</td>
+<td>Disable buffering and configure compatible proxy timeouts</td>
+</tr>
+<tr>
+<td><code class="inline-code">Last-Event-ID</code> assumed</td>
+<td>Client resumes from state the server does not support</td>
+<td>Reconnect with a new request and refetch</td>
+</tr>
+<tr>
+<td>Every client reconnects immediately</td>
+<td>Recovery creates another outage</td>
+<td>Use capped exponential backoff with jitter</td>
+</tr>
+<tr>
+<td>Task ack treated as final cancellation</td>
+<td>Worker keeps running after UI says stopped</td>
+<td>Poll the Task until a terminal status</td>
+</tr>
+</tbody></table>
+<h2 id="capstone-connection" class="prose-h prose-h2"><a class="prose-h__anchor" href="#capstone-connection" aria-label="Link to this section">#</a>Capstone Connection</h2>
+<p>The tool-ecosystem capstone should treat reliability as executable evidence, not a paragraph in an architecture diagram.</p>
+<p>Require these artifacts:</p>
+<ul>
+<li>one cancellation race transcript for each transport;</li>
+<li>a retry table for every exposed mutation;</li>
+<li>an idempotency-key record and mismatch fixture;</li>
+<li>a concurrent same-key transcript, a reopen check, and a mutation-alias check;</li>
+<li>a bounded-buffer overload result;</li>
+<li>reverse-proxy SSE headers and idle policy;</li>
+<li>a reconnect plan that names authoritative refetch methods;</li>
+<li>a durable Task cancellation trace when the capstone uses Tasks.</li>
+</ul>
+<p>A green request in a local process proves only the happy path. The capstone is production-ready when lost responses, late cancellation, slow consumers, and reconnect herds have deterministic outcomes.</p>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Request cancellation</td>
+<td>Abandonment of one in-flight MCP request</td>
+</tr>
+<tr>
+<td>Cancellation race</td>
+<td>Competition between terminal completion and cancellation events</td>
+</tr>
+<tr>
+<td>Idle timeout</td>
+<td>Limit since the last useful request activity</td>
+</tr>
+<tr>
+<td>Maximum timeout</td>
+<td>Absolute limit from request start, unaffected by progress</td>
+</tr>
+<tr>
+<td>Idempotency key</td>
+<td>Application identifier that deduplicates one business intent</td>
+</tr>
+<tr>
+<td>Atomic ledger</td>
+<td>Durable boundary that commits the key claim, effect record, and result as one unit</td>
+</tr>
+<tr>
+<td>Backpressure</td>
+<td>Control applied when producers outpace consumers</td>
+</tr>
+<tr>
+<td>Progress coalescing</td>
+<td>Replacing older progress with a newer authoritative value</td>
+</tr>
+<tr>
+<td>Refetch</td>
+<td>Reading current state again after a stream gap</td>
+</tr>
+<tr>
+<td>Jitter</td>
+<td>Deliberate variation that spreads retries across time</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/cancellation" target="_blank" rel="noopener">MCP Cancellation</a></li>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/progress" target="_blank" rel="noopener">MCP Progress</a></li>
+<li><a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http" target="_blank" rel="noopener">MCP Streamable HTTP</a></li>
+<li><a href="https://tasks.extensions.modelcontextprotocol.io/specification/draft/tasks" target="_blank" rel="noopener">MCP Tasks Extension</a></li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="28-mcp-tool-contracts-and-content.html">
+  <span class="label">← Previous</span>
+  <b>MCP Tool Contracts and Content</b>
+</a>
+      <a class="pager__item pager__item--next" href="30-mcp-registry-supply-chain-and-drift.html">
+  <span class="label">Next →</span>
+  <b>MCP Registry Supply Chain: Admission, Drift, and Rollback</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>12 minutes</b> of Tools &amp; Protocols behind you.</p>
+      <a class="btn btn--solid" href="30-mcp-registry-supply-chain-and-drift.html">Continue to MCP Registry Supply Chain: Admission, Drift, and Rollback →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#request-cancellation-is-transport-specific">Request Cancellation Is Transport-Specific</a></li><li class="mini__item mini__item--d3"><a href="#stdio">stdio</a></li><li class="mini__item mini__item--d3"><a href="#streamable-http">Streamable HTTP</a></li><li class="mini__item mini__item--d3"><a href="#server-sent-cancellation-is-narrow">Server-sent cancellation is narrow</a></li><li class="mini__item mini__item--d2"><a href="#cancellation-is-a-race">Cancellation Is a Race</a></li><li class="mini__item mini__item--d3"><a href="#cancellation-wins">Cancellation wins</a></li><li class="mini__item mini__item--d3"><a href="#completion-wins">Completion wins</a></li><li class="mini__item mini__item--d2"><a href="#timeouts-need-two-clocks">Timeouts Need Two Clocks</a></li><li class="mini__item mini__item--d2"><a href="#request-cancellation-is-not-tasks-cancel">Request Cancellation Is Not tasks/cancel</a></li><li class="mini__item mini__item--d2"><a href="#a-new-json-rpc-id-is-not-idempotency">A New JSON-RPC ID Is Not Idempotency</a></li><li class="mini__item mini__item--d3"><a href="#the-ledger-boundary-must-be-atomic-and-durable">The ledger boundary must be atomic and durable</a></li><li class="mini__item mini__item--d3"><a href="#retry-matrix">Retry matrix</a></li><li class="mini__item mini__item--d2"><a href="#backpressure-is-part-of-correctness">Backpressure Is Part of Correctness</a></li><li class="mini__item mini__item--d3"><a href="#proxy-buffering">Proxy buffering</a></li><li class="mini__item mini__item--d2"><a href="#reconnect-means-refetch">Reconnect Means Refetch</a></li><li class="mini__item mini__item--d3"><a href="#prevent-a-reconnect-herd">Prevent a reconnect herd</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#requestcoordinator">RequestCoordinator</a></li><li class="mini__item mini__item--d3"><a href="#mutationledger">MutationLedger</a></li><li class="mini__item mini__item--d3"><a href="#durabletaskservice">DurableTaskService</a></li><li class="mini__item mini__item--d3"><a href="#boundedssebuffer">BoundedSseBuffer</a></li><li class="mini__item mini__item--d3"><a href="#recovery-helpers">Recovery helpers</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#interactive-lab">Interactive Lab</a></li><li class="mini__item mini__item--d2"><a href="#practice-lab">Practice Lab</a></li><li class="mini__item mini__item--d2"><a href="#shipped-artifact">Shipped Artifact</a></li><li class="mini__item mini__item--d2"><a href="#verify-it">Verify It</a></li><li class="mini__item mini__item--d2"><a href="#production-failure-modes">Production Failure Modes</a></li><li class="mini__item mini__item--d2"><a href="#capstone-connection">Capstone Connection</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

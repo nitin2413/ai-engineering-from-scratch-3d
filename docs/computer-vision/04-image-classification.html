@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Image Classification — Computer Vision — AIFS</title>
+<meta name="description" content="Computer Vision: Image Classification. 7 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Image Classification — Computer Vision — AIFS">
+<meta property="og:description" content="Computer Vision: Image Classification. 7 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"receptive-field":["../assets/figures/figures-vision-speech.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-vision-speech.js"];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#FF6B1A" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#FF6B1A;--accent-ink:#111111"
+  data-lesson-id="computer-vision/04-image-classification" data-module="computer-vision"
+  data-prev="03-cnns-lenet-to-resnet.html" data-next="05-transfer-learning.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#FF6B1A">
+        <span class="label">Phase 04</span>
+        <b>Computer Vision</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="computer-vision/01-image-fundamentals"><a href="01-image-fundamentals.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Image Fundamentals — Pixels, Channels, Color Spaces</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/02-convolutions-from-scratch"><a href="02-convolutions-from-scratch.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Convolutions from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/03-cnns-lenet-to-resnet"><a href="03-cnns-lenet-to-resnet.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">CNNs — LeNet to ResNet</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/04-image-classification"><a href="04-image-classification.html" class="is-current">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Image Classification</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/05-transfer-learning"><a href="05-transfer-learning.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Transfer Learning &amp; Fine-Tuning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/06-object-detection-yolo"><a href="06-object-detection-yolo.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Object Detection — YOLO from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/07-semantic-segmentation-unet"><a href="07-semantic-segmentation-unet.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Semantic Segmentation — U-Net</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/08-instance-segmentation-mask-rcnn"><a href="08-instance-segmentation-mask-rcnn.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Instance Segmentation — Mask R-CNN</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/09-image-generation-gans"><a href="09-image-generation-gans.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Image Generation — GANs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/10-image-generation-diffusion"><a href="10-image-generation-diffusion.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Image Generation — Diffusion Models</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/11-stable-diffusion"><a href="11-stable-diffusion.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Stable Diffusion — Architecture &amp; Fine-Tuning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/12-video-understanding"><a href="12-video-understanding.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Video Understanding — Temporal Modeling</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/13-3d-vision-nerf"><a href="13-3d-vision-nerf.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">3D Vision — Point Clouds &amp; NeRFs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/14-vision-transformers"><a href="14-vision-transformers.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Vision Transformers (ViT)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/15-real-time-edge"><a href="15-real-time-edge.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Real-Time Vision — Edge Deployment</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/16-vision-pipeline-capstone"><a href="16-vision-pipeline-capstone.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Build a Complete Vision Pipeline — Capstone</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/17-self-supervised-vision"><a href="17-self-supervised-vision.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Self-Supervised Vision — SimCLR, DINO, MAE</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/18-open-vocab-clip"><a href="18-open-vocab-clip.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Open-Vocabulary Vision — CLIP</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/19-ocr-document-understanding"><a href="19-ocr-document-understanding.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">OCR &amp; Document Understanding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/20-image-retrieval-metric"><a href="20-image-retrieval-metric.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Image Retrieval &amp; Metric Learning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/21-keypoint-pose"><a href="21-keypoint-pose.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Keypoint Detection &amp; Pose Estimation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/22-3d-gaussian-splatting"><a href="22-3d-gaussian-splatting.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">3D Gaussian Splatting from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/23-diffusion-transformers-rectified-flow"><a href="23-diffusion-transformers-rectified-flow.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Diffusion Transformers &amp; Rectified Flow</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/24-sam3-open-vocab-segmentation"><a href="24-sam3-open-vocab-segmentation.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">SAM 3 &amp; Open-Vocabulary Segmentation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/25-vision-language-models"><a href="25-vision-language-models.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Vision-Language Models — The ViT-MLP-LLM Pattern</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/26-monocular-depth"><a href="26-monocular-depth.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Monocular Depth &amp; Geometry Estimation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/27-multi-object-tracking"><a href="27-multi-object-tracking.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">Multi-Object Tracking &amp; Video Memory</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="computer-vision/28-world-models-video-diffusion"><a href="28-world-models-video-diffusion.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">World Models &amp; Video Diffusion</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Computer Vision</a></p>
+      <h1 class="page__title">Image Classification</h1>
+      <p class="page__lede">A classifier is a function from pixels to a probability distribution over classes. Everything else is plumbing.</p>
+      <div class="page__meta">
+        <span class="chip">7 min read</span>
+        <span class="chip">1,580 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 2 Lesson 09 (Model Evaluation), Phase 3 Lesson 10 (Mini Framework), Phase 4 Lesson 03 (CNNs)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Build an end-to-end image classification pipeline on CIFAR-10: dataset, augmentation, model, training loop, evaluation</li>
+<li>Explain the role of each component (dataloader, loss, optimizer, scheduler, augmentation) and predict how breaking any one of them manifests in the loss curve</li>
+<li>Implement mixup, cutout, and label smoothing from scratch and justify when each is worth adding</li>
+<li>Read a confusion matrix and a per-class precision/recall table to diagnose dataset and model failures beyond aggregate accuracy</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Every vision task that ships reduces to image classification at some level. Detection classifies regions. Segmentation classifies pixels. Retrieval ranks by similarity to class centroids. Getting classification right — the dataset loop, the augmentation policy, the loss, the evaluation — is the skill that transfers to every other task in the phase.</p>
+<p>Most classification bugs are not in the model. They live in the pipeline: a broken normalisation, an unshuffled training set, augmentation that distorts labels, a validation split contaminated by training data, a learning rate that silently diverges after epoch 30. A CNN that would hit 93% on CIFAR-10 with a correct setup commonly scores 70-75% with a broken one, and the loss curve looks plausible the whole time.</p>
+<p>This lesson wires the entire pipeline by hand so every part is inspectable. You will not use anything from <code class="inline-code">torchvision.datasets</code> that could hide a bug.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<h3 id="the-classification-pipeline" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-classification-pipeline" aria-label="Link to this section">#</a>The classification pipeline</h3>
+<figure class="mermaid-figure">
+  <pre class="mermaid">flowchart LR
+    A[&quot;Dataset&lt;br/&gt;(images + labels)&quot;] --&gt; B[&quot;Augment&lt;br/&gt;(random transforms)&quot;]
+    B --&gt; C[&quot;Normalise&lt;br/&gt;(mean/std)&quot;]
+    C --&gt; D[&quot;DataLoader&lt;br/&gt;(batch + shuffle)&quot;]
+    D --&gt; E[&quot;Model&lt;br/&gt;(CNN)&quot;]
+    E --&gt; F[&quot;Logits&lt;br/&gt;(N, C)&quot;]
+    F --&gt; G[&quot;Cross-entropy loss&quot;]
+    F --&gt; H[&quot;Argmax&lt;br/&gt;at eval&quot;]
+    G --&gt; I[&quot;Backward&quot;]
+    I --&gt; J[&quot;Optimizer step&quot;]
+    J --&gt; K[&quot;Scheduler step&quot;]
+    K --&gt; E
+
+    style A fill:#dbeafe,stroke:#2563eb
+    style E fill:#fef3c7,stroke:#d97706
+    style G fill:#fecaca,stroke:#dc2626
+    style H fill:#dcfce7,stroke:#16a34a</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<p>Every line in this loop is where a bug can live. Cross-entropy takes raw logits, not softmax outputs, so any <code class="inline-code">model(x).softmax()</code> before the loss quietly computes the wrong gradient. Augmentations apply to inputs only, not labels — except for mixup, which mixes both. <code class="inline-code">optimizer.zero_grad()</code> must happen once per step; skipping it accumulates gradients and looks like a wildly unstable learning rate. Each of those bugs flattens the learning curve without throwing an error.</p>
+<h3 id="cross-entropy-logits-and-softmax" class="prose-h prose-h3"><a class="prose-h__anchor" href="#cross-entropy-logits-and-softmax" aria-label="Link to this section">#</a>Cross-entropy, logits, and softmax</h3>
+<p>A classifier produces <code class="inline-code">C</code> numbers per image called logits. Applying softmax converts them into a probability distribution:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>softmax(z)_i = exp(z_i) / sum_j exp(z_j)</code></pre>
+</figure>
+<p>Cross-entropy measures the negative log probability of the correct class:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>CE(z, y) = -log( softmax(z)_y )
+        = -z_y + log( sum_j exp(z_j) )</code></pre>
+</figure>
+<p>The right-hand form is the numerically stable one (log-sum-exp). PyTorch&#39;s <code class="inline-code">nn.CrossEntropyLoss</code> fuses softmax + NLL in one op and takes raw logits directly. Applying softmax yourself first is almost always a bug — you compute log(softmax(softmax(z))), a meaningless quantity.</p>
+<h3 id="why-augmentation-works" class="prose-h prose-h3"><a class="prose-h__anchor" href="#why-augmentation-works" aria-label="Link to this section">#</a>Why augmentation works</h3>
+<p>A CNN has inductive bias for translation (from weight sharing) but no built-in invariance to crops, flips, colour jitter, or occlusion. The only way to teach it those invariances is to show it pixels that exercise them. Every random transform during training is a way of saying: &quot;these two images have the same label; learn the features that ignore the difference.&quot;</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>Original crop:  &quot;dog facing left&quot;
+Flip:           &quot;dog facing right&quot;       &lt;- same label, different pixels
+Rotate(+15):    &quot;dog, slight tilt&quot;
+Colour jitter:  &quot;dog in warmer light&quot;
+RandomErasing:  &quot;dog with patch missing&quot;</code></pre>
+</figure>
+<p>The rule: augmentation must preserve the label. Cutout and rotation on a digit can flip &quot;6&quot; into &quot;9&quot;; for that dataset you use smaller rotation ranges and pick augmentations that respect digit-specific invariances.</p>
+<h3 id="mixup-and-cutmix" class="prose-h prose-h3"><a class="prose-h__anchor" href="#mixup-and-cutmix" aria-label="Link to this section">#</a>Mixup and cutmix</h3>
+<p>Ordinary augmentation transforms pixels but keeps labels one-hot. <strong>Mixup</strong> and <strong>cutmix</strong> break that by interpolating both.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>Mixup:
+  lambda ~ Beta(a, a)
+  x = lambda * x_i + (1 - lambda) * x_j
+  y = lambda * y_i + (1 - lambda) * y_j
+
+Cutmix:
+  paste a random rectangle of x_j into x_i
+  y = area-weighted mix of y_i and y_j</code></pre>
+</figure>
+<p>Why it helps: the model stops memorising spiky one-hot targets and learns to interpolate between classes. Training loss goes up, test accuracy goes up. It is the single cheapest robustness upgrade for any classifier.</p>
+<h3 id="label-smoothing" class="prose-h prose-h3"><a class="prose-h__anchor" href="#label-smoothing" aria-label="Link to this section">#</a>Label smoothing</h3>
+<p>A cousin of mixup. Instead of training against <code class="inline-code">[0, 0, 1, 0, 0]</code>, train against <code class="inline-code">[eps/C, eps/C, 1-eps, eps/C, eps/C]</code> for a small <code class="inline-code">eps</code> like 0.1. Stops the model from producing arbitrarily sharp logits and improves calibration at almost no cost. Built into <code class="inline-code">nn.CrossEntropyLoss(label_smoothing=0.1)</code> since PyTorch 1.10.</p>
+<h3 id="evaluation-beyond-accuracy" class="prose-h prose-h3"><a class="prose-h__anchor" href="#evaluation-beyond-accuracy" aria-label="Link to this section">#</a>Evaluation beyond accuracy</h3>
+<p>Aggregate accuracy hides imbalance. A 90-10 binary classifier that always predicts the majority class scores 90%. The tools that actually tell you what is happening:</p>
+<ul>
+<li><strong>Per-class accuracy</strong> — one number per class; immediately surfaces underperforming categories.</li>
+<li><strong>Confusion matrix</strong> — C x C grid with row i col j = count of true class i predicted as class j; the diagonal is correct, the off-diagonals are where your model lives.</li>
+<li><strong>Top-1 / Top-5</strong> — whether the correct class is in the top 1 or top 5 predictions; Top-5 matters for ImageNet because classes like &quot;Norwich terrier&quot; vs &quot;Norfolk terrier&quot; are genuinely ambiguous.</li>
+<li><strong>Calibration (ECE)</strong> — does a 0.8 confidence prediction get it right 80% of the time? Modern networks are systematically over-confident; fix with temperature scaling or label smoothing.</li>
+</ul>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="receptive-field"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">receptive-field</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> receptive field</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-a-deterministic-synthetic-dataset" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-a-deterministic-synthetic-dataset" aria-label="Link to this section">#</a>Step 1: A deterministic synthetic dataset</h3>
+<p>CIFAR-10 lives on disk. To make this lesson reproducible and fast we build a synthetic dataset that looks like CIFAR — 32x32 RGB images with class-specific structure the model must learn. The exact same pipeline works unchanged on real CIFAR-10.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+<span class="token keyword">import</span> torch
+<span class="token keyword">from</span> torch<span class="token punctuation">.</span>utils<span class="token punctuation">.</span>data <span class="token keyword">import</span> Dataset
+
+
+<span class="token keyword">def</span> <span class="token function">synthetic_cifar</span><span class="token punctuation">(</span>num_per_class<span class="token operator">=</span><span class="token number">1000</span><span class="token punctuation">,</span> num_classes<span class="token operator">=</span><span class="token number">10</span><span class="token punctuation">,</span> seed<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    rng <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>default_rng<span class="token punctuation">(</span>seed<span class="token punctuation">)</span>
+    X <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    Y <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> c <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>num_classes<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        centre <span class="token operator">=</span> rng<span class="token punctuation">.</span>uniform<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        freq <span class="token operator">=</span> <span class="token number">2</span> <span class="token operator">+</span> c
+        <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>num_per_class<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            yy<span class="token punctuation">,</span> xx <span class="token operator">=</span> np<span class="token punctuation">.</span>meshgrid<span class="token punctuation">(</span>np<span class="token punctuation">.</span>linspace<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">,</span> np<span class="token punctuation">.</span>linspace<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">,</span> indexing<span class="token operator">=</span><span class="token string">"ij"</span><span class="token punctuation">)</span>
+            r <span class="token operator">=</span> np<span class="token punctuation">.</span>sin<span class="token punctuation">(</span>xx <span class="token operator">*</span> freq<span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">0.5</span> <span class="token operator">+</span> centre<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+            g <span class="token operator">=</span> np<span class="token punctuation">.</span>cos<span class="token punctuation">(</span>yy <span class="token operator">*</span> freq<span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">0.5</span> <span class="token operator">+</span> centre<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span>
+            b <span class="token operator">=</span> <span class="token punctuation">(</span>xx <span class="token operator">+</span> yy<span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">0.5</span> <span class="token operator">*</span> centre<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span>
+            img <span class="token operator">=</span> np<span class="token punctuation">.</span>stack<span class="token punctuation">(</span><span class="token punctuation">[</span>r<span class="token punctuation">,</span> g<span class="token punctuation">,</span> b<span class="token punctuation">]</span><span class="token punctuation">,</span> axis<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+            img <span class="token operator">+=</span> rng<span class="token punctuation">.</span>normal<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0.08</span><span class="token punctuation">,</span> img<span class="token punctuation">.</span>shape<span class="token punctuation">)</span>
+            img <span class="token operator">=</span> np<span class="token punctuation">.</span>clip<span class="token punctuation">(</span>img<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span>
+            X<span class="token punctuation">.</span>append<span class="token punctuation">(</span>img<span class="token punctuation">.</span>astype<span class="token punctuation">(</span>np<span class="token punctuation">.</span>float32<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            Y<span class="token punctuation">.</span>append<span class="token punctuation">(</span>c<span class="token punctuation">)</span>
+    X <span class="token operator">=</span> np<span class="token punctuation">.</span>stack<span class="token punctuation">(</span>X<span class="token punctuation">)</span>
+    Y <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span>Y<span class="token punctuation">)</span>
+    idx <span class="token operator">=</span> rng<span class="token punctuation">.</span>permutation<span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>X<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> X<span class="token punctuation">[</span>idx<span class="token punctuation">]</span><span class="token punctuation">,</span> Y<span class="token punctuation">[</span>idx<span class="token punctuation">]</span>
+
+
+<span class="token keyword">class</span> <span class="token class-name">ArrayDataset</span><span class="token punctuation">(</span>Dataset<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> X<span class="token punctuation">,</span> Y<span class="token punctuation">,</span> transform<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>X <span class="token operator">=</span> X
+        self<span class="token punctuation">.</span>Y <span class="token operator">=</span> Y
+        self<span class="token punctuation">.</span>transform <span class="token operator">=</span> transform
+
+    <span class="token keyword">def</span> <span class="token function">__len__</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token builtin">len</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>X<span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">__getitem__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> i<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        img <span class="token operator">=</span> self<span class="token punctuation">.</span>X<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+        <span class="token keyword">if</span> self<span class="token punctuation">.</span>transform <span class="token keyword">is</span> <span class="token keyword">not</span> <span class="token boolean">None</span><span class="token punctuation">:</span>
+            img <span class="token operator">=</span> self<span class="token punctuation">.</span>transform<span class="token punctuation">(</span>img<span class="token punctuation">)</span>
+        img <span class="token operator">=</span> torch<span class="token punctuation">.</span>from_numpy<span class="token punctuation">(</span>img<span class="token punctuation">)</span><span class="token punctuation">.</span>permute<span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> img<span class="token punctuation">,</span> <span class="token builtin">int</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>Y<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Each class gets its own colour palette and frequency pattern, plus Gaussian noise to force the model to learn the signal rather than memorise pixels. Ten classes, one thousand images each, permuted.</p>
+<h3 id="step-2-normalisation-and-augmentation" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-normalisation-and-augmentation" aria-label="Link to this section">#</a>Step 2: Normalisation and augmentation</h3>
+<p>The two transforms that every vision pipeline has.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">standardize</span><span class="token punctuation">(</span>mean<span class="token punctuation">,</span> std<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    mean <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span>mean<span class="token punctuation">,</span> dtype<span class="token operator">=</span>np<span class="token punctuation">.</span>float32<span class="token punctuation">)</span>
+    std <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span>std<span class="token punctuation">,</span> dtype<span class="token operator">=</span>np<span class="token punctuation">.</span>float32<span class="token punctuation">)</span>
+    <span class="token keyword">def</span> <span class="token function">_fn</span><span class="token punctuation">(</span>img<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">(</span>img <span class="token operator">-</span> mean<span class="token punctuation">)</span> <span class="token operator">/</span> std
+    <span class="token keyword">return</span> _fn
+
+
+<span class="token keyword">def</span> <span class="token function">random_hflip</span><span class="token punctuation">(</span>p<span class="token operator">=</span><span class="token number">0.5</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">_fn</span><span class="token punctuation">(</span>img<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>random<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&lt;</span> p<span class="token punctuation">:</span>
+            <span class="token keyword">return</span> img<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> img
+    <span class="token keyword">return</span> _fn
+
+
+<span class="token keyword">def</span> <span class="token function">random_crop</span><span class="token punctuation">(</span>pad<span class="token operator">=</span><span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">_fn</span><span class="token punctuation">(</span>img<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        h<span class="token punctuation">,</span> w <span class="token operator">=</span> img<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">2</span><span class="token punctuation">]</span>
+        padded <span class="token operator">=</span> np<span class="token punctuation">.</span>pad<span class="token punctuation">(</span>img<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>pad<span class="token punctuation">,</span> pad<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">(</span>pad<span class="token punctuation">,</span> pad<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> mode<span class="token operator">=</span><span class="token string">"reflect"</span><span class="token punctuation">)</span>
+        y <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>randint<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">2</span> <span class="token operator">*</span> pad<span class="token punctuation">)</span>
+        x <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>randint<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">2</span> <span class="token operator">*</span> pad<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> padded<span class="token punctuation">[</span>y<span class="token punctuation">:</span>y <span class="token operator">+</span> h<span class="token punctuation">,</span> x<span class="token punctuation">:</span>x <span class="token operator">+</span> w<span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">]</span>
+    <span class="token keyword">return</span> _fn
+
+
+<span class="token keyword">def</span> <span class="token function">compose</span><span class="token punctuation">(</span><span class="token operator">*</span>fns<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">_fn</span><span class="token punctuation">(</span>img<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">for</span> fn <span class="token keyword">in</span> fns<span class="token punctuation">:</span>
+            img <span class="token operator">=</span> fn<span class="token punctuation">(</span>img<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> img
+    <span class="token keyword">return</span> _fn</code></pre>
+</figure>
+<p>Reflect-pad before crop, not zero-pad, because black borders are a signal the model would learn to ignore in a non-useful way.</p>
+<h3 id="step-3-mixup" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-mixup" aria-label="Link to this section">#</a>Step 3: Mixup</h3>
+<p>Mixes two images and two labels inside the training step. Implemented as a batch transform so it lives next to the forward pass rather than inside the dataset.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">mixup_batch</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> y<span class="token punctuation">,</span> num_classes<span class="token punctuation">,</span> alpha<span class="token operator">=</span><span class="token number">0.2</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> alpha <span class="token operator">&lt;=</span> <span class="token number">0</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> x<span class="token punctuation">,</span> torch<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>functional<span class="token punctuation">.</span>one_hot<span class="token punctuation">(</span>y<span class="token punctuation">,</span> num_classes<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token builtin">float</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    lam <span class="token operator">=</span> <span class="token builtin">float</span><span class="token punctuation">(</span>np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>beta<span class="token punctuation">(</span>alpha<span class="token punctuation">,</span> alpha<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    idx <span class="token operator">=</span> torch<span class="token punctuation">.</span>randperm<span class="token punctuation">(</span>x<span class="token punctuation">.</span>size<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span> device<span class="token operator">=</span>x<span class="token punctuation">.</span>device<span class="token punctuation">)</span>
+    x_mixed <span class="token operator">=</span> lam <span class="token operator">*</span> x <span class="token operator">+</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> lam<span class="token punctuation">)</span> <span class="token operator">*</span> x<span class="token punctuation">[</span>idx<span class="token punctuation">]</span>
+    y_onehot <span class="token operator">=</span> torch<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>functional<span class="token punctuation">.</span>one_hot<span class="token punctuation">(</span>y<span class="token punctuation">,</span> num_classes<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token builtin">float</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    y_mixed <span class="token operator">=</span> lam <span class="token operator">*</span> y_onehot <span class="token operator">+</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> lam<span class="token punctuation">)</span> <span class="token operator">*</span> y_onehot<span class="token punctuation">[</span>idx<span class="token punctuation">]</span>
+    <span class="token keyword">return</span> x_mixed<span class="token punctuation">,</span> y_mixed
+
+
+<span class="token keyword">def</span> <span class="token function">soft_cross_entropy</span><span class="token punctuation">(</span>logits<span class="token punctuation">,</span> soft_targets<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    log_probs <span class="token operator">=</span> torch<span class="token punctuation">.</span>log_softmax<span class="token punctuation">(</span>logits<span class="token punctuation">,</span> dim<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token operator">-</span><span class="token punctuation">(</span>soft_targets <span class="token operator">*</span> log_probs<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token builtin">sum</span><span class="token punctuation">(</span>dim<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">.</span>mean<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p><code class="inline-code">soft_cross_entropy</code> is cross-entropy against a soft-label distribution. It reduces to the usual one-hot case when the target is exactly one-hot.</p>
+<h3 id="step-4-the-training-loop" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-the-training-loop" aria-label="Link to this section">#</a>Step 4: The training loop</h3>
+<p>The complete recipe: one pass over the data, gradients once per batch, scheduler stepped once per epoch.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> torch
+<span class="token keyword">import</span> torch<span class="token punctuation">.</span>nn <span class="token keyword">as</span> nn
+<span class="token keyword">from</span> torch<span class="token punctuation">.</span>utils<span class="token punctuation">.</span>data <span class="token keyword">import</span> DataLoader
+<span class="token keyword">from</span> torch<span class="token punctuation">.</span>optim <span class="token keyword">import</span> SGD
+<span class="token keyword">from</span> torch<span class="token punctuation">.</span>optim<span class="token punctuation">.</span>lr_scheduler <span class="token keyword">import</span> CosineAnnealingLR
+
+<span class="token keyword">def</span> <span class="token function">train_one_epoch</span><span class="token punctuation">(</span>model<span class="token punctuation">,</span> loader<span class="token punctuation">,</span> optimizer<span class="token punctuation">,</span> device<span class="token punctuation">,</span> num_classes<span class="token punctuation">,</span> use_mixup<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    model<span class="token punctuation">.</span>train<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    total<span class="token punctuation">,</span> correct<span class="token punctuation">,</span> loss_sum <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0.0</span>
+    <span class="token keyword">for</span> x<span class="token punctuation">,</span> y <span class="token keyword">in</span> loader<span class="token punctuation">:</span>
+        x<span class="token punctuation">,</span> y <span class="token operator">=</span> x<span class="token punctuation">.</span>to<span class="token punctuation">(</span>device<span class="token punctuation">)</span><span class="token punctuation">,</span> y<span class="token punctuation">.</span>to<span class="token punctuation">(</span>device<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> use_mixup<span class="token punctuation">:</span>
+            x_m<span class="token punctuation">,</span> y_soft <span class="token operator">=</span> mixup_batch<span class="token punctuation">(</span>x<span class="token punctuation">,</span> y<span class="token punctuation">,</span> num_classes<span class="token punctuation">)</span>
+            logits <span class="token operator">=</span> model<span class="token punctuation">(</span>x_m<span class="token punctuation">)</span>
+            loss <span class="token operator">=</span> soft_cross_entropy<span class="token punctuation">(</span>logits<span class="token punctuation">,</span> y_soft<span class="token punctuation">)</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            logits <span class="token operator">=</span> model<span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+            loss <span class="token operator">=</span> nn<span class="token punctuation">.</span>functional<span class="token punctuation">.</span>cross_entropy<span class="token punctuation">(</span>logits<span class="token punctuation">,</span> y<span class="token punctuation">,</span> label_smoothing<span class="token operator">=</span><span class="token number">0.1</span><span class="token punctuation">)</span>
+        optimizer<span class="token punctuation">.</span>zero_grad<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        loss<span class="token punctuation">.</span>backward<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        optimizer<span class="token punctuation">.</span>step<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        loss_sum <span class="token operator">+=</span> loss<span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">*</span> x<span class="token punctuation">.</span>size<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+        total <span class="token operator">+=</span> x<span class="token punctuation">.</span>size<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+        <span class="token comment"># Training accuracy vs the un-mixed labels `y` is only an approximation</span>
+        <span class="token comment"># when mixup is on (the model saw soft targets, not y). Treat it as a</span>
+        <span class="token comment"># rough progress signal; rely on val accuracy for real performance.</span>
+        <span class="token keyword">with</span> torch<span class="token punctuation">.</span>no_grad<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            pred <span class="token operator">=</span> logits<span class="token punctuation">.</span>argmax<span class="token punctuation">(</span>dim<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+            correct <span class="token operator">+=</span> <span class="token punctuation">(</span>pred <span class="token operator">==</span> y<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> loss_sum <span class="token operator">/</span> total<span class="token punctuation">,</span> correct <span class="token operator">/</span> total
+
+
+<span class="token decorator annotation punctuation">@torch<span class="token punctuation">.</span>no_grad</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">evaluate</span><span class="token punctuation">(</span>model<span class="token punctuation">,</span> loader<span class="token punctuation">,</span> device<span class="token punctuation">,</span> num_classes<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    model<span class="token punctuation">.</span><span class="token builtin">eval</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    total<span class="token punctuation">,</span> correct <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span>
+    loss_sum <span class="token operator">=</span> <span class="token number">0.0</span>
+    cm <span class="token operator">=</span> torch<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span>num_classes<span class="token punctuation">,</span> num_classes<span class="token punctuation">,</span> dtype<span class="token operator">=</span>torch<span class="token punctuation">.</span><span class="token builtin">long</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> x<span class="token punctuation">,</span> y <span class="token keyword">in</span> loader<span class="token punctuation">:</span>
+        x<span class="token punctuation">,</span> y <span class="token operator">=</span> x<span class="token punctuation">.</span>to<span class="token punctuation">(</span>device<span class="token punctuation">)</span><span class="token punctuation">,</span> y<span class="token punctuation">.</span>to<span class="token punctuation">(</span>device<span class="token punctuation">)</span>
+        logits <span class="token operator">=</span> model<span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+        loss <span class="token operator">=</span> nn<span class="token punctuation">.</span>functional<span class="token punctuation">.</span>cross_entropy<span class="token punctuation">(</span>logits<span class="token punctuation">,</span> y<span class="token punctuation">)</span>
+        pred <span class="token operator">=</span> logits<span class="token punctuation">.</span>argmax<span class="token punctuation">(</span>dim<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+        <span class="token keyword">for</span> t<span class="token punctuation">,</span> p <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>y<span class="token punctuation">.</span>cpu<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> pred<span class="token punctuation">.</span>cpu<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            cm<span class="token punctuation">[</span>t<span class="token punctuation">,</span> p<span class="token punctuation">]</span> <span class="token operator">+=</span> <span class="token number">1</span>
+        loss_sum <span class="token operator">+=</span> loss<span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">*</span> x<span class="token punctuation">.</span>size<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+        total <span class="token operator">+=</span> x<span class="token punctuation">.</span>size<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+        correct <span class="token operator">+=</span> <span class="token punctuation">(</span>pred <span class="token operator">==</span> y<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token builtin">sum</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>item<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> loss_sum <span class="token operator">/</span> total<span class="token punctuation">,</span> correct <span class="token operator">/</span> total<span class="token punctuation">,</span> cm</code></pre>
+</figure>
+<p>Five invariants you check every time you write a training loop:</p>
+<ol>
+<li><code class="inline-code">model.train()</code> before training, <code class="inline-code">model.eval()</code> before evaluation — flips dropout and batchnorm behaviour.</li>
+<li><code class="inline-code">.zero_grad()</code> before <code class="inline-code">.backward()</code>.</li>
+<li><code class="inline-code">.item()</code> when accumulating metrics so nothing keeps the computation graph alive.</li>
+<li><code class="inline-code">@torch.no_grad()</code> during evaluation — saves memory and time, prevents subtle accidents.</li>
+<li>Argmax against raw logits, not softmax — same result, one fewer op.</li>
+</ol>
+<h3 id="step-5-put-it-together" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-put-it-together" aria-label="Link to this section">#</a>Step 5: Put it together</h3>
+<p>Use the <code class="inline-code">TinyResNet</code> from the previous lesson, train for a few epochs, evaluate.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> main <span class="token keyword">import</span> synthetic_cifar<span class="token punctuation">,</span> ArrayDataset
+<span class="token keyword">from</span> main <span class="token keyword">import</span> standardize<span class="token punctuation">,</span> random_hflip<span class="token punctuation">,</span> random_crop<span class="token punctuation">,</span> compose
+<span class="token keyword">from</span> main <span class="token keyword">import</span> mixup_batch<span class="token punctuation">,</span> soft_cross_entropy
+<span class="token keyword">from</span> main <span class="token keyword">import</span> train_one_epoch<span class="token punctuation">,</span> evaluate
+<span class="token comment"># TinyResNet comes from the previous lesson (03-cnns-lenet-to-resnet).</span>
+<span class="token comment"># Adjust the import path to wherever you stored the previous lesson's code.</span>
+<span class="token keyword">from</span> cnns_lenet_to_resnet <span class="token keyword">import</span> TinyResNet  <span class="token comment"># example placeholder</span>
+
+X<span class="token punctuation">,</span> Y <span class="token operator">=</span> synthetic_cifar<span class="token punctuation">(</span>num_per_class<span class="token operator">=</span><span class="token number">500</span><span class="token punctuation">)</span>
+split <span class="token operator">=</span> <span class="token builtin">int</span><span class="token punctuation">(</span><span class="token number">0.9</span> <span class="token operator">*</span> <span class="token builtin">len</span><span class="token punctuation">(</span>X<span class="token punctuation">)</span><span class="token punctuation">)</span>
+X_train<span class="token punctuation">,</span> Y_train <span class="token operator">=</span> X<span class="token punctuation">[</span><span class="token punctuation">:</span>split<span class="token punctuation">]</span><span class="token punctuation">,</span> Y<span class="token punctuation">[</span><span class="token punctuation">:</span>split<span class="token punctuation">]</span>
+X_val<span class="token punctuation">,</span> Y_val <span class="token operator">=</span> X<span class="token punctuation">[</span>split<span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">,</span> Y<span class="token punctuation">[</span>split<span class="token punctuation">:</span><span class="token punctuation">]</span>
+
+mean <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.5</span><span class="token punctuation">,</span> <span class="token number">0.5</span><span class="token punctuation">,</span> <span class="token number">0.5</span><span class="token punctuation">]</span>
+std <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.25</span><span class="token punctuation">,</span> <span class="token number">0.25</span><span class="token punctuation">,</span> <span class="token number">0.25</span><span class="token punctuation">]</span>
+train_tf <span class="token operator">=</span> compose<span class="token punctuation">(</span>random_hflip<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> random_crop<span class="token punctuation">(</span>pad<span class="token operator">=</span><span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">,</span> standardize<span class="token punctuation">(</span>mean<span class="token punctuation">,</span> std<span class="token punctuation">)</span><span class="token punctuation">)</span>
+eval_tf <span class="token operator">=</span> standardize<span class="token punctuation">(</span>mean<span class="token punctuation">,</span> std<span class="token punctuation">)</span>
+
+train_ds <span class="token operator">=</span> ArrayDataset<span class="token punctuation">(</span>X_train<span class="token punctuation">,</span> Y_train<span class="token punctuation">,</span> transform<span class="token operator">=</span>train_tf<span class="token punctuation">)</span>
+val_ds <span class="token operator">=</span> ArrayDataset<span class="token punctuation">(</span>X_val<span class="token punctuation">,</span> Y_val<span class="token punctuation">,</span> transform<span class="token operator">=</span>eval_tf<span class="token punctuation">)</span>
+
+train_loader <span class="token operator">=</span> DataLoader<span class="token punctuation">(</span>train_ds<span class="token punctuation">,</span> batch_size<span class="token operator">=</span><span class="token number">128</span><span class="token punctuation">,</span> shuffle<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">,</span> num_workers<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span>
+val_loader <span class="token operator">=</span> DataLoader<span class="token punctuation">(</span>val_ds<span class="token punctuation">,</span> batch_size<span class="token operator">=</span><span class="token number">256</span><span class="token punctuation">,</span> shuffle<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">,</span> num_workers<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span>
+
+device <span class="token operator">=</span> <span class="token string">"cuda"</span> <span class="token keyword">if</span> torch<span class="token punctuation">.</span>cuda<span class="token punctuation">.</span>is_available<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">else</span> <span class="token string">"cpu"</span>
+model <span class="token operator">=</span> TinyResNet<span class="token punctuation">(</span>num_classes<span class="token operator">=</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">.</span>to<span class="token punctuation">(</span>device<span class="token punctuation">)</span>
+optimizer <span class="token operator">=</span> SGD<span class="token punctuation">(</span>model<span class="token punctuation">.</span>parameters<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> lr<span class="token operator">=</span><span class="token number">0.1</span><span class="token punctuation">,</span> momentum<span class="token operator">=</span><span class="token number">0.9</span><span class="token punctuation">,</span> weight_decay<span class="token operator">=</span><span class="token number">5e-4</span><span class="token punctuation">,</span> nesterov<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+scheduler <span class="token operator">=</span> CosineAnnealingLR<span class="token punctuation">(</span>optimizer<span class="token punctuation">,</span> T_max<span class="token operator">=</span><span class="token number">10</span><span class="token punctuation">)</span>
+
+<span class="token keyword">for</span> epoch <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    tr_loss<span class="token punctuation">,</span> tr_acc <span class="token operator">=</span> train_one_epoch<span class="token punctuation">(</span>model<span class="token punctuation">,</span> train_loader<span class="token punctuation">,</span> optimizer<span class="token punctuation">,</span> device<span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">,</span> use_mixup<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+    va_loss<span class="token punctuation">,</span> va_acc<span class="token punctuation">,</span> _ <span class="token operator">=</span> evaluate<span class="token punctuation">(</span>model<span class="token punctuation">,</span> val_loader<span class="token punctuation">,</span> device<span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span>
+    scheduler<span class="token punctuation">.</span>step<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"epoch </span><span class="token interpolation"><span class="token punctuation">{</span>epoch<span class="token punctuation">:</span><span class="token format-spec">2d</span><span class="token punctuation">}</span></span><span class="token string">  lr </span><span class="token interpolation"><span class="token punctuation">{</span>scheduler<span class="token punctuation">.</span>get_last_lr<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.4f</span><span class="token punctuation">}</span></span><span class="token string">  "</span></span>
+          <span class="token string-interpolation"><span class="token string">f"train </span><span class="token interpolation"><span class="token punctuation">{</span>tr_loss<span class="token punctuation">:</span><span class="token format-spec">.3f</span><span class="token punctuation">}</span></span><span class="token string">/</span><span class="token interpolation"><span class="token punctuation">{</span>tr_acc<span class="token punctuation">:</span><span class="token format-spec">.3f</span><span class="token punctuation">}</span></span><span class="token string">  val </span><span class="token interpolation"><span class="token punctuation">{</span>va_loss<span class="token punctuation">:</span><span class="token format-spec">.3f</span><span class="token punctuation">}</span></span><span class="token string">/</span><span class="token interpolation"><span class="token punctuation">{</span>va_acc<span class="token punctuation">:</span><span class="token format-spec">.3f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+</figure>
+<p>On the synthetic dataset, this gets to near-perfect validation accuracy within five epochs, which is the point: the pipeline is correct, the model can learn what is learnable. Swap the dataset for real CIFAR-10 and the same loop trains to ~90% without changes.</p>
+<h3 id="step-6-read-the-confusion-matrix" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-6-read-the-confusion-matrix" aria-label="Link to this section">#</a>Step 6: Read the confusion matrix</h3>
+<p>Accuracy alone never tells you where the model is failing. The confusion matrix does.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">print_confusion</span><span class="token punctuation">(</span>cm<span class="token punctuation">,</span> labels<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    c <span class="token operator">=</span> cm<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+    labels <span class="token operator">=</span> labels <span class="token keyword">or</span> <span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span> <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span><span class="token punctuation">]</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span><span class="token string">''</span><span class="token punctuation">:</span><span class="token format-spec">>6</span><span class="token punctuation">}</span></span><span class="token string">"</span></span> <span class="token operator">+</span> <span class="token string">""</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>l<span class="token punctuation">:</span><span class="token format-spec">>5</span><span class="token punctuation">}</span></span><span class="token string">"</span></span> <span class="token keyword">for</span> l <span class="token keyword">in</span> labels<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        row <span class="token operator">=</span> cm<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>tolist<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>labels<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">>6</span><span class="token punctuation">}</span></span><span class="token string">"</span></span> <span class="token operator">+</span> <span class="token string">""</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>v<span class="token punctuation">:</span><span class="token format-spec">>5</span><span class="token punctuation">}</span></span><span class="token string">"</span></span> <span class="token keyword">for</span> v <span class="token keyword">in</span> row<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    tp <span class="token operator">=</span> cm<span class="token punctuation">.</span>diag<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token builtin">float</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    fp <span class="token operator">=</span> cm<span class="token punctuation">.</span><span class="token builtin">sum</span><span class="token punctuation">(</span>dim<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token builtin">float</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span> tp
+    fn <span class="token operator">=</span> cm<span class="token punctuation">.</span><span class="token builtin">sum</span><span class="token punctuation">(</span>dim<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token builtin">float</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span> tp
+    prec <span class="token operator">=</span> tp <span class="token operator">/</span> <span class="token punctuation">(</span>tp <span class="token operator">+</span> fp<span class="token punctuation">)</span><span class="token punctuation">.</span>clamp_min<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+    rec <span class="token operator">=</span> tp <span class="token operator">/</span> <span class="token punctuation">(</span>tp <span class="token operator">+</span> fn<span class="token punctuation">)</span><span class="token punctuation">.</span>clamp_min<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+    f1 <span class="token operator">=</span> <span class="token number">2</span> <span class="token operator">*</span> prec <span class="token operator">*</span> rec <span class="token operator">/</span> <span class="token punctuation">(</span>prec <span class="token operator">+</span> rec<span class="token punctuation">)</span><span class="token punctuation">.</span>clamp_min<span class="token punctuation">(</span><span class="token number">1e-9</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>labels<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">>6</span><span class="token punctuation">}</span></span><span class="token string">  prec </span><span class="token interpolation"><span class="token punctuation">{</span>prec<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.3f</span><span class="token punctuation">}</span></span><span class="token string">  rec </span><span class="token interpolation"><span class="token punctuation">{</span>rec<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.3f</span><span class="token punctuation">}</span></span><span class="token string">  f1 </span><span class="token interpolation"><span class="token punctuation">{</span>f1<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">.3f</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+_<span class="token punctuation">,</span> _<span class="token punctuation">,</span> cm <span class="token operator">=</span> evaluate<span class="token punctuation">(</span>model<span class="token punctuation">,</span> val_loader<span class="token punctuation">,</span> device<span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span>
+print_confusion<span class="token punctuation">(</span>cm<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Rows are true classes, columns are predictions. A cluster of off-diagonal counts between classes 3 and 5 means the model confuses those two and gives you a starting point for targeted data collection or a class-specific augmentation.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p><code class="inline-code">torchvision</code> wraps everything above into idiomatic components. For real CIFAR-10 the full pipeline is four lines plus a training loop.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">from</span> torchvision<span class="token punctuation">.</span>datasets <span class="token keyword">import</span> CIFAR10
+<span class="token keyword">from</span> torchvision<span class="token punctuation">.</span>transforms <span class="token keyword">import</span> Compose<span class="token punctuation">,</span> RandomCrop<span class="token punctuation">,</span> RandomHorizontalFlip<span class="token punctuation">,</span> ToTensor<span class="token punctuation">,</span> Normalize
+
+mean <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token number">0.4914</span><span class="token punctuation">,</span> <span class="token number">0.4822</span><span class="token punctuation">,</span> <span class="token number">0.4465</span><span class="token punctuation">)</span>
+std <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token number">0.2470</span><span class="token punctuation">,</span> <span class="token number">0.2435</span><span class="token punctuation">,</span> <span class="token number">0.2616</span><span class="token punctuation">)</span>
+train_tf <span class="token operator">=</span> Compose<span class="token punctuation">(</span><span class="token punctuation">[</span>
+    RandomCrop<span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">,</span> padding<span class="token operator">=</span><span class="token number">4</span><span class="token punctuation">,</span> padding_mode<span class="token operator">=</span><span class="token string">"reflect"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    RandomHorizontalFlip<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    ToTensor<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    Normalize<span class="token punctuation">(</span>mean<span class="token punctuation">,</span> std<span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">]</span><span class="token punctuation">)</span>
+eval_tf <span class="token operator">=</span> Compose<span class="token punctuation">(</span><span class="token punctuation">[</span>ToTensor<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> Normalize<span class="token punctuation">(</span>mean<span class="token punctuation">,</span> std<span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+train_ds <span class="token operator">=</span> CIFAR10<span class="token punctuation">(</span>root<span class="token operator">=</span><span class="token string">"./data"</span><span class="token punctuation">,</span> train<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">,</span>  download<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">,</span> transform<span class="token operator">=</span>train_tf<span class="token punctuation">)</span>
+val_ds   <span class="token operator">=</span> CIFAR10<span class="token punctuation">(</span>root<span class="token operator">=</span><span class="token string">"./data"</span><span class="token punctuation">,</span> train<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">,</span> download<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">,</span> transform<span class="token operator">=</span>eval_tf<span class="token punctuation">)</span></code></pre>
+</figure>
+<p>Two things to notice: the mean/std are <strong>dataset-specific</strong> — computed on the CIFAR-10 training set, not ImageNet — and the reflect pad is the community-default crop policy. Copy-pasting ImageNet stats here is a ~1% accuracy leak that nobody catches until someone profiles the model.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>This lesson produces:</p>
+<ul>
+<li><code class="inline-code">outputs/prompt-classifier-pipeline-auditor.md</code> — a prompt that audits a training script for the five invariants above and surfaces the first violation.</li>
+<li><code class="inline-code">outputs/skill-classification-diagnostics.md</code> — a skill that, given a confusion matrix and a list of class names, summarises per-class failures and proposes the single most impactful fix.</li>
+</ul>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><strong>(Easy)</strong> Train the same model with and without mixup for five epochs on the synthetic dataset. Plot train and val loss for both. Explain why train loss with mixup is higher yet val accuracy is similar or better.</li>
+<li><strong>(Medium)</strong> Implement Cutout — zero out a random 8x8 square in each training image — and run an ablation vs no augmentation, hflip+crop, hflip+crop+cutout, hflip+crop+mixup. Report val accuracy for each.</li>
+<li><strong>(Hard)</strong> Build a CIFAR-100 pipeline (100 classes, same input size) and reproduce a ResNet-34 training run to within 1% of published accuracy. Extras: sweep three learning rates and two weight decays, log to a local CSV, produce the final confusion-matrix-top-confusions table.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Logits</td>
+<td>&quot;Raw outputs&quot;</td>
+<td>The pre-softmax vector of C numbers per image; cross-entropy expects these, not softmaxed values</td>
+</tr>
+<tr>
+<td>Cross-entropy</td>
+<td>&quot;The loss&quot;</td>
+<td>Negative log-probability of the correct class; combines log-softmax and NLL in one stable op</td>
+</tr>
+<tr>
+<td>DataLoader</td>
+<td>&quot;The batcher&quot;</td>
+<td>Wraps a dataset with shuffling, batching, and (optional) multi-worker loading; gets blamed for half of training bugs</td>
+</tr>
+<tr>
+<td>Augmentation</td>
+<td>&quot;Random transforms&quot;</td>
+<td>Any pixel-level transform at training time that preserves the label; teaches invariances the CNN does not have natively</td>
+</tr>
+<tr>
+<td>Mixup / Cutmix</td>
+<td>&quot;Mix two images&quot;</td>
+<td>Blend both inputs and labels so the classifier learns smooth interpolations instead of hard boundaries</td>
+</tr>
+<tr>
+<td>Label smoothing</td>
+<td>&quot;Softer targets&quot;</td>
+<td>Replace one-hot with (1-eps, eps/(C-1), ...); improves calibration and slightly boosts accuracy</td>
+</tr>
+<tr>
+<td>Top-k accuracy</td>
+<td>&quot;Top-5&quot;</td>
+<td>The correct class is in the k highest-probability predictions; used on datasets with genuinely ambiguous classes</td>
+</tr>
+<tr>
+<td>Confusion matrix</td>
+<td>&quot;Where errors live&quot;</td>
+<td>C x C table where entry (i, j) counts images of true class i predicted as j; diagonal is right, off-diagonal tells you what to fix</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://cs231n.github.io/neural-networks-3/" target="_blank" rel="noopener">CS231n: Training Neural Networks</a> — still the clearest tour of the training pipeline at a single page</li>
+<li><a href="https://arxiv.org/abs/1812.01187" target="_blank" rel="noopener">Bag of Tricks for Image Classification (He et al., 2019)</a> — every small trick that together adds 3-4% to ResNet accuracy on ImageNet</li>
+<li><a href="https://arxiv.org/abs/1710.09412" target="_blank" rel="noopener">mixup: Beyond Empirical Risk Minimization (Zhang et al., 2017)</a> — the original mixup paper; three pages of theory plus convincing experiments</li>
+<li><a href="https://arxiv.org/abs/1706.04599" target="_blank" rel="noopener">Why temperature scaling matters (Guo et al., 2017)</a> — the paper that proved modern networks are miscalibrated and fixed it with one scalar parameter</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="03-cnns-lenet-to-resnet.html">
+  <span class="label">← Previous</span>
+  <b>CNNs — LeNet to ResNet</b>
+</a>
+      <a class="pager__item pager__item--next" href="05-transfer-learning.html">
+  <span class="label">Next →</span>
+  <b>Transfer Learning &amp; Fine-Tuning</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>7 minutes</b> of Computer Vision behind you.</p>
+      <a class="btn btn--solid" href="05-transfer-learning.html">Continue to Transfer Learning &amp; Fine-Tuning →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#the-classification-pipeline">The classification pipeline</a></li><li class="mini__item mini__item--d3"><a href="#cross-entropy-logits-and-softmax">Cross-entropy, logits, and softmax</a></li><li class="mini__item mini__item--d3"><a href="#why-augmentation-works">Why augmentation works</a></li><li class="mini__item mini__item--d3"><a href="#mixup-and-cutmix">Mixup and cutmix</a></li><li class="mini__item mini__item--d3"><a href="#label-smoothing">Label smoothing</a></li><li class="mini__item mini__item--d3"><a href="#evaluation-beyond-accuracy">Evaluation beyond accuracy</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-a-deterministic-synthetic-dataset">Step 1: A deterministic synthetic dataset</a></li><li class="mini__item mini__item--d3"><a href="#step-2-normalisation-and-augmentation">Step 2: Normalisation and augmentation</a></li><li class="mini__item mini__item--d3"><a href="#step-3-mixup">Step 3: Mixup</a></li><li class="mini__item mini__item--d3"><a href="#step-4-the-training-loop">Step 4: The training loop</a></li><li class="mini__item mini__item--d3"><a href="#step-5-put-it-together">Step 5: Put it together</a></li><li class="mini__item mini__item--d3"><a href="#step-6-read-the-confusion-matrix">Step 6: Read the confusion matrix</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

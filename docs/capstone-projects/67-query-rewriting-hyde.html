@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Query Rewriting: HyDE, Multi-Query, and Decomposition — Capstone Projects — AIFS</title>
+<meta name="description" content="Capstone Projects: Query Rewriting: HyDE, Multi-Query, and Decomposition. 7 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Query Rewriting: HyDE, Multi-Query, and Decomposition — Capstone Projects — AIFS">
+<meta property="og:description" content="Capstone Projects: Query Rewriting: HyDE, Multi-Query, and Decomposition. 7 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"cd-hyde-vector":["../assets/figures/figures-capstone-d.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-capstone-d.js"];</script>
+<script>window.AIFS_MERMAID=1;</script>
+</head>
+<body class="is-reader" style="--accent:#00FF85" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#00FF85;--accent-ink:#111111"
+  data-lesson-id="capstone-projects/67-query-rewriting-hyde" data-module="capstone-projects"
+  data-prev="66-reranker-cross-encoder.html" data-next="68-rag-eval-precision-recall.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#00FF85">
+        <span class="label">Phase 19</span>
+        <b>Capstone Projects</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="capstone-projects/01-terminal-native-coding-agent"><a href="01-terminal-native-coding-agent.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Capstone 01 — Terminal-Native Coding Agent</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/02-rag-over-codebase"><a href="02-rag-over-codebase.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Capstone 02 — RAG over Codebase (Cross-Repo Semantic Search)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/03-realtime-voice-assistant"><a href="03-realtime-voice-assistant.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Capstone 03 — Real-Time Voice Assistant (ASR to LLM to TTS)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/04-multimodal-document-qa"><a href="04-multimodal-document-qa.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Capstone 04 — Multimodal Document QA (Vision-First PDF, Tables, Charts)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/05-autonomous-research-agent"><a href="05-autonomous-research-agent.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Capstone 05 — Autonomous Research Agent (AI-Scientist Class)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/06-devops-troubleshooting-agent"><a href="06-devops-troubleshooting-agent.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Capstone 06 — DevOps Troubleshooting Agent for Kubernetes</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/07-end-to-end-fine-tuning-pipeline"><a href="07-end-to-end-fine-tuning-pipeline.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Capstone 07 — End-to-End Fine-Tuning Pipeline (Data to SFT to DPO to Serve)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/08-production-rag-chatbot"><a href="08-production-rag-chatbot.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Capstone 08 — Production RAG Chatbot for a Regulated Vertical</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/09-code-migration-agent"><a href="09-code-migration-agent.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Capstone 09 — Code Migration Agent (Repo-Level Language / Runtime Upgrade)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/10-multi-agent-software-team"><a href="10-multi-agent-software-team.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Capstone 10 — Multi-Agent Software Engineering Team</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/11-llm-observability-dashboard"><a href="11-llm-observability-dashboard.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Capstone 11 — LLM Observability &amp; Eval Dashboard</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/12-video-understanding-pipeline"><a href="12-video-understanding-pipeline.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Capstone 12 — Video Understanding Pipeline (Scene, QA, Search)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/13-mcp-server-with-registry"><a href="13-mcp-server-with-registry.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Capstone 13: Stateless MCP Server with Registry and Governance</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/14-speculative-decoding-server"><a href="14-speculative-decoding-server.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Capstone 14 — Speculative-Decoding Inference Server</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/15-constitutional-safety-harness"><a href="15-constitutional-safety-harness.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Capstone 15 — Constitutional Safety Harness + Red-Team Range</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/16-github-issue-to-pr-agent"><a href="16-github-issue-to-pr-agent.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Capstone 16 — GitHub Issue-to-PR Autonomous Agent</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/17-personal-ai-tutor"><a href="17-personal-ai-tutor.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Capstone 17 — Personal AI Tutor (Adaptive, Multimodal, with Memory)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/20-agent-harness-loop-contract"><a href="20-agent-harness-loop-contract.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">Agent Harness Loop Contract</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/21-tool-registry-schema-validation"><a href="21-tool-registry-schema-validation.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Tool Registry with Schema Validation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/22-jsonrpc-stdio-transport"><a href="22-jsonrpc-stdio-transport.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">JSON-RPC 2.0 Over Newline-Delimited Stdio</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/23-function-call-dispatcher"><a href="23-function-call-dispatcher.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Function Call Dispatcher</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/24-plan-execute-control-flow"><a href="24-plan-execute-control-flow.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Plan-Execute Control Flow</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/25-verification-gates-observation-budget"><a href="25-verification-gates-observation-budget.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Capstone Lesson 25: Verification Gates and the Observation Budget</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/26-sandbox-runner-denylist"><a href="26-sandbox-runner-denylist.html" class="">
+  <span class="snav__n">26</span>
+  <span class="snav__t">Capstone Lesson 26: Sandbox Runner with Denylist and Path Jail</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/27-eval-harness-fixture-tasks"><a href="27-eval-harness-fixture-tasks.html" class="">
+  <span class="snav__n">27</span>
+  <span class="snav__t">Capstone Lesson 27: Eval Harness with Fixture Tasks</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/28-observability-otel-traces"><a href="28-observability-otel-traces.html" class="">
+  <span class="snav__n">28</span>
+  <span class="snav__t">Capstone Lesson 28: Observability with OTel GenAI Spans and Prometheus Metrics</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/29-end-to-end-coding-task-demo"><a href="29-end-to-end-coding-task-demo.html" class="">
+  <span class="snav__n">29</span>
+  <span class="snav__t">Capstone Lesson 29: End-to-End Coding Agent on the Harness</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/30-bpe-tokenizer-from-scratch"><a href="30-bpe-tokenizer-from-scratch.html" class="">
+  <span class="snav__n">30</span>
+  <span class="snav__t">BPE Tokenizer From Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/31-tokenized-dataset-sliding-window"><a href="31-tokenized-dataset-sliding-window.html" class="">
+  <span class="snav__n">31</span>
+  <span class="snav__t">Tokenized Dataset with Sliding Window</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/32-token-positional-embeddings"><a href="32-token-positional-embeddings.html" class="">
+  <span class="snav__n">32</span>
+  <span class="snav__t">Token and Positional Embeddings</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/33-multihead-self-attention"><a href="33-multihead-self-attention.html" class="">
+  <span class="snav__n">33</span>
+  <span class="snav__t">Multi-Head Self-Attention</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/34-transformer-block"><a href="34-transformer-block.html" class="">
+  <span class="snav__n">34</span>
+  <span class="snav__t">Transformer Block from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/35-gpt-model-assembly"><a href="35-gpt-model-assembly.html" class="">
+  <span class="snav__n">35</span>
+  <span class="snav__t">GPT Model Assembly</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/36-training-loop-eval"><a href="36-training-loop-eval.html" class="">
+  <span class="snav__n">36</span>
+  <span class="snav__t">Training Loop and Evaluation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/37-loading-pretrained-weights"><a href="37-loading-pretrained-weights.html" class="">
+  <span class="snav__n">37</span>
+  <span class="snav__t">Loading Pretrained Weights</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/38-classifier-finetuning"><a href="38-classifier-finetuning.html" class="">
+  <span class="snav__n">38</span>
+  <span class="snav__t">Capstone Lesson 38: Classifier Fine-Tuning by Head Swap</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/39-instruction-tuning-sft"><a href="39-instruction-tuning-sft.html" class="">
+  <span class="snav__n">39</span>
+  <span class="snav__t">Capstone Lesson 39: Instruction Tuning by Supervised Fine-Tuning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/40-dpo-from-scratch"><a href="40-dpo-from-scratch.html" class="">
+  <span class="snav__n">40</span>
+  <span class="snav__t">Capstone Lesson 40: Direct Preference Optimization from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/41-eval-pipeline"><a href="41-eval-pipeline.html" class="">
+  <span class="snav__n">41</span>
+  <span class="snav__t">Capstone Lesson 41: Full Evaluation Pipeline</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/42-large-corpus-downloader"><a href="42-large-corpus-downloader.html" class="">
+  <span class="snav__n">42</span>
+  <span class="snav__t">Large Corpus Downloader</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/43-hdf5-tokenized-corpus"><a href="43-hdf5-tokenized-corpus.html" class="">
+  <span class="snav__n">43</span>
+  <span class="snav__t">HDF5 Tokenized Corpus</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/44-cosine-lr-warmup"><a href="44-cosine-lr-warmup.html" class="">
+  <span class="snav__n">44</span>
+  <span class="snav__t">Cosine LR with Linear Warmup</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/45-gradient-clipping-amp"><a href="45-gradient-clipping-amp.html" class="">
+  <span class="snav__n">45</span>
+  <span class="snav__t">Gradient Clipping and Mixed Precision</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/46-gradient-accumulation"><a href="46-gradient-accumulation.html" class="">
+  <span class="snav__n">46</span>
+  <span class="snav__t">Gradient Accumulation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/47-checkpoint-save-resume"><a href="47-checkpoint-save-resume.html" class="">
+  <span class="snav__n">47</span>
+  <span class="snav__t">Checkpoint Save and Resume</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/48-distributed-fsdp-ddp"><a href="48-distributed-fsdp-ddp.html" class="">
+  <span class="snav__n">48</span>
+  <span class="snav__t">Distributed Data Parallel and FSDP from Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/49-lm-eval-harness"><a href="49-lm-eval-harness.html" class="">
+  <span class="snav__n">49</span>
+  <span class="snav__t">Language Model Evaluation Harness</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/50-hypothesis-generator"><a href="50-hypothesis-generator.html" class="">
+  <span class="snav__n">50</span>
+  <span class="snav__t">Hypothesis Generator</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/51-literature-retrieval"><a href="51-literature-retrieval.html" class="">
+  <span class="snav__n">51</span>
+  <span class="snav__t">Literature Retrieval</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/52-experiment-runner"><a href="52-experiment-runner.html" class="">
+  <span class="snav__n">52</span>
+  <span class="snav__t">Experiment Runner</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/53-result-evaluator"><a href="53-result-evaluator.html" class="">
+  <span class="snav__n">53</span>
+  <span class="snav__t">Result Evaluator</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/54-paper-writer"><a href="54-paper-writer.html" class="">
+  <span class="snav__n">54</span>
+  <span class="snav__t">Paper Writer</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/55-critic-loop"><a href="55-critic-loop.html" class="">
+  <span class="snav__n">55</span>
+  <span class="snav__t">Critic Loop</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/56-iteration-scheduler"><a href="56-iteration-scheduler.html" class="">
+  <span class="snav__n">56</span>
+  <span class="snav__t">Iteration Scheduler</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/57-end-to-end-research-demo"><a href="57-end-to-end-research-demo.html" class="">
+  <span class="snav__n">57</span>
+  <span class="snav__t">End-to-End Research Demo</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/58-vision-encoder-patches"><a href="58-vision-encoder-patches.html" class="">
+  <span class="snav__n">58</span>
+  <span class="snav__t">Vision Encoder Patches</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/59-vit-transformer"><a href="59-vit-transformer.html" class="">
+  <span class="snav__n">59</span>
+  <span class="snav__t">Vision Transformer Encoder</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/60-projection-layer-modality-align"><a href="60-projection-layer-modality-align.html" class="">
+  <span class="snav__n">60</span>
+  <span class="snav__t">Projection Layer for Modality Alignment</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/61-cross-attention-fusion"><a href="61-cross-attention-fusion.html" class="">
+  <span class="snav__n">61</span>
+  <span class="snav__t">Cross-Attention Fusion</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/62-vision-language-pretraining"><a href="62-vision-language-pretraining.html" class="">
+  <span class="snav__n">62</span>
+  <span class="snav__t">Vision-Language Pretraining</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/63-multimodal-eval"><a href="63-multimodal-eval.html" class="">
+  <span class="snav__n">63</span>
+  <span class="snav__t">Multimodal Evaluation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/64-chunking-strategies-advanced"><a href="64-chunking-strategies-advanced.html" class="">
+  <span class="snav__n">64</span>
+  <span class="snav__t">Chunking Strategies, Compared</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/65-hybrid-retrieval-bm25-dense"><a href="65-hybrid-retrieval-bm25-dense.html" class="">
+  <span class="snav__n">65</span>
+  <span class="snav__t">Hybrid Retrieval with BM25 and Dense Embeddings</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/66-reranker-cross-encoder"><a href="66-reranker-cross-encoder.html" class="">
+  <span class="snav__n">66</span>
+  <span class="snav__t">Cross-Encoder Reranker</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/67-query-rewriting-hyde"><a href="67-query-rewriting-hyde.html" class="is-current">
+  <span class="snav__n">67</span>
+  <span class="snav__t">Query Rewriting: HyDE, Multi-Query, and Decomposition</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/68-rag-eval-precision-recall"><a href="68-rag-eval-precision-recall.html" class="">
+  <span class="snav__n">68</span>
+  <span class="snav__t">RAG Evaluation: Precision, Recall, MRR, nDCG, Faithfulness, Answer Relevance</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/69-end-to-end-rag-system"><a href="69-end-to-end-rag-system.html" class="">
+  <span class="snav__n">69</span>
+  <span class="snav__t">End-to-End RAG System</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/70-task-spec-format"><a href="70-task-spec-format.html" class="">
+  <span class="snav__n">70</span>
+  <span class="snav__t">Task Spec Format</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/71-classical-metrics"><a href="71-classical-metrics.html" class="">
+  <span class="snav__n">71</span>
+  <span class="snav__t">Classical Metrics</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/72-code-exec-metric"><a href="72-code-exec-metric.html" class="">
+  <span class="snav__n">72</span>
+  <span class="snav__t">Code Exec Metric</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/73-perplexity-calibration"><a href="73-perplexity-calibration.html" class="">
+  <span class="snav__n">73</span>
+  <span class="snav__t">Perplexity and Calibration</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/74-leaderboard-aggregation"><a href="74-leaderboard-aggregation.html" class="">
+  <span class="snav__n">74</span>
+  <span class="snav__t">Leaderboard Aggregation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/75-end-to-end-eval-runner"><a href="75-end-to-end-eval-runner.html" class="">
+  <span class="snav__n">75</span>
+  <span class="snav__t">End-to-End Eval Runner</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/76-collective-ops-from-scratch"><a href="76-collective-ops-from-scratch.html" class="">
+  <span class="snav__n">76</span>
+  <span class="snav__t">Collective Ops From Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/77-data-parallel-ddp"><a href="77-data-parallel-ddp.html" class="">
+  <span class="snav__n">77</span>
+  <span class="snav__t">Data Parallel DDP From Scratch</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/78-zero-parameter-sharding"><a href="78-zero-parameter-sharding.html" class="">
+  <span class="snav__n">78</span>
+  <span class="snav__t">ZeRO Optimizer State Sharding</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/79-pipeline-parallel"><a href="79-pipeline-parallel.html" class="">
+  <span class="snav__n">79</span>
+  <span class="snav__t">Pipeline Parallel and Bubble Analysis</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/80-checkpoint-sharded-resume"><a href="80-checkpoint-sharded-resume.html" class="">
+  <span class="snav__n">80</span>
+  <span class="snav__t">Sharded Checkpoint and Atomic Resume</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/81-end-to-end-distributed-train"><a href="81-end-to-end-distributed-train.html" class="">
+  <span class="snav__n">81</span>
+  <span class="snav__t">End-to-End Distributed Training</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/82-jailbreak-taxonomy"><a href="82-jailbreak-taxonomy.html" class="">
+  <span class="snav__n">82</span>
+  <span class="snav__t">Capstone 82 — Jailbreak Taxonomy</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/83-prompt-injection-detector"><a href="83-prompt-injection-detector.html" class="">
+  <span class="snav__n">83</span>
+  <span class="snav__t">Capstone 83 — Prompt Injection Detector</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/84-refusal-evaluation"><a href="84-refusal-evaluation.html" class="">
+  <span class="snav__n">84</span>
+  <span class="snav__t">Capstone 84 — Refusal Evaluation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/85-content-classifier-integration"><a href="85-content-classifier-integration.html" class="">
+  <span class="snav__n">85</span>
+  <span class="snav__t">Capstone 85 — Content Classifier Integration</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/86-constitutional-rules-engine"><a href="86-constitutional-rules-engine.html" class="">
+  <span class="snav__n">86</span>
+  <span class="snav__t">Capstone 86 — Constitutional Rules Engine</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="capstone-projects/87-end-to-end-safety-gate"><a href="87-end-to-end-safety-gate.html" class="">
+  <span class="snav__n">87</span>
+  <span class="snav__t">Capstone 87 — End-to-End Safety Gate</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Capstone Projects</a></p>
+      <h1 class="page__title">Query Rewriting: HyDE, Multi-Query, and Decomposition</h1>
+      <p class="page__lede">The query the user types is not the query your retriever wants. Rewriting bridges the gap before retrieval, so the index sees something closer to what the answer looks like.</p>
+      <div class="page__meta">
+        <span class="chip">7 min read</span>
+        <span class="chip">1,471 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 11 lessons 04 (embeddings), 06 (RAG); Phase 19 Track B foundations (lessons 20-29); Phase 19 lessons 64 and 65</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~90 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="learning-objectives" class="prose-h prose-h2"><a class="prose-h__anchor" href="#learning-objectives" aria-label="Link to this section">#</a>Learning Objectives</h2>
+<ul>
+<li>Implement Hypothetical Document Embeddings (HyDE): generate a fake answer, embed it, retrieve against that vector instead of the query vector.</li>
+<li>Implement multi-query expansion: rewrite one query into N paraphrases, retrieve with each, merge the union by reciprocal rank fusion.</li>
+<li>Implement query decomposition: split a complex question into sub-questions, retrieve per sub-question, merge.</li>
+<li>Compare the three rewriters head to head on a fixture and explain when each strategy wins.</li>
+<li>Wire a mock LLM that produces deterministic, on-fixture outputs so the rewriter loop runs offline.</li>
+</ul>
+<h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>A user types &quot;what does our team do when uploads fail and the budget is gone?&quot;. The corpus contains a doc that says &quot;AbortMultipartOnFail aborts an in-flight S3 multipart upload and decrements the per-bucket retry budget when the upload fails&quot;. The query and the document do not share a noun phrase. BM25 misses. The bi-encoder ranks the document third or fourth because the query vector lands in a region of the embedding space that prefers the doc about cancelled jobs, not the doc about aborted uploads. The two-stage rerank from lesson 66 can salvage the answer if it sits in the top-N, but if it does not even reach top-N, the reranker never sees it.</p>
+<p>The fix is to rewrite the query before it touches the retriever. The 2023 paper &quot;Precise Zero-Shot Dense Retrieval without Relevance Labels&quot; (Gao et al.) introduced HyDE: ask an LLM to write the document that would answer the query, embed that hypothetical document, and use its embedding as the retrieval vector. The hypothetical document sits in the right region of the embedding space because it is written in the corpus&#39;s voice. The query vector did not.</p>
+<p>Two cousin techniques pair with HyDE. Multi-query expansion (the term Microsoft&#39;s GraphRAG used) generates N paraphrases of the query and retrieves with each, then merges. Decomposition (popularized as &quot;subquery decomposition&quot; in the 2024 Stanford DSPy work) splits &quot;what does our team do when uploads fail and the budget is gone&quot; into two questions: &quot;what happens when an upload fails&quot; and &quot;what happens when the retry budget is gone&quot;. Two retrievals, one merged result, both pieces of the answer reachable.</p>
+<p>This lesson implements all three and runs them against the same fixture corpus.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<figure class="mermaid-figure">
+  <pre class="mermaid">flowchart LR
+  Query[User Query] --&gt; HyDE[HyDE: generate fake answer]
+  Query --&gt; MQ[Multi-Query: N paraphrases]
+  Query --&gt; DC[Decompose: sub-questions]
+  HyDE --&gt; Embed1[Embed fake answer]
+  MQ --&gt; Embed2[Embed each paraphrase]
+  DC --&gt; Embed3[Embed each sub-question]
+  Embed1 --&gt; Retrieve[Hybrid Retriever]
+  Embed2 --&gt; Retrieve
+  Embed3 --&gt; Retrieve
+  Retrieve --&gt; Merge[RRF Merge]
+  Merge --&gt; Out[Top-K]</pre>
+  <figcaption class="lfwrap__cap"><span class="label">Diagram</span></figcaption>
+</figure>
+<h3 id="hyde-in-detail" class="prose-h prose-h3"><a class="prose-h__anchor" href="#hyde-in-detail" aria-label="Link to this section">#</a>HyDE in detail</h3>
+<p>HyDE replaces the user&#39;s query vector with an LLM-written hypothetical document vector. The prompt is short:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>You are a domain expert. Write a one-paragraph passage that answers the question
+below. Use the same vocabulary and phrasing the documentation in this domain would
+use. Do not refuse. Do not say you do not know.
+
+Question: {user_query}
+
+Passage:</code></pre>
+</figure>
+<p>The LLM&#39;s answer is wrong as a factual answer because the LLM does not know your corpus. That is fine. The retriever does not care about factual correctness, only about token distribution. The hypothetical passage contains the words &quot;abort&quot;, &quot;multipart&quot;, &quot;bucket&quot;, &quot;budget&quot;, because that is what a documentation passage on this topic would say. Embed that passage. The vector lands near the real passage.</p>
+<p>In production you cap the hypothetical document to two or three sentences. Longer hypotheticals collect more noise. Shorter ones lose the lexical signal HyDE needs.</p>
+<h3 id="multi-query-expansion-in-detail" class="prose-h prose-h3"><a class="prose-h__anchor" href="#multi-query-expansion-in-detail" aria-label="Link to this section">#</a>Multi-query expansion in detail</h3>
+<p>Generate N paraphrases of the user&#39;s query. The simplest prompt:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>Rewrite the following question in {N} different ways. Each rewrite must preserve
+the original intent. Number them 1 to {N}. Do not add explanations.</code></pre>
+</figure>
+<p>Retrieve top-k for each paraphrase. Merge the N ranked lists with RRF (the same algorithm from lesson 65). Cheap, parallel, deterministic.</p>
+<p>Multi-query wins when the user&#39;s phrasing is one of many equally valid ways to ask the question, and any of the rewrites would have asked it better. Loses when all rewrites are equally bad because the original was bad in the same way.</p>
+<h3 id="decomposition-in-detail" class="prose-h prose-h3"><a class="prose-h__anchor" href="#decomposition-in-detail" aria-label="Link to this section">#</a>Decomposition in detail</h3>
+<p>A single retrieval cannot satisfy a multi-faceted question. Decomposition asks the LLM to split the question into sub-questions and the system retrieves per sub-question. The prompt:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>The following question may require information from multiple distinct topics.
+Decompose it into a list of sub-questions. Each sub-question must be answerable
+independently. If the question is already atomic, return it unchanged.
+
+Question: {user_query}</code></pre>
+</figure>
+<p>Retrieve per sub-question. Merge. Decomposition is the right tool for questions that contain conjunctions, multi-clause comparisons, or two unrelated topics. Wrong tool for atomic questions; the decomposer&#39;s job there is to return the single question and not invent fake sub-questions.</p>
+<h3 id="why-all-three-exist" class="prose-h prose-h3"><a class="prose-h__anchor" href="#why-all-three-exist" aria-label="Link to this section">#</a>Why all three exist</h3>
+<p>The three are complementary. HyDE bridges the query-corpus token gap. Multi-query covers paraphrase variance. Decomposition covers multi-topic queries. A production system runs all three and picks the strategy per query (lesson 69&#39;s end-to-end system shows the selector).</p>
+<h2 id="the-mock-llm" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-mock-llm" aria-label="Link to this section">#</a>The Mock LLM</h2>
+<p>The lesson runs offline. The mock LLM is a small lookup table keyed on the user&#39;s query, plus a fallback for queries it has not seen. The lookup table contains:</p>
+<ul>
+<li>For each fixture query: a written hypothetical passage, three paraphrases, and a decomposition.</li>
+<li>For an unknown query: a deterministic transformation: take the query&#39;s content words, expand them through a synonym map, and return the result.</li>
+</ul>
+<p>The shape of the mock is what matters, not the data. In production you swap the mock for a real model call. The retriever does not change.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="cd-hyde-vector"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">cd-hyde-vector</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> cd hyde vector</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<p><code class="inline-code">code/main.py</code> implements:</p>
+<ul>
+<li><code class="inline-code">MockLLM</code> - the deterministic stand-in described above.</li>
+<li><code class="inline-code">HyDERewriter</code> - calls the LLM to write the hypothetical document, returns the rewriter output as <code class="inline-code">RewriteResult</code> with the hypothetical text and the query the retriever should use.</li>
+<li><code class="inline-code">MultiQueryRewriter</code> - calls the LLM for N paraphrases, returns a list of queries.</li>
+<li><code class="inline-code">DecomposeRewriter</code> - calls the LLM to decompose, returns sub-questions.</li>
+<li><code class="inline-code">retrieve_with_rewriter</code> - takes a rewriter and a retriever, runs the rewrites, fuses the results.</li>
+<li>A demo that runs the three rewriters on a fixture and prints which strategy returned the gold answer document first.</li>
+</ul>
+<p>The retriever shape is reused from lesson 65 (hybrid BM25 + dense). The fusion is the same RRF. The only new shape is the rewriter interface, which is small.</p>
+<p>Run it:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">bash</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-bash">python3 code/main.py</code></pre>
+</figure>
+<p>The output is a per-strategy ranking and a final summary. HyDE wins on the phrasing-mismatched query. Multi-query wins on the paraphrase-variance query. Decomposition wins on the multi-topic query. The fallback (no rewriter) loses on at least one of the three.</p>
+<h2 id="failure-modes-the-demo-will-hide" class="prose-h prose-h2"><a class="prose-h__anchor" href="#failure-modes-the-demo-will-hide" aria-label="Link to this section">#</a>Failure modes the demo will hide</h2>
+<p><strong>HyDE hallucinates corpus-specific identifiers wrong.</strong> The model invents a function name. The hypothetical&#39;s BM25 score on the right doc collapses because the invented name is now a high-weight token that does not appear in the index. Cap the hypothetical&#39;s length and weight BM25 lower in the fusion.</p>
+<p><strong>Multi-query rewrites all converge.</strong> A weak model produces three near-identical paraphrases. The N retrievals return the same top-k. The RRF merge is no better than a single retrieval. Add an explicit diversity instruction to the rewrite prompt and detect duplicates by Jaccard.</p>
+<p><strong>Decomposition over-splits.</strong> The decomposer turns an atomic question into a list. The retrievals all return the same document but with reduced rank. The merge is worse than the original. Detect this with a &quot;are these sub-questions distinct enough&quot; pass before fan-out.</p>
+<p><strong>Latency multiplies.</strong> HyDE costs one LLM call. Multi-query costs one LLM call to generate N rewrites, then N retrievals. Decomposition costs one LLM call to decompose, then M retrievals. The retrievals run in parallel; the LLM call is the floor.</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>Production patterns:</p>
+<ul>
+<li>Per-query strategy selection by query length: atomic short queries get multi-query, complex multi-clause queries get decomposition, jargon-heavy queries get HyDE.</li>
+<li>Cache the rewriter output by query hash. Many queries repeat.</li>
+<li>Run all three in parallel and fuse the three result sets into one with RRF. The cost is three LLM calls and one fusion; the quality is the union of all three strategies&#39; coverage.</li>
+</ul>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>Lesson 69 wires this rewriter stage before the retriever from lesson 65 and the reranker from lesson 66. Lesson 68 evaluates the lift the rewriter adds to retrieval recall.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li>Implement RAG-Fusion (a 2024 variant of multi-query) where the rewriter&#39;s paraphrases are intentionally diverse, then the rerank step (lesson 66) picks the final list.</li>
+<li>Add a fourth strategy: step-back prompting (ask the LLM for the more general question, retrieve on that, then narrow). Compare on the fixture.</li>
+<li>Train the decomposer to recognize atomic queries by adding a &quot;is the question atomic&quot; head. Measure the over-split rate before and after.</li>
+<li>Replace the mock LLM with a real model call. Measure the latency-per-strategy on your stack.</li>
+<li>Add a confidence score per rewrite. Drop rewrites below the threshold. Measure the impact on recall.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>HyDE</td>
+<td>&quot;Fake-document retrieval&quot;</td>
+<td>LLM writes the answer; embed and retrieve on that instead of the query</td>
+</tr>
+<tr>
+<td>Multi-query</td>
+<td>&quot;Paraphrase expansion&quot;</td>
+<td>N rewrites of the query; retrieve N times, merge by RRF</td>
+</tr>
+<tr>
+<td>Decomposition</td>
+<td>&quot;Subquery split&quot;</td>
+<td>Multi-topic queries split into sub-questions, retrieved separately</td>
+</tr>
+<tr>
+<td>Atomic query</td>
+<td>&quot;Single-topic&quot;</td>
+<td>Cannot be decomposed without inventing fake sub-questions</td>
+</tr>
+<tr>
+<td>Step-back</td>
+<td>&quot;Abstract the query&quot;</td>
+<td>Ask the more general question, retrieve, then narrow</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li>Gao, Ma, Lin, Callan, &quot;Precise Zero-Shot Dense Retrieval without Relevance Labels&quot; (HyDE), 2023</li>
+<li>Microsoft Research, &quot;Multi-Query Expansion for Retrieval&quot;</li>
+<li>Stanford DSPy, &quot;Subquery Decomposition for Multi-Hop QA&quot;</li>
+<li><a href="https://docs.llamaindex.ai/en/stable/optimizing/advanced_retrieval/query_transformations/" target="_blank" rel="noopener">LlamaIndex query transformations documentation</a></li>
+<li>Phase 11 lesson 07 - advanced RAG patterns</li>
+<li>Phase 19 lesson 65 - the retriever this rewriter feeds</li>
+<li>Phase 19 lesson 68 - the eval that measures the rewriter lift</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="66-reranker-cross-encoder.html">
+  <span class="label">← Previous</span>
+  <b>Cross-Encoder Reranker</b>
+</a>
+      <a class="pager__item pager__item--next" href="68-rag-eval-precision-recall.html">
+  <span class="label">Next →</span>
+  <b>RAG Evaluation: Precision, Recall, MRR, nDCG, Faithfulness, Answer Relevance</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>7 minutes</b> of Capstone Projects behind you.</p>
+      <a class="btn btn--solid" href="68-rag-eval-precision-recall.html">Continue to RAG Evaluation: Precision, Recall, MRR, nDCG, Faithfulness, Answer Relevance →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#learning-objectives">Learning Objectives</a></li><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d3"><a href="#hyde-in-detail">HyDE in detail</a></li><li class="mini__item mini__item--d3"><a href="#multi-query-expansion-in-detail">Multi-query expansion in detail</a></li><li class="mini__item mini__item--d3"><a href="#decomposition-in-detail">Decomposition in detail</a></li><li class="mini__item mini__item--d3"><a href="#why-all-three-exist">Why all three exist</a></li><li class="mini__item mini__item--d2"><a href="#the-mock-llm">The Mock LLM</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d2"><a href="#failure-modes-the-demo-will-hide">Failure modes the demo will hide</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

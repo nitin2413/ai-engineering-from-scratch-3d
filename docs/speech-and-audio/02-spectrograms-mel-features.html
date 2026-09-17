@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spectrograms, Mel Scale &amp; Audio Features — Speech &amp; Audio — AIFS</title>
+<meta name="description" content="Speech &amp; Audio: Spectrograms, Mel Scale &amp; Audio Features. 5 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Spectrograms, Mel Scale &amp; Audio Features — Speech &amp; Audio — AIFS">
+<meta property="og:description" content="Speech &amp; Audio: Spectrograms, Mel Scale &amp; Audio Features. 5 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"spectrogram-window":["../assets/figures/figures-vision-speech.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-vision-speech.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#00C2FF" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#00C2FF;--accent-ink:#111111"
+  data-lesson-id="speech-and-audio/02-spectrograms-mel-features" data-module="speech-and-audio"
+  data-prev="01-audio-fundamentals.html" data-next="03-audio-classification.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#00C2FF">
+        <span class="label">Phase 06</span>
+        <b>Speech &amp; Audio</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="speech-and-audio/01-audio-fundamentals"><a href="01-audio-fundamentals.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Audio Fundamentals — Waveforms, Sampling, Fourier Transform</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/02-spectrograms-mel-features"><a href="02-spectrograms-mel-features.html" class="is-current">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Spectrograms, Mel Scale &amp; Audio Features</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/03-audio-classification"><a href="03-audio-classification.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Audio Classification — From k-NN on MFCCs to AST and BEATs</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/04-speech-recognition-asr"><a href="04-speech-recognition-asr.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">Speech Recognition (ASR) — CTC, RNN-T, Attention</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/05-whisper-architecture-finetuning"><a href="05-whisper-architecture-finetuning.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Whisper — Architecture &amp; Fine-Tuning</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/06-speaker-recognition-verification"><a href="06-speaker-recognition-verification.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Speaker Recognition &amp; Verification</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/07-text-to-speech"><a href="07-text-to-speech.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Text-to-Speech (TTS) — From Tacotron to F5 and Kokoro</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/08-voice-cloning-conversion"><a href="08-voice-cloning-conversion.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Voice Cloning &amp; Voice Conversion</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/09-music-generation"><a href="09-music-generation.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Music Generation — MusicGen, Stable Audio, Suno, and the Licensing Earthquake</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/10-audio-language-models"><a href="10-audio-language-models.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Audio-Language Models — Qwen2.5-Omni, Audio Flamingo, GPT-4o Audio</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/11-real-time-audio-processing"><a href="11-real-time-audio-processing.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Real-Time Audio Processing</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/12-voice-assistant-pipeline"><a href="12-voice-assistant-pipeline.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">Build a Voice Assistant Pipeline — The Phase 6 Capstone</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/13-neural-audio-codecs"><a href="13-neural-audio-codecs.html" class="">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Neural Audio Codecs — EnCodec, SNAC, Mimi, DAC and the Semantic-Acoustic Split</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/14-voice-activity-detection-turn-taking"><a href="14-voice-activity-detection-turn-taking.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Voice Activity Detection &amp; Turn-Taking — Silero, Cobra, and the Flush Trick</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/15-streaming-speech-to-speech-moshi-hibiki"><a href="15-streaming-speech-to-speech-moshi-hibiki.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Streaming Speech-to-Speech — Moshi, Hibiki, and Full-Duplex Dialogue</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/16-anti-spoofing-audio-watermarking"><a href="16-anti-spoofing-audio-watermarking.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Voice Anti-Spoofing &amp; Audio Watermarking — ASVspoof 5, AudioSeal, WaveVerify</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="speech-and-audio/17-audio-evaluation-metrics"><a href="17-audio-evaluation-metrics.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Audio Evaluation — WER, MOS, UTMOS, MMAU, FAD, and the Open Leaderboards</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Speech &amp; Audio</a></p>
+      <h1 class="page__title">Spectrograms, Mel Scale &amp; Audio Features</h1>
+      <p class="page__lede">Neural nets do not consume raw waveforms well. They consume spectrograms. They consume mel spectrograms even better. Every ASR, TTS, and audio classifier in 2026 lives or dies by this single preprocessing choice.</p>
+      <div class="page__meta">
+        <span class="chip">5 min read</span>
+        <span class="chip">1,070 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 6 · 01 (Audio Fundamentals)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~45 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="the-problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-problem" aria-label="Link to this section">#</a>The Problem</h2>
+<p>Take a 10-second 16 kHz clip. That is 160,000 floats, all in <code class="inline-code">[-1, 1]</code>, almost perfectly uncorrelated with the label &quot;dog barking&quot; or &quot;the word cat&quot;. The raw waveform has the information but in a form the model cannot easily extract. Two identical phonemes spoken 100 ms apart have completely different raw samples.</p>
+<p>A spectrogram fixes this. It collapses the temporal detail where human perception ignores it (microsecond jitter) and preserves the structure where perception attends (which frequencies are energetic, over time windows of ~10–25 ms).</p>
+<p>Mel spectrograms push further. Humans perceive pitch logarithmically: 100 Hz vs 200 Hz sounds &quot;the same distance apart&quot; as 1000 Hz vs 2000 Hz. The mel scale warps the frequency axis to match. A mel-scaled spectrogram is the single most important feature in speech ML from 2010 through 2026.</p>
+<h2 id="the-concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#the-concept" aria-label="Link to this section">#</a>The Concept</h2>
+<p><img src="assets/02-spectrograms-mel-features/mel-features.svg" alt="Waveform to STFT to mel spectrogram to MFCC ladder" loading="lazy"></p>
+<p><strong>STFT (Short-Time Fourier Transform).</strong> Slice the waveform into overlapping frames (typical: 25 ms window, 10 ms hop = 400 samples / 160 samples at 16 kHz). Multiply each frame by a window function (Hann is the default; Hamming slightly different tradeoff). FFT each frame. Stack the magnitude spectra into a matrix of shape <code class="inline-code">(n_frames, n_freq_bins)</code>. That is your spectrogram.</p>
+<p><strong>Log-magnitude.</strong> Raw magnitudes span 5-6 orders of magnitude. Take <code class="inline-code">log(|X| + 1e-6)</code> or <code class="inline-code">20 * log10(|X|)</code> to compress dynamic range. Every production pipeline uses log-magnitude, not raw magnitude.</p>
+<p><strong>Mel scale.</strong> Frequency <code class="inline-code">f</code> in Hz maps to mel <code class="inline-code">m</code> by <code class="inline-code">m = 2595 * log10(1 + f / 700)</code>. The mapping is roughly linear below 1 kHz and roughly logarithmic above. 80 mel bins covering 0–8 kHz is the standard ASR input.</p>
+<p><strong>Mel filterbank.</strong> A set of triangular filters spaced equally on the mel scale. Each filter is a weighted sum of adjacent FFT bins. Multiplying the STFT magnitude by the filterbank matrix gives the mel spectrogram in one matmul.</p>
+<p><strong>Log-mel spectrogram.</strong> <code class="inline-code">log(mel_spec + 1e-10)</code>. Whisper&#39;s input. Parakeet&#39;s input. SeamlessM4T&#39;s input. The universal 2026 audio frontend.</p>
+<p><strong>MFCCs.</strong> Take the log-mel spectrogram, apply a DCT (type II), keep the first 13 coefficients. Decorrelates the features and compresses further. Dominant feature until about 2015 when CNNs/Transformers on raw log-mels caught up. Still used in speaker recognition (x-vectors, ECAPA).</p>
+<p><strong>Resolution trade.</strong> Larger FFT = better frequency resolution but worse time resolution. 25 ms / 10 ms is the audio-ML default; 50 ms / 12.5 ms for music; 5 ms / 2 ms for transient detection (drum hits, plosives).</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="spectrogram-window"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">spectrogram-window</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> spectrogram window</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<h3 id="step-1-frame-the-waveform" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-1-frame-the-waveform" aria-label="Link to this section">#</a>Step 1: frame the waveform</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">frame</span><span class="token punctuation">(</span>signal<span class="token punctuation">,</span> frame_len<span class="token punctuation">,</span> hop<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    n <span class="token operator">=</span> <span class="token number">1</span> <span class="token operator">+</span> <span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>signal<span class="token punctuation">)</span> <span class="token operator">-</span> frame_len<span class="token punctuation">)</span> <span class="token operator">//</span> hop
+    <span class="token keyword">return</span> <span class="token punctuation">[</span>signal<span class="token punctuation">[</span>i <span class="token operator">*</span> hop <span class="token punctuation">:</span> i <span class="token operator">*</span> hop <span class="token operator">+</span> frame_len<span class="token punctuation">]</span> <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">]</span></code></pre>
+</figure>
+<p>A 10-second 16 kHz clip with <code class="inline-code">frame_len=400, hop=160</code> yields 998 frames.</p>
+<h3 id="step-2-hann-window" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-2-hann-window" aria-label="Link to this section">#</a>Step 2: Hann window</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">import</span> math
+
+<span class="token keyword">def</span> <span class="token function">hann</span><span class="token punctuation">(</span>N<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token number">0.5</span> <span class="token operator">*</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> math<span class="token punctuation">.</span>cos<span class="token punctuation">(</span><span class="token number">2</span> <span class="token operator">*</span> math<span class="token punctuation">.</span>pi <span class="token operator">*</span> n <span class="token operator">/</span> <span class="token punctuation">(</span>N <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">for</span> n <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>N<span class="token punctuation">)</span><span class="token punctuation">]</span></code></pre>
+</figure>
+<p>Multiply element-wise before the FFT. Removes spectral leakage caused by truncating at non-zero endpoints.</p>
+<h3 id="step-3-stft-magnitude" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-3-stft-magnitude" aria-label="Link to this section">#</a>Step 3: STFT magnitude</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">stft_magnitude</span><span class="token punctuation">(</span>signal<span class="token punctuation">,</span> frame_len<span class="token operator">=</span><span class="token number">400</span><span class="token punctuation">,</span> hop<span class="token operator">=</span><span class="token number">160</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    win <span class="token operator">=</span> hann<span class="token punctuation">(</span>frame_len<span class="token punctuation">)</span>
+    frames <span class="token operator">=</span> frame<span class="token punctuation">(</span>signal<span class="token punctuation">,</span> frame_len<span class="token punctuation">,</span> hop<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token punctuation">[</span>magnitudes<span class="token punctuation">(</span>dft<span class="token punctuation">(</span><span class="token punctuation">[</span>w <span class="token operator">*</span> s <span class="token keyword">for</span> w<span class="token punctuation">,</span> s <span class="token keyword">in</span> <span class="token builtin">zip</span><span class="token punctuation">(</span>win<span class="token punctuation">,</span> f<span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">for</span> f <span class="token keyword">in</span> frames<span class="token punctuation">]</span></code></pre>
+</figure>
+<p>Production uses <code class="inline-code">torch.stft</code> or <code class="inline-code">librosa.stft</code> (FFT-backed, vectorized). The loop here is pedagogical; it runs on short clips in <code class="inline-code">code/main.py</code>.</p>
+<h3 id="step-4-mel-filterbank" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-4-mel-filterbank" aria-label="Link to this section">#</a>Step 4: mel filterbank</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">hz_to_mel</span><span class="token punctuation">(</span>f<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token number">2595.0</span> <span class="token operator">*</span> math<span class="token punctuation">.</span>log10<span class="token punctuation">(</span><span class="token number">1.0</span> <span class="token operator">+</span> f <span class="token operator">/</span> <span class="token number">700.0</span><span class="token punctuation">)</span>
+
+<span class="token keyword">def</span> <span class="token function">mel_to_hz</span><span class="token punctuation">(</span>m<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token number">700.0</span> <span class="token operator">*</span> <span class="token punctuation">(</span><span class="token number">10</span> <span class="token operator">**</span> <span class="token punctuation">(</span>m <span class="token operator">/</span> <span class="token number">2595.0</span><span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span>
+
+<span class="token keyword">def</span> <span class="token function">mel_filterbank</span><span class="token punctuation">(</span>n_mels<span class="token punctuation">,</span> n_fft<span class="token punctuation">,</span> sr<span class="token punctuation">,</span> fmin<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">,</span> fmax<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    fmax <span class="token operator">=</span> fmax <span class="token keyword">or</span> sr <span class="token operator">/</span> <span class="token number">2</span>
+    mels <span class="token operator">=</span> <span class="token punctuation">[</span>hz_to_mel<span class="token punctuation">(</span>fmin<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token punctuation">(</span>hz_to_mel<span class="token punctuation">(</span>fmax<span class="token punctuation">)</span> <span class="token operator">-</span> hz_to_mel<span class="token punctuation">(</span>fmin<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">*</span> i <span class="token operator">/</span> <span class="token punctuation">(</span>n_mels <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span>
+            <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n_mels <span class="token operator">+</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+    hzs <span class="token operator">=</span> <span class="token punctuation">[</span>mel_to_hz<span class="token punctuation">(</span>m<span class="token punctuation">)</span> <span class="token keyword">for</span> m <span class="token keyword">in</span> mels<span class="token punctuation">]</span>
+    bins <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">(</span>h <span class="token operator">*</span> n_fft <span class="token operator">/</span> sr<span class="token punctuation">)</span> <span class="token keyword">for</span> h <span class="token keyword">in</span> hzs<span class="token punctuation">]</span>
+    fb <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token punctuation">(</span>n_fft <span class="token operator">//</span> <span class="token number">2</span> <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n_mels<span class="token punctuation">)</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> m <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n_mels<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">for</span> k <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>bins<span class="token punctuation">[</span>m<span class="token punctuation">]</span><span class="token punctuation">,</span> bins<span class="token punctuation">[</span>m <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            fb<span class="token punctuation">[</span>m<span class="token punctuation">]</span><span class="token punctuation">[</span>k<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span>k <span class="token operator">-</span> bins<span class="token punctuation">[</span>m<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token builtin">max</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> bins<span class="token punctuation">[</span>m <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">-</span> bins<span class="token punctuation">[</span>m<span class="token punctuation">]</span><span class="token punctuation">)</span>
+        <span class="token keyword">for</span> k <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>bins<span class="token punctuation">[</span>m <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> bins<span class="token punctuation">[</span>m <span class="token operator">+</span> <span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            fb<span class="token punctuation">[</span>m<span class="token punctuation">]</span><span class="token punctuation">[</span>k<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span>bins<span class="token punctuation">[</span>m <span class="token operator">+</span> <span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">-</span> k<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token builtin">max</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> bins<span class="token punctuation">[</span>m <span class="token operator">+</span> <span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">-</span> bins<span class="token punctuation">[</span>m <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> fb</code></pre>
+</figure>
+<p>80 mels covering 0–8 kHz with <code class="inline-code">n_fft=400</code> gives an <code class="inline-code">(80, 201)</code> matrix. Multiply the <code class="inline-code">(n_frames, 201)</code> STFT magnitude by the transpose to get <code class="inline-code">(n_frames, 80)</code> mel spectrogram.</p>
+<h3 id="step-5-log-mel" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-5-log-mel" aria-label="Link to this section">#</a>Step 5: log-mel</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">log_mel</span><span class="token punctuation">(</span>mel_spec<span class="token punctuation">,</span> eps<span class="token operator">=</span><span class="token number">1e-10</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token punctuation">[</span>math<span class="token punctuation">.</span>log<span class="token punctuation">(</span><span class="token builtin">max</span><span class="token punctuation">(</span>v<span class="token punctuation">,</span> eps<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">for</span> v <span class="token keyword">in</span> frame<span class="token punctuation">]</span> <span class="token keyword">for</span> frame <span class="token keyword">in</span> mel_spec<span class="token punctuation">]</span></code></pre>
+</figure>
+<p>Common alternatives: <code class="inline-code">librosa.power_to_db</code> (reference-normalized dB), <code class="inline-code">10 * log10(power + eps)</code>. Whisper uses a more involved clip + normalize routine (see Whisper&#39;s <code class="inline-code">log_mel_spectrogram</code>).</p>
+<h3 id="step-6-mfccs" class="prose-h prose-h3"><a class="prose-h__anchor" href="#step-6-mfccs" aria-label="Link to this section">#</a>Step 6: MFCCs</h3>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">python</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code class="language-python"><span class="token keyword">def</span> <span class="token function">dct_ii</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> n_coeffs<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    N <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token punctuation">[</span>
+        <span class="token builtin">sum</span><span class="token punctuation">(</span>x<span class="token punctuation">[</span>n<span class="token punctuation">]</span> <span class="token operator">*</span> math<span class="token punctuation">.</span>cos<span class="token punctuation">(</span>math<span class="token punctuation">.</span>pi <span class="token operator">*</span> k <span class="token operator">*</span> <span class="token punctuation">(</span><span class="token number">2</span> <span class="token operator">*</span> n <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token punctuation">(</span><span class="token number">2</span> <span class="token operator">*</span> N<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">for</span> n <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>N<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">for</span> k <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n_coeffs<span class="token punctuation">)</span>
+    <span class="token punctuation">]</span></code></pre>
+</figure>
+<p>Apply DCT to each log-mel frame, keep the first 13 coefficients. That is your MFCC matrix. The first coefficient is usually dropped (it encodes overall energy).</p>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p>The 2026 stack:</p>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Features</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ASR (Whisper, Parakeet, SeamlessM4T)</td>
+<td>80 log-mels, 10 ms hop, 25 ms window</td>
+</tr>
+<tr>
+<td>TTS acoustic model (VITS, F5-TTS, Kokoro)</td>
+<td>80 mels, 5–12 ms hop for fine temporal control</td>
+</tr>
+<tr>
+<td>Audio classification (AST, PANNs, BEATs)</td>
+<td>128 log-mels, 10 ms hop</td>
+</tr>
+<tr>
+<td>Speaker embedding (ECAPA-TDNN, WavLM)</td>
+<td>80 log-mels or raw-waveform SSL</td>
+</tr>
+<tr>
+<td>Music (MusicGen, Stable Audio 2)</td>
+<td>EnCodec discrete tokens (not mels)</td>
+</tr>
+<tr>
+<td>Keyword spotting</td>
+<td>40 MFCCs for tiny devices</td>
+</tr>
+</tbody></table>
+<p>Rule of thumb: <strong>if you are not working on music, start with 80 log-mels.</strong> The burden of proof is on any deviation.</p>
+<h2 id="pitfalls-that-still-ship-in-2026" class="prose-h prose-h2"><a class="prose-h__anchor" href="#pitfalls-that-still-ship-in-2026" aria-label="Link to this section">#</a>Pitfalls that still ship in 2026</h2>
+<ul>
+<li><strong>Mel count mismatch.</strong> Training with 80 mels, inference with 128 mels. Silent failure. Log the feature shape at both ends.</li>
+<li><strong>Sample-rate mismatch upstream.</strong> Mels computed at 22.05 kHz look different from 16 kHz. Fix SR <em>before</em> featurization.</li>
+<li><strong>dB vs log.</strong> Whisper expects log-mel, not dB-mel. Some HF pipelines autodetect; your custom code will not.</li>
+<li><strong>Normalization drift.</strong> Per-utterance normalization during training, global normalization during inference. Production bug that doubles WER.</li>
+<li><strong>Leakage from padding.</strong> Zero-padding the end of a clip produces a flat spectrum in the trailing frames. Pad symmetrically or replicate.</li>
+</ul>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>Save as <code class="inline-code">outputs/skill-feature-extractor.md</code>. The skill picks feature type, mel count, frame/hop, and normalization for a given model target.</p>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li><strong>Easy.</strong> Run <code class="inline-code">code/main.py</code>. It synthesizes a chirp (frequency swept 200 → 4000 Hz) and prints the argmax mel bin per frame. Plot (optional) and confirm it matches the sweep.</li>
+<li><strong>Medium.</strong> Re-run with <code class="inline-code">n_mels</code> in <code class="inline-code">{40, 80, 128}</code> and <code class="inline-code">frame_len</code> in <code class="inline-code">{200, 400, 800}</code>. Measure sharp-peak bandwidth across the time axis. Which combo resolves the chirp the best?</li>
+<li><strong>Hard.</strong> Implement <code class="inline-code">power_to_db</code> and compare ASR accuracy of a tiny CNN classifier on AudioMNIST using (a) raw log-mel, (b) dB-mel with <code class="inline-code">ref=max</code>, (c) MFCC-13 + delta + delta-delta. Report top-1 accuracy.</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Frame</td>
+<td>A slice</td>
+<td>25 ms chunk of waveform fed to one FFT.</td>
+</tr>
+<tr>
+<td>Hop</td>
+<td>Stride</td>
+<td>Samples between consecutive frames; 10 ms is ASR default.</td>
+</tr>
+<tr>
+<td>Window</td>
+<td>Hann/Hamming thing</td>
+<td>Point-wise multiplier that tapers the frame edges to zero.</td>
+</tr>
+<tr>
+<td>STFT</td>
+<td>Spectrogram generator</td>
+<td>Framed + windowed FFT; yields time × frequency matrix.</td>
+</tr>
+<tr>
+<td>Mel</td>
+<td>Warped frequency</td>
+<td>Log-perception scale; <code class="inline-code">m = 2595·log10(1 + f/700)</code>.</td>
+</tr>
+<tr>
+<td>Filterbank</td>
+<td>The matrix</td>
+<td>Triangular filters that project STFT onto mel bins.</td>
+</tr>
+<tr>
+<td>Log-mel</td>
+<td>Whisper&#39;s input</td>
+<td><code class="inline-code">log(mel_spec + eps)</code>; standardized in 2026.</td>
+</tr>
+<tr>
+<td>MFCC</td>
+<td>Old-school feature</td>
+<td>DCT of log-mel; 13 coeffs, decorrelated.</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://ieeexplore.ieee.org/document/1163420" target="_blank" rel="noopener">Davis, Mermelstein (1980). Comparison of parametric representations for monosyllabic word recognition</a> — the MFCC paper.</li>
+<li><a href="https://pubs.aip.org/asa/jasa/article-abstract/8/3/185/735757/" target="_blank" rel="noopener">Stevens, Volkmann, Newman (1937). A Scale for the Measurement of the Psychological Magnitude Pitch</a> — the original mel scale.</li>
+<li><a href="https://github.com/openai/whisper/blob/main/whisper/audio.py" target="_blank" rel="noopener">OpenAI — Whisper source, log_mel_spectrogram</a> — read the reference implementation.</li>
+<li><a href="https://librosa.org/doc/main/feature.html" target="_blank" rel="noopener">librosa feature extraction docs</a> — reference for <code class="inline-code">mfcc</code>, <code class="inline-code">melspectrogram</code>, and hop/window.</li>
+<li><a href="https://docs.nvidia.com/deeplearning/nemo/user-guide/docs/en/main/asr/asr_all.html#featurizers" target="_blank" rel="noopener">NVIDIA NeMo — audio preprocessing</a> — production-scale pipeline for Parakeet + Canary models.</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="01-audio-fundamentals.html">
+  <span class="label">← Previous</span>
+  <b>Audio Fundamentals — Waveforms, Sampling, Fourier Transform</b>
+</a>
+      <a class="pager__item pager__item--next" href="03-audio-classification.html">
+  <span class="label">Next →</span>
+  <b>Audio Classification — From k-NN on MFCCs to AST and BEATs</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>5 minutes</b> of Speech &amp; Audio behind you.</p>
+      <a class="btn btn--solid" href="03-audio-classification.html">Continue to Audio Classification — From k-NN on MFCCs to AST and BEATs →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#the-problem">The Problem</a></li><li class="mini__item mini__item--d2"><a href="#the-concept">The Concept</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d3"><a href="#step-1-frame-the-waveform">Step 1: frame the waveform</a></li><li class="mini__item mini__item--d3"><a href="#step-2-hann-window">Step 2: Hann window</a></li><li class="mini__item mini__item--d3"><a href="#step-3-stft-magnitude">Step 3: STFT magnitude</a></li><li class="mini__item mini__item--d3"><a href="#step-4-mel-filterbank">Step 4: mel filterbank</a></li><li class="mini__item mini__item--d3"><a href="#step-5-log-mel">Step 5: log-mel</a></li><li class="mini__item mini__item--d3"><a href="#step-6-mfccs">Step 6: MFCCs</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#pitfalls-that-still-ship-in-2026">Pitfalls that still ship in 2026</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>

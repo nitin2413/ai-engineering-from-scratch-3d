@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shared Memory and Blackboard Patterns — Multi-Agent &amp; Swarms — AIFS</title>
+<meta name="description" content="Multi-Agent &amp; Swarms: Shared Memory and Blackboard Patterns. 7 minute read.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Shared Memory and Blackboard Patterns — Multi-Agent &amp; Swarms — AIFS">
+<meta property="og:description" content="Multi-Agent &amp; Swarms: Shared Memory and Blackboard Patterns. 7 minute read.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%23FFE500%22%2F%3E%3Crect%20x%3D%221.5%22%20y%3D%221.5%22%20width%3D%2229%22%20height%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2223%22%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22%23111%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/styles.css">
+<script>try{var t=localStorage.getItem('course:theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.AIFS_FIGURE_PROVIDERS={"swarm-blackboard":["../assets/figures/figures-swarms2.js"]};window.AIFS_FIGURE_PROVIDER_ORDER=["../assets/figures/figures-swarms2.js"];</script>
+</head>
+<body class="is-reader" style="--accent:#7CFFB2" data-rel="../">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="readbar" aria-hidden="true"><span class="readbar__fill" data-progress-bar></span></div>
+<header class="bar">
+  <a class="bar__mark" href="../index.html">
+    <span class="bar__badge">AI</span>
+    <span class="bar__wordmark">AI <em>FROM SCRATCH</em></span>
+  </a>
+  <nav class="bar__nav" aria-label="Site">
+    <a href="../index.html#modules">Phases</a>
+    <a href="../index.html#path">Path</a>
+    
+    <a href="../about.html">About</a>
+  </nav>
+  <div class="bar__tools">
+    <button class="btn btn--sm" type="button" data-open-search>Search <kbd>⌘K</kbd></button>
+    <button class="btn btn--icon" type="button" data-theme-toggle title="Toggle light / dark" aria-label="Toggle light or dark theme"><span data-theme-icon>◑</span></button>
+  </div>
+</header>
+<main id="main" class="reader" style="--accent:#7CFFB2;--accent-ink:#111111"
+  data-lesson-id="multi-agent-and-swarms/13-shared-memory-blackboard" data-module="multi-agent-and-swarms"
+  data-prev="12-a2a-protocol.html" data-next="14-consensus-and-bft.html">
+  <aside class="snav" data-snav>
+    <div class="snav__head">
+      <a class="snav__module" href="index.html" style="--accent:#7CFFB2">
+        <span class="label">Phase 16</span>
+        <b>Multi-Agent &amp; Swarms</b>
+      </a>
+      <button class="btn btn--icon snav__close" type="button" data-snav-close aria-label="Close contents">✕</button>
+    </div>
+    <ol class="snav__list"><li data-lesson="multi-agent-and-swarms/01-why-multi-agent"><a href="01-why-multi-agent.html" class="">
+  <span class="snav__n">01</span>
+  <span class="snav__t">Why Multi-Agent?</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/02-fipa-acl-heritage"><a href="02-fipa-acl-heritage.html" class="">
+  <span class="snav__n">02</span>
+  <span class="snav__t">Heritage of FIPA-ACL and Speech Acts</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/03-communication-protocols"><a href="03-communication-protocols.html" class="">
+  <span class="snav__n">03</span>
+  <span class="snav__t">Communication Protocols</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/04-primitive-model"><a href="04-primitive-model.html" class="">
+  <span class="snav__n">04</span>
+  <span class="snav__t">The Multi-Agent Primitive Model</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/05-supervisor-orchestrator-pattern"><a href="05-supervisor-orchestrator-pattern.html" class="">
+  <span class="snav__n">05</span>
+  <span class="snav__t">Supervisor / Orchestrator-Worker Pattern</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/06-hierarchical-architecture"><a href="06-hierarchical-architecture.html" class="">
+  <span class="snav__n">06</span>
+  <span class="snav__t">Hierarchical Architecture and Its Failure Mode</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/07-society-of-mind-debate"><a href="07-society-of-mind-debate.html" class="">
+  <span class="snav__n">07</span>
+  <span class="snav__t">Society of Mind and Multi-Agent Debate</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/08-role-specialization"><a href="08-role-specialization.html" class="">
+  <span class="snav__n">08</span>
+  <span class="snav__t">Role Specialization — Planner, Critic, Executor, Verifier</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/09-parallel-swarm-networks"><a href="09-parallel-swarm-networks.html" class="">
+  <span class="snav__n">09</span>
+  <span class="snav__t">Parallel / Swarm / Networked Architectures</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/10-group-chat-speaker-selection"><a href="10-group-chat-speaker-selection.html" class="">
+  <span class="snav__n">10</span>
+  <span class="snav__t">Group Chat and Speaker Selection</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/11-handoffs-and-routines"><a href="11-handoffs-and-routines.html" class="">
+  <span class="snav__n">11</span>
+  <span class="snav__t">Handoffs and Routines — Stateless Orchestration</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/12-a2a-protocol"><a href="12-a2a-protocol.html" class="">
+  <span class="snav__n">12</span>
+  <span class="snav__t">A2A — The Agent-to-Agent Protocol</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/13-shared-memory-blackboard"><a href="13-shared-memory-blackboard.html" class="is-current">
+  <span class="snav__n">13</span>
+  <span class="snav__t">Shared Memory and Blackboard Patterns</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/14-consensus-and-bft"><a href="14-consensus-and-bft.html" class="">
+  <span class="snav__n">14</span>
+  <span class="snav__t">Consensus and Byzantine Fault Tolerance for Agents</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/15-voting-debate-topology"><a href="15-voting-debate-topology.html" class="">
+  <span class="snav__n">15</span>
+  <span class="snav__t">Voting, Self-Consistency, and Debate Topology</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/16-negotiation-bargaining"><a href="16-negotiation-bargaining.html" class="">
+  <span class="snav__n">16</span>
+  <span class="snav__t">Negotiation and Bargaining</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/17-generative-agents-simulation"><a href="17-generative-agents-simulation.html" class="">
+  <span class="snav__n">17</span>
+  <span class="snav__t">Generative Agents and Emergent Simulation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/18-theory-of-mind-coordination"><a href="18-theory-of-mind-coordination.html" class="">
+  <span class="snav__n">18</span>
+  <span class="snav__t">Theory of Mind and Emergent Coordination</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/19-swarm-optimization-pso-aco"><a href="19-swarm-optimization-pso-aco.html" class="">
+  <span class="snav__n">19</span>
+  <span class="snav__t">Swarm Optimization for LLMs (PSO, ACO)</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/20-marl-maddpg-qmix-mappo"><a href="20-marl-maddpg-qmix-mappo.html" class="">
+  <span class="snav__n">20</span>
+  <span class="snav__t">MARL — MADDPG, QMIX, MAPPO</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/21-agent-economies"><a href="21-agent-economies.html" class="">
+  <span class="snav__n">21</span>
+  <span class="snav__t">Agent Economies, Token Incentives, Reputation</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/22-production-scaling-queues-checkpoints"><a href="22-production-scaling-queues-checkpoints.html" class="">
+  <span class="snav__n">22</span>
+  <span class="snav__t">Production Scaling — Queues, Checkpoints, Durability</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/23-failure-modes-mast-groupthink"><a href="23-failure-modes-mast-groupthink.html" class="">
+  <span class="snav__n">23</span>
+  <span class="snav__t">Failure Modes — MAST, Groupthink, Monoculture, Cascading Errors</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/24-evaluation-coordination-benchmarks"><a href="24-evaluation-coordination-benchmarks.html" class="">
+  <span class="snav__n">24</span>
+  <span class="snav__t">Evaluation and Coordination Benchmarks</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li><li data-lesson="multi-agent-and-swarms/25-case-studies-2026-sota"><a href="25-case-studies-2026-sota.html" class="">
+  <span class="snav__n">25</span>
+  <span class="snav__t">Case Studies and the 2026 State of the Art</span>
+  <span class="snav__tick" data-tick aria-hidden="true">✓</span>
+</a></li></ol>
+    <div class="snav__foot"><a href="../index.html#modules">All modules →</a></div>
+  </aside>
+
+  <article class="page">
+    <header class="page__head">
+      <p class="page__crumbs"><a href="../index.html">Home</a> <span>/</span> <a href="index.html">Multi-Agent &amp; Swarms</a></p>
+      <h1 class="page__title">Shared Memory and Blackboard Patterns</h1>
+      <p class="page__lede">Two approaches coexist in 2026 multi-agent systems: the <b>message pool</b> (everyone sees everyone's messages, as in AutoGen GroupChat or MetaGPT) and the <b>blackboard with subscription</b> (agents subscribe to relevant events, as in Context-Aware MCP or the Matrix framework). Both are the only stateful part of a multi-agent system — which means both are where the interesting bugs live. The reference failure mode is <b>memory poisoning</b>: one agent hallucinates a &quot;fact,&quot; other agents treat it as verified, and accuracy decays gradually in a way that is much harder to debug than an immediate crash. This lesson builds both structures from stdlib, injects a poisoning attack, and shows the three mitigations that actually work in production.</p>
+      <div class="page__meta">
+        <span class="chip">7 min read</span>
+        <span class="chip">1,465 words</span>
+        <button class="chip chip--btn" type="button" data-mark-read>Mark as read</button>
+      </div>
+      <dl class="facts"><div class="facts__pair"><dt class="label">Type</dt><dd>Learn + Build</dd></div><div class="facts__pair"><dt class="label">Languages</dt><dd>Python (stdlib, <code class="inline-code">threading</code>)</dd></div><div class="facts__pair"><dt class="label">Prerequisites</dt><dd>Phase 16 · 04 (Primitive Model), Phase 16 · 09 (Parallel Swarm Networks)</dd></div><div class="facts__pair"><dt class="label">Time</dt><dd>~75 minutes</dd></div></dl>
+    </header>
+    <div class="prose" data-prose><h2 id="problem" class="prose-h prose-h2"><a class="prose-h__anchor" href="#problem" aria-label="Link to this section">#</a>Problem</h2>
+<p>Multi-agent systems need a place for agents to share facts. A literal option is &quot;pass everything in messages&quot; — but that reinvents shared state with extra copying. Another is &quot;give everyone a global log&quot; — but global logs grow unbounded and poison easily. A third is &quot;project a view per agent&quot; — scalable but schema-heavy.</p>
+<p>When one of the agents hallucinates and writes the hallucination to shared state, every downstream agent that reads that state adopts the hallucination as fact. By the time the human notices, the reasoning chain is five steps deep and the root cause is the third message ever written. Debugging multi-agent accuracy decay is harder than debugging a crash.</p>
+<p>This is memory poisoning. It is the second-most-documented failure family in the MAST taxonomy (Cemri et al., arXiv:2503.13657) and it is structural: any shared-memory design without provenance and an unwritable verifier will exhibit it eventually.</p>
+<h2 id="concept" class="prose-h prose-h2"><a class="prose-h__anchor" href="#concept" aria-label="Link to this section">#</a>Concept</h2>
+<h3 id="the-two-main-topologies" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-two-main-topologies" aria-label="Link to this section">#</a>The two main topologies</h3>
+<p><strong>Full message pool.</strong> Every agent reads every message. AutoGen GroupChat and MetaGPT use this. Simple, transparent, inspectable, but does not scale past ~10 agents because each agent&#39;s context fills with other agents&#39; work.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>agent-A ──write──▶ ┌────────────────┐ ◀──read── agent-D
+                   │ message pool   │
+agent-B ──write──▶ │                │ ◀──read── agent-E
+                   │ (global log)   │
+agent-C ──write──▶ └────────────────┘ ◀──read── agent-F</code></pre>
+</figure>
+<p><strong>Blackboard with subscription.</strong> Agents declare interest in topics; the substrate routes only relevant messages. CA-MCP (arXiv:2601.11595) and the Matrix decentralized framework (arXiv:2511.21686) use this. Scales further, but requires upfront schema design to make subscriptions meaningful.</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>                   ┌─ topic: prices ──┐
+agent-A ──pub────▶ │                  │ ──▶ agent-D (subscribed)
+                   ├─ topic: orders ──┤
+agent-B ──pub────▶ │                  │ ──▶ agent-E (subscribed)
+                   ├─ topic: alerts ──┤
+agent-C ──pub────▶ │                  │ ──▶ agent-F (subscribed)
+                   └──────────────────┘</code></pre>
+</figure>
+<h3 id="when-each-wins" class="prose-h prose-h3"><a class="prose-h__anchor" href="#when-each-wins" aria-label="Link to this section">#</a>When each wins</h3>
+<ul>
+<li><strong>Full pool</strong> wins when agents are few (&lt; 10), heterogeneous, and the conversation is short-horizon. Reasoning about who said what is trivial when everyone sees everything.</li>
+<li><strong>Blackboard</strong> wins when agents are many, homogeneous in role but numerous in instance (swarms), and the conversation is long-running. Routing saves token cost and context pollution.</li>
+</ul>
+<p>Production systems often mix: a small full pool at the top (planning layer), blackboards below (worker layer).</p>
+<h3 id="memory-poisoning-in-one-scenario" class="prose-h prose-h3"><a class="prose-h__anchor" href="#memory-poisoning-in-one-scenario" aria-label="Link to this section">#</a>Memory poisoning, in one scenario</h3>
+<p>Three agents work on a research task. Agent A is a retrieval agent. Agent B is a summarizer. Agent C is an analyst.</p>
+<ol>
+<li>A fetches a page and writes a message to shared state: &quot;The study reports a 42% accuracy improvement.&quot;</li>
+<li>The fetched page actually said &quot;4.2% improvement.&quot; A hallucinated a decimal.</li>
+<li>B, reading shared state, writes: &quot;Large 42% accuracy gain reported (source: A).&quot;</li>
+<li>C, reading shared state, writes: &quot;Recommend adoption — 42% lift is transformative.&quot;</li>
+<li>The final report cites a 42% number that never existed.</li>
+</ol>
+<p>No agent crashed. No test failed. The system &quot;worked.&quot; The hallucination crossed from one agent&#39;s context into every downstream agent&#39;s reasoning via shared state.</p>
+<h3 id="why-this-is-structural" class="prose-h prose-h3"><a class="prose-h__anchor" href="#why-this-is-structural" aria-label="Link to this section">#</a>Why this is structural</h3>
+<p>Without shared state, agent A&#39;s hallucination stays in A&#39;s context. Downstream agents would re-fetch or re-derive and might catch the error. With naive shared state, A&#39;s context becomes everyone&#39;s context, and the hallucination is laundered into fact.</p>
+<p>The problem is not shared state per se — it is shared state <strong>without provenance and without an independent verifier</strong>. Three mitigations address this:</p>
+<ol>
+<li><strong>Attribute provenance on every write.</strong> Every entry in shared state records who wrote it, when, under what prompt, and (if applicable) what source the agent cited. Downstream agents read with skepticism keyed to provenance.</li>
+<li><strong>Version writes; treat them as append-only.</strong> A correction is a new entry that supersedes the old, not an in-place update. The audit trail is preserved.</li>
+<li><strong>Keep at least one agent that cannot write to shared state.</strong> A read-only verifier agent samples entries, re-fetches sources, and flags inconsistencies. Because it cannot write to the pool, it cannot be poisoned by the pool.</li>
+</ol>
+<h3 id="blackboard-precedent-hayes-roth-1985" class="prose-h prose-h3"><a class="prose-h__anchor" href="#blackboard-precedent-hayes-roth-1985" aria-label="Link to this section">#</a>Blackboard precedent (Hayes-Roth, 1985)</h3>
+<p>The blackboard pattern predates LLM agents by four decades. Hayes-Roth (1985, &quot;A Blackboard Architecture for Control&quot;) described specialist Knowledge Sources that observe a global blackboard, contribute partial solutions, and trigger other sources. The 2026 blackboard (CA-MCP, Matrix) is the same pattern with LLM agents as Knowledge Sources and JSON blobs as partial solutions. The old literature has documented solutions to write contention, opportunistic control, and consistency that modern systems rediscover.</p>
+<h3 id="projection-vs-full-view" class="prose-h prose-h3"><a class="prose-h__anchor" href="#projection-vs-full-view" aria-label="Link to this section">#</a>Projection vs full view</h3>
+<p>A pure blackboard gives every subscriber the same projection (topic-scoped). A more aggressive design is <strong>per-agent projection</strong>: each agent gets a view customized to its role. LangGraph&#39;s state reducers are the canonical 2026 implementation — the reducer function folds global state into a role-specific slice.</p>
+<p>Per-agent projection scales further but needs a schema. Without one, you rebuild ad-hoc projection in every agent&#39;s prompt.</p>
+<h3 id="write-contention-patterns" class="prose-h prose-h3"><a class="prose-h__anchor" href="#write-contention-patterns" aria-label="Link to this section">#</a>Write-contention patterns</h3>
+<p>Multiple agents writing simultaneously is a concurrency problem, not just an LLM problem. Three patterns work:</p>
+<ul>
+<li><strong>Sequential writer (single producer).</strong> All writes go through one coordinator agent that serializes. Simple, but a bottleneck.</li>
+<li><strong>Optimistic concurrency with versioning.</strong> Each entry has a version; writers fail on version mismatch and retry. Classic database technique.</li>
+<li><strong>Topic partitioning.</strong> Different agents own different topics. No cross-topic contention. Requires designed partition boundaries.</li>
+</ul>
+<p>Most 2026 frameworks default to sequential writer because LLM calls are slow enough that contention is rare and the bottleneck does not hurt.</p>
+<h3 id="the-unwritable-verifier" class="prose-h prose-h3"><a class="prose-h__anchor" href="#the-unwritable-verifier" aria-label="Link to this section">#</a>The unwritable verifier</h3>
+<p>The most load-bearing mitigation is the read-only verifier. Implementation rules:</p>
+<ul>
+<li>Verifier shares state with the team (reads the blackboard or pool).</li>
+<li>Verifier has no write handle to shared state — only to a separate verification channel.</li>
+<li>Verifier independently fetches sources cited in writes. Flags disagreement.</li>
+<li>Verifier&#39;s own outputs are routed to a human or a separate decision agent, never fed back into the pool.</li>
+</ul>
+<p>Without this separation, the verifier&#39;s outputs become new entries in the pool, which means a poisoned pool poisons the verifier, which poisons its verifications.</p>
+<figure class="lfwrap">
+  <div class="lesson-figure" data-figure="swarm-blackboard"></div>
+  <noscript><p class="lfwrap__fallback">Interactive figure <code class="inline-code">swarm-blackboard</code> — it needs JavaScript to animate.</p></noscript>
+  <figcaption class="lfwrap__cap"><span class="label">Interactive</span> swarm blackboard</figcaption>
+</figure>
+<h2 id="build-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#build-it" aria-label="Link to this section">#</a>Build It</h2>
+<p><code class="inline-code">code/main.py</code> implements both topologies in stdlib Python plus a toy poisoning attack and the three mitigations.</p>
+<ul>
+<li><code class="inline-code">MessagePool</code> — thread-safe append-only log with full read-out.</li>
+<li><code class="inline-code">Blackboard</code> — topic-keyed pub/sub with per-agent subscriptions.</li>
+<li><code class="inline-code">ProvenanceEntry</code> — every write records (writer, timestamp, prompt_hash, source_uri).</li>
+<li><code class="inline-code">PoisoningScenario</code> — runs a three-agent research task where agent A hallucinates a decimal. Prints final report.</li>
+<li><code class="inline-code">Verifier</code> — a read-only agent that re-fetches sources and flags inconsistencies. Runs the same scenario with the verifier present.</li>
+</ul>
+<p>Run:</p>
+<figure class="code">
+  <figcaption class="code__bar"><span class="code__lang">text</span><button class="code__copy" type="button" data-copy aria-label="Copy code">COPY</button></figcaption>
+  <pre class="code__pre"><code>python3 code/main.py</code></pre>
+</figure>
+<p>Expected output:</p>
+<ul>
+<li>Run 1 (no verifier): the hallucinated 42% propagates to the final report.</li>
+<li>Run 2 (with verifier): the verifier flags the inconsistency, the pool is labeled &quot;flagged&quot;, the final report includes a retraction.</li>
+</ul>
+<h2 id="use-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#use-it" aria-label="Link to this section">#</a>Use It</h2>
+<p><code class="inline-code">outputs/skill-memory-auditor.md</code> is a skill that audits any multi-agent system&#39;s shared-memory design for provenance, versioning, and verifier separation. Run it on new multi-agent architectures before production.</p>
+<h2 id="ship-it" class="prose-h prose-h2"><a class="prose-h__anchor" href="#ship-it" aria-label="Link to this section">#</a>Ship It</h2>
+<p>For any shared-memory design:</p>
+<ul>
+<li>Record provenance on every write: <code class="inline-code">(writer, timestamp, prompt_hash, tool_calls_cited, source_uri)</code>.</li>
+<li>Make the log append-only. Corrections are new entries that reference the superseded one.</li>
+<li>Deploy at least one read-only verifier agent with independent source access.</li>
+<li>Route verifier output to a separate channel, not back into the shared pool.</li>
+<li>Log the ratio of writes that are supersessions — a rising ratio is early evidence of hallucination patterns.</li>
+</ul>
+<h2 id="exercises" class="prose-h prose-h2"><a class="prose-h__anchor" href="#exercises" aria-label="Link to this section">#</a>Exercises</h2>
+<ol>
+<li>Run <code class="inline-code">code/main.py</code>. Confirm run 1 propagates the hallucination and run 2 catches it.</li>
+<li>Add a second hallucination: agent B invents a dataset size. The verifier should catch both without being hand-tuned for either.</li>
+<li>Switch the full pool to a blackboard with topic partitions (<code class="inline-code">prices</code>, <code class="inline-code">summaries</code>, <code class="inline-code">analyses</code>). Which poisoning scenarios does topic partitioning make harder to pull off, and which does it not help with?</li>
+<li>Read Hayes-Roth (1985, &quot;A Blackboard Architecture for Control&quot;). Identify two control patterns from the paper not discussed in this lesson that 2026 systems would benefit from.</li>
+<li>Read CA-MCP (arXiv:2601.11595). Map its Shared Context Store to either the MessagePool or Blackboard class in <code class="inline-code">code/main.py</code>. Which primitives does CA-MCP add on top?</li>
+</ol>
+<h2 id="key-terms" class="prose-h prose-h2"><a class="prose-h__anchor" href="#key-terms" aria-label="Link to this section">#</a>Key Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What people say</th>
+<th>What it actually means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Message pool</td>
+<td>&quot;Shared chat history&quot;</td>
+<td>Append-only log that every agent reads. Full transparency, poor scaling.</td>
+</tr>
+<tr>
+<td>Blackboard</td>
+<td>&quot;Shared workspace&quot;</td>
+<td>Topic-keyed pub/sub. Agents subscribe to relevant topics. Scales farther.</td>
+</tr>
+<tr>
+<td>Provenance</td>
+<td>&quot;Who wrote what&quot;</td>
+<td>Metadata on each write: writer, timestamp, prompt, sources.</td>
+</tr>
+<tr>
+<td>Memory poisoning</td>
+<td>&quot;Hallucinations spreading&quot;</td>
+<td>One agent&#39;s error enters shared state, downstream agents adopt it as fact.</td>
+</tr>
+<tr>
+<td>Append-only</td>
+<td>&quot;No in-place updates&quot;</td>
+<td>Corrections are new entries that supersede. Preserves audit trail.</td>
+</tr>
+<tr>
+<td>Unwritable verifier</td>
+<td>&quot;Independent auditor&quot;</td>
+<td>Read-only agent that re-fetches sources and flags inconsistencies.</td>
+</tr>
+<tr>
+<td>Projection</td>
+<td>&quot;Scoped view&quot;</td>
+<td>Per-agent view computed from global state. LangGraph reducers are the canonical case.</td>
+</tr>
+<tr>
+<td>Knowledge Source</td>
+<td>&quot;Specialist agent&quot;</td>
+<td>Hayes-Roth&#39;s 1985 term for a blackboard participant.</td>
+</tr>
+</tbody></table>
+<h2 id="further-reading" class="prose-h prose-h2"><a class="prose-h__anchor" href="#further-reading" aria-label="Link to this section">#</a>Further Reading</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2503.13657" target="_blank" rel="noopener">Cemri et al. — Why Do Multi-Agent LLM Systems Fail?</a> — MAST taxonomy; memory poisoning is a coordination-failure sub-family</li>
+<li><a href="https://arxiv.org/abs/2601.11595" target="_blank" rel="noopener">CA-MCP — Context-Aware Multi-Server MCP</a> — Shared Context Store for coordinated MCP servers</li>
+<li><a href="https://arxiv.org/abs/2511.21686" target="_blank" rel="noopener">Matrix — decentralized multi-agent framework</a> — message-queue-based blackboard without a central orchestrator</li>
+<li><a href="https://docs.langchain.com/oss/python/langgraph/workflows-agents" target="_blank" rel="noopener">LangGraph state and reducers</a> — the per-agent projection pattern in production</li>
+<li><a href="https://www.anthropic.com/engineering/multi-agent-research-system" target="_blank" rel="noopener">Anthropic — How we built our multi-agent research system</a> — provenance and verification notes from a production deployment</li>
+</ul>
+</div>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="pager__item pager__item--prev" href="12-a2a-protocol.html">
+  <span class="label">← Previous</span>
+  <b>A2A — The Agent-to-Agent Protocol</b>
+</a>
+      <a class="pager__item pager__item--next" href="14-consensus-and-bft.html">
+  <span class="label">Next →</span>
+  <b>Consensus and Byzantine Fault Tolerance for Agents</b>
+</a>
+    </nav>
+    <div class="page__done" data-done-card hidden>
+      <span class="label">Lesson complete</span>
+      <p>Nice. That's <b>7 minutes</b> of Multi-Agent &amp; Swarms behind you.</p>
+      <a class="btn btn--solid" href="14-consensus-and-bft.html">Continue to Consensus and Byzantine Fault Tolerance for Agents →</a>
+    </div>
+  </article>
+
+  <aside class="mini">
+    <div class="mini__sticky">
+      <h2 class="label">On this page</h2>
+      <ol class="mini__list" data-outline><li class="mini__item mini__item--d2"><a href="#problem">Problem</a></li><li class="mini__item mini__item--d2"><a href="#concept">Concept</a></li><li class="mini__item mini__item--d3"><a href="#the-two-main-topologies">The two main topologies</a></li><li class="mini__item mini__item--d3"><a href="#when-each-wins">When each wins</a></li><li class="mini__item mini__item--d3"><a href="#memory-poisoning-in-one-scenario">Memory poisoning, in one scenario</a></li><li class="mini__item mini__item--d3"><a href="#why-this-is-structural">Why this is structural</a></li><li class="mini__item mini__item--d3"><a href="#blackboard-precedent-hayes-roth-1985">Blackboard precedent (Hayes-Roth, 1985)</a></li><li class="mini__item mini__item--d3"><a href="#projection-vs-full-view">Projection vs full view</a></li><li class="mini__item mini__item--d3"><a href="#write-contention-patterns">Write-contention patterns</a></li><li class="mini__item mini__item--d3"><a href="#the-unwritable-verifier">The unwritable verifier</a></li><li class="mini__item mini__item--d2"><a href="#build-it">Build It</a></li><li class="mini__item mini__item--d2"><a href="#use-it">Use It</a></li><li class="mini__item mini__item--d2"><a href="#ship-it">Ship It</a></li><li class="mini__item mini__item--d2"><a href="#exercises">Exercises</a></li><li class="mini__item mini__item--d2"><a href="#key-terms">Key Terms</a></li><li class="mini__item mini__item--d2"><a href="#further-reading">Further Reading</a></li></ol>
+      <div class="mini__tools">
+        <button class="btn btn--sm" type="button" data-snav-open>Contents <kbd>c</kbd></button>
+        <button class="btn btn--sm" type="button" data-top>Top ↑</button>
+      </div>
+    </div>
+  </aside>
+  <button class="fab" type="button" data-snav-open aria-label="Open contents">☰ Contents</button>
+</main>
+<footer class="foot">
+  <div class="foot__grid">
+    <div class="foot__block">
+      <h3 class="label">The Material</h3>
+      <p>Written by <strong>Rohit Ghumare</strong>, licensed <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. Every word is theirs — only the reading experience is new.</p>
+      <a class="foot__link" href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Original repository ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">This Edition</h3>
+      <p>A static, 3D-flavoured brutalist reader: offline-friendly, no trackers, no paywall, keyboard-first.</p>
+      <a class="foot__link" href="https://github.com/RaghavGanesh7/ai-engineering-from-scratch-3d" target="_blank" rel="noopener">Source for this site ↗</a>
+    </div>
+    <div class="foot__block">
+      <h3 class="label">Keys</h3>
+      <ul class="keylist">
+        <li><kbd>⌘K</kbd> search</li>
+        <li><kbd>[</kbd> <kbd>]</kbd> prev / next</li>
+        <li><kbd>c</kbd> contents</li>
+        <li><kbd>t</kbd> theme</li>
+        <li><kbd>?</kbd> all shortcuts</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__base">
+    <span>© Rohit Ghumare — text</span>
+    <span class="foot__dot">◆</span>
+    <span>Free to read, forever</span>
+    <span class="foot__dot">◆</span>
+    <button class="foot__reset" type="button" data-reset-progress>Reset my progress</button>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search__scrim" data-search-close></div>
+  <div class="search__panel" role="dialog" aria-modal="true" aria-label="Search the modules">
+    <div class="search__head">
+      <span class="search__icon">⌕</span>
+      <input class="search__input" type="search" placeholder="Search every lesson…" aria-label="Search" data-search-input autocomplete="off" spellcheck="false">
+      <button class="btn btn--sm" type="button" data-search-close>ESC</button>
+    </div>
+    <div class="search__body" data-search-results>
+      <p class="search__hint">Type at least two characters. Results are ranked by heading, then by body text.</p>
+    </div>
+  </div>
+</div>
+<div class="sheet" data-sheet hidden>
+  <div class="search__scrim" data-sheet-close></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <h2 class="sheet__title">Keyboard</h2>
+    <dl class="sheet__list">
+      <dt><kbd>⌘K</kbd> / <kbd>/</kbd></dt><dd>Open search</dd>
+      <dt><kbd>]</kbd></dt><dd>Next lesson</dd>
+      <dt><kbd>[</kbd></dt><dd>Previous lesson</dd>
+      <dt><kbd>c</kbd></dt><dd>Toggle lesson contents</dd>
+      <dt><kbd>m</kbd></dt><dd>Mark lesson read / unread</dd>
+      <dt><kbd>t</kbd></dt><dd>Light / dark</dd>
+      <dt><kbd>g</kbd> then <kbd>h</kbd></dt><dd>Go home</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close anything</dd>
+    </dl>
+    <button class="btn" type="button" data-sheet-close>Got it</button>
+  </div>
+</div>
+<script src="../assets/app.js" defer></script>
+<script src="../assets/figures/lesson-figures.js" defer></script>
+
+</body>
+</html>
